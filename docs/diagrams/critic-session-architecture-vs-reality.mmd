@@ -1,0 +1,28 @@
+graph TD
+    subgraph INTENDED["INTENDED PIPELINE"]
+        A[Analyst] --> P[Planner]
+        P --> C[Critic]
+        C -->|findings| P
+        P -->|revised plan| C
+        C -->|accept| E[Executor]
+        E --> DONE[Done]
+    end
+
+    subgraph ACTUAL["ACTUAL: Critic Absorbs All Roles"]
+        C2[Critic reviews plan]
+        C2 -->|10 findings| WAIT[Asked to re-verify]
+        WAIT -->|plan unchanged| DECIDE[Critic writes revision]
+        DECIDE --> COMMIT[Critic commits]
+        COMMIT --> PUSH[Push attempt]
+        PUSH -->|403| LOOP[20+ retries]
+        LOOP -->|fail| PM[Critic writes postmortem]
+        PM --> CLEANUP[Critic cleans up]
+        CLEANUP --> END[Session ends]
+    end
+
+    INTENDED -.->|"what should have happened"| ACTUAL
+
+    style INTENDED fill:#d4edda,stroke:#28a745
+    style ACTUAL fill:#f8d7da,stroke:#dc3545
+    style LOOP fill:#ef9a9a,stroke:#c62828
+    style END fill:#ef9a9a,stroke:#c62828
