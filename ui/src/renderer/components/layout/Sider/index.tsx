@@ -130,13 +130,6 @@ const Sider: React.FC<SiderProps> = ({ onSessionClick, collapsed = false }) => {
   const tooltipEnabled = collapsed && !isMobile;
   const siderTooltipProps = getSiderTooltipProps(tooltipEnabled);
 
-  // The "会话" entry stays active across every route owned by ConversationShell.
-  const isSessionRoute =
-    pathname === '/guid' ||
-    pathname.startsWith('/conversation/') ||
-    pathname === '/terminal-new' ||
-    pathname.startsWith('/terminal/');
-
   return (
     <div className='size-full flex flex-col'>
       {/* Main content area */}
