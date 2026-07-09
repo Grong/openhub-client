@@ -309,6 +309,8 @@ export type I18nKey =
   | 'common.siderSection.automation'
   | 'common.siderSection.common'
   | 'common.siderSection.data'
+  | 'common.siderSection.plugins'
+  | 'common.siderSection.project'
   | 'common.siderSection.publicService'
   | 'common.siderSection.settings'
   | 'common.siderSection.tools'
