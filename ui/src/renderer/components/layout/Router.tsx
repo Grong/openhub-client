@@ -34,6 +34,7 @@ const PluginsPage = React.lazy(() => import('@renderer/pages/plugins'));
 const WorkshopCanvasPage = React.lazy(() => import('@renderer/pages/workshop/CanvasPage'));
 const AssetLibraryPage = React.lazy(() => import('@renderer/pages/assets'));
 const CompanionPage = React.lazy(() => import('@renderer/pages/companion'));
+const OnboardingWizard = React.lazy(() => import('@renderer/pages/onboarding'));
 const ConversationShell = React.lazy(() => import('@renderer/pages/conversation/components/ConversationShell'));
 
 const withRouteFallback = (Component: React.LazyExoticComponent<React.ComponentType>) => (
@@ -84,6 +85,7 @@ const getHashRouteRedirectUrl = () => {
 
 const ProtectedLayout: React.FC<{ layout: React.ReactElement }> = ({ layout }) => {
   const { status } = useAuth();
+  const location = useLocation();
 
   if (status === 'checking') {
     return <AppLoader />;
@@ -91,6 +93,15 @@ const ProtectedLayout: React.FC<{ layout: React.ReactElement }> = ({ layout }) =
 
   if (status !== 'authenticated') {
     return <Navigate to='/login' replace />;
+  }
+
+  // Show onboarding wizard on first launch unless skipped.
+  if (
+    !location.pathname.startsWith('/onboarding') &&
+    typeof localStorage !== 'undefined' &&
+    localStorage.getItem('nomifun_onboarding_skipped') !== 'true'
+  ) {
+    return <Navigate to='/onboarding' replace />;
   }
 
   return (
@@ -157,6 +168,7 @@ const PanelRoute: React.FC<{ layout: React.ReactElement }> = ({ layout }) => {
   return (
     <HashRouter>
       <Routes>
+        <Route path='/onboarding' element={withRouteFallback(OnboardingWizard)} />
         <Route
           path='/login'
           element={status === 'authenticated' ? <Navigate to='/guid' replace /> : withRouteFallback(LoginPage)}
