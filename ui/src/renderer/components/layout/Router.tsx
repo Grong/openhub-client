@@ -30,6 +30,7 @@ const PublicAgentDetailPage = React.lazy(() => import('@renderer/pages/publicCom
 const KnowledgeListPage = React.lazy(() => import('@renderer/pages/knowledge/KnowledgeListPage'));
 const KnowledgeDetailPage = React.lazy(() => import('@renderer/pages/knowledge/KnowledgeDetailPage'));
 const WorkshopListPage = React.lazy(() => import('@renderer/pages/workshop'));
+const PluginsPage = React.lazy(() => import('@renderer/pages/plugins'));
 const WorkshopCanvasPage = React.lazy(() => import('@renderer/pages/workshop/CanvasPage'));
 const AssetLibraryPage = React.lazy(() => import('@renderer/pages/assets'));
 const CompanionPage = React.lazy(() => import('@renderer/pages/companion'));
@@ -169,7 +170,7 @@ const PanelRoute: React.FC<{ layout: React.ReactElement }> = ({ layout }) => {
           <Route path='/extensions' element={<LegacyExtensionsRedirect />} />
           <Route path='/mcp' element={withRouteFallback(McpPage)} />
           <Route path='/open-capabilities' element={withRouteFallback(OpenCapabilitiesPage)} />
-          <Route path='/plugins' element={<Navigate to='/open-capabilities' replace />} />
+          <Route path='/plugins' element={withRouteFallback(PluginsPage)} />
           {/* Assistants — relocated out of Settings into a top-level homepage destination */}
           <Route path='/assistants' element={withRouteFallback(AssistantSettings)} />
           {/* Session section — the secondary sidebar (ContentSider) persists across these routes */}
