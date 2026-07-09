@@ -7,7 +7,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tooltip } from '@arco-design/web-react';
-import { Puzzle } from '@icon-park/react';
+import { AllApplication } from '@icon-park/react';
 import classNames from 'classnames';
 import type { SiderTooltipProps } from '@renderer/utils/ui/siderTooltip';
 
@@ -34,7 +34,7 @@ const SiderPluginEntry: React.FC<SiderPluginEntryProps> = ({ isMobile, isActive,
           )}
           onClick={onClick}
         >
-          <Puzzle
+          <AllApplication
             theme='outline'
             size='20'
             fill='currentColor'
@@ -57,7 +57,7 @@ const SiderPluginEntry: React.FC<SiderPluginEntryProps> = ({ isMobile, isActive,
         onClick={onClick}
       >
         <span className='size-22px flex items-center justify-center shrink-0'>
-          <Puzzle
+          <AllApplication
             theme='outline'
             size='16'
             fill='currentColor'

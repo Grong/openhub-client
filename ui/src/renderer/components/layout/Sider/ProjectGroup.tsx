@@ -8,7 +8,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Tooltip } from '@arco-design/web-react';
-import { FolderOpen } from '@icon-park/react';
+import { Folder } from '@icon-park/react';
 import classNames from 'classnames';
 import type { SiderTooltipProps } from '@renderer/utils/ui/siderTooltip';
 import {
@@ -62,7 +62,7 @@ const ProjectGroup: React.FC<ProjectGroupProps> = ({ isMobile, collapsed, siderT
                 )}
                 onClick={() => handleProjectClick(project)}
               >
-                <FolderOpen
+                <Folder
                   theme='outline'
                   size='20'
                   fill='currentColor'
@@ -84,7 +84,7 @@ const ProjectGroup: React.FC<ProjectGroupProps> = ({ isMobile, collapsed, siderT
               onClick={() => handleProjectClick(project)}
             >
               <span className='size-22px flex items-center justify-center shrink-0'>
-                <FolderOpen
+                <Folder
                   theme='outline'
                   size='16'
                   fill='currentColor'
