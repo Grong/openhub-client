@@ -1,7 +1,0 @@
-{
-  "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"git show 758178c --no-stat -p -- ui/src/renderer/components/layout/Router.tsx\",\"description\":\"Show Router diff of commit 758178c (PluginsPage commit)\"}",
-  "error": "Exit code 128\nfatal: unrecognized argument: --no-stat",
-  "timestamp": "2026-07-09T09:05:59.876Z",
-  "retry_count": 2
-}
