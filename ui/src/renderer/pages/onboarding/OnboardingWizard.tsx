@@ -24,12 +24,10 @@ const OnboardingWizard: React.FC = () => {
     }
   };
 
-  const handleSkip = () => {
-    localStorage.setItem(ONBOARDING_SKIPPED_KEY, 'true');
-    finish();
-  };
+  const handleSkip = () => finish();
 
   const finish = () => {
+    localStorage.setItem(ONBOARDING_SKIPPED_KEY, 'true');
     navigate('/guid');
   };
 

@@ -1,0 +1,488 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1783480578008,
+  "projectRoot": "/Users/chenguorong/code/github/nomifun-tauri",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
+      {
+        "name": "Rust",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "Cargo.toml"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "axum",
+        "version": null,
+        "category": "backend"
+      }
+    ],
+    "packageManager": "cargo",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": "npm run build",
+    "testCommand": "npm test",
+    "lintCommand": "cargo clippy",
+    "devCommand": "npm run dev",
+    "scripts": {
+      "dev": "bun scripts/prune-build.mjs && bun scripts/free-ports.mjs 5173 && bun scripts/kill-stale-dev.mjs && bun scripts/ensure-ui-dist.mjs && NOMI_CHANNEL=dev tauri dev --config apps/desktop/tauri.conf.json --config apps/desktop/tauri.dev.conf.json",
+      "dev:web": "bun scripts/prune-build.mjs && bun scripts/free-ports.mjs 5173 8787 && concurrently -k -n api,ui -c blue,magenta \"cargo run -p nomifun-web -- --port 8787 --dist ui/dist --insecure-no-auth\" \"bun run --filter=./ui dev:web\"",
+      "dev:ui": "bun run --filter=./ui dev",
+      "build": "CI=true tauri build --config apps/desktop/tauri.conf.json && bun scripts/prune-build.mjs --post",
+      "build:mac": "bash scripts/desktop-build-mac.sh",
+      "build:win": "bun scripts/run-win-build.mjs",
+      "build:linux": "bash scripts/desktop-build-linux.sh",
+      "build:signed": "bash scripts/desktop-build-signed.sh",
+      "build:updater": "CI=true tauri build --config apps/desktop/tauri.conf.json --config '{\"bundle\":{\"createUpdaterArtifacts\":true}}' && bun scripts/prune-build.mjs --post",
+      "make:latest": "bun scripts/make-latest-json.mjs",
+      "release:mac": "bun scripts/run-mac-release.mjs",
+      "release:win": "bun scripts/run-win-release.mjs",
+      "build:ui": "bun run --filter=./ui build",
+      "serve:web": "bun scripts/prune-build.mjs && bun scripts/free-ports.mjs 8787 && cargo run -p nomifun-web",
+      "test": "bun scripts/prune-build.mjs && cargo test",
+      "test:fast": "bun scripts/prune-build.mjs && cargo nextest run",
+      "check": "bun run typecheck && bun run check:i18n && bun run check:theme && bun run check:icons && bun run help --check",
+      "typecheck": "bun run --filter=./ui typecheck",
+      "check:i18n": "bun scripts/generate-i18n-types.mjs --check",
+      "check:theme": "bun scripts/check-theme-contract.mjs",
+      "check:icons": "bun scripts/check-icon-imports.mjs",
+      "fmt": "cargo fmt",
+      "fmt:check": "cargo fmt --check",
+      "gen:i18n": "bun scripts/generate-i18n-types.mjs",
+      "clean": "bun scripts/prune-build.mjs --release",
+      "seed:dev": "bun scripts/seed-dev-from-prod.mjs",
+      "bump": "bun scripts/bump-version.mjs",
+      "help": "bun scripts/help.mjs"
+    }
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": true,
+    "workspaces": [
+      "ui"
+    ],
+    "mainDirectories": [
+      "docs",
+      "scripts"
+    ],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "apps": {
+      "path": "apps",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1783480577899,
+      "keyFiles": []
+    },
+    "build.noindex": {
+      "path": "build.noindex",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1783480577900,
+      "keyFiles": [
+        "CACHEDIR.TAG"
+      ]
+    },
+    "crates": {
+      "path": "crates",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1783480577973,
+      "keyFiles": []
+    },
+    "docs": {
+      "path": "docs",
+      "purpose": "Documentation",
+      "fileCount": 2,
+      "lastAccessed": 1783480577974,
+      "keyFiles": [
+        "README.md",
+        "README.zh.md"
+      ]
+    },
+    "packaging": {
+      "path": "packaging",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1783480577975,
+      "keyFiles": []
+    },
+    "scripts": {
+      "path": "scripts",
+      "purpose": "Build/utility scripts",
+      "fileCount": 24,
+      "lastAccessed": 1783480577978,
+      "keyFiles": [
+        "bump-version.mjs",
+        "check-icon-imports.mjs",
+        "check-theme-contract.mjs",
+        "desktop-build-linux.sh",
+        "desktop-build-mac.sh"
+      ]
+    },
+    "target": {
+      "path": "target",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1783480577978,
+      "keyFiles": [
+        "CACHEDIR.TAG"
+      ]
+    },
+    "ui": {
+      "path": "ui",
+      "purpose": null,
+      "fileCount": 7,
+      "lastAccessed": 1783480577978,
+      "keyFiles": [
+        "_shot_analyze.py",
+        "bun.lock",
+        "index.html",
+        "package.json",
+        "tsconfig.json"
+      ]
+    },
+    "ui/public": {
+      "path": "ui/public",
+      "purpose": "Public files",
+      "fileCount": 2,
+      "lastAccessed": 1783480577988,
+      "keyFiles": [
+        "manifest.webmanifest",
+        "sw.js"
+      ]
+    },
+    "ui/src": {
+      "path": "ui/src",
+      "purpose": "Source code",
+      "fileCount": 0,
+      "lastAccessed": 1783480577988,
+      "keyFiles": []
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "docs/superpowers/specs/2026-07-08-ui-simplification-design.md",
+      "accessCount": 26,
+      "lastAccessed": 1783587542738,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/components/layout/Sider/index.tsx",
+      "accessCount": 24,
+      "lastAccessed": 1783588684740,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/components/layout/Router.tsx",
+      "accessCount": 24,
+      "lastAccessed": 1783588719879,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/pages/settings/ExtensionSettingsPage.tsx",
+      "accessCount": 9,
+      "lastAccessed": 1783588640092,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/components/layout/Sider/SiderNav/index.ts",
+      "accessCount": 8,
+      "lastAccessed": 1783587543751,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/components/layout/Sider/SiderNav/SiderPluginEntry.tsx",
+      "accessCount": 7,
+      "lastAccessed": 1783587543247,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/components/layout/Sider/ProjectGroup.tsx",
+      "accessCount": 7,
+      "lastAccessed": 1783588091158,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/pages/conversation/SessionList/utils/projectWorkpaths.ts",
+      "accessCount": 6,
+      "lastAccessed": 1783587558019,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/components/layout/Sider/SiderNav/SiderNewConversationEntry.tsx",
+      "accessCount": 5,
+      "lastAccessed": 1783587969736,
+      "type": "file"
+    },
+    {
+      "path": ".superpowers/sdd/task-1-brief.md",
+      "accessCount": 4,
+      "lastAccessed": 1783585378448,
+      "type": "file"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-07-08-ui-simplification.md",
+      "accessCount": 4,
+      "lastAccessed": 1783587543966,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/components/layout/Sider/SiderNav/SiderKnowledgeEntry.tsx",
+      "accessCount": 4,
+      "lastAccessed": 1783587557051,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/components/layout/Sider/SiderNav/SiderSectionHeader.tsx",
+      "accessCount": 4,
+      "lastAccessed": 1783587570132,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/components/layout/Sider/SiderNav/SiderConversationEntry.tsx",
+      "accessCount": 4,
+      "lastAccessed": 1783587974669,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/pages/settings/components/SettingsSider.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1783583729728,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/components/layout/Sider/SiderNav/SiderMcpEntry.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1783584227354,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/components/layout/Sider/SiderFooter.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1783586451782,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/hooks/projectWorkpaths.ts",
+      "accessCount": 3,
+      "lastAccessed": 1783587544525,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/pages/mcp/index.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1783587821517,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/components/layout/Sider/SiderNav/ConversationSiderActions.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1783583993616,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/components/layout/Sider/SiderNav/SiderSearchEntry.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1783584053394,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/components/layout/Sider/SiderNav/SiderModelHubEntry.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1783584056947,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/pages/conversation/components/ConversationShell/index.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1783584319846,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/components/layout/Sider/SiderItem.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1783587557526,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/services/i18n/locales/zh-CN/common.json",
+      "accessCount": 2,
+      "lastAccessed": 1783587559115,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/services/i18n/locales/en-US/common.json",
+      "accessCount": 2,
+      "lastAccessed": 1783587559588,
+      "type": "file"
+    },
+    {
+      "path": "README.md",
+      "accessCount": 1,
+      "lastAccessed": 1783480634815,
+      "type": "file"
+    },
+    {
+      "path": "package.json",
+      "accessCount": 1,
+      "lastAccessed": 1783480634880,
+      "type": "file"
+    },
+    {
+      "path": "docs/architecture/overview.md",
+      "accessCount": 1,
+      "lastAccessed": 1783480652914,
+      "type": "file"
+    },
+    {
+      "path": "docs/architecture/backend-crates.md",
+      "accessCount": 1,
+      "lastAccessed": 1783480662124,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/components/workspace/WorkspaceFolderSelect.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1783484168177,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/pages/settings/AssistantSettings/index.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1783484433301,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/pages/workshop/index.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1783484436764,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/pages/requirements/RequirementsLayout/index.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1783484437346,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/pages/nomi/index.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1783484437836,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/pages/conversation/components/ConversationShell/SessionCreateBar.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1783484441538,
+      "type": "file"
+    },
+    {
+      "path": "docs/lessons/2026-07-08-critic-session.md",
+      "accessCount": 1,
+      "lastAccessed": 1783488324323,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/components/layout/Sider/SiderNav/SiderWorkshopEntry.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1783583994074,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/pages/conversation/SessionList/hooks/useWorkpathBranches.ts",
+      "accessCount": 1,
+      "lastAccessed": 1783584045304,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/pages/conversation/SessionList/hooks/useWorkpathUiState.ts",
+      "accessCount": 1,
+      "lastAccessed": 1783584046587,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/pages/conversation/SessionList/hooks/useWorkpathKnowledge.ts",
+      "accessCount": 1,
+      "lastAccessed": 1783584046965,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/components/layout/Sider/SiderNav/SiderNomiEntry.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1783584051978,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/components/layout/Sider/SiderNav/SiderAssetLibraryEntry.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1783584053207,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/components/layout/Sider/SiderNav/SiderAssistantSkillsEntry.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1783584061546,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/components/layout/Sider/SiderNav/SiderOpenCapabilitiesEntry.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1783584061781,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/components/layout/Sider/SiderNav/SiderPublicServiceEntry.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1783584063231,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/components/layout/Sider/SiderNav/SiderRequirementsEntry.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1783584063363,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/components/layout/Sider/SiderNav/SiderScheduledEntry.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1783584063748,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/pages/conversation/SessionList/utils/workpathKey.ts",
+      "accessCount": 1,
+      "lastAccessed": 1783584271114,
+      "type": "file"
+    },
+    {
+      "path": "ui/src/renderer/pages/conversation/SessionList/index.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1783584325676,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}

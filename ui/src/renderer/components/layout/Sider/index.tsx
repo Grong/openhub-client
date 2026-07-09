@@ -22,7 +22,6 @@ import {
 } from './SiderNav';
 import SiderFooter from './SiderFooter';
 import ProjectGroup from './ProjectGroup';
-import { useProjectWorkPaths } from '@renderer/hooks/projectWorkpaths';
 
 const SettingsSider = React.lazy(() => import('@renderer/pages/settings/components/SettingsSider'));
 
