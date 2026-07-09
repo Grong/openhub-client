@@ -5,7 +5,9 @@
     "data": "数据空间",
     "automation": "自动化",
     "tools": "增强工具",
-    "settings": "设置"
+    "settings": "设置",
+    "plugins": "插件",
+    "project": "项目"
   },
   "send": "发送",
   "cancel": "取消",

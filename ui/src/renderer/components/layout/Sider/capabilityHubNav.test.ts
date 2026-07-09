@@ -24,21 +24,20 @@ describe('capability hub navigation', () => {
     expect(enSettings.openCapabilities.railTitle).toBe('Remote & Open');
   });
 
-  test('groups assistants and skills together and keeps MCP in enhanced tools', () => {
+  test('groups assistants, skills, and MCP into unified Plugins entry', () => {
     const siderSource = readSource(new URL('./index.tsx', import.meta.url));
 
-    expect(siderSource.includes('SiderAssistantSkillsEntry')).toBe(true);
-    expect(siderSource.includes("navTo('/assistants?tab=assistants')")).toBe(true);
-    expect(siderSource.includes('SiderMcpEntry')).toBe(true);
-    expect(siderSource.includes("navTo('/mcp')")).toBe(true);
-    expect(siderSource.includes("pathname.startsWith('/mcp')")).toBe(true);
-    expect(siderSource.includes('SiderOpenCapabilitiesEntry')).toBe(true);
-    expect(siderSource.includes("navTo('/open-capabilities')")).toBe(true);
-    expect(siderSource.includes("pathname.startsWith('/open-capabilities')")).toBe(true);
-    expect(siderSource.includes("pathname.startsWith('/open-capabilities') || pathname.startsWith('/mcp')")).toBe(false);
-
-    expect(siderSource.includes('SiderExtensionsEntry')).toBe(false);
-    expect(siderSource.includes('SiderAssistantsEntry')).toBe(false);
+    expect(siderSource.includes('SiderPluginEntry')).toBe(true);
+    expect(siderSource.includes("navTo('/plugins')")).toBe(true);
+    expect(siderSource.includes("pathname.startsWith('/plugins')")).toBe(true);
+    expect(siderSource.includes('SiderAssistantSkillsEntry')).toBe(false);
+    expect(siderSource.includes("navTo('/assistants?tab=assistants')")).toBe(false);
+    expect(siderSource.includes('SiderMcpEntry')).toBe(false);
+    expect(siderSource.includes("navTo('/mcp')")).toBe(false);
+    expect(siderSource.includes("pathname.startsWith('/mcp')")).toBe(false);
+    expect(siderSource.includes('SiderOpenCapabilitiesEntry')).toBe(false);
+    expect(siderSource.includes("navTo('/open-capabilities')")).toBe(false);
+    expect(siderSource.includes("pathname.startsWith('/open-capabilities')")).toBe(false);
   });
 
   test('routes Open Capabilities and preserves MCP legacy destinations', () => {

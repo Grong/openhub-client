@@ -14,21 +14,15 @@ import { blurActiveElement } from '@renderer/utils/ui/focus';
 import { isDesktopShell } from '@renderer/utils/platform';
 import { useKnowledgeInboxPending } from '@renderer/pages/knowledge/useKnowledge';
 import {
-  SiderAssetLibraryEntry,
-  SiderAssistantSkillsEntry,
   SiderConversationEntry,
   SiderKnowledgeEntry,
-  SiderMcpEntry,
   SiderModelHubEntry,
-  SiderNomiEntry,
-  SiderOpenCapabilitiesEntry,
-  SiderPublicServiceEntry,
-  SiderRequirementsEntry,
-  SiderScheduledEntry,
+  SiderPluginEntry,
   SiderSectionHeader,
-  SiderWorkshopEntry,
 } from './SiderNav';
 import SiderFooter from './SiderFooter';
+import ProjectGroup from './ProjectGroup';
+import { useProjectWorkPaths } from '@renderer/hooks/projectWorkpaths';
 
 const SettingsSider = React.lazy(() => import('@renderer/pages/settings/components/SettingsSider'));
 
@@ -40,14 +34,9 @@ interface SiderProps {
 /**
  * Sider — the app-level primary navigation rail.
  *
- * Slimmed down to a pure capability rail: the conversation/terminal session
- * list, the create switches, and full-text search were lifted out into the
- * content-area secondary sidebar (`ConversationShell` / `ContentSider`),
- * reached via the "会话" entry. The rail holds top-level destinations grouped
- * by small-text section headers (`SiderSectionHeader`): 常用 (会话 / 桌面伙伴),
- * 对外服务 (对外伙伴), 数据空间 (知识库), 自动化 (定时任务 / 需求平台),
- * 增强工具 (助手&Skill / MCP), and a bottom-pinned 设置 group
- * (模型&Agent + the footer).
+ * Simplified to 5 core entries: Conversation, Knowledge, Plugins (unified
+ * MCP + Skill + Extension), dynamic Project group, and a bottom-pinned
+ * Settings group (ModelHub + footer).
  */
 const Sider: React.FC<SiderProps> = ({ onSessionClick, collapsed = false }) => {
   const { t } = useTranslation();
@@ -86,16 +75,8 @@ const Sider: React.FC<SiderProps> = ({ onSessionClick, collapsed = false }) => {
   );
 
   const handleConversationClick = () => navTo('/guid');
-  const handleScheduledClick = () => navTo('/scheduled');
-  const handleRequirementsClick = () => navTo('/requirements');
   const handleKnowledgeClick = () => navTo('/knowledge');
-  const handleAssetLibraryClick = () => navTo('/assets');
-  const handleNomiClick = () => navTo('/nomi');
-  const handleWorkshopClick = () => navTo('/workshop');
-  const handlePublicServiceClick = () => navTo('/public-companions');
-  const handleAssistantSkillsClick = () => navTo('/assistants?tab=assistants');
-  const handleMcpClick = () => navTo('/mcp');
-  const handleOpenCapabilitiesClick = () => navTo('/open-capabilities');
+  const handlePluginsClick = () => navTo('/plugins');
   const handleModelHubClick = () => navTo('/models');
 
   const handleSettingsClick = () => {
@@ -166,9 +147,7 @@ const Sider: React.FC<SiderProps> = ({ onSessionClick, collapsed = false }) => {
           </Suspense>
         ) : (
           <div className='size-full flex flex-col gap-2px'>
-            {/* 常用 — high-frequency primary destinations */}
-            <SiderSectionHeader label={t('common.siderSection.common')} collapsed={collapsed} />
-            {/* Conversations — opens the session secondary sidebar (ContentSider) */}
+            {/* + 新建对话 */}
             <SiderConversationEntry
               isMobile={isMobile}
               isActive={isSessionRoute}
@@ -176,35 +155,7 @@ const Sider: React.FC<SiderProps> = ({ onSessionClick, collapsed = false }) => {
               siderTooltipProps={siderTooltipProps}
               onClick={handleConversationClick}
             />
-            {/* Work partner (桌面伙伴) */}
-            <SiderNomiEntry
-              isMobile={isMobile}
-              isActive={pathname.startsWith('/nomi')}
-              collapsed={collapsed}
-              siderTooltipProps={siderTooltipProps}
-              onClick={handleNomiClick}
-            />
-            {/* Creative Workshop (创意工坊) — infinite-canvas AI creation surface */}
-            <SiderWorkshopEntry
-              isMobile={isMobile}
-              isActive={pathname.startsWith('/workshop')}
-              collapsed={collapsed}
-              siderTooltipProps={siderTooltipProps}
-              onClick={handleWorkshopClick}
-            />
-            {/* 对外服务 — public-facing customer-service agents (对外伙伴), a domain
-                fully separate from the desktop-companion group above. */}
-            <SiderSectionHeader label={t('common.siderSection.publicService')} collapsed={collapsed} />
-            <SiderPublicServiceEntry
-              isMobile={isMobile}
-              isActive={pathname.startsWith('/public-companions')}
-              collapsed={collapsed}
-              siderTooltipProps={siderTooltipProps}
-              onClick={handlePublicServiceClick}
-            />
-            {/* 数据空间 — data & storage (文件管理 reserved for later) */}
-            <SiderSectionHeader label={t('common.siderSection.data')} collapsed={collapsed} />
-            {/* Knowledge base */}
+            {/* 知识库 */}
             <SiderKnowledgeEntry
               isMobile={isMobile}
               isActive={pathname.startsWith('/knowledge')}
@@ -213,54 +164,25 @@ const Sider: React.FC<SiderProps> = ({ onSessionClick, collapsed = false }) => {
               onClick={handleKnowledgeClick}
               dot={pendingInboxCount > 0}
             />
-            {/* Asset library — unified management of creative-workshop assets */}
-            <SiderAssetLibraryEntry
+            {/* 插件 — 统一 MCP + Skill + Extension */}
+            <SiderPluginEntry
               isMobile={isMobile}
-              isActive={pathname.startsWith('/assets')}
+              isActive={pathname.startsWith('/plugins')}
               collapsed={collapsed}
               siderTooltipProps={siderTooltipProps}
-              onClick={handleAssetLibraryClick}
+              onClick={handlePluginsClick}
             />
-            {/* 自动化 — automation platforms */}
-            <SiderSectionHeader label={t('common.siderSection.automation')} collapsed={collapsed} />
-            {/* Scheduled tasks */}
-            <SiderScheduledEntry
+
+            {/* 项目 — 动态分组 */}
+            <ProjectGroup
               isMobile={isMobile}
-              isActive={pathname === '/scheduled'}
               collapsed={collapsed}
               siderTooltipProps={siderTooltipProps}
-              onClick={handleScheduledClick}
-            />
-            {/* Requirements platform */}
-            <SiderRequirementsEntry
-              isMobile={isMobile}
-              isActive={pathname.startsWith('/requirements')}
-              collapsed={collapsed}
-              siderTooltipProps={siderTooltipProps}
-              onClick={handleRequirementsClick}
-            />
-            {/* 增强工具 — extension capabilities */}
-            <SiderSectionHeader label={t('common.siderSection.tools')} collapsed={collapsed} />
-            {/* Assistant & Skill — assistant presets plus reusable skill packages */}
-            <SiderAssistantSkillsEntry
-              isMobile={isMobile}
-              isActive={pathname.startsWith('/assistants')}
-              collapsed={collapsed}
-              siderTooltipProps={siderTooltipProps}
-              onClick={handleAssistantSkillsClick}
-            />
-            {/* MCP — MCP tool server configuration */}
-            <SiderMcpEntry
-              isMobile={isMobile}
-              isActive={pathname.startsWith('/mcp')}
-              collapsed={collapsed}
-              siderTooltipProps={siderTooltipProps}
-              onClick={handleMcpClick}
             />
           </div>
         )}
       </div>
-      {/* Bottom pinned group (设置) — Model & Agent and Open Capabilities sit directly above Settings */}
+      {/* Bottom pinned group (设置) — Model & Agent sits directly above Settings */}
       <div className='shrink-0 mt-auto pt-8px flex flex-col gap-2px border-t border-solid border-[var(--color-border-2)] border-l-0 border-r-0 border-b-0'>
         {/* 设置 — section label; the enclosing border-t already separates this region when collapsed */}
         <SiderSectionHeader label={t('common.siderSection.settings')} collapsed={collapsed} collapsedRule={false} />
@@ -270,13 +192,6 @@ const Sider: React.FC<SiderProps> = ({ onSessionClick, collapsed = false }) => {
           collapsed={collapsed}
           siderTooltipProps={siderTooltipProps}
           onClick={handleModelHubClick}
-        />
-        <SiderOpenCapabilitiesEntry
-          isMobile={isMobile}
-          isActive={pathname.startsWith('/open-capabilities')}
-          collapsed={collapsed}
-          siderTooltipProps={siderTooltipProps}
-          onClick={handleOpenCapabilitiesClick}
         />
         <SiderFooter
           isMobile={isMobile}
