@@ -14,9 +14,9 @@ import { blurActiveElement } from '@renderer/utils/ui/focus';
 import { isDesktopShell } from '@renderer/utils/platform';
 import { useKnowledgeInboxPending } from '@renderer/pages/knowledge/useKnowledge';
 import {
-  SiderConversationEntry,
   SiderKnowledgeEntry,
   SiderModelHubEntry,
+  SiderNewConversationEntry,
   SiderPluginEntry,
   SiderSectionHeader,
 } from './SiderNav';
@@ -74,6 +74,7 @@ const Sider: React.FC<SiderProps> = ({ onSessionClick, collapsed = false }) => {
   );
 
   const handleConversationClick = () => navTo('/guid');
+  const handleNewTerminalClick = () => navTo('/terminal-new');
   const handleKnowledgeClick = () => navTo('/knowledge');
   const handlePluginsClick = () => navTo('/plugins');
   const handleModelHubClick = () => navTo('/models');
@@ -146,13 +147,13 @@ const Sider: React.FC<SiderProps> = ({ onSessionClick, collapsed = false }) => {
           </Suspense>
         ) : (
           <div className='size-full flex flex-col gap-2px'>
-            {/* + 新建对话 */}
-            <SiderConversationEntry
+            {/* + 新建对话 / 新建终端 */}
+            <SiderNewConversationEntry
               isMobile={isMobile}
-              isActive={isSessionRoute}
               collapsed={collapsed}
               siderTooltipProps={siderTooltipProps}
               onClick={handleConversationClick}
+              onNewTerminal={handleNewTerminalClick}
             />
             {/* 知识库 */}
             <SiderKnowledgeEntry
