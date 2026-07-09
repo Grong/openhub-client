@@ -1,12 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames';
-import { ArrowCircleLeft, ArrowLeft, ArrowRight, ExpandLeft, ExpandRight, Plus, Terminal } from '@icon-park/react';
+import { ArrowCircleLeft, ArrowLeft, ArrowRight, ExpandLeft, ExpandRight, ListMiddle, Plus, Terminal } from '@icon-park/react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { ipcBridge } from '@/common';
 import InstantHoverTooltip from '@renderer/components/base/InstantHoverTooltip';
 import MobileConversationBrand from './MobileConversationBrand';
+import MobileDrawer from '../MobileDrawer';
 import TitlebarLanguageMenu from './TitlebarLanguageMenu';
 import WindowControls from '../WindowControls';
 import { WORKSPACE_STATE_EVENT, dispatchWorkspaceToggleEvent } from '@renderer/utils/workspace/workspaceEvents';
@@ -69,6 +70,7 @@ const Titlebar: React.FC<TitlebarProps> = ({ workspaceAvailable }) => {
   const [sessionSiderCollapsed, setSessionSiderCollapsed] = useState(false);
   const [mobileCenterTitle, setMobileCenterTitle] = useState(appTitle);
   const [mobileCenterOffset, setMobileCenterOffset] = useState(0);
+  const [drawerVisible, setDrawerVisible] = useState(false);
   const layout = useLayoutContext();
   const navigationHistory = useNavigationHistory();
   const location = useLocation();
@@ -308,6 +310,14 @@ const Titlebar: React.FC<TitlebarProps> = ({ workspaceAvailable }) => {
       })}
     >
       <div ref={menuRef} className='app-titlebar__menu' style={menuStyle}>
+        {layout?.isMobile && (
+          renderIconButton({
+            tooltip: t('common.menu', { defaultValue: '菜单' }),
+            className: 'app-titlebar__button app-titlebar__button--mobile',
+            onClick: () => setDrawerVisible(true),
+            children: <ListMiddle theme='outline' size={iconSize} fill='currentColor' />,
+          })
+        )}
         {showBackToChatButton && (
           renderIconButton({
             tooltip: backToChatTooltip,
@@ -409,6 +419,7 @@ const Titlebar: React.FC<TitlebarProps> = ({ workspaceAvailable }) => {
         )}
         {showWindowControls && <WindowControls />}
       </div>
+      <MobileDrawer visible={drawerVisible} onClose={() => setDrawerVisible(false)} />
     </div>
   );
 };
