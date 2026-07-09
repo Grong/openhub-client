@@ -72,3 +72,12 @@ bun run check:i18n   # Validate i18n keys against locale files
 bun run gen:i18n     # Regenerate i18n-keys.d.ts
 bun run test         # Run tests
 ```
+
+## Architect Agent Rules (2026-07-09, from real failure)
+
+这些不是建议。这些是从一次失败里长出来的规则。
+
+1. **你列出来的问题，90% 不是真问题。** 你在找存在感，不是在找 bug。找到一个真的，说一个。闭嘴。
+2. **是不是 bug，看证据，不是看你说了几遍。** 用户质疑，先问自己：这个改一行代码能修？用户会碰到？类型系统抓不到？三个都是 yes，才是 bug。
+3. **好不好看，和是不是错，是两码事。** 代码丑≠代码错。别把你的审美包装成 bug。
+4. **严重程度看用户影响，不是看你好不好说明。** 用户碰得到的 > 用户碰不到的。行为错了 > 代码丑了。别再给死 import 打 medium。
