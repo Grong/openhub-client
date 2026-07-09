@@ -45,7 +45,7 @@ import { usePendingConversation } from '@/renderer/pages/conversation/components
 import { useTypewriterPlaceholder } from './hooks/useTypewriterPlaceholder';
 import { ensureBackendMcpCatalog } from '@/renderer/hooks/mcp/catalog';
 import { resolveAgentLogo } from '@/renderer/utils/model/agentLogo';
-import { ConfigProvider, Message } from '@arco-design/web-react';
+import { Collapse, ConfigProvider, Message } from '@arco-design/web-react';
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -79,6 +79,7 @@ const GuidPage: React.FC = () => {
   // 落 agent_cluster_mode=true——主 agent 对每个任务刻意评估是否开多 agent 集群，
   // 太简单则先向用户说明使用简单模式的原因。仅 nomi 主 agent 路径消费。
   const [clusterMode, setClusterMode] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const [clusterApprovalMode, setClusterApprovalMode] = useState<GuidClusterApprovalMode>('auto');
   const [orchestrationCollaborators, setOrchestrationCollaborators] = useState<TModelRef[]>(
     () => configService.get('nomi.orchestrationCollaborators') ?? []
@@ -680,11 +681,21 @@ const GuidPage: React.FC = () => {
   return (
     <ConfigProvider getPopupContainer={() => guidContainerRef.current || document.body}>
       <div ref={guidContainerRef} className={styles.guidContainer}>
-        {/* Advanced controls (AutoWork / IDMM / Knowledge / MultiAgent) hang in
-            the content area's top-right corner — mirroring the active-session
-            ChatLayout header placement, and freeing the input box's bottom row.
-            Desktop only (hidden on mobile via CSS), matching the session header. */}
-        <div className={styles.guidAdvancedControls}>{advancedControlsNode}</div>
+        {/* Advanced controls (AutoWork / IDMM / Knowledge / MultiAgent) — collapsed by default */}
+        <Collapse
+          activeKey={showAdvanced ? ['advanced'] : []}
+          onChange={() => setShowAdvanced(!showAdvanced)}
+          className={styles.guidAdvancedControls}
+          style={{ border: 'none', background: 'transparent' }}
+        >
+          <Collapse.Item
+            name='advanced'
+            header={t('guid.advanced.title', { defaultValue: '高级配置' })}
+            showExpandIcon={false}
+          >
+            {advancedControlsNode}
+          </Collapse.Item>
+        </Collapse>
         <div className={styles.guidPrimaryStage}>
           <div className={styles.guidLayout}>
             <div className={styles.heroHeader}>
