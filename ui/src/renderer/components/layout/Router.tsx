@@ -169,6 +169,7 @@ const PanelRoute: React.FC<{ layout: React.ReactElement }> = ({ layout }) => {
           <Route path='/extensions' element={<LegacyExtensionsRedirect />} />
           <Route path='/mcp' element={withRouteFallback(McpPage)} />
           <Route path='/open-capabilities' element={withRouteFallback(OpenCapabilitiesPage)} />
+          <Route path='/plugins' element={<Navigate to='/open-capabilities' replace />} />
           {/* Assistants — relocated out of Settings into a top-level homepage destination */}
           <Route path='/assistants' element={withRouteFallback(AssistantSettings)} />
           {/* Session section — the secondary sidebar (ContentSider) persists across these routes */}
