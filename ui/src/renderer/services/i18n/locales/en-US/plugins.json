@@ -1,0 +1,9 @@
+{
+  "title": "Plugins",
+  "subtitle": "Extend your AI with plugins",
+  "recommendations": "Recommended Plugins",
+  "extensions": {
+    "empty": "No extensions installed",
+    "hint": "Click an extension to view its settings"
+  }
+}

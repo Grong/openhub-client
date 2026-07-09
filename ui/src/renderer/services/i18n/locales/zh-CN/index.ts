@@ -40,6 +40,8 @@ import workshopAssets from './workshopAssets.json';
 import workshopEditor from './workshopEditor.json';
 import workshopGeneration from './workshopGeneration.json';
 import workshopAssistant from './workshopAssistant.json';
+import plugins from './plugins.json';
+import onboarding from './onboarding.json';
 
 export default {
   common,
@@ -79,4 +81,6 @@ export default {
   workshopEditor,
   workshopGeneration,
   workshopAssistant,
+  plugins,
+  onboarding,
 };

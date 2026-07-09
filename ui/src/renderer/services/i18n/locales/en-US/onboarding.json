@@ -1,0 +1,21 @@
+{
+  "welcome": {
+    "title": "Welcome to NomiFun",
+    "subtitle": "Your AI workstation. All data stays on your computer.",
+    "start": "Start Setup",
+    "skip": "Skip, start using"
+  },
+  "apiKey": {
+    "title": "Connect Your AI Brain",
+    "placeholder": "Paste API Key",
+    "hint": "26+ providers supported. You can add or switch anytime in Settings.",
+    "next": "Next",
+    "skip": "Skip, configure later",
+    "timeout": "Verification timed out. You can configure this later in Settings."
+  },
+  "companion": {
+    "title": "Hi, I'm Nomi",
+    "desc": "I'm your AI companion. I'll chat with you, help you work, and learn to know you better over time.",
+    "start": "Start Chatting"
+  }
+}

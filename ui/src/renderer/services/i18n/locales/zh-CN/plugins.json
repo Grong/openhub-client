@@ -1,0 +1,9 @@
+{
+  "title": "插件",
+  "subtitle": "给 AI 装插件，扩展它的能力",
+  "recommendations": "推荐插件",
+  "extensions": {
+    "empty": "暂无已安装的扩展",
+    "hint": "点击扩展名称进入详细设置"
+  }
+}

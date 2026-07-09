@@ -4177,6 +4177,7 @@ export type I18nKey =
   | 'settings.weixin.step3'
   | 'settings.workDir'
   | 'settings.yoloMode'
+  | 'settings.extensions.title'
   | 'starOffice.monitor.assistPromptInstalled'
   | 'starOffice.monitor.checking'
   | 'starOffice.monitor.connectedInline'
@@ -4847,7 +4848,25 @@ export type I18nKey =
   | 'workshopGeneration.status.idle'
   | 'workshopGeneration.status.queued'
   | 'workshopGeneration.status.running'
-  | 'workshopGeneration.status.success';
+  | 'workshopGeneration.status.success'
+  | 'onboarding.welcome.title'
+  | 'onboarding.welcome.subtitle'
+  | 'onboarding.welcome.start'
+  | 'onboarding.welcome.skip'
+  | 'onboarding.apiKey.title'
+  | 'onboarding.apiKey.placeholder'
+  | 'onboarding.apiKey.hint'
+  | 'onboarding.apiKey.next'
+  | 'onboarding.apiKey.skip'
+  | 'onboarding.apiKey.timeout'
+  | 'onboarding.companion.title'
+  | 'onboarding.companion.desc'
+  | 'onboarding.companion.start'
+  | 'plugins.title'
+  | 'plugins.subtitle'
+  | 'plugins.recommendations'
+  | 'plugins.extensions.empty'
+  | 'plugins.extensions.hint';
 
 export type I18nModule =
   | 'common'
@@ -4886,4 +4905,6 @@ export type I18nModule =
   | 'workshopAssets'
   | 'workshopEditor'
   | 'workshopGeneration'
-  | 'workshopAssistant';
+  | 'workshopAssistant'
+  | 'plugins'
+  | 'onboarding';
