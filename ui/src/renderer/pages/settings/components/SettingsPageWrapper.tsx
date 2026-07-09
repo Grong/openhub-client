@@ -5,7 +5,7 @@ import { SettingsViewModeProvider } from '@/renderer/components/settings/Setting
 import { resolveExtensionAssetUrl } from '@/renderer/utils/platform';
 import { type IExtensionSettingsTab } from '@/common/adapter/ipcBridge';
 import { useExtensionSettingsTabs } from '@/renderer/hooks/system/useExtensionSettingsTabs';
-import { Computer, Earth, Info, Lightning, LinkCloud, Puzzle, Robot, Send, Speed, System } from '@icon-park/react';
+import { AlarmClock, Computer, Earth, FormatBrush, Info, Lightning, LinkCloud, Puzzle, Robot, Send, SmilingFace, Speed, System } from '@icon-park/react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useExtI18n } from '@/renderer/hooks/system/useExtI18n';
@@ -25,6 +25,10 @@ type TranslateFn = (key: string, options?: { defaultValue?: string }) => string;
 export function getBuiltinSettingsNavItems(t: TranslateFn): NavItem[] {
   const builtinMap: Record<string, NavItem> = {
     model: { id: 'model', label: t('settings.model'), icon: <LinkCloud theme='outline' size='16' />, path: 'model' },
+    companion: { id: 'companion', label: t('settings.companion', { defaultValue: '桌面伙伴' }), icon: <SmilingFace theme='outline' size='16' />, path: 'companion' },
+    requirements: { id: 'requirements', label: t('settings.requirements', { defaultValue: '需求 & 自动化' }), icon: <AlarmClock theme='outline' size='16' />, path: 'requirements' },
+    'public-service': { id: 'public-service', label: t('settings.publicService', { defaultValue: '对外伙伴' }), icon: <Earth theme='outline' size='16' />, path: 'public-service' },
+    workshop: { id: 'workshop', label: t('settings.workshop', { defaultValue: '创意工坊 & 资产库' }), icon: <FormatBrush theme='outline' size='16' />, path: 'workshop' },
     assistants: {
       id: 'assistants',
       label: t('settings.assistants', { defaultValue: 'Assistants' }),

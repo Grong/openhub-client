@@ -4,4 +4,5 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export { default, shouldShowOnboarding } from './OnboardingWizard';
+export { default } from './OnboardingWizard';
+export { ONBOARDING_SKIPPED_KEY, shouldShowOnboarding } from './constants';

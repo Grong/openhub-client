@@ -10,7 +10,7 @@ import WelcomeStep from './steps/WelcomeStep';
 import ApiKeyStep from './steps/ApiKeyStep';
 import CompanionStep from './steps/CompanionStep';
 
-const ONBOARDING_SKIPPED_KEY = 'nomifun_onboarding_skipped';
+import { ONBOARDING_SKIPPED_KEY } from "./constants";
 
 const OnboardingWizard: React.FC = () => {
   const [step, setStep] = useState(0);
@@ -55,11 +55,6 @@ const OnboardingWizard: React.FC = () => {
       </div>
     </div>
   );
-};
-
-/** Check whether the onboarding wizard should be shown. */
-export const shouldShowOnboarding = (): boolean => {
-  return localStorage.getItem(ONBOARDING_SKIPPED_KEY) !== 'true';
 };
 
 export default OnboardingWizard;

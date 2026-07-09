@@ -6,6 +6,7 @@ import { useAuth } from '@renderer/hooks/context/AuthContext';
 import { useCompanionWindowsSync } from '@renderer/hooks/useCompanionWindowsSync';
 import { useTrayLabels } from '@renderer/hooks/useTrayLabels';
 import { isTauriRuntime } from '@/common/adapter/tauriRuntime';
+import { shouldShowOnboarding } from '@renderer/pages/onboarding/constants';
 const Conversation = React.lazy(() => import('@renderer/pages/conversation'));
 const Guid = React.lazy(() => import('@renderer/pages/guid'));
 const AssistantSettings = React.lazy(() => import('@renderer/pages/settings/AssistantSettings'));
@@ -99,7 +100,7 @@ const ProtectedLayout: React.FC<{ layout: React.ReactElement }> = ({ layout }) =
   if (
     !location.pathname.startsWith('/onboarding') &&
     typeof localStorage !== 'undefined' &&
-    localStorage.getItem('nomifun_onboarding_skipped') !== 'true'
+    shouldShowOnboarding()
   ) {
     return <Navigate to='/onboarding' replace />;
   }
@@ -176,6 +177,10 @@ const PanelRoute: React.FC<{ layout: React.ReactElement }> = ({ layout }) => {
         {/* The desktop-companion window route: fullscreen transparent, no app layout/sidebar. */}
         <Route path='/companion' element={withRouteFallback(CompanionPage)} />
         <Route element={<ProtectedLayout layout={layout} />}>
+          <Route path='/settings/companion' element={<Navigate to='/nomi' replace />} />
+          <Route path='/settings/requirements' element={<Navigate to='/requirements' replace />} />
+          <Route path='/settings/public-service' element={<Navigate to='/public-companions' replace />} />
+          <Route path='/settings/workshop' element={<Navigate to='/workshop' replace />} />
           <Route index element={<Navigate to='/guid' replace />} />
           {/* Model Management, Assistant & Skill, and MCP — top-level homepage destinations */}
           <Route path='/models' element={withRouteFallback(ModelHubPage)} />
