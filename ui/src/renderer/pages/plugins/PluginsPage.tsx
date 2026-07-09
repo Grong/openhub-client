@@ -13,7 +13,7 @@ import PluginRecommendations from './PluginRecommendations';
 
 const McpPage = React.lazy(() => import('@renderer/pages/mcp'));
 const SkillsHubSettings = React.lazy(() => import('@renderer/pages/settings/SkillsHubSettings'));
-const ExtensionsTab = React.lazy(() => import('./ExtensionsTab'));
+const ExtensionSettingsPage = React.lazy(() => import('@renderer/pages/settings/ExtensionSettingsPage'));
 
 const TabPane = Tabs.TabPane;
 
@@ -54,7 +54,7 @@ const PluginsPage: React.FC = () => {
       <Suspense fallback={<AppLoader />}>
         {activeTab === 'mcp' && <McpPage />}
         {activeTab === 'skills' && <SkillsHubSettings />}
-        {activeTab === 'extensions' && <ExtensionsTab />}
+        {activeTab === 'extensions' && <ExtensionSettingsPage />}
       </Suspense>
     </HubPageShell>
   );

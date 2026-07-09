@@ -5,7 +5,7 @@
  */
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { extensions as extensionsIpc, type IExtensionSettingsTab } from '@/common/adapter/ipcBridge';
 import { useExtI18n } from '@/renderer/hooks/system/useExtI18n';
@@ -22,15 +22,18 @@ const isExternalSettingsUrl = (url?: string): boolean => /^https?:\/\//i.test(ur
  */
 const ExtensionSettingsPage: React.FC = () => {
   const { tabId } = useParams<{ tabId: string }>();
-  const { i18n } = useTranslation();
+  const navigate = useNavigate();
+  const { i18n, t } = useTranslation();
   const { resolveExtTabName } = useExtI18n();
   const extensionTabs = useExtensionSettingsTabs();
   const [loading, setLoading] = useState(true);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const { tab, error } = useMemo<{ tab: IExtensionSettingsTab | null; error: string | null }>(() => {
+    // When no tabId is provided (e.g. embedded in Plugins page), show the list
+    // view instead of an error.
     if (!tabId) {
-      return { tab: null, error: 'No tab ID provided' };
+      return { tab: null, error: null };
     }
     // While shared cache is still warming up (empty on first mount), defer
     // the "not found" error so a freshly-loaded tab list can resolve it.
@@ -120,7 +123,27 @@ const ExtensionSettingsPage: React.FC = () => {
   return (
     <SettingsPageWrapper>
       <div className='relative w-full h-full min-h-400px'>
-        {!tab && !error && (
+        {/* List view — when embedded without a specific tabId (e.g. Plugins page). */}
+        {!tabId && extensionTabs.length > 0 && (
+          <div className='flex flex-col gap-8px'>
+            {extensionTabs.map((ext) => (
+              <div
+                key={ext.id}
+                className='flex items-center gap-8px px-16px py-12px rd-8px cursor-pointer hover:bg-fill-2 transition-colors'
+                onClick={() => navigate(`/settings/ext/${ext.id}`)}
+              >
+                <span className='text-14px font-500 text-t-primary'>{ext.label}</span>
+                <span className='text-12px text-t-tertiary ml-auto'>{ext.extensionName}</span>
+              </div>
+            ))}
+          </div>
+        )}
+        {!tabId && extensionTabs.length === 0 && (
+          <div className='flex items-center justify-center h-full text-t-secondary text-14px'>
+            {t('plugins.extensions.empty', { defaultValue: '暂无已安装的扩展' })}
+          </div>
+        )}
+        {tabId && !tab && !error && (
           <div className='absolute inset-0 flex items-center justify-center text-t-secondary text-14px'>
             <span className='animate-pulse'>Loading…</span>
           </div>
