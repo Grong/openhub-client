@@ -522,7 +522,7 @@ impl AgentBootstrap {
             match McpManager::connect_all(&self.config.mcp.servers).await {
                 Ok(mgr) => {
                     let mgr = Arc::new(mgr);
-                    openhub_mcp::tool_proxy::register_mcp_tools(
+                    openhub_agent_mcp::tool_proxy::register_mcp_tools(
                         &mut registry,
                         &mgr,
                         &builtin_names,

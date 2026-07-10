@@ -13,7 +13,7 @@ use openhub_agent::requirement_tools::{RequirementCompleteTool, RequirementSink,
 use openhub_agent::cron_tools::{CronCreateTool, CronDeleteTool, CronListTool, CronSink};
 use openhub_agent::session::Session;
 use openhub_config::config::{CliArgs, Config};
-use openhub_mcp::manager::McpManager;
+use openhub_agent_mcp::manager::McpManager;
 use openhub_protocol::commands::SessionMode;
 #[cfg(feature = "browser-use")]
 use openhub_protocol::events::ToolCategory;

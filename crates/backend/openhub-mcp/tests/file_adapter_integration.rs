@@ -215,16 +215,16 @@ mod opencode {
 
 mod openhub {
     use super::*;
-    use openhub_mcp::NomiAdapter;
+    use openhub_mcp::OpenhubAdapter;
 
     #[test]
     fn source_is_openhub() {
-        assert_eq!(NomiAdapter.source(), McpSource::Nomi);
+        assert_eq!(OpenhubAdapter.source(), McpSource::Openhub);
     }
 
     #[test]
     fn trait_object_safety() {
-        let adapter: Box<dyn McpAgentAdapter> = Box::new(NomiAdapter);
-        assert_eq!(adapter.source(), McpSource::Nomi);
+        let adapter: Box<dyn McpAgentAdapter> = Box::new(OpenhubAdapter);
+        assert_eq!(adapter.source(), McpSource::Openhub);
     }
 }

@@ -12,6 +12,5 @@ pub use codebuddy::CodeBuddyAdapter;
 pub use codex::CodexAdapter;
 pub use gemini::GeminiAdapter;
 pub use openhub::OpenhubAdapter;
-pub use openhub::OpenhubAdapter;
 pub use opencode::OpencodeAdapter;
 pub use qwen::QwenAdapter;

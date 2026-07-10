@@ -1224,7 +1224,7 @@ mod tests {
     }
 
     #[test]
-    fn platform_to_source_reserved_defaults_toopenhub) {
+    fn platform_to_source_reserved_defaults_to_openhub() {
         assert_eq!(platform_to_source(PluginType::Slack), ConversationSource::Openhub);
         assert_eq!(platform_to_source(PluginType::Discord), ConversationSource::Openhub);
     }

@@ -1,6 +1,8 @@
 use std::collections::HashMap;
+use std::sync::Arc;
 
 use openhub_common::McpSource;
+use openhub_db::IMcpServerRepository;
 
 use crate::adapter::{DetectedServer, McpAgentAdapter};
 use crate::error::McpError;
@@ -33,12 +35,20 @@ const CLI_NAME: &str = "openhub";
 /// [mcp.servers.remote-server.headers]
 /// Authorization = "Bearer xxx"
 /// ```
-pub struct NomiAdapter;
+pub struct OpenhubAdapter {
+    repo: Arc<dyn IMcpServerRepository>,
+}
+
+impl OpenhubAdapter {
+    pub fn new(repo: Arc<dyn IMcpServerRepository>) -> Self {
+        Self { repo }
+    }
+}
 
 #[async_trait::async_trait]
-impl McpAgentAdapter for NomiAdapter {
+impl McpAgentAdapter for OpenhubAdapter {
     fn source(&self) -> McpSource {
-        McpSource::Nomi
+        McpSource::Openhub
     }
 
     async fn is_installed(&self) -> Result<bool, McpError> {
@@ -331,7 +341,7 @@ mod tests {
 
     #[test]
     fn source_is_openhub() {
-        assert_eq!(NomiAdapter.source(), McpSource::Nomi);
+        assert_eq!(OpenhubAdapter.source(), McpSource::Openhub);
     }
 
     // -- parse_toml_servers ---------------------------------------------------
@@ -597,7 +607,7 @@ args = ["srv.js"]
 
     #[test]
     fn trait_is_object_safe() {
-        let adapter: Box<dyn McpAgentAdapter> = Box::new(NomiAdapter);
-        assert_eq!(adapter.source(), McpSource::Nomi);
+        let adapter: Box<dyn McpAgentAdapter> = Box::new(OpenhubAdapter);
+        assert_eq!(adapter.source(), McpSource::Openhub);
     }
 }

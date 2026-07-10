@@ -12,7 +12,7 @@ pub mod types;
 
 pub use adapter::{DetectedServer, McpAgentAdapter};
 pub use adapters::{
-    ClaudeAdapter, CodeBuddyAdapter, CodexAdapter, GeminiAdapter, NomiAdapter, OpenhubAdapter, OpencodeAdapter,
+    ClaudeAdapter, CodeBuddyAdapter, CodexAdapter, GeminiAdapter, OpenhubAdapter, OpencodeAdapter,
     QwenAdapter,
 };
 pub use connection_test::McpConnectionTestService;

@@ -32,7 +32,7 @@ use openhub_idmm::{IdmmManager, IdmmRouterState};
 use openhub_knowledge::KnowledgeRouterState;
 use openhub_mcp::{
     ClaudeAdapter, CodeBuddyAdapter, CodexAdapter, GeminiAdapter, McpAgentAdapter, McpConfigService,
-    McpConnectionTestService, McpRouterState, McpSyncService, NomiAdapter, OpenhubAdapter, OpencodeAdapter,
+    McpConnectionTestService, McpRouterState, McpSyncService, OpenhubAdapter, OpencodeAdapter,
     QwenAdapter,
 };
 use openhub_office::{
@@ -453,7 +453,6 @@ pub fn build_mcp_state(services: &AppServices) -> McpRouterState {
         Arc::new(CodexAdapter),
         Arc::new(CodeBuddyAdapter),
         Arc::new(OpencodeAdapter),
-        Arc::new(NomiAdapter),
         Arc::new(OpenhubAdapter::new(repo.clone())),
     ];
 

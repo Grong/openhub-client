@@ -19,9 +19,9 @@ fn map_arch() -> &'static str {
     }
 }
 
-/// Resolve the cache directory for Nomi.
+/// Resolve the cache directory for OpenHub.
 ///
-/// Priority: `OPENHUB_CACHE_DIR` env → `dirs::cache_dir()openhub.
+/// Priority: `OPENHUB_CACHE_DIR` env → `dirs::cache_dir()/openhub`.
 fn resolve_cache_dir() -> String {
     if let Ok(v) = std::env::var("OPENHUB_CACHE_DIR")
         && !v.is_empty()
@@ -33,9 +33,9 @@ fn resolve_cache_dir() -> String {
         .unwrap_or_default()
 }
 
-/// Resolve the work (data) directory for Nomi.
+/// Resolve the work (data) directory for OpenHub.
 ///
-/// Priority: `OPENHUB_WORK_DIR` env → `dirs::data_dir()openhub.
+/// Priority: `OPENHUB_WORK_DIR` env → `dirs::data_dir()/openhub`.
 fn resolve_work_dir() -> String {
     if let Ok(v) = std::env::var("OPENHUB_WORK_DIR")
         && !v.is_empty()
@@ -47,10 +47,10 @@ fn resolve_work_dir() -> String {
         .unwrap_or_default()
 }
 
-/// Resolve the log directory for Nomi.
+/// Resolve the log directory for OpenHub.
 ///
 /// Priority: `OPENHUB_LOG_DIR` env →
-///   macOS: `~/Library/Logsopenhub
+///   macOS: `~/Library/Logs/openhub`
 ///   Linux: `dirs::state_dir()/openhub/logs` (XDG_STATE_HOME)
 ///   Windows: `dirs::data_dir()/openhub/logs`
 fn resolve_log_dir() -> String {
@@ -63,7 +63,7 @@ fn resolve_log_dir() -> String {
     if cfg!(target_os = "macos")
         && let Some(home) = dirs::home_dir()
     {
-        return home.join("Library/Logsopenhub).to_string_lossy().into_owned();
+        return home.join("Library/Logs/openhub").to_string_lossy().into_owned();
     }
     // Linux: XDG state dir
     if let Some(state) = dirs::state_dir() {

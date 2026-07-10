@@ -174,7 +174,7 @@ mod tests {
     #[test]
     fn test_app_config_database_path() {
         let config = AppConfig {
-            data_dir: PathBuf::from("/tmpopenhub),
+            data_dir: PathBuf::from("/tmp/openhub"),
             ..Default::default()
         };
         assert_eq!(config.database_path(), PathBuf::from("/tmp/openhub/openhub-backend.db"));

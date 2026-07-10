@@ -103,7 +103,7 @@ fn resolve_scan_paths_inner(
         }
     } else {
         if let Some(home) = dirs::home_dir() {
-            push(home.join("openhub).join(EXTENSIONS_DIR_NAME), ExtensionSource::Local);
+            push(home.join("openhub").join(EXTENSIONS_DIR_NAME), ExtensionSource::Local);
         }
 
         // 3. AppData directory (platform-specific).
@@ -258,8 +258,8 @@ fn is_engine_compatible(ext: &LoadedExtension, app_version: &semver::Version) ->
     let Some(engine) = &ext.manifest.engine else {
         return true; // no engine constraint
     };
-    let Some(required) = &engine_openhub} else {
-        return true; // noopenhubconstraint
+    let Some(required) = &engine.openhub else {
+        return true; // no openhub constraint
     };
 
     match semver::VersionReq::parse(required) {

@@ -247,7 +247,7 @@ async fn sm11_get_skill_paths() {
     }
 
     let resource_dir = Path::new("/app/resources");
-    let data_dir = Path::new("/home/user/openhub);
+    let data_dir = Path::new("/home/user/.openhub");
     let paths = resolve_skill_paths(resource_dir, data_dir);
 
     assert!(paths.user_skills_dir.to_string_lossy().contains("skills"));
