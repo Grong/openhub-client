@@ -10,7 +10,7 @@ import classNames from 'classnames';
 import { Button, Dropdown } from '@arco-design/web-react';
 import { Branch, Down } from '@icon-park/react';
 import type { TModelRef } from '@/common/types/orchestrator/orchestratorTypes';
-import NomiSelect from '@/renderer/components/base/NomiSelect';
+import OpenHubSelect from '@/renderer/components/base/OpenHubSelect';
 import { encodePair, decodePair, useModelRange } from '@/renderer/pages/orchestrator/useModelRange';
 import { iconColors } from '@/renderer/styles/colors';
 import ocStyles from '@/renderer/pages/orchestrator/orchestratorComposer.module.css';
@@ -92,7 +92,7 @@ const GuidCollaboratorSelector: React.FC<GuidCollaboratorSelectorProps> = ({ val
           <div className='text-12px leading-18px text-warning-6'>{t('orchestrator.composer.noModels')}</div>
         ) : (
           <>
-            <NomiSelect
+            <OpenHubSelect
               mode='multiple'
               value={encodedValue}
               onChange={handleChange}
@@ -105,22 +105,22 @@ const GuidCollaboratorSelector: React.FC<GuidCollaboratorSelectorProps> = ({ val
                 const models = getAvailableModels(p);
                 if (models.length === 0) return null;
                 return (
-                  <NomiSelect.OptGroup key={p.id} label={p.name || p.platform}>
+                  <OpenHubSelect.OptGroup key={p.id} label={p.name || p.platform}>
                     {models.map((m) => {
                       const ref: TModelRef = { provider_id: p.id, model: m };
                       const key = encodePair(ref);
                       const isMainOpt = key === mainKey;
                       return (
-                        <NomiSelect.Option key={key} value={key} disabled={isMainOpt}>
+                        <OpenHubSelect.Option key={key} value={key} disabled={isMainOpt}>
                           {formatModelLabel(p, m)}
                           {isMainOpt ? ` · ${t('guid.orchestration.collaborators.mainTag')}` : ''}
-                        </NomiSelect.Option>
+                        </OpenHubSelect.Option>
                       );
                     })}
-                  </NomiSelect.OptGroup>
+                  </OpenHubSelect.OptGroup>
                 );
               })}
-            </NomiSelect>
+            </OpenHubSelect>
             <div className={ocStyles.composerHint}>
               {value.length === 0
                 ? t('guid.orchestration.collaborators.emptyHint')

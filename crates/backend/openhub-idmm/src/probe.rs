@@ -535,7 +535,7 @@ impl SessionProbe for ConversationProbe {
         // Structured tool-permission approval: resolve the agent's pending
         // confirmation oneshot via `confirm` (a hidden chat message would never
         // clear it). `data` carries the submit-value under BOTH keys so either
-        // backend resolves it (ACP reads `option_id`, nomi reads `value`).
+        // backend resolves it (ACP reads `option_id`, openhub reads `value`).
         if let WakeAction::Confirm {
             call_id,
             value,
@@ -558,7 +558,7 @@ impl SessionProbe for ConversationProbe {
         // for the swap). The helper resolves the effective config (session
         // override else global). It returns `Ok(false)` when NO switch happened
         // (failover disabled / queue exhausted / deps unregistered — and now also
-        // when the conversation is not nomi: review #9 moved the ACP boundary gate
+        // when the conversation is not openhub: review #9 moved the ACP boundary gate
         // INTO `perform_model_failover`, so an ACP conversation reaching here is
         // safely rejected there and reports `Ok(false)`). On `Ok(false)` we do NOT
         // return early (review #8 — a misconfigured/exhausted slot must still

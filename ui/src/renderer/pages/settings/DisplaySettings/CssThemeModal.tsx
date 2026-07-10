@@ -9,7 +9,7 @@ import { ipcBridge } from '@/common';
 import { useThemeContext } from '@renderer/hooks/context/ThemeContext.tsx';
 import { iconColors } from '@renderer/styles/colors';
 import { Button, Input } from '@arco-design/web-react';
-import NomiModal from '@renderer/components/base/NomiModal.tsx';
+import OpenHubModal from '@renderer/components/base/OpenHubModal.tsx';
 import { Plus, Delete } from '@icon-park/react';
 import CodeMirror from '@uiw/react-codemirror';
 import { css as cssLang } from '@codemirror/lang-css';
@@ -112,7 +112,7 @@ const CssThemeModal: React.FC<CssThemeModalProps> = ({ visible, theme, onClose, 
   const isEditing = !!theme;
 
   return (
-    <NomiModal
+    <OpenHubModal
       visible={visible}
       header={isEditing ? t('settings.cssTheme.editTheme') : t('settings.cssTheme.addToPreset')}
       onCancel={onClose}
@@ -189,7 +189,7 @@ const CssThemeModal: React.FC<CssThemeModalProps> = ({ visible, theme, onClose, 
           </div>
         </div>
       </div>
-    </NomiModal>
+    </OpenHubModal>
   );
 };
 

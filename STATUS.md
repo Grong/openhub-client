@@ -35,7 +35,7 @@ The current frontend route map lives in
 - `/open-capabilities`
 - `/requirements`, `/requirements/extensions`, `/requirements/sources`
 - `/scheduled` and `/scheduled/:job_id`
-- `/nomi`
+- `/openhub`
 - `/knowledge` and `/knowledge/:id`
 - `/settings/system` plus system sub-sections routed through that page
 

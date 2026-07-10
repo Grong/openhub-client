@@ -2679,17 +2679,17 @@ impl CdpBackend {
 
     /// **Extract 分支**（F-actions，DESIGN §9，**deterministic plumbing**）：按 `schema` 请求的字段，
     /// 返回当前页的**结构化表示**供上层 LLM 抽取——P2 给确定性的页面捕获（aria snapshot + 可见文本），
-    /// **不在引擎内塞 LLM 调用**（P2 引擎无 LLM；真 LLM-driven 字段抽取需 nomi 集成 = P3）。
+    /// **不在引擎内塞 LLM 调用**（P2 引擎无 LLM；真 LLM-driven 字段抽取需 openhub 集成 = P3）。
     ///
     /// 捕获两路（都经 redact + `<data>` wrap，喂 LLM 的**不可信内容**，镜像 observe/get_page_text 安全契约）：
     /// 1. **aria snapshot YAML**（[`CdpBackend::observe_impl`]，已 redact + `<data>`-wrap）——结构化可交互树。
     /// 2. **可见页面文本**（[`Self::act_extract_page_text`] → redact → wrap）——补充正文内容。
     ///
     /// `schema` 是 agent 给的 JSON schema（要抽哪些字段）：P2 把它**回显**作「请求字段」提示，连同上面
-    /// 两路结构化表示一起返回，供上层（P3 nomi 集成）据 schema 做真正的字段抽取。**脱敏铁律**：返回内容
+    /// 两路结构化表示一起返回，供上层（P3 openhub 集成）据 schema 做真正的字段抽取。**脱敏铁律**：返回内容
     /// 已 redact（页面密文不进输出）+ `<data>` wrap（防提示注入越狱）——LLM 永不见明文 secret。
     ///
-    /// **TODO(P3): LLM-driven extraction** —— P3 在 nomi 集成层把本 deterministic 表示 + schema 喂给
+    /// **TODO(P3): LLM-driven extraction** —— P3 在 openhub 集成层把本 deterministic 表示 + schema 喂给
     /// LLM 产出结构化 JSON（引擎层仍不持有 LLM；抽取在上层）。
     ///
     /// 只读零写（Info 级）。页面级动作，走简化骨架（abort+retry，无 ref）。

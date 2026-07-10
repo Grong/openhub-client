@@ -66,7 +66,7 @@ The source of truth is
 | `/open-capabilities` | Remote/public capability exposure. |
 | `/scheduled`, `/scheduled/:job_id` | Scheduled tasks. |
 | `/requirements`, `/requirements/extensions`, `/requirements/sources` | Requirements Platform, AutoWork, notification/source extensions. |
-| `/nomi` | Companion configuration. |
+| `/openhub` | Companion configuration. |
 | `/knowledge`, `/knowledge/:id` | Knowledge base list/detail. |
 | `/settings/system` and related settings subroutes | System settings page and sub-sections. |
 

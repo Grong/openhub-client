@@ -34,8 +34,8 @@ const isModelKeyAvailable = (key: string | null, providers?: IProvider[]) => {
 type ProviderAgentKey = 'openhub';
 
 /** Map agent key → storage key for persisting default model */
-const MODEL_STORAGE_KEY: Record<ProviderAgentKey, 'nomi.defaultModel'> = {
-  openhub: 'nomi.defaultModel',
+const MODEL_STORAGE_KEY: Record<ProviderAgentKey, 'openhub.defaultModel'> = {
+  openhub: 'openhub.defaultModel',
 };
 
 export type GuidModelSelectionResult = {

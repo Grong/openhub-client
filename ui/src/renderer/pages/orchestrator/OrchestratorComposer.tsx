@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, Dropdown, Input } from '@arco-design/web-react';
 import { ArrowUp, Brain, Down, Send, Shield } from '@icon-park/react';
 import type { TModelRef } from '@/common/types/orchestrator/orchestratorTypes';
-import NomiSelect from '@/renderer/components/base/NomiSelect';
+import OpenHubSelect from '@/renderer/components/base/OpenHubSelect';
 import { useInputFocusRing } from '@/renderer/hooks/chat/useInputFocusRing';
 import { useCompositionInput } from '@/renderer/hooks/chat/useCompositionInput';
 import { iconColors } from '@/renderer/styles/colors';
@@ -218,7 +218,7 @@ const OrchestratorComposer: React.FC<OrchestratorComposerProps> = ({
                 {t('orchestrator.composer.model.autoHint', { count: allPairs.length })}
               </div>
             ) : (modelRange?.mode ?? 'auto') === 'single' ? (
-              <NomiSelect
+              <OpenHubSelect
                 value={modelRange?.single || undefined}
                 onChange={(v) =>
                   onModelRangeChange?.({ mode: 'single', single: v as string, range: modelRange?.range ?? [] })
@@ -229,20 +229,20 @@ const OrchestratorComposer: React.FC<OrchestratorComposerProps> = ({
                 className='w-full'
               >
                 {providers.map((p) => (
-                  <NomiSelect.OptGroup key={p.id} label={p.name || p.platform}>
+                  <OpenHubSelect.OptGroup key={p.id} label={p.name || p.platform}>
                     {getAvailableModels(p).map((m) => {
                       const ref: TModelRef = { provider_id: p.id, model: m };
                       return (
-                        <NomiSelect.Option key={encodePair(ref)} value={encodePair(ref)}>
+                        <OpenHubSelect.Option key={encodePair(ref)} value={encodePair(ref)}>
                           {formatModelLabel(p, m)}
-                        </NomiSelect.Option>
+                        </OpenHubSelect.Option>
                       );
                     })}
-                  </NomiSelect.OptGroup>
+                  </OpenHubSelect.OptGroup>
                 ))}
-              </NomiSelect>
+              </OpenHubSelect>
             ) : (
-              <NomiSelect
+              <OpenHubSelect
                 mode='multiple'
                 value={modelRange?.range ?? []}
                 onChange={(v) =>
@@ -254,18 +254,18 @@ const OrchestratorComposer: React.FC<OrchestratorComposerProps> = ({
                 className='w-full'
               >
                 {providers.map((p) => (
-                  <NomiSelect.OptGroup key={p.id} label={p.name || p.platform}>
+                  <OpenHubSelect.OptGroup key={p.id} label={p.name || p.platform}>
                     {getAvailableModels(p).map((m) => {
                       const ref: TModelRef = { provider_id: p.id, model: m };
                       return (
-                        <NomiSelect.Option key={encodePair(ref)} value={encodePair(ref)}>
+                        <OpenHubSelect.Option key={encodePair(ref)} value={encodePair(ref)}>
                           {formatModelLabel(p, m)}
-                        </NomiSelect.Option>
+                        </OpenHubSelect.Option>
                       );
                     })}
-                  </NomiSelect.OptGroup>
+                  </OpenHubSelect.OptGroup>
                 ))}
-              </NomiSelect>
+              </OpenHubSelect>
             )}
           </>
         )}

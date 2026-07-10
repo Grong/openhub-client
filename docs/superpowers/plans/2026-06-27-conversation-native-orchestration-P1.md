@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: superpowers:subagent-driven-development。Steps `- [ ]`。
 
-**Goal:** 用户在会话入口选「自动/范围」模型、写需求、提交 → 落地一个**主管会话**（nomi + 主管系统提示 + caps_orchestrator 工具 + model_range），主管可 `openhub_run_create` 从 model_range 直接拆出多 agent run，**无需预建 workspace/fleet**。引擎整套复用。
+**Goal:** 用户在会话入口选「自动/范围」模型、写需求、提交 → 落地一个**主管会话**（openhub + 主管系统提示 + caps_orchestrator 工具 + model_range），主管可 `openhub_run_create` 从 model_range 直接拆出多 agent run，**无需预建 workspace/fleet**。引擎整套复用。
 
-**Architecture:** 新增 `RunService::create_adhoc`（从 model_range 就地构造成员快照），caps_orchestrator 的 `openhub_run_create` 改为从调用会话上下文取参；后端给 nomi 加 `orchestrator_role` 识别并注入主管提示；前端模型选择器三态 + useGuidSend 注入 lead 标记。迁移 020 给 `orch_runs` 加 `work_dir` 并使 `workspace_id` 可空，引擎取目录优先 `work_dir`。
+**Architecture:** 新增 `RunService::create_adhoc`（从 model_range 就地构造成员快照），caps_orchestrator 的 `openhub_run_create` 改为从调用会话上下文取参；后端给 openhub 加 `orchestrator_role` 识别并注入主管提示；前端模型选择器三态 + useGuidSend 注入 lead 标记。迁移 020 给 `orch_runs` 加 `work_dir` 并使 `workspace_id` 可空，引擎取目录优先 `work_dir`。
 
 **Spec:** `docs/superpowers/specs/2026-06-27-conversation-native-orchestration-redesign.md` §3、§4、§9.1、§11、§12。
 
@@ -23,7 +23,7 @@
 - api-types：`openhub-api-types/src/orchestrator.rs`（`ModelRange`、`CreateAdhocRunRequest`、`Run.workspace_id` → `Option<String>`）
 - orchestrator：`run_service.rs`（`create_adhoc`）、`engine.rs`（work_dir 适配）
 - gateway：`openhub-gateway/src/caps_orchestrator.rs`（`openhub_run_create` 改签名）
-- ai-agent：`openhub-api-types/src/agent_build_extra.rs`（`NomiBuildExtra.orchestrator_role`）、`openhub-ai-agent/src/factory/nomi.rs`（lead 主管提示注入）
+- ai-agent：`openhub-api-types/src/agent_build_extra.rs`（`NomiBuildExtra.orchestrator_role`）、`openhub-ai-agent/src/factory/openhub.rs`（lead 主管提示注入）
 - 前端：`ui/src/renderer/pages/guid/hooks/useGuidModelSelection.ts`、`components/GuidModelSelector.tsx`、`GuidPage.tsx`、`hooks/useGuidSend.ts`、`ui/src/common/adapter/ipcBridge.ts`（`ICreateConversationParams.extra` 加字段）
 
 ---
@@ -188,11 +188,11 @@ let run = deps.orchestrator_run_service.create_adhoc(user, req).await ...;
 
 ## Task 4: 后端 lead 主管武装（orchestrator_role + 主管系统提示注入）
 
-**Files:** Modify `openhub-api-types/src/agent_build_extra.rs`（`NomiBuildExtra.orchestrator_role`）、`openhub-ai-agent/src/factory/nomi.rs`（lead 时注入主管提示）；测试内联。
+**Files:** Modify `openhub-api-types/src/agent_build_extra.rs`（`NomiBuildExtra.orchestrator_role`）、`openhub-ai-agent/src/factory/openhub.rs`（lead 时注入主管提示）；测试内联。
 
 **改动：**
 - `agent_build_extra.rs:219-305`：`NomiBuildExtra` 加 `#[serde(default)] pub orchestrator_role: Option<String>`。
-- `factory/nomi.rs`：在组装 `system_prompt`（:291 附近，preset_rules 合并之后）时，若 `overrides.orchestrator_role.as_deref()==Some("lead")`，把**主管系统提示**前置/合并进 `system_prompt`。主管提示常量（中文，server-authored）：
+- `factory/openhub.rs`：在组装 `system_prompt`（:291 附近，preset_rules 合并之后）时，若 `overrides.orchestrator_role.as_deref()==Some("lead")`，把**主管系统提示**前置/合并进 `system_prompt`。主管提示常量（中文，server-authored）：
   > 「你是 OpenHub 的编排主管。用户已在本会话限定可用模型范围（见运行上下文）。对简单或单步需求：直接作答。对复杂、可拆分为多个并行/有依赖子任务的需求：调用工具 `openhub_run_create(goal)` 把需求拆成任务 DAG 并行执行（模型范围与工作目录会自动取用），随后用 `openhub_run_status`/`openhub_run_result` 跟进并向用户汇报进展与产出。不要询问 workspace 或 fleet——它们已不存在。」
 - 工具可达性：lead 会话在受信桌面会话上已默认获得 desktopGateway（含 caps_orchestrator），无需新增 gateway 代码（见 spec §3.3 勘察）。**不**从客户端标记强制开 gateway（避免非受信会话自授权）；WebUI/非受信编排门控列 carry-forward。
 
@@ -223,9 +223,9 @@ let run = deps.orchestrator_run_service.create_adhoc(user, req).await ...;
 
 ## Task 6: 前端 useGuidSend 注入 lead 标记
 
-**Files:** Modify `useGuidSend.ts`（nomi 分支 269-320 + `GuidSendDeps` 21-76 + 解构 88-123 + deps 数组 403-427）。
+**Files:** Modify `useGuidSend.ts`（openhub 分支 269-320 + `GuidSendDeps` 21-76 + 解构 88-123 + deps 数组 403-427）。
 
-**改动：** nomi 分支构造 `extra` 时，若 `selectionMode ∈ {auto, range}`：
+**改动：** openhub 分支构造 `extra` 时，若 `selectionMode ∈ {auto, range}`：
 - 注入 `orchestrator_role: 'lead'`；
 - 注入 `model_range`：`single`→`{mode:'single',model:{provider_id:current_model.id,model:current_model.use_model}}`；`auto`→`{mode:'auto'}`；`range`→`{mode:'range',models:selectedRange.map(m=>({provider_id:m.id,model:m.use_model}))}`；
 - `session_mode` 覆盖为 `'yolo'`（替代 `selectedMode`）；

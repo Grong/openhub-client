@@ -280,7 +280,7 @@ pub trait KnowledgeWritebackSink: Send + Sync {
 /// `knowledge_write` — persist reusable knowledge straight into a bound base.
 ///
 /// This is the write-back ("回血") counterpart of [`KnowledgeSearchTool`]. The
-/// generic file `Write` tool cannot do this reliably in a nomi chat session:
+/// generic file `Write` tool cannot do this reliably in a openhub chat session:
 /// it has no workspace cwd (so the relative mount path the prompt advertises
 /// resolves against the process cwd, missing the base) AND it sits behind the
 /// approval gate. This tool resolves the base by name within the bound set,

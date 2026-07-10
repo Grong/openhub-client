@@ -162,14 +162,14 @@ const Titlebar: React.FC<TitlebarProps> = ({ workspaceAvailable }) => {
       const path = `${location.pathname}${location.search}${location.hash}`;
       lastNonSettingsPathRef.current = path;
       try {
-        sessionStorage.setItem('nomi:last-non-settings-path', path);
+        sessionStorage.setItem('openhub:last-non-settings-path', path);
       } catch {
         // ignore
       }
       return;
     }
     try {
-      const stored = sessionStorage.getItem('nomi:last-non-settings-path');
+      const stored = sessionStorage.getItem('openhub:last-non-settings-path');
       if (stored) {
         lastNonSettingsPathRef.current = stored;
       }

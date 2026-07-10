@@ -9,7 +9,7 @@
 
 use std::sync::Arc;
 
-use openhub_ai_agent::manager::nomi::NomiAgentManager;
+use openhub_ai_agent::manager::openhub::NomiAgentManager;
 use openhub_ai_agent::task_manager::AgentFactory;
 use openhub_ai_agent::types::{BuildTaskOptions, NomiResolvedConfig, SendMessageData};
 use openhub_ai_agent::*;
@@ -301,7 +301,7 @@ fn agent_type_serde_all_variants() {
         (AgentType::OpenclawGateway, "\"openclaw-gateway\""),
         (AgentType::Nanobot, "\"nanobot\""),
         (AgentType::Remote, "\"remote\""),
-        (AgentType::Nomi, "\"nomi\""),
+        (AgentType::Nomi, "\"openhub\""),
     ] {
         let json = serde_json::to_string(&variant).unwrap();
         assert_eq!(json, expected_json, "Failed for {:?}", variant);

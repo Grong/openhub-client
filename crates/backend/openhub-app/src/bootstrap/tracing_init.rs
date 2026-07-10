@@ -45,7 +45,7 @@ fn build_backend_filter(log_level: Option<&str>) -> EnvFilter {
 /// RAII guards that flush log buffers on drop. Hold for the process lifetime.
 pub struct LogGuards {
     _backend: tracing_appender::non_blocking::WorkerGuard,
-    _nomi: tracing_appender::non_blocking::WorkerGuard,
+    _openhub: tracing_appender::non_blocking::WorkerGuard,
 }
 
 pub fn init_tracing(log_dir: &Path, log_level: Option<&str>) -> LogGuards {
@@ -83,7 +83,7 @@ pub fn init_tracing(log_dir: &Path, log_level: Option<&str>) -> LogGuards {
         dir: log_dir.to_path_buf(),
     };
     let (openhub_layer, openhub_guard) =
-        openhub_ai_agent::openhub_config::logging::create_file_layer(&openhub_resolved).expect("failed to create nomi log layer");
+        openhub_ai_agent::openhub_config::logging::create_file_layer(&openhub_resolved).expect("failed to create openhub log layer");
 
     // `try_init` (not `init`) so a second bootstrap in the same process — e.g.
     // several integration tests each calling `DesktopServer::start` — reuses the
@@ -99,6 +99,6 @@ pub fn init_tracing(log_dir: &Path, log_level: Option<&str>) -> LogGuards {
 
     LogGuards {
         _backend: backend_guard,
-        _nomi: openhub_guard,
+        _openhub: openhub_guard,
     }
 }

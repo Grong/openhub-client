@@ -172,7 +172,7 @@ token:首次启用领域时生成一枚**长期 token**(加密落 `{data_dir}/lo
 
 ### 5.5 视觉桥(用户点名的体验场景)+ 用户图片内联补齐
 
-勘察发现一个重要现状:**桌面 nomi 会话的用户图片目前并不内联给模型**(`SendMessageData.files` 是路径,引擎只吃文本;内联 Image 块只来自工具结果截图)。因此设计两件事,一并做:
+勘察发现一个重要现状:**桌面 openhub 会话的用户图片目前并不内联给模型**(`SendMessageData.files` 是路径,引擎只吃文本;内联 Image 块只来自工具结果截图)。因此设计两件事,一并做:
 
 1. **补齐用户图片内联链路**(独立价值,云 VL 也受益):conversation service 发送预处理读取 files 中的图片字节→构造 Image 块进用户回合(受 `supports_image` 门控,大小/数量限幅)。
 2. **视觉桥**:发送预处理中,若目标模型无视觉(capabilities/VisionUnsupportedRegistry)且本轮含图片→用**本地 VL 模型**(设置里指定,默认 Qwen3-VL-2B)经既有 `one_shot_completion` 生成结构化描述→以文本前置注入(与 knowledge prelude 同构),UI 标注「图片已由本地视觉模型转述」。模式三挡:关闭/自动(仅无视觉模型时)/总是。

@@ -587,7 +587,7 @@ impl openhub_channel::message_service::MasterAgentProfile for PublicStubProfile 
     }
 }
 
-/// (a) A public-agent-bound bot's turn builds an ISOLATED per-chat nomi
+/// (a) A public-agent-bound bot's turn builds an ISOLATED per-chat openhub
 /// conversation carrying `public_agent_id` + `channelPlatform` + the public
 /// agent's model, and NO `companionId` / `desktopGateway` (no gateway for public
 /// agents). The companion path is never taken.

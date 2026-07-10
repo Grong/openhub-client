@@ -49,7 +49,7 @@ export interface CustomFigureMeta {
 export interface CharacterMeta {
   /** Stable id persisted in companion config (appearance.character). */
   id: string;
-  /** i18n key suffix: nomi.characters.<id>.name / .style */
+  /** i18n key suffix: openhub.characters.<id>.name / .style */
   nameKey: string;
   /** Two swatch colors shown in the picker chip. */
   palette: [string, string];

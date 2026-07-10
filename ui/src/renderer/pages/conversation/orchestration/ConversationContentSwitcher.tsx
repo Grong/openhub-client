@@ -9,7 +9,7 @@ import { useOrchestrationSafe } from './OrchestrationContext';
 import ProjectedWorkerView from './ProjectedWorkerView';
 
 type ConversationContentSwitcherProps = {
-  /** The main agent content (= NomiChat). ALWAYS mounted; only its visibility is
+  /** The main agent content (= OpenHubChat). ALWAYS mounted; only its visibility is
    * toggled while a worker node is projected. */
   children: React.ReactNode;
 };
@@ -17,14 +17,14 @@ type ConversationContentSwitcherProps = {
 /**
  * ConversationContentSwitcher — the content-area projection switch for
  * 「会话原生编排 v2」(F7). Sits between {@link ChatLayout}'s content slot and the
- * main {@link NomiChat}, projecting a clicked DAG worker node's read-only
+ * main {@link OpenHubChat}, projecting a clicked DAG worker node's read-only
  * transcript over the (still-mounted) main conversation and back.
  *
  * Invariants:
- *  - **The main agent content (children = NomiChat) is ALWAYS mounted.** When a
+ *  - **The main agent content (children = OpenHubChat) is ALWAYS mounted.** When a
  *    node is projected we hide it with `display:none` rather than unmounting it,
  *    so the user's input draft + scroll position survive the round-trip and the
- *    expensive NomiChat subtree never tears down / re-initializes. Returning to
+ *    expensive OpenHubChat subtree never tears down / re-initializes. Returning to
  *    main is a pure visibility flip.
  *  - **Default = main.** `projectedTaskId === null` (the F3 default, and reset on
  *    every run change / returnToMain) → only the children are visible, no overlay.

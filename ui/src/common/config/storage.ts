@@ -65,14 +65,14 @@ export interface IConfigStorageRefer {
   customCss: string; // 自定义 CSS 样式
   'css.themes': ICssTheme[]; // 自定义 CSS 主题列表 / Custom CSS themes list
   'css.activeThemeId': string; // 当前激活的主题 ID / Currently active theme ID
-  'nomi.config'?: {
+  'openhub.config'?: {
     /** Preferred session mode for new conversations / 新会话的默认模式 */
     preferredMode?: string;
   };
-  'nomi.defaultModel'?: { id: string; use_model: string };
-  // 智能编排「协作模型」默认偏好（多选）。主模型见 nomi.defaultModel；这里是供主模型
+  'openhub.defaultModel'?: { id: string; use_model: string };
+  // 智能编排「协作模型」默认偏好（多选）。主模型见 openhub.defaultModel；这里是供主模型
   // 按任务难度挑选的额外 worker 模型池。空 = 全程用主模型。
-  'nomi.orchestrationCollaborators'?: { provider_id: string; model: string }[];
+  'openhub.orchestrationCollaborators'?: { provider_id: string; model: string }[];
   'tools.imageGenerationModel': TProviderWithModel & {
     /** @deprecated Image generation is now controlled via built-in MCP server toggle */
     switch?: boolean;
@@ -206,7 +206,7 @@ export interface TokenUsageData {
   cache_creation_tokens?: number;
   /** Tokens read back from the provider prompt cache. */
   cache_read_tokens?: number;
-  /** Wall-clock duration of the last turn in milliseconds (optional; nomi
+  /** Wall-clock duration of the last turn in milliseconds (optional; openhub
    * turn_completed carries it). Absent on legacy persisted payloads. */
   elapsed_ms?: number;
   /** Current context occupancy (gauge numerator). */
@@ -485,7 +485,7 @@ export type TChatConversation =
           | { mode: 'single'; model: { provider_id: string; model: string } }
           | { mode: 'auto' }
           | { mode: 'range'; models: { provider_id: string; model: string }[] };
-        /** Marks this nomi conversation as a desktop-companion's single per-companion
+        /** Marks this openhub conversation as a desktop-companion's single per-companion
          * session (单会话契约). Written by the backend at companion-session creation.
          * Drives the 桌面伙伴 session-list group, the constrained companion chat panel
          * (CompanionChatPanel), and the work-conversation list filter. */

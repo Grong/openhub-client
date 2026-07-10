@@ -118,7 +118,7 @@ async fn create(deps: Arc<GatewayDeps>, ctx: CallerCtx, p: CronCreateParams) -> 
         Err(e) => return json!({ "error": e.to_string() }),
     }
 
-    // ── model guard (nomi conversations only) ────────────────────────
+    // ── model guard (openhub conversations only) ────────────────────────
     let mut model_note: Option<String> = None;
     match deps.conversation_service.get(&ctx.user_id, &target_conversation).await {
         Ok(conv) => {
@@ -210,7 +210,7 @@ pub(crate) fn register(out: &mut Vec<Capability>) {
         CapabilityMeta::new(
             "openhub_cron_create",
             "cron",
-            "Schedule a recurring prompt (cron). Binds to conversation_id or the calling conversation; guards against duplicates and model-less nomi sessions.",
+            "Schedule a recurring prompt (cron). Binds to conversation_id or the calling conversation; guards against duplicates and model-less openhub sessions.",
             DangerTier::Write,
         ),
         create,

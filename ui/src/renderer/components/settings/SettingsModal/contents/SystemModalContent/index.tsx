@@ -7,8 +7,8 @@
 import { ipcBridge } from '@/common';
 import type { IGpuStatus, IStartOnBootStatus } from '@/common/adapter/ipcBridge';
 import { configService } from '@/common/config/configService';
-import NomiScrollArea from '@/renderer/components/base/NomiScrollArea';
-import NomiSelect from '@/renderer/components/base/NomiSelect';
+import OpenHubScrollArea from '@/renderer/components/base/OpenHubScrollArea';
+import OpenHubSelect from '@/renderer/components/base/OpenHubSelect';
 import FeedbackButton from '@/renderer/components/base/FeedbackButton';
 import LanguageSwitcher from '@/renderer/components/settings/LanguageSwitcher';
 import { iconColors } from '@/renderer/styles/colors';
@@ -231,14 +231,14 @@ const SystemModalContent: React.FC = () => {
       label: t('settings.sendKey'),
       description: t('settings.sendKeyDesc'),
       component: (
-        <NomiSelect
+        <OpenHubSelect
           className='w-200px'
           value={sendKey}
           onChange={(v) => handleSendKeyChange(v as 'enter' | 'mod-enter')}
         >
-          <NomiSelect.Option value='enter'>{t('settings.sendKeyEnter')}</NomiSelect.Option>
-          <NomiSelect.Option value='mod-enter'>{t('settings.sendKeyModEnter')}</NomiSelect.Option>
-        </NomiSelect>
+          <OpenHubSelect.Option value='enter'>{t('settings.sendKeyEnter')}</OpenHubSelect.Option>
+          <OpenHubSelect.Option value='mod-enter'>{t('settings.sendKeyModEnter')}</OpenHubSelect.Option>
+        </OpenHubSelect>
       ),
     },
     {
@@ -346,7 +346,7 @@ const SystemModalContent: React.FC = () => {
     <div className='flex flex-col h-full w-full'>
       {modalContextHolder}
 
-      <NomiScrollArea className='flex-1 min-h-0 pb-16px' disableOverflow={isPageMode}>
+      <OpenHubScrollArea className='flex-1 min-h-0 pb-16px' disableOverflow={isPageMode}>
         <div className='space-y-16px'>
           <div className='px-[12px] md:px-[32px] py-16px bg-2 rd-16px space-y-12px'>
             <div className='w-full flex flex-col divide-y divide-border-2'>
@@ -448,7 +448,7 @@ const SystemModalContent: React.FC = () => {
             </div>
           </div>
         </div>
-      </NomiScrollArea>
+      </OpenHubScrollArea>
 
       <FactoryResetModal visible={factoryResetVisible} onClose={() => setFactoryResetVisible(false)} />
     </div>

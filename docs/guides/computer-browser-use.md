@@ -85,7 +85,7 @@ requiring Node, npm, or Playwright.
 | Host | Computer use | Browser use |
 | --- | --- | --- |
 | `openhub-desktop` | Compiled by the `computer-use` feature | Compiled by the `browser-use` feature |
-| `nomi` CLI | Enabled in the current `openhub-cli` build | Not enabled in the current `openhub-cli` manifest |
+| `openhub` CLI | Enabled in the current `openhub-cli` build | Not enabled in the current `openhub-cli` manifest |
 | `openhub-web` / Docker | Not compiled | Not compiled in the current headless web host |
 
 Web/server builds should not promise desktop or managed-browser control. If a

@@ -4,7 +4,7 @@
 //! applies.
 //!
 //! Consumers:
-//! - `openhub-ai-agent` factory paths (ACP assembler preset context, nomi
+//! - `openhub-ai-agent` factory paths (ACP assembler preset context, openhub
 //!   engine system prompt) via [`KnowledgeContextFormat::PromptSection`];
 //! - the terminal-session task (C1) writes a standalone
 //!   `{cwd}/.openhub/knowledge/README.md` via
@@ -296,7 +296,7 @@ fn writeback_contract(
     }
     // Tool-based contract: the surface exposes the native `knowledge_write`
     // tool, so instruct the agent to CALL it. This is the reliable path for the
-    // nomi engine — the tool resolves the base + placement internally and is
+    // openhub engine — the tool resolves the base + placement internally and is
     // allow-listed past the approval gate, unlike the generic Write tool.
     let mut contract = if options.has_write_tool {
         match mode {

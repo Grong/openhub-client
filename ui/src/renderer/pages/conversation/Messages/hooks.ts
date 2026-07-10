@@ -756,7 +756,7 @@ export const mergeFetchedMessagesForConversation = (
  *  - default (legacy): one shot of up to 10000 messages.
  *  - `windowed: true`: keyset pagination — load only the newest
  *    `HISTORY_WINDOW_SIZE` on mount and expose `loadOlder()` to prepend older
- *    windows on scroll-up. Used by the nomi chat surfaces (incl. the companion's
+ *    windows on scroll-up. Used by the openhub chat surfaces (incl. the companion's
  *    single session, which now also absorbs every IM-channel turn and can grow
  *    without bound) so an enormous transcript never crushes the API/DB or the
  *    DOM. The returned `{ loadOlder, hasMore, loadingOlder }` is consumed by

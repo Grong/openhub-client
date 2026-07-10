@@ -83,7 +83,7 @@ where
 
     let file_appender = tracing_appender::rolling::RollingFileAppender::builder()
         .rotation(tracing_appender::rolling::Rotation::DAILY)
-        .filename_suffix("nomi.log")
+        .filename_suffix("openhub.log")
         .build(&config.dir)
         .map_err(|e| LoggingError::AppenderInit(e.to_string()))?;
 

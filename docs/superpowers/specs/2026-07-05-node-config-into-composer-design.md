@@ -33,9 +33,9 @@
 
 删掉独立大面板，配置融进底部输入框：**单一模型入口、单一主文本框、外加一个「预置要求」pill**。后端零改动。
 
-### Settled 节点（有 nomi worker 会话）
+### Settled 节点（有 openhub worker 会话）
 
-worker 恒为 `nomi` 会话（`worker.rs` 确认），底部输入框永远是 `NomiSendBox`。
+worker 恒为 `openhub` 会话（`worker.rs` 确认），底部输入框永远是 `NomiSendBox`。
 
 1. **删除**折叠式「重跑配置」头 + 内嵌的 `NodePreconfigPanel`（`ProjectedWorkerView.tsx`）。
 2. **模型合一**：增强 `ReadOnlyConversationView` → `NomiReadOnlyChat` 的 `onSelectModel`——当传入了 orchestrator 节点绑定时，改模型除写 `conversation.update({ model })` 外，**同时** `setTaskConfig({ override_provider_id, override_model })`。→ 只剩输入框自带的一个模型选择器，改一次即同时定 live 会话模型 + 下次重跑模型。
@@ -55,7 +55,7 @@ pending 没有会话故无底部输入框。把原 `NodePreconfigPanel` body 换
 ### prop 透传链（settled）
 
 - `ProjectedWorkerView` 传可选 `nodeBinding = { runId, taskId, onSaved }` 给 `ReadOnlyConversationView`。
-- `ReadOnlyConversationView` → `NomiReadOnlyChat`：接收 `nodeBinding`，在 `onSelectModel` 里写透 override；并把 `<NodePresetPill .../>` 作为 `extraRightTools`（新增可选 prop，仿 `collaboratorSelectorNode`）透传给 `NomiChat` → `NomiSendBox`（`rightTools` 内追加）。
+- `ReadOnlyConversationView` → `NomiReadOnlyChat`：接收 `nodeBinding`，在 `onSelectModel` 里写透 override；并把 `<NodePresetPill .../>` 作为 `extraRightTools`（新增可选 prop，仿 `collaboratorSelectorNode`）透传给 `OpenHubChat` → `NomiSendBox`（`rightTools` 内追加）。
 - 所有新 prop **可选**，不影响 `ReadOnlyConversationView` 的其它用途（如 transcript 镜像）。
 
 ## i18n
@@ -64,7 +64,7 @@ pending 没有会话故无底部输入框。把原 `NodePreconfigPanel` body 换
 
 ## 边界与取舍
 
-- **非 nomi worker**：不存在（worker 恒为 nomi）。若将来出现，pill 仅在 nomi 分支注入，其它分支自然不显示（可接受）。
+- **非 openhub worker**：不存在（worker 恒为 openhub）。若将来出现，pill 仅在 openhub 分支注入，其它分支自然不显示（可接受）。
 - **模型写透的时序**：输入框显示 worker 实际用的 `conversation.model`；改它会连带写 override，以最新一次改动为准。若此前 override 被单独预设成别的值，会被覆盖——可接受，popover/说明里点明。
 - **视觉硬门槛**：pill/popover 沿用现有 `sendbox-model-btn` + composer popover 视觉语言（`orchestratorComposer.module.css` / arco Dropdown），必须漂亮、与既有输入框语言对齐。
 - **无前端单测**：验收＝`ui` 目录 `bun run typecheck` 退出码 0 + 用户真机视觉验收。

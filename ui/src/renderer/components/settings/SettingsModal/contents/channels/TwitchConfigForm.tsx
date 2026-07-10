@@ -77,7 +77,7 @@ const TwitchConfigForm: React.FC<TwitchConfigFormProps> = ({ pluginStatus, chann
     const config = { credentials: { token: token.trim(), twitch_channel: twitchChannel.trim() } };
     const result = await channel.enablePlugin.invoke(channelTarget ? { plugin_id: channelTarget.channelId, plugin_type: 'twitch', ...(channelTarget.publicAgentId ? { public_agent_id: channelTarget.publicAgentId } : { companion_id: channelTarget.companionId }), config } : { plugin_id: 'twitch', config });
     if (!result.success) {
-      throw new Error(result.error || result.message || t('nomi.settings.remoteEnableFailed', { defaultValue: 'Failed to enable channel' }));
+      throw new Error(result.error || result.message || t('openhub.settings.remoteEnableFailed', { defaultValue: 'Failed to enable channel' }));
     }
     Message.success(t('settings.twitch.pluginEnabled', 'Twitch bot enabled'));
     const plugins = await channel.getPluginStatus.invoke();

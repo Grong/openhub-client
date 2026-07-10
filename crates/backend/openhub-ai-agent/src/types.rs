@@ -41,7 +41,7 @@ pub struct BuildTaskOptions {
     #[serde(default)]
     pub extra: serde_json::Value,
     /// Owning conversation row's `created_at` (ms). Stable per conversation
-    /// INSTANCE — used to stamp/validate the nomi session's `owner_token` so a
+    /// INSTANCE — used to stamp/validate the openhub session's `owner_token` so a
     /// reused integer id never resumes a stale session. `None` skips validation.
     #[serde(default)]
     pub conversation_created_at: Option<i64>,
@@ -78,7 +78,7 @@ pub struct NomiResolvedConfig {
     pub context_limit: Option<u64>,
     /// Provider-specific compat overrides.
     pub compat_overrides: NomiCompatOverrides,
-    /// Directory for nomi session persistence files.
+    /// Directory for openhub session persistence files.
     pub session_directory: PathBuf,
     /// Session mode (default, auto_edit, yolo).
     pub session_mode: Option<String>,
@@ -139,7 +139,7 @@ pub struct NomiResolvedConfig {
     /// `openhub_browser` type) so this crate needs no `openhub-browser` dependency.
     pub browser_secret_vault: Option<BrowserSecretVault>,
     /// Stable identity of the owning conversation INSTANCE (the conversation
-    /// row's `created_at`, stringified). Threaded to the nomi manager so it can
+    /// row's `created_at`, stringified). Threaded to the openhub manager so it can
     /// stamp/validate the session's `owner_token` and refuse to resume a stale
     /// session left by a prior conversation that reused this integer id. `None`
     /// = caller did not supply it (validation skipped — legacy/safe).

@@ -22,7 +22,7 @@ pub struct ChannelSettingsService {
 /// Resolved agent configuration for a channel platform.
 ///
 /// `backend` is only meaningful for ACP agents (claude, gemini, codex, …).
-/// Non-ACP agent types (nomi, nanobot, remote, …) have `backend = None`.
+/// Non-ACP agent types (openhub, nanobot, remote, …) have `backend = None`.
 #[derive(Debug, Clone)]
 pub struct ResolvedAgentConfig {
     pub agent_type: String,
@@ -48,7 +48,7 @@ impl ChannelSettingsService {
     /// - **New:** `{"agent_type":"acp","backend":"claude","name":"Claude"}`
     /// - **Legacy:** `{"backend":"claude","name":"Claude"}` (no agent_type field)
     ///
-    /// Falls back to `agent_type=nomi, backend=None` when no config exists.
+    /// Falls back to `agent_type=openhub, backend=None` when no config exists.
     pub async fn get_agent_config(&self, platform: PluginType) -> Result<ResolvedAgentConfig, ChannelError> {
         let key = agent_key(platform);
         let prefs = self.pref_repo.get_by_keys(&[&key]).await?;
@@ -345,7 +345,7 @@ mod tests {
     }
 
     #[test]
-    fn openhub_backends_map_to_nomi() {
+    fn openhub_backends_map_to_openhub() {
         assert_eq!(backend_to_agent_type("openhub"), "openhub");
         assert_eq!(backend_to_agent_type("openhub-cli"), "openhub");
     }
@@ -416,7 +416,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn agent_config_reads_new_format_nomi() {
+    async fn agent_config_reads_new_format_openhub() {
         let repo = Arc::new(MockPrefRepo::with_data(vec![(
             "assistant.lark.agent",
             r#"{"agent_type":"openhub","name":"Nomi"}"#,

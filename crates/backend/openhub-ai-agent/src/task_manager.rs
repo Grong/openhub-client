@@ -358,7 +358,7 @@ impl OnConversationDelete for WorkerTaskManagerImpl {
     }
 }
 
-/// Conversation-delete hook that removes a conversation's on-disk nomi state:
+/// Conversation-delete hook that removes a conversation's on-disk openhub state:
 /// the global `openhub-sessions/*_{id}.json` file (+ index entry) and any legacy
 /// id-named temp workspace under `work_dir/conversations`.
 ///
@@ -366,7 +366,7 @@ impl OnConversationDelete for WorkerTaskManagerImpl {
 /// only by the reusable integer conversation id, so an orphan could later be
 /// resumed by a brand-new conversation that reuses the id (e.g. after a DB
 /// rebaseline) — the cross-conversation "memory bleed" this guards against,
-/// complementing the per-session `owner_token` check in the nomi factory.
+/// complementing the per-session `owner_token` check in the openhub factory.
 /// Best-effort: every failure is logged, never fatal.
 pub struct NomiSessionFilesCascade {
     pub data_dir: PathBuf,
@@ -378,10 +378,10 @@ impl OnConversationDelete for NomiSessionFilesCascade {
     async fn on_conversation_deleted(&self, conversation_id: i64) {
         let id = conversation_id.to_string();
 
-        // 1) nomi session transcript file + index entry.
+        // 1) openhub session transcript file + index entry.
         let mgr = SessionManager::new(self.data_dir.join("openhub-sessions"), 100);
         if let Err(e) = mgr.delete_session(&id) {
-            warn!(conversation_id, error = %e, "Failed to delete nomi session file on conversation delete (non-fatal)");
+            warn!(conversation_id, error = %e, "Failed to delete openhub session file on conversation delete (non-fatal)");
         }
 
         // 2) legacy auto-provisioned temp workspace(s) named `{label}-temp-{id}`.

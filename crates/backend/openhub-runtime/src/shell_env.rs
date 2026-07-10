@@ -732,12 +732,12 @@ mod tests {
     #[cfg(unix)]
     #[test]
     fn run_login_shell_path_sources_interactive_rc() {
-        // Regression test for the "only nomi shows up" bug: a *non*-interactive
+        // Regression test for the "only openhub shows up" bug: a *non*-interactive
         // login shell (`-l`) does NOT source ~/.zshrc, where most users add
         // their CLI dirs (nvm/fnm/pnpm/asdf/mise/custom npm prefixes). The
         // probe must use an *interactive* login shell (`-i -l`) so PATH
         // entries from ~/.zshrc are visible — otherwise claude/codex go
-        // undetected and only the internal `nomi` agent shows up.
+        // undetected and only the internal `openhub` agent shows up.
         let zsh = Path::new("/bin/zsh");
         if !zsh.exists() {
             eprintln!("skipping run_login_shell_path_sources_interactive_rc: /bin/zsh absent");

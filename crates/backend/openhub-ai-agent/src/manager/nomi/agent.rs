@@ -390,7 +390,7 @@ impl NomiAgentManager {
             config_extra.browser_unrestricted_approval,
             approval_manager.as_ref(),
         ) {
-            let gate = crate::manager::nomi::browser_approval::DesktopApprovalGate::new(
+            let gate = crate::manager::openhub::browser_approval::DesktopApprovalGate::new(
                 runtime.event_sender(),
                 confirmations.clone(),
                 approval_manager.clone(),
@@ -403,7 +403,7 @@ impl NomiAgentManager {
                 conversation_id = %conversation_id,
                 session_id = %session.id,
                 message_count = session.messages.len(),
-                "Resuming nomi session"
+                "Resuming openhub session"
             );
             bootstrap = bootstrap.resume(session);
         }

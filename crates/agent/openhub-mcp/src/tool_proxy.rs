@@ -94,7 +94,7 @@ impl McpToolProxy {
 
     /// Map MCP annotations to an approval [`ToolCategory`].
     ///
-    /// Rule (mirrors codex `requires_mcp_tool_approval`, collapsed onto nomi's
+    /// Rule (mirrors codex `requires_mcp_tool_approval`, collapsed onto openhub's
     /// Info/Exec axis):
     /// - `readOnlyHint == Some(true)` → [`ToolCategory::Info`] (approval-free).
     /// - everything else — `destructiveHint`, no hints, or an old server with no

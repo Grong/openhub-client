@@ -640,7 +640,7 @@ mod tests {
     fn host_guard_rejects_domain_names() {
         assert!(!host_is_ip_or_localhost("evil.com"));
         assert!(!host_is_ip_or_localhost("attacker.example:25808"));
-        assert!(!host_is_ip_or_localhost("nomi.local"));
+        assert!(!host_is_ip_or_localhost("openhub.local"));
     }
 
     #[test]

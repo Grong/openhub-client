@@ -7,7 +7,7 @@
 import { ipcBridge } from '@/common';
 import type { AgentMetadata } from '@/renderer/utils/model/agentTypes';
 import classNames from 'classnames';
-import NomiModal from '@/renderer/components/base/NomiModal';
+import OpenHubModal from '@/renderer/components/base/OpenHubModal';
 import { useAgents } from '@/renderer/hooks/agent/useAgents';
 import { useContainerWidth } from '@/renderer/hooks/ui/useContainerWidth';
 import { Button, Typography } from '@arco-design/web-react';
@@ -21,7 +21,7 @@ import { AgentHubModal } from './AgentHubModal';
 import InlineAgentEditor, { type CustomAgentDraft } from './InlineAgentEditor';
 import { getAgentKey } from '@/renderer/pages/guid/hooks/agentSelectionUtils';
 import { openExternalUrl } from '@/renderer/utils/platform';
-import { useNomiQuickStart } from '@/renderer/hooks/agent/useNomiQuickStart';
+import { useOpenHubQuickStart } from '@/renderer/hooks/agent/useOpenHubQuickStart';
 import { SUPPORTED_AGENTS, type SupportedAgent } from './supportedAgents';
 
 /**
@@ -73,7 +73,7 @@ const LocalAgents: React.FC = () => {
     (s) => !installedBackends.has(s.backend) && (Boolean(s.website) || s.installHint.trim().length > 0)
   );
 
-  const { start: startNomiInstall } = useNomiQuickStart();
+  const { start: startNomiInstall } = useOpenHubQuickStart();
   const [installingBackend, setInstallingBackend] = useState<string | null>(null);
 
   const handleOneClickInstall = useCallback(
@@ -290,7 +290,7 @@ const LocalAgents: React.FC = () => {
         </div>
       )}
 
-      <NomiModal
+      <OpenHubModal
         visible={editorVisible}
         onCancel={() => {
           setEditorVisible(false);
@@ -327,7 +327,7 @@ const LocalAgents: React.FC = () => {
             }}
           />
         )}
-      </NomiModal>
+      </OpenHubModal>
 
       <div className='flex flex-col gap-4px px-0'>
         {customAgents?.map((agent) => (

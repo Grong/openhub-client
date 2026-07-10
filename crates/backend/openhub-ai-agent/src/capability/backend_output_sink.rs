@@ -199,7 +199,7 @@ impl OutputSink for BackendOutputSink {
             tool = name,
             has_input_preview = parsed_input.is_some(),
             status = ?ToolCallStatus::Running,
-            "Emitting nomi tool_call progress event"
+            "Emitting openhub tool_call progress event"
         );
 
         self.remember_active_tool_call(
@@ -244,14 +244,14 @@ impl OutputSink for BackendOutputSink {
             call_id = %call_id,
             tool = name,
             status = ?ToolCallStatus::Running,
-            "Derived internal tool_call id from nomi tool_use_id"
+            "Derived internal tool_call id from openhub tool_use_id"
         );
         tracing::info!(
             tool_use_id = %tool_use_id,
             call_id = %call_id,
             tool = name,
             status = ?ToolCallStatus::Running,
-            "Emitting nomi tool_call event"
+            "Emitting openhub tool_call event"
         );
 
         self.remember_active_tool_call(
@@ -304,7 +304,7 @@ impl OutputSink for BackendOutputSink {
             call_id = %call_id,
             tool = name,
             status = ?status,
-            "Emitting nomi tool_result event"
+            "Emitting openhub tool_result event"
         );
 
         let _ = self.event_tx.send(AgentStreamEvent::ToolCall(ToolCallEventData {

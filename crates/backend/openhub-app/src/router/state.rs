@@ -230,7 +230,7 @@ pub async fn build_module_states(services: &AppServices) -> (ModuleStates, Chann
         // ConversationService (the one worker turns run on) by handing it the
         // same IdmmManager (as a `ConversationSupervisionHook`) the route/terminal
         // instances use. `orchestrator_idmm_hook` was cloned above (before
-        // `idmm_state` moved into the `idmm:` field) — autonomous worker (nomi
+        // `idmm_state` moved into the `idmm:` field) — autonomous worker (openhub
         // yolo) turns then arm 智能决策 per turn and auto-resolve
         // decisions/open-questions instead of stalling. The wiring lives entirely
         // in this app layer (no orchestrator→idmm dependency — the hook is a
@@ -361,7 +361,7 @@ pub fn build_conversation_state(
     )));
     conversation_service.with_knowledge_service(services.knowledge_service.clone());
     // Phase 3: wire the model-failover deps so a pre-response provider fault on a
-    // nomi turn can switch to the next queued model (plan D5).
+    // openhub turn can switch to the next queued model (plan D5).
     conversation_service.with_failover_deps(
         Arc::new(SqliteProviderRepository::new(services.database.pool().clone())),
         Arc::new(SqliteClientPreferenceRepository::new(services.database.pool().clone())),
@@ -378,10 +378,10 @@ pub fn build_conversation_state(
     conversation_service.with_delete_hook(Arc::new(IdmmRecordCascade {
         records: Arc::new(SqliteIdmmInterventionRepository::new(services.database.pool().clone())),
     }) as Arc<dyn OnConversationDelete>);
-    // Remove the conversation's on-disk nomi session file + auto-provisioned
+    // Remove the conversation's on-disk openhub session file + auto-provisioned
     // temp workspace so a future conversation reusing this integer id cannot
     // resume stale state (cross-conversation memory bleed). Pairs with the
-    // per-session `owner_token` validation in the nomi factory.
+    // per-session `owner_token` validation in the openhub factory.
     conversation_service.with_delete_hook(Arc::new(
         openhub_ai_agent::task_manager::NomiSessionFilesCascade {
             data_dir: services.data_dir.clone(),
@@ -723,7 +723,7 @@ pub async fn build_channel_state(
     conversation_svc.with_mcp_server_repo(Arc::new(openhub_db::SqliteMcpServerRepository::new(
         services.database.pool().clone(),
     )));
-    // Phase 3: channel master-agent turns run the nomi send loop too.
+    // Phase 3: channel master-agent turns run the openhub send loop too.
     conversation_svc.with_failover_deps(
         Arc::new(SqliteProviderRepository::new(services.database.pool().clone())),
         Arc::new(SqliteClientPreferenceRepository::new(services.database.pool().clone())),
@@ -826,7 +826,7 @@ pub fn build_terminal_state(services: &AppServices) -> TerminalRouterState {
 /// services.
 ///
 /// Reuses the singleton `requirement_service` (which shares its repo + WS emitter
-/// with the nomi native-tool sink), attaches a `ConversationService` + repo to a
+/// with the openhub native-tool sink), attaches a `ConversationService` + repo to a
 /// clone for AutoWork config persistence, builds the AutoWork orchestrator, and
 /// constructs the IDMM supervisor sharing the same live-session collaborators
 /// (threaded back into the orchestrator as its `IdmmHandle`).
@@ -853,7 +853,7 @@ pub fn build_requirement_state(services: &AppServices) -> (RequirementRouterStat
         acp_session_repo,
     )
     .with_runtime_state(services.conversation_runtime_state.clone());
-    // Phase 3: AutoWork-driven nomi turns run the send loop, and IDMM fault
+    // Phase 3: AutoWork-driven openhub turns run the send loop, and IDMM fault
     // supervision (Task 3) reuses `perform_model_failover` — wire the deps here too.
     conv_service.with_failover_deps(
         Arc::new(SqliteProviderRepository::new(pool.clone())),
@@ -1258,7 +1258,7 @@ impl LeadReporter for OrchestratorLeadReporter {
 }
 /// [`RunService`] (create/plan/inspect/cancel) + [`RunEngine`] (serial execution
 /// loop). The fleet/workspace repos + the run repo are root-re-exported from
-/// `openhub_db`; the worker runs tasks on real nomi conversations via a
+/// `openhub_db`; the worker runs tasks on real openhub conversations via a
 /// `ConversationWorkerRunner` built from a fresh `ConversationService` (the same
 /// recipe `build_cron_state` / `build_requirement_state` use).
 ///
@@ -1283,7 +1283,7 @@ pub fn build_orchestrator_state(
     // Realtime emitter shares the app's broadcast bus.
     let emitter = OrchestratorRunEventEmitter::new(services.event_bus.clone());
 
-    // Worker = a fresh nomi conversation. Build a ConversationService mirroring
+    // Worker = a fresh openhub conversation. Build a ConversationService mirroring
     // build_cron_state's recipe, then a ConversationWorkerRunner over it.
     let conv_repo: Arc<dyn openhub_db::IConversationRepository> =
         Arc::new(SqliteConversationRepository::new(pool.clone()));
@@ -1304,7 +1304,7 @@ pub fn build_orchestrator_state(
         acp_session_repo,
     )
     .with_runtime_state(services.conversation_runtime_state.clone());
-    // A worker turn runs the same nomi send loop as a plain conversation, so wire
+    // A worker turn runs the same openhub send loop as a plain conversation, so wire
     // the failover deps here too — parity with build_requirement_state's
     // ConversationService (the seam self-gates on AgentType::Nomi).
     conv_service.with_failover_deps(
@@ -1312,7 +1312,7 @@ pub fn build_orchestrator_state(
         Arc::new(SqliteClientPreferenceRepository::new(pool.clone())),
     );
     // P3b: arm IDMM supervision on the worker's ConversationService so each worker
-    // (autonomous nomi yolo) turn fires `on_turn_start` and IDMM auto-resolves
+    // (autonomous openhub yolo) turn fires `on_turn_start` and IDMM auto-resolves
     // decisions/open-questions instead of stalling to timeout. `with_supervision_hook`
     // is `&self` interior-mutable, so the cancel/steer/worker clones below all share
     // this same armed hook slot. The hook is the same IdmmManager (as a
@@ -1539,7 +1539,7 @@ fn spawn_idmm_record_janitor(records: Arc<dyn IIdmmInterventionRepository>) {
 /// singleton `services.companion_service` (constructed in `AppServices::from_config`
 /// before the agent factory, which holds its memory sink) and late-wires the
 /// companion thread manager with a `ConversationService` so companion chats
-/// run as real nomi conversations.
+/// run as real openhub conversations.
 pub fn build_companion_state(
     services: &AppServices,
     channel_manager: Arc<openhub_channel::manager::ChannelManager>,
@@ -1570,7 +1570,7 @@ pub fn build_companion_state(
     // mounts the companion-level knowledge binding ('companion', companionId) at task start —
     // same injection as the main conversation assembly.
     conv_service.with_knowledge_service(services.knowledge_service.clone());
-    // Phase 3: companion turns run the same nomi send loop, so wire failover too.
+    // Phase 3: companion turns run the same openhub send loop, so wire failover too.
     conv_service.with_failover_deps(
         Arc::new(SqliteProviderRepository::new(services.database.pool().clone())),
         Arc::new(SqliteClientPreferenceRepository::new(services.database.pool().clone())),
@@ -1698,7 +1698,7 @@ pub fn build_cron_state(services: &AppServices) -> CronRouterState {
     // Cron-spawned conversations mount their bound knowledge bases too —
     // same injection as the main conversation assembly.
     conv_service.with_knowledge_service(services.knowledge_service.clone());
-    // Phase 3: cron-spawned nomi conversations run the send loop too.
+    // Phase 3: cron-spawned openhub conversations run the send loop too.
     conv_service.with_failover_deps(
         Arc::new(SqliteProviderRepository::new(services.database.pool().clone())),
         Arc::new(SqliteClientPreferenceRepository::new(services.database.pool().clone())),

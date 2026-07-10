@@ -14,7 +14,7 @@ import type { TChatConversation } from '@/common/config/storage';
 /**
  * ClusterModePill —「agent 集群」的会话内图标开关（需求1/5）。
  *
- * 挂在 nomi composer 工具条的权限旁边，popover 内保留两枚开关：
+ * 挂在 openhub composer 工具条的权限旁边，popover 内保留两枚开关：
  *  - **agent 集群**：写 `extra.agent_cluster_mode`。
  *  - **节点审批模式**：写 `extra.orchestrator_approval_mode`（'manual' | 'auto'）。
  *

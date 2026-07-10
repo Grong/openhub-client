@@ -5,7 +5,7 @@
 //! It is a thin facade over the in-tree `openhub_computer::ComputerTool` — every
 //! tool here translates to a `ComputerTool` action and forwards the result — so
 //! codex gets the exact same upgraded automation (multi-window semantic tree,
-//! scrollables, reliable `launch`, real right/double click) that the nomi engine
+//! scrollables, reliable `launch`, real right/double click) that the openhub engine
 //! gets, with zero duplicated logic. Injected on every desktop OS (macOS /
 //! Windows / Linux) when the `computer-use` feature is built (see
 //! `ComputerMcpConfig`); compiled only with that feature so headless/web builds
@@ -13,7 +13,7 @@
 //! per-OS (macOS AX / Windows UIA / Linux AT-SPI); unsupported ops on a given OS
 //! (e.g. OCR on Linux) surface as honest errors rather than being gated off.
 //!
-//! Discrete tools (vs the nomi engine's single `Computer(action)` tool) match
+//! Discrete tools (vs the openhub engine's single `Computer(action)` tool) match
 //! the shape models are trained on, which raises adoption — the user picked this
 //! form for the bridge.
 

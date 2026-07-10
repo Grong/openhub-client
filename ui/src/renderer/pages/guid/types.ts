@@ -9,7 +9,7 @@ import type { AgentSource } from '@/renderer/utils/model/agentTypes';
 
 /**
  * Available agent entry returned by the backend.
- * `agent_type` is the top-level discriminant (acp, nomi, nanobot, etc.).
+ * `agent_type` is the top-level discriminant (acp, openhub, nanobot, etc.).
  * `backend` is only present when `agent_type === 'acp'` (claude, qwen, codex, …).
  */
 export type AvailableAgent = {

@@ -301,7 +301,7 @@ impl ConversationService {
     /// Read AND remove the conversation's accumulated token total (`input +
     /// output` summed across the turns the stream relay saw complete). Returns
     /// `None` when nothing was recorded — e.g. a turn that errored before
-    /// completing, a non-nomi engine that emits no `TurnCompleted`, or a relay
+    /// completing, a non-openhub engine that emits no `TurnCompleted`, or a relay
     /// not wired with the runtime state (every non-orchestrator conversation).
     /// The orchestrator worker calls this exactly once, after its turn settles,
     /// to fill `orch_run_tasks.tokens`. Removing the entry keeps the map bounded.
@@ -398,21 +398,21 @@ impl ConversationService {
         // a silent write to a column nobody reads.
         if req.r#type != AgentType::Nomi && req.model.is_some() {
             return Err(AppError::BadRequest(format!(
-                "top-level `model` is only accepted for nomi conversations; pass model via `extra` for {}",
+                "top-level `model` is only accepted for openhub conversations; pass model via `extra` for {}",
                 req.r#type.serde_name()
             )));
         }
 
         let mut extra = req.extra;
 
-        // nomi source-of-truth rule: top-level `model` wins. If an older client
+        // openhub source-of-truth rule: top-level `model` wins. If an older client
         // still packs `extra.model`, strip it before persist so the stored row
         // has a single canonical model representation.
         if req.r#type == AgentType::Nomi
             && let Some(obj) = extra.as_object_mut()
             && obj.remove("model").is_some()
         {
-            warn!("nomi create: stripped legacy `extra.model`; top-level `model` is canonical");
+            warn!("openhub create: stripped legacy `extra.model`; top-level `model` is canonical");
         }
 
         // Determine whether the user chose this workspace ("custom") or we
@@ -923,20 +923,20 @@ impl ConversationService {
             ));
         }
 
-        // Type-aware rule: top-level `model` is openhub-only. For non-nomi
+        // Type-aware rule: top-level `model` is openhub-only. For non-openhub
         // conversations, model/mode must be updated via `extra` (see spec
         // 2026-05-12).
         let existing_type: AgentType = string_to_enum(&existing.r#type)?;
         if existing_type != AgentType::Nomi && req.model.is_some() {
             return Err(AppError::BadRequest(format!(
-                "top-level `model` is only accepted for nomi conversations; pass model via `extra` for {}",
+                "top-level `model` is only accepted for openhub conversations; pass model via `extra` for {}",
                 existing.r#type
             )));
         }
 
         let now = now_ms();
 
-        // Merge extra if provided. For nomi, strip `extra.model` post-merge
+        // Merge extra if provided. For openhub, strip `extra.model` post-merge
         // so the row keeps a single canonical model source (top-level column).
         let merged_extra = if let Some(new_extra) = &req.extra {
             let mut existing_extra: serde_json::Value =
@@ -946,7 +946,7 @@ impl ConversationService {
                 && let Some(obj) = existing_extra.as_object_mut()
                 && obj.remove("model").is_some()
             {
-                warn!("nomi update: stripped legacy `extra.model` from merged extra");
+                warn!("openhub update: stripped legacy `extra.model` from merged extra");
             }
             if new_extra.get("workspace").is_some() {
                 normalize_workspace_extra(&mut existing_extra)?;
@@ -1897,7 +1897,7 @@ impl ConversationService {
                     relay = relay.with_runtime_state(state);
                 }
 
-                // 为 nomi 轮安装 pre-response 错误抑制器:既隐藏"将被换模型重试"的
+                // 为 openhub 轮安装 pre-response 错误抑制器:既隐藏"将被换模型重试"的
                 // provider fault(在切换上限内),也隐藏"将被同模型剔图重试"的
                 // image-unsupported 400(每轮一次)。被吞的错误进 outcome.suppressed_error,
                 // 若两种重试都未触发,则下方原样 re-surface。
@@ -1939,13 +1939,13 @@ impl ConversationService {
                 }
 
                 // Phase 3 (plan D3): model failover. Only fires on a pre-response
-                // nomi provider fault, bounded by min(max_switches, queue.len()).
+                // openhub provider fault, bounded by min(max_switches, queue.len()).
                 // On a usable next model we swap `agent` to the rebuilt task and
                 // resend the SAME content with a fresh msg_id; on None (queue
                 // exhausted / disabled / not eligible) we fall through to the
                 // ACP-eviction + error-surfacing path unchanged. This runs BEFORE
                 // `evict_acp_task_after_terminal_error` (which only acts on ACP),
-                // so a successful nomi failover short-circuits via `continue`.
+                // so a successful openhub failover short-circuits via `continue`.
                 if let Some(switch) = service
                     .maybe_failover_in_send_loop(
                         &conv_id,
@@ -1981,7 +1981,7 @@ impl ConversationService {
 
                 // 图片不支持降级:pre-response 的 image-unsupported 400 → 记忆 + 提示 +
                 // 同模型剔图重跑(每轮一次)。重跑因命中 registry 而剔图,通常成功。
-                // 未触发(已重跑过 / 非 nomi / 有响应 / 码不符 / 重建失败)则落到下方
+                // 未触发(已重跑过 / 非 openhub / 有响应 / 码不符 / 重建失败)则落到下方
                 // re-surface,把原始错误显示给用户。
                 if image_strip_retries_done == 0
                     && agent.agent_type() == AgentType::Nomi
@@ -2535,7 +2535,7 @@ impl ConversationService {
             model,
             conversation_id: row.id.to_string(),
             extra,
-            // Stamp/validate the nomi session against this conversation instance.
+            // Stamp/validate the openhub session against this conversation instance.
             conversation_created_at: Some(row.created_at),
         })
     }

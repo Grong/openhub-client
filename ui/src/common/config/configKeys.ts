@@ -38,11 +38,11 @@ export type ConfigKeyMap = {
   customCss: string;
   'css.themes': ICssTheme[];
   'css.activeThemeId': string;
-  'nomi.config': { preferredMode?: string } | undefined;
-  'nomi.defaultModel': { id: string; use_model: string } | undefined;
-  // 智能编排「协作模型」默认偏好：主模型(=nomi.defaultModel)之外、供主模型按任务难度
+  'openhub.config': { preferredMode?: string } | undefined;
+  'openhub.defaultModel': { id: string; use_model: string } | undefined;
+  // 智能编排「协作模型」默认偏好：主模型(=openhub.defaultModel)之外、供主模型按任务难度
   // 为各节点挑选的额外 worker 模型池。仅编排发起时使用；空 = 全程用主模型。
-  'nomi.orchestrationCollaborators': { provider_id: string; model: string }[] | undefined;
+  'openhub.orchestrationCollaborators': { provider_id: string; model: string }[] | undefined;
   // Default provider+model for the knowledge-base AI description/overview
   // generators (autogen / description.generate / description.polish). Empty
   // value = let the backend fall back to its own default completer model.
@@ -58,10 +58,10 @@ export type ConfigKeyMap = {
   'system.autoPreviewOfficeFiles': boolean | undefined;
   // 发送键偏好：'enter'=Enter 发送/Shift+Enter 换行（默认）；'mod-enter'=Ctrl/⌘+Enter 发送、Enter 换行
   'chat.sendKey': 'enter' | 'mod-enter' | undefined;
-  // Desktop control (computer-use): gates the nomi engine's Computer tool
+  // Desktop control (computer-use): gates the openhub engine's Computer tool
   // (observe/click/type/launch). Read by the backend agent factory per session.
   'agent.computerUse': boolean | undefined;
-  // Browser control (browser-use): gates the nomi engine's built-in browser
+  // Browser control (browser-use): gates the openhub engine's built-in browser
   // tools (native CDP engine). ON by default on browser-use (desktop) builds; the
   // managed Chromium is fetched lazily on first use and runs silently (headless).
   // Read by the backend agent factory per session.

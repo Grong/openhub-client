@@ -19,7 +19,7 @@ mod discovery_supplemental_tests {
 
     /// Create a `.openhub/skills/` directory inside `parent`.
     fn create_skill_dir(parent: &Path) -> PathBuf {
-        let dir = parent.join(".nomi").join("skills");
+        let dir = parent.join(".openhub").join("skills");
         fs::create_dir_all(&dir).unwrap();
         dir
     }

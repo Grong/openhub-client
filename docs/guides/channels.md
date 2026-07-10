@@ -23,8 +23,8 @@ Channels are useful when:
 
 ## Where to find it
 
-Open the Nomi page (`/nomi`), select a companion, and switch to the
-**Remote** tab (`/nomi?companion=<id>&tab=remote`). That tab lists the
+Open the Nomi page (`/openhub`), select a companion, and switch to the
+**Remote** tab (`/openhub?companion=<id>&tab=remote`). That tab lists the
 remote connectors for the selected companion — built-in (Telegram,
 Lark, DingTalk, WeChat, WeCom, Slack, Discord, extensions). For each
 plugin you'll see:
@@ -266,7 +266,7 @@ What you don't get from the IM side (yet):
 
 | What                            | Where                                                   |
 | ------------------------------- | ------------------------------------------------------- |
-| Channels UI                     | `/nomi?companion=<id>&tab=remote`                       |
+| Channels UI                     | `/openhub?companion=<id>&tab=remote`                       |
 | List plugins / status           | `GET /api/channel/plugins`                              |
 | Enable / disable                | `POST /api/channel/plugins/enable`, `…/disable`         |
 | Test credentials                | `POST /api/channel/plugins/test`                        |

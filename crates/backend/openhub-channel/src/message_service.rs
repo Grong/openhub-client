@@ -20,7 +20,7 @@ use crate::types::{OutgoingMessageType, PluginType, UnifiedOutgoingMessage};
 /// resolves which companion greets a session via the channel row's own `companion_id`
 /// binding first, falling back to this profile (`master_companion_id`: legacy
 /// per-platform binding only — no default-companion fallback). `companion_model` is the **primary** model
-/// source for a master-mode nomi session bound to a companion (唯一事实源
+/// source for a master-mode openhub session bound to a companion (唯一事实源
 /// `profile.model`); the platform `defaultModel` is only a legacy fallback
 /// when the companion has no model.
 /// Implemented in `openhub-app` over `CompanionService` + `ChannelSettingsService`
@@ -252,7 +252,7 @@ impl ChannelMessageService {
     ) -> Result<SendResult, ChannelError> {
         // 对外伙伴 (public agent) binding takes precedence over EVERYTHING. A
         // bot bound to a public agent serves strangers via an isolated per-chat,
-        // PublicService-clamped nomi session — never a companion, and never the
+        // PublicService-clamped openhub session — never a companion, and never the
         // desktop gateway. Resolved FIRST and PER-BOT (from the channel row's own
         // `public_agent_id`, via session.channel_id) so a companion-bound bot on
         // the same platform is unaffected: precedence is per-bot, and the hard
@@ -264,7 +264,7 @@ impl ChannelMessageService {
             return self.send_to_public_agent(session, text, platform, &pa_id).await;
         }
 
-        // Resolve the target conversation. A nomi channel turn bound to a
+        // Resolve the target conversation. A openhub channel turn bound to a
         // companion is routed into that companion's ONE persistent session, so
         // the desktop bubble, the chat tab, and every IM chat share a single
         // transcript (no more separate per-chat channel-master conversation
@@ -315,9 +315,9 @@ impl ChannelMessageService {
     }
 
     /// Routes an inbound turn on a 对外伙伴 (public-agent) bound platform into an
-    /// isolated per-chat, `PublicService`-clamped nomi session. NEVER a companion
+    /// isolated per-chat, `PublicService`-clamped openhub session. NEVER a companion
     /// and NEVER the desktop gateway — the session's `extra.public_agent_id` is
-    /// what hard-clamps it to safe tools in the nomi factory, so a stranger can be
+    /// what hard-clamps it to safe tools in the openhub factory, so a stranger can be
     /// auto-served safely.
     async fn send_to_public_agent(
         &self,
@@ -465,9 +465,9 @@ impl ChannelMessageService {
             None
         };
 
-        // 模型解析顺序（绑定伙伴的 nomi 会话）：
+        // 模型解析顺序（绑定伙伴的 openhub 会话）：
         // 绑定伙伴的 profile.model 为主（唯一事实源）> 平台 defaultModel（遗留兜底）> 空。
-        // 伙伴模型只作用于 nomi 引擎——ACP CLI 自带模型配置，仍走平台 defaultModel。
+        // 伙伴模型只作用于 openhub 引擎——ACP CLI 自带模型配置，仍走平台 defaultModel。
         let mut model = if agent_type == AgentType::Nomi
             && let Some(profile) = self.master_profile.as_ref()
             && let Some(companion_id) = master_companion_id.as_deref()
@@ -493,7 +493,7 @@ impl ChannelMessageService {
             session.chat_id.as_deref(),
         );
 
-        // Top-level `model` is only accepted for nomi; other types pass via `extra`.
+        // Top-level `model` is only accepted for openhub; other types pass via `extra`.
         let top_level_model = if agent_type == AgentType::Nomi {
             Some(model)
         } else {
@@ -528,8 +528,8 @@ impl ChannelMessageService {
 
     /// Creates a fresh per-chat conversation for a 对外伙伴 (public-agent) session.
     ///
-    /// A public-agent session is ALWAYS a nomi conversation (the `PublicService`
-    /// hard clamp lives in the nomi factory and keys off `extra.public_agent_id`),
+    /// A public-agent session is ALWAYS a openhub conversation (the `PublicService`
+    /// hard clamp lives in the openhub factory and keys off `extra.public_agent_id`),
     /// regardless of the platform's configured agent type. The extra carries
     /// `public_agent_id` + `channelPlatform` but deliberately NO `companionId` and
     /// NO `desktopGateway` — public agents get no gateway. The answering model
@@ -569,7 +569,7 @@ impl ChannelMessageService {
         let req = CreateConversationRequest {
             r#type: AgentType::Nomi,
             name: Some(name),
-            // Public agents are nomi only → the model rides the top-level field.
+            // Public agents are openhub only → the model rides the top-level field.
             model: Some(model),
             source: Some(platform_to_source(platform)),
             channel_chat_id: session.chat_id.clone(),
@@ -822,7 +822,7 @@ impl ChannelMessageService {
     /// Build the `extra` JSON for a 对外伙伴 (public-agent) channel conversation.
     ///
     /// `session_mode: "yolo"` (no interactive confirmations on a channel), plus
-    /// `public_agent_id` (the nomi factory keys the `PublicService` hard clamp off
+    /// `public_agent_id` (the openhub factory keys the `PublicService` hard clamp off
     /// this) and `channelPlatform` (persona remote-context framing). Deliberately
     /// carries NO `companionId` and NO `desktopGateway` — public agents get no
     /// gateway; the clamp turns off gateway / computer / browser / spawn.
@@ -873,7 +873,7 @@ pub enum StreamAction {
 
 /// Decorate a channel conversation's extra so the session is a companion master
 /// session: it gets the Desktop Gateway tools (`extra.desktopGateway`, every
-/// agent type), and on the nomi engine additionally the companion semantics —
+/// agent type), and on the openhub engine additionally the companion semantics —
 /// persona system prompt (built fresh per agent build by the factory's
 /// `CompanionPromptProvider`) + memory tools (`extra.companionSession`), with the
 /// platform recorded for the persona's remote-context framing and the bound
@@ -1578,7 +1578,7 @@ mod tests {
         assert_eq!(extra["backend"], "claude");
     }
 
-    // ── model placement by agent_type (regression: non-nomi must not
+    // ── model placement by agent_type (regression: non-openhub must not
     //    use top-level model) ──────────────────────────────────────────
 
     #[test]
@@ -1620,7 +1620,7 @@ mod tests {
             None
         };
 
-        assert!(top_level_model.is_some(), "nomi must use top-level model");
+        assert!(top_level_model.is_some(), "openhub must use top-level model");
         assert!(extra.get("model").is_none() || extra["model"].is_null());
     }
 
@@ -1633,7 +1633,7 @@ mod tests {
     }
 
     #[test]
-    fn conv_name_telegram_nomi() {
+    fn conv_name_telegram_openhub() {
         let name = channel_conversation_name(PluginType::Telegram, "openhub", None, Some("70880480"));
         assert_eq!(name, "tg-openhub-70880480");
     }

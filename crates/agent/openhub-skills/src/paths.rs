@@ -43,7 +43,7 @@ pub fn project_commands_dirs(cwd: &Path) -> Vec<PathBuf> {
 pub fn additional_skills_dirs(add_dirs: &[PathBuf]) -> Vec<PathBuf> {
     add_dirs
         .iter()
-        .map(|d| d.join(".nomi").join("skills"))
+        .map(|d| d.join(".openhub").join("skills"))
         .filter(|p| p.is_dir())
         .collect()
 }
@@ -80,7 +80,7 @@ fn walk_up_dirs(cwd: &Path, subdir: &str) -> Vec<PathBuf> {
     let mut current = cwd.to_path_buf();
 
     loop {
-        let candidate = current.join(".nomi").join(subdir);
+        let candidate = current.join(".openhub").join(subdir);
         if candidate.is_dir() {
             dirs.push(candidate);
         }

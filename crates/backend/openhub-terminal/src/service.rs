@@ -2093,7 +2093,7 @@ mod tests {
         );
 
         // The README contract is materialized inside the mount dir.
-        let readme = cwd.path().join(".nomi").join("knowledge").join("README.md");
+        let readme = cwd.path().join(".openhub").join("knowledge").join("README.md");
         assert!(readme.exists(), "README.md must be written at {readme:?}");
         let text = std::fs::read_to_string(&readme).unwrap();
         assert!(
@@ -2147,7 +2147,7 @@ mod tests {
         // End-to-end: the README contract materializes from the workpath binding.
         assert!(
             cwd.path()
-                .join(".nomi")
+                .join(".openhub")
                 .join("knowledge")
                 .join("README.md")
                 .exists(),
@@ -2229,7 +2229,7 @@ mod tests {
         let mut request = req("cat", &[]);
         request.cwd = cwd.path().to_string_lossy().into_owned();
         let resp = svc.create("u", request).await.unwrap(); // no kb ids yet
-        let readme = cwd.path().join(".nomi").join("knowledge").join("README.md");
+        let readme = cwd.path().join(".openhub").join("knowledge").join("README.md");
         assert!(!readme.exists(), "no binding yet → no README");
 
         // Bind afterwards (the KnowledgeControl UI path), then relaunch in place
@@ -2287,7 +2287,7 @@ mod tests {
         );
         assert!(
             !cwd.path()
-                .join(".nomi")
+                .join(".openhub")
                 .join("knowledge")
                 .join("README.md")
                 .exists()

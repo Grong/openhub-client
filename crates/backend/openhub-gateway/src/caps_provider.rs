@@ -1,5 +1,5 @@
 //! Provider-domain capability (registry form): the read-only model-provider
-//! catalog. The shared nomi model-resolution chain stays in `tools_provider`
+//! catalog. The shared openhub model-resolution chain stays in `tools_provider`
 //! (used by the cron + conversation capabilities), this only exposes listing.
 
 use std::sync::Arc;
@@ -48,7 +48,7 @@ async fn list(deps: Arc<GatewayDeps>, p: ListProvidersParams) -> Value {
     if items.is_empty() {
         return ok(json!({
             "providers": [],
-            "note": "no model provider is configured/enabled on this desktop yet — add one in Settings → Providers (or via openhub_create_provider) before creating nomi conversations or cron jobs"
+            "note": "no model provider is configured/enabled on this desktop yet — add one in Settings → Providers (or via openhub_create_provider) before creating openhub conversations or cron jobs"
         }));
     }
     ok(json!({ "providers": items }))

@@ -153,7 +153,7 @@ fn sync_mounts_inner(workspace: &Path, specs: &[MountSpec]) -> Vec<String> {
     present
 }
 
-/// Best-effort sweep of the pre-`.nomi` mount scaffolding left in workspaces
+/// Best-effort sweep of the pre-`.openhub` mount scaffolding left in workspaces
 /// created before the rename: `{ws}/.openhub/knowledge/*` links (deleted as
 /// links — never followed into the knowledge bases) plus the self-ignore we
 /// used to write at `{ws}/.openhub/.gitignore`. The `.openhub/` directory
@@ -358,11 +358,11 @@ mod tests {
 
         // The self-ignore lives INSIDE `.openhub/knowledge/` — pinned to the
         // literal path so a constant regression cannot slip through.
-        let inside = ws.path().join(".nomi").join("knowledge").join(".gitignore");
+        let inside = ws.path().join(".openhub").join("knowledge").join(".gitignore");
         assert_eq!(std::fs::read_to_string(&inside).unwrap().trim(), "*");
         // Never at the `.openhub/` root: that would shadow committable sibling
         // trees like `.openhub/skills` out of the user's git repository.
-        assert!(!ws.path().join(".nomi").join(".gitignore").exists());
+        assert!(!ws.path().join(".openhub").join(".gitignore").exists());
     }
 
     #[tokio::test]

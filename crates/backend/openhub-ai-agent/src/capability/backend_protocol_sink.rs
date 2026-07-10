@@ -11,7 +11,7 @@ use crate::protocol::events::{AcpPermissionEventData, AgentStreamEvent, ToolCall
 
 /// Implements `ProtocolEmitter` for the nomicore context.
 ///
-/// Bridges nomi `ProtocolEvent` emissions to `AgentStreamEvent` on a
+/// Bridges openhub `ProtocolEvent` emissions to `AgentStreamEvent` on a
 /// broadcast channel. Only handles events relevant to the approval flow;
 /// other events (text, thinking, tool results) are already handled by
 /// `BackendOutputSink` via the `OutputSink` trait.

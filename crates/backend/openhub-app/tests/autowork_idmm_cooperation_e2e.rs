@@ -117,7 +117,7 @@ async fn autowork_and_idmm_enable_auto_resumes_paused_tag_and_runs_requirement()
     let (token, csrf) = setup_and_login(&mut app, &services, "admin", "StrongP@ss1").await;
     let tag = "coop";
 
-    // A plain desktop nomi conversation (no channel markers → IDMM may act).
+    // A plain desktop openhub conversation (no channel markers → IDMM may act).
     let conv = {
         let body = json!({ "type": "openhub", "name": "coop", "extra": { "workspace": "/project" } });
         let resp = app

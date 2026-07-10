@@ -132,9 +132,9 @@ mod tests {
 
     #[test]
     fn test_update_work_dir_request_deserializes_snake_case() {
-        let raw = json!({ "work_dir": "/Users/me/Workspaces/nomi" });
+        let raw = json!({ "work_dir": "/Users/me/Workspaces/openhub" });
         let req: UpdateWorkDirRequest = serde_json::from_value(raw).unwrap();
-        assert_eq!(req.work_dir, "/Users/me/Workspaces/nomi");
+        assert_eq!(req.work_dir, "/Users/me/Workspaces/openhub");
     }
 
     // -- UpdateCheckResult --

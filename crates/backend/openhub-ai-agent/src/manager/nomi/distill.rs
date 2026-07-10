@@ -1,4 +1,4 @@
-//! Post-session memory distillation orchestration for the nomi engine.
+//! Post-session memory distillation orchestration for the openhub engine.
 //!
 //! This is the async/LLM half of spec-G: the pure functions live in
 //! `openhub_memory::distill`. Here we gate on an opt-in flag, redact the
@@ -24,7 +24,7 @@ use openhub_redact::redact_secrets_owned;
 use crate::factory::provider_config::{one_shot_completion, user_message};
 
 /// Token ceiling for the distillation completion. codex Phase1 runs
-/// low-effort; nomi's `one_shot_completion` already sends no reasoning_effort,
+/// low-effort; openhub's `one_shot_completion` already sends no reasoning_effort,
 /// and a small ceiling keeps the cost of each distilled session bounded.
 const DISTILL_MAX_TOKENS: u32 = 2048;
 

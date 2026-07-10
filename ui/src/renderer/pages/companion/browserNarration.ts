@@ -53,7 +53,7 @@ const extractNameAndArgs = (
 ): { name: string; args: Record<string, unknown> } | null => {
   if (!data || typeof data !== 'object') return null;
 
-  // tool_call（nomi 引擎）：{ name, args, ... }
+  // tool_call（openhub 引擎）：{ name, args, ... }
   const asToolCall = data as { name?: unknown; args?: unknown };
   if (typeof asToolCall.name === 'string' && asToolCall.args && typeof asToolCall.args === 'object') {
     return { name: asToolCall.name, args: asToolCall.args as Record<string, unknown> };
@@ -106,32 +106,32 @@ export const browserNarrationFor = (data: unknown): BrowserNarration | null => {
     case 'open_link_new_tab': {
       const host = friendlyHost(str(args, 'url'));
       return host
-        ? { key: 'nomi.companion.browser.navigate', params: { host } }
-        : { key: 'nomi.companion.browser.busy', params: {} };
+        ? { key: 'openhub.companion.browser.navigate', params: { host } }
+        : { key: 'openhub.companion.browser.busy', params: {} };
     }
     case 'click':
-      return { key: 'nomi.companion.browser.click', params: {} };
+      return { key: 'openhub.companion.browser.click', params: {} };
     case 'type':
     case 'set_value':
-      return { key: 'nomi.companion.browser.type', params: {} };
+      return { key: 'openhub.companion.browser.type', params: {} };
     case 'observe':
-      return { key: 'nomi.companion.browser.observe', params: {} };
+      return { key: 'openhub.companion.browser.observe', params: {} };
     case 'screenshot':
-      return { key: 'nomi.companion.browser.screenshot', params: {} };
+      return { key: 'openhub.companion.browser.screenshot', params: {} };
     case 'extract':
     case 'get_page_text':
-      return { key: 'nomi.companion.browser.read', params: {} };
+      return { key: 'openhub.companion.browser.read', params: {} };
     case 'search_page':
     case 'scroll_to_text':
     case 'find_elements': {
       const q = truncate(str(args, 'query') || str(args, 'text') || str(args, 'selector'), 30);
       return q
-        ? { key: 'nomi.companion.browser.search', params: { query: q } }
-        : { key: 'nomi.companion.browser.busy', params: {} };
+        ? { key: 'openhub.companion.browser.search', params: { query: q } }
+        : { key: 'openhub.companion.browser.busy', params: {} };
     }
     case 'download':
     case 'save_as_pdf':
-      return { key: 'nomi.companion.browser.download', params: {} };
+      return { key: 'openhub.companion.browser.download', params: {} };
     case 'scroll':
     case 'press_key':
     case 'hover':
@@ -152,6 +152,6 @@ export const browserNarrationFor = (data: unknown): BrowserNarration | null => {
     case 'evaluate':
     default:
       // 其余动作（含未知/缺 action）→ 一句通用「正在浏览网页…」，仍比 usingTools 具体。
-      return { key: 'nomi.companion.browser.busy', params: {} };
+      return { key: 'openhub.companion.browser.busy', params: {} };
   }
 };

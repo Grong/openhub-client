@@ -498,7 +498,7 @@ impl Config {
         let project_path = cli
             .project_dir
             .as_ref()
-            .map(|d| d.join(".nomi.toml"))
+            .map(|d| d.join(".openhub.toml"))
             .unwrap_or_else(project_config_path);
         let project = load_config_file(&project_path);
 
@@ -726,7 +726,7 @@ fn resolve_api_key(
 
     anyhow::bail!(
         "No API key found. Provide via --api-key, config file, environment variable \
-         (API_KEY, ANTHROPIC_API_KEY, or OPENAI_API_KEY), or run 'nomi --login'."
+         (API_KEY, ANTHROPIC_API_KEY, or OPENAI_API_KEY), or run 'openhub --login'."
     )
 }
 
@@ -734,9 +734,9 @@ fn resolve_api_key(
 
 /// Platform-aware app config root.
 ///
-/// - Linux:   `~/.config/nomi`
-/// - macOS:   `~/Library/Application Support/nomi`
-/// - Windows: `%APPDATA%\nomi`
+/// - Linux:   `~/.config/openhub`
+/// - macOS:   `~/Library/Application Support/openhub`
+/// - Windows: `%APPDATA%\openhub`
 pub fn app_config_dir() -> Option<PathBuf> {
     dirs::config_dir().map(|d| d.join("openhub"))
 }
@@ -750,7 +750,7 @@ pub fn global_config_path() -> PathBuf {
 }
 
 fn project_config_path() -> PathBuf {
-    PathBuf::from(".nomi.toml")
+    PathBuf::from(".openhub.toml")
 }
 
 fn load_config_file(path: &Path) -> ConfigFile {
@@ -1106,7 +1106,7 @@ pub fn init_config() -> anyhow::Result<()> {
     Ok(())
 }
 
-const DEFAULT_CONFIG_TEMPLATE: &str = r#"# nomi configuration
+const DEFAULT_CONFIG_TEMPLATE: &str = r#"# openhub configuration
 
 # Default provider settings
 [default]
@@ -1235,7 +1235,7 @@ max_sessions = 20                # auto-cleanup oldest
 # [logging]
 # enabled = true                   # enable file logging (default: false)
 # level = "info"                   # log level filter (default: "info")
-# dir = "~/Library/Logs/nomi"    # log directory (default: platform-specific)
+# dir = "~/Library/Logs/openhub"    # log directory (default: platform-specific)
 
 # MCP (Model Context Protocol) servers
 # [mcp.servers.filesystem]
@@ -2196,7 +2196,7 @@ enabled = false
     #[test]
     fn test_resolve_with_project_dir_loads_project_config() {
         let tmp = tempfile::tempdir().unwrap();
-        let project_toml = tmp.path().join(".nomi.toml");
+        let project_toml = tmp.path().join(".openhub.toml");
         std::fs::write(
             &project_toml,
             r#"

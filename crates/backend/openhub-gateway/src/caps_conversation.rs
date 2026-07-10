@@ -1,8 +1,8 @@
 //! Conversation-domain capabilities (registry form): list / status / send /
 //! create / update / delete. All self-protection guards from the legacy tool
 //! are preserved (no self-injection, no self-model-change, no self-deletion),
-//! and nomi sessions still get a model at creation via the shared resolution
-//! chain so downstream consumers never see a model-less nomi conversation.
+//! and openhub sessions still get a model at creation via the shared resolution
+//! chain so downstream consumers never see a model-less openhub conversation.
 
 use std::sync::Arc;
 use std::time::{Duration, Instant};
@@ -67,11 +67,11 @@ struct CreateConversationParams {
     /// ACP backend vendor when agent_type is "acp" (e.g. "claude", "codex", "gemini").
     #[serde(default)]
     backend: Option<String>,
-    /// Provider id for nomi sessions (from openhub_list_providers). Omit to
+    /// Provider id for openhub sessions (from openhub_list_providers). Omit to
     /// auto-resolve: your own companion model → first configured provider.
     #[serde(default)]
     provider_id: Option<String>,
-    /// Model id for nomi sessions. Omit to auto-resolve (see provider_id).
+    /// Model id for openhub sessions. Omit to auto-resolve (see provider_id).
     #[serde(default)]
     model: Option<String>,
 }
@@ -86,10 +86,10 @@ struct UpdateConversationParams {
     /// Pin (true) or unpin (false) the conversation in the sidebar.
     #[serde(default)]
     pinned: Option<bool>,
-    /// New provider id (nomi conversations only; from openhub_list_providers).
+    /// New provider id (openhub conversations only; from openhub_list_providers).
     #[serde(default)]
     provider_id: Option<String>,
-    /// New model id (nomi conversations only).
+    /// New model id (openhub conversations only).
     #[serde(default)]
     model: Option<String>,
 }
@@ -103,7 +103,7 @@ struct DeleteConversationParams {
 
 #[derive(Deserialize, JsonSchema)]
 struct AgentRunParams {
-    /// The goal / task to delegate. A fresh autonomous OpenHub (nomi) agent is
+    /// The goal / task to delegate. A fresh autonomous OpenHub (openhub) agent is
     /// spun up to accomplish it end-to-end.
     goal: String,
     /// Optional absolute workspace directory for the run. Omit for an
@@ -111,7 +111,7 @@ struct AgentRunParams {
     #[serde(default)]
     workspace: Option<String>,
     /// Optional model id for the agent (provider auto-resolved). Omit to use the
-    /// default nomi model.
+    /// default openhub model.
     #[serde(default)]
     model: Option<String>,
     /// Max seconds to wait for completion before returning a `{status:"running"}`
@@ -418,7 +418,7 @@ async fn drain_stream(
     }
 }
 
-/// Delegate a goal to a fresh autonomous nomi agent. Streams the agent's
+/// Delegate a goal to a fresh autonomous openhub agent. Streams the agent's
 /// events (text / tool-call deltas) through `progress` as they arrive (the
 /// streaming `/tool/stream` path); the buffered path returns only the final
 /// result. Either way: on completion returns the final assistant text; on
@@ -431,7 +431,7 @@ async fn agent_run(deps: Arc<GatewayDeps>, ctx: CallerCtx, p: AgentRunParams, pr
     if p.goal.trim().is_empty() {
         return json!({ "error": "goal must not be empty" });
     }
-    // A nomi conversation must get a model at creation.
+    // A openhub conversation must get a model at creation.
     let model = match tools_provider::resolve_openhub_model(&deps, &ctx, None, p.model.as_deref()).await {
         Ok((m, _source)) => Some(m),
         Err(e) => return e,
@@ -653,7 +653,7 @@ pub(crate) fn register(out: &mut Vec<Capability>) {
         CapabilityMeta::new(
             "openhub_create_conversation",
             "conversation",
-            "Open a fresh desktop session (nomi or acp). nomi sessions get a model at creation.",
+            "Open a fresh desktop session (openhub or acp). openhub sessions get a model at creation.",
             DangerTier::Write,
         ),
         create,
@@ -681,7 +681,7 @@ pub(crate) fn register(out: &mut Vec<Capability>) {
         CapabilityMeta::new(
             "openhub_agent_run",
             "agent",
-            "Delegate a goal to a fresh autonomous OpenHub agent: spins up a nomi session (yolo, full platform tools), runs it to completion, and returns the final answer. Streams the agent's progress over /tool/stream (or the SSE REST endpoint); buffered callers get the final result. Long runs return a {status:\"running\"} handle — poll openhub_agent_result.",
+            "Delegate a goal to a fresh autonomous OpenHub agent: spins up a openhub session (yolo, full platform tools), runs it to completion, and returns the final answer. Streams the agent's progress over /tool/stream (or the SSE REST endpoint); buffered callers get the final result. Long runs return a {status:\"running\"} handle — poll openhub_agent_result.",
             DangerTier::Write,
         ),
         agent_run,

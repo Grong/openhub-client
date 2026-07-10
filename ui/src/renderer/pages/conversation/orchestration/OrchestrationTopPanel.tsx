@@ -76,7 +76,7 @@ function readInitialCollapsed(): boolean {
  *
  * Reads {@link useOrchestration} (always inside an `OrchestrationProvider`):
  *  - `runId == null` → renders nothing (no run linked → pane absent; the chat takes
- *    the full width, so a plain nomi conversation looks exactly as before).
+ *    the full width, so a plain openhub conversation looks exactly as before).
  *  - collapsed → a thin vertical strip on the right edge (status dot + a 「‹」expand
  *    affordance) so the canvas can be hidden and the chat reclaim the width.
  *  - expanded → a width-resizable column: a left-edge drag handle to widen/narrow;

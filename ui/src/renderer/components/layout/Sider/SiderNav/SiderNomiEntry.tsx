@@ -30,7 +30,7 @@ const SiderNomiEntry: React.FC<SiderNomiEntryProps> = ({
 
   if (collapsed) {
     return (
-      <Tooltip {...siderTooltipProps} content={t('nomi.siderTitle')} position='right'>
+      <Tooltip {...siderTooltipProps} content={t('openhub.siderTitle')} position='right'>
         <div
           className={classNames(
             'w-full h-34px flex items-center justify-center cursor-pointer transition-colors rd-8px text-t-primary',
@@ -51,7 +51,7 @@ const SiderNomiEntry: React.FC<SiderNomiEntryProps> = ({
   }
 
   return (
-    <Tooltip {...siderTooltipProps} content={t('nomi.siderTitle')} position='right'>
+    <Tooltip {...siderTooltipProps} content={t('openhub.siderTitle')} position='right'>
       <div
         className={classNames(
           'box-border group h-34px w-full flex items-center justify-start gap-8px pl-10px pr-8px rd-0.5rem cursor-pointer shrink-0 transition-all text-t-primary',
@@ -63,7 +63,7 @@ const SiderNomiEntry: React.FC<SiderNomiEntryProps> = ({
         <span className='size-22px flex items-center justify-center shrink-0'>
           <Peoples theme='outline' size='16' fill='currentColor' className='block leading-none' style={{ lineHeight: 0 }} />
         </span>
-        <span className='collapsed-hidden text-14px font-[500] leading-24px'>{t('nomi.siderTitle')}</span>
+        <span className='collapsed-hidden text-14px font-[500] leading-24px'>{t('openhub.siderTitle')}</span>
       </div>
     </Tooltip>
   );

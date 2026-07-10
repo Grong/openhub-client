@@ -30,7 +30,7 @@ impl KnowledgeWritebackSink for LiveKnowledgeWritebackSink {
             TMode::Direct => WriteMode::Direct,
             TMode::Staged { scope } => WriteMode::Staged { scope },
         };
-        // The nomi tool path always permits creating new docs; staged/direct is
+        // The openhub tool path always permits creating new docs; staged/direct is
         // already decided by the factory. `surface` is informational at this
         // layer (placement is driven by `mode`), so RegularChat is a safe label.
         let policy = WritePolicy { mode, allow_create: true, surface: WriteSurface::RegularChat };

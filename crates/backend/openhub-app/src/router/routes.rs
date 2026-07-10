@@ -411,7 +411,7 @@ pub fn create_router_with_all_state(
     let idmm_authenticated = idmm_routes(states.idmm)
         .route_layer(from_fn_with_state(auth_mw_state.clone(), auth_middleware));
 
-    // Companion (nomi) routes protected by auth middleware
+    // Companion (openhub) routes protected by auth middleware
     let companion_authenticated = companion_routes(states.companion.clone())
         .route_layer(from_fn_with_state(auth_mw_state.clone(), auth_middleware));
 

@@ -99,7 +99,7 @@ pub async fn build_companion_system_prompt(
     // NOTE: the persona prompt deliberately does NOT pin a reply language. The
     // companion must answer in the app's UI language, which is decided live at
     // agent-build time and appended as a final directive in
-    // `openhub-ai-agent::factory::nomi` (read from system settings). Re-adding a
+    // `openhub-ai-agent::factory::openhub` (read from system settings). Re-adding a
     // hardcoded 「用中文」 here would freeze the language into the persisted prompt
     // and reintroduce the always-Chinese bug.
     let mut system = format!(
@@ -604,7 +604,7 @@ impl CompanionThreads {
                 "workspace": workspace,
                 // No explicit session_mode here: the Nomi factory defaults every
                 // desktopGateway (companion-owned) session to "yolo" auto-approval
-                // (see factory/nomi.rs) — the companion chat has no interactive
+                // (see factory/openhub.rs) — the companion chat has no interactive
                 // approval UI, so a tool call under Default mode would park forever
                 // (聊天永久「思考中」). The companion's prompt is what guards destructive
                 // ops (复述确认), not an approval gate.
@@ -638,13 +638,13 @@ impl CompanionThreads {
         let mut removed_ids: Vec<String> = Vec::new();
         for t in threads.drain(..) {
             match self.conversations.get(COMPANION_USER_ID, &t.conversation_id).await {
-                // A companion session is valid only when it's a `nomi` conversation — the
-                // companion chat UI (ChatTab/CompanionConversation) renders nomi only.
+                // A companion session is valid only when it's a `openhub` conversation — the
+                // companion chat UI (ChatTab/CompanionConversation) renders openhub only.
                 Ok(resp) if resp.r#type == openhub_common::AgentType::Nomi => pruned.push(t),
                 // Missing (deleted out-of-band) OR type-incompatible (e.g. a stale `acp`
                 // conversation left by a different build's ACP-companion feature, which this
                 // openhub-only build can't render → "走神" with no chat). Drop the registry
-                // pointer so `create` mints a fresh nomi session; the orphaned conversation
+                // pointer so `create` mints a fresh openhub session; the orphaned conversation
                 // row stays hidden (extra.companionSession filters it from every list).
                 Ok(_) | Err(AppError::NotFound(_)) => {
                     let _ = self.store.delete_companion_thread(&t.conversation_id).await;
@@ -748,11 +748,11 @@ impl CompanionStoreSink {
     }
 }
 
-/// Mirror a companion `save` into the nomi agent's file-memory at `dir` (the
+/// Mirror a companion `save` into the openhub agent's file-memory at `dir` (the
 /// §3.4 "消两库割裂" bridge). Best-effort; the deterministic content hash gives a
 /// stable filename so re-saving the same fact overwrites rather than duplicates.
 /// Companion memories are about the user, so they map to `MemoryType::User`.
-fn mirror_memory_to_nomi(dir: &std::path::Path, kind: &str, content: &str) -> std::io::Result<()> {
+fn mirror_memory_to_openhub(dir: &std::path::Path, kind: &str, content: &str) -> std::io::Result<()> {
     use std::hash::{Hash, Hasher};
 
     use openhub_memory::types::{MemoryEntry, MemoryFrontmatter, MemoryType};
@@ -839,13 +839,13 @@ impl CompanionMemorySink for CompanionStoreSink {
             let _ = self.store.add_companion_xp(companion_id, 5).await;
         }
         self.emitter.emit_memory_created(&mem);
-        // §3.4 bridge (opt-in): mirror the save into the nomi agent's file-memory
+        // §3.4 bridge (opt-in): mirror the save into the openhub agent's file-memory
         // so it recalls companion-learned facts. Off unless an operator sets a
         // target dir; best-effort so a mirror failure never fails the save.
         let bridge_dir = self.config.read().await.bridge_to_memory_dir.clone();
         if let Some(dir) = bridge_dir.filter(|d| !d.trim().is_empty()) {
-            if let Err(e) = mirror_memory_to_nomi(std::path::Path::new(&dir), kind, content) {
-                tracing::warn!(target: "openhub_companion", error = %e, "companion→nomi memory bridge write failed");
+            if let Err(e) = mirror_memory_to_openhub(std::path::Path::new(&dir), kind, content) {
+                tracing::warn!(target: "openhub_companion", error = %e, "companion→openhub memory bridge write failed");
             }
         }
         Ok(format!("已保存记忆（{kind}）：{content}"))
@@ -887,7 +887,7 @@ mod tests {
     #[test]
     fn mirror_memory_to_openhub_writes_a_file_and_indexes_it() {
         let dir = tempfile::tempdir().unwrap();
-        mirror_memory_to_nomi(dir.path(), "preference", "用户偏好用 pnpm 而非 npm").unwrap();
+        mirror_memory_to_openhub(dir.path(), "preference", "用户偏好用 pnpm 而非 npm").unwrap();
 
         // A memory file was written and references the content.
         let files: Vec<_> = std::fs::read_dir(dir.path())
@@ -906,7 +906,7 @@ mod tests {
         assert!(index.contains("pnpm"), "index references the bridged memory: {index}");
 
         // Deterministic name → re-saving the same fact overwrites (no duplicate).
-        mirror_memory_to_nomi(dir.path(), "preference", "用户偏好用 pnpm 而非 npm").unwrap();
+        mirror_memory_to_openhub(dir.path(), "preference", "用户偏好用 pnpm 而非 npm").unwrap();
         let count = std::fs::read_dir(dir.path())
             .unwrap()
             .filter_map(|e| e.ok())
@@ -997,7 +997,7 @@ mod tests {
         // reply language. The old hardcoded 「你和主人对话时用中文」 made the
         // companion answer in Chinese regardless of the app language. Reply
         // language is now decided at agent-build time from the app setting
-        // (openhub-ai-agent::factory::nomi), so baking it here would freeze it
+        // (openhub-ai-agent::factory::openhub), so baking it here would freeze it
         // into the persisted prompt and reintroduce the bug.
         let store = CompanionStore::open_memory().await.unwrap();
         let profile = CompanionProfileConfig::new("毛球", "ink");
@@ -1026,7 +1026,7 @@ mod tests {
         };
         let prompt = build_companion_system_prompt(&store, &profile, None, false).await;
         assert!(prompt.contains("你是 毛球"));
-        assert!(!prompt.contains("你是 nomi"));
+        assert!(!prompt.contains("你是 openhub"));
         assert!(prompt.contains("沉稳温柔"));
         assert!(prompt.contains("老大"));
         // The owner-custom persona block must precede the knowledge-curation

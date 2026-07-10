@@ -8,7 +8,7 @@ use crate::attachments::PromptAttachment;
 /// build time.
 ///
 /// This must mirror the runtime registration logic: only the Nomi factory
-/// (`crates/backend/openhub-ai-agent/src/factory/nomi.rs`) consumes the
+/// (`crates/backend/openhub-ai-agent/src/factory/openhub.rs`) consumes the
 /// `requirement_sink`, and only `NomiAgentManager` registers
 /// `RequirementCompleteTool` / `RequirementUpdateStatusTool` on the engine.
 /// Every other engine (ACP, Openclaw, Nanobot, Remote, Gemini) ships without
@@ -368,7 +368,7 @@ mod tests {
     }
 
     #[test]
-    fn has_native_requirement_tools_only_for_nomi() {
+    fn has_native_requirement_tools_only_for_openhub() {
         assert!(has_native_requirement_tools(AgentType::Nomi));
         for at in [
             AgentType::Acp,

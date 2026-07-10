@@ -318,7 +318,7 @@ async fn tc_11_1_bare_mode_only_loads_add_dirs() {
     let add_tmp = TempDir::new().unwrap();
 
     // Put a skill in add_dir's .openhub/skills/
-    let add_skills_dir = add_tmp.path().join(".nomi").join("skills");
+    let add_skills_dir = add_tmp.path().join(".openhub").join("skills");
     fs::create_dir_all(&add_skills_dir).unwrap();
     write_skill(&add_skills_dir, "add-skill/SKILL.md", "---\n---\n");
 
@@ -343,7 +343,7 @@ async fn tc_11_1_bare_mode_only_loads_add_dirs() {
 #[serial]
 async fn tc_11_4_nonexistent_dirs_silently_skipped() {
     let add_tmp = TempDir::new().unwrap();
-    let add_skills_dir = add_tmp.path().join(".nomi").join("skills");
+    let add_skills_dir = add_tmp.path().join(".openhub").join("skills");
     fs::create_dir_all(&add_skills_dir).unwrap();
     write_skill(&add_skills_dir, "extra/SKILL.md", "---\n---\n");
 
@@ -378,7 +378,7 @@ async fn tc_11_6_empty_add_dirs_no_effect() {
     let root = tmp.path();
     fs::create_dir(root.join(".git")).unwrap();
 
-    let skills_dir = root.join(".nomi").join("skills");
+    let skills_dir = root.join(".openhub").join("skills");
     fs::create_dir_all(&skills_dir).unwrap();
     write_skill(&skills_dir, "proj-skill/SKILL.md", "---\n---\n");
 
@@ -510,7 +510,7 @@ async fn tc_4_5_mcp_manager_none_returns_no_mcp_skills() {
     let tmp = TempDir::new().unwrap();
     let root = tmp.path();
     fs::create_dir(root.join(".git")).unwrap();
-    let skills_dir = root.join(".nomi").join("skills");
+    let skills_dir = root.join(".openhub").join("skills");
     fs::create_dir_all(&skills_dir).unwrap();
     write_skill(
         &skills_dir,

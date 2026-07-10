@@ -65,7 +65,7 @@ For implementation details, see [Architecture Overview](../architecture/overview
 - **Requirements / AutoWork**: backend-owned queue processing and completion
   notifications.
 - **Scheduled tasks**: recurring or one-shot jobs.
-- **Desktop Companion** (`/nomi`): companion configuration, memory, and remote binding.
+- **Desktop Companion** (`/openhub`): companion configuration, memory, and remote binding.
 - **Knowledge**: local knowledge-base management and session bindings.
 
 The current frontend route source is

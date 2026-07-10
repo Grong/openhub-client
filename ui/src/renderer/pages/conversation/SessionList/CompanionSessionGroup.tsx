@@ -9,7 +9,7 @@ import type { ICompanionWithStatus } from '@/common/adapter/ipcBridge';
 import CompanionAvatar from '@renderer/pages/companion/CompanionAvatar';
 import type { CompanionMood } from '@renderer/pages/companion/characters';
 import { customFigureMetaOf } from '@renderer/pages/companion/characters/customMeta';
-import { useCompanions } from '@renderer/pages/nomi/useNomi';
+import { useCompanions } from '@renderer/pages/openhub/useOpenHub';
 import { cleanupSiderTooltips } from '@renderer/utils/ui/siderTooltip';
 import { Message, Tooltip } from '@arco-design/web-react';
 import { Info } from '@icon-park/react';
@@ -46,7 +46,7 @@ const modelReadyOf = (c: ICompanionWithStatus) => Boolean(c.model?.provider_id &
  * `/conversation/:id`（由 ChatConversation 识别 extra.companionSession 渲染受限聊天）。
  *
  * 与项目/工作路径分组的区别：仅交互式会话（无终端子组）、不在此新建（创建仍在管理中心
- * /nomi）。未配置模型的伙伴点击跳转管理中心引导配置，而非创建会话（后端会 400）。
+ * /openhub）。未配置模型的伙伴点击跳转管理中心引导配置，而非创建会话（后端会 400）。
  *
  * 不触碰工作会话过滤器：伙伴会话仍被 useConversationListSync 过滤出项目分组，故不会重复列出。
  */
@@ -104,7 +104,7 @@ const CompanionSessionGroup: React.FC<Props> = ({
       }
       // 未配置模型：无法 ensure（后端 400）→ 跳管理中心引导配置。
       if (!modelReadyOf(c)) {
-        void navigate(`/nomi?companion=${encodeURIComponent(c.id)}&tab=overview`);
+        void navigate(`/openhub?companion=${encodeURIComponent(c.id)}&tab=overview`);
         return;
       }
       try {
@@ -212,7 +212,7 @@ const CompanionSessionGroup: React.FC<Props> = ({
                   <span
                     className='absolute -right-1px -bottom-1px w-9px h-9px rd-full border-2 border-[var(--color-bg-1)]'
                     style={{ background: modelReady ? 'rgb(var(--success-6))' : 'rgb(var(--warning-6))' }}
-                    title={modelReady ? undefined : t('nomi.chat.modelUnset')}
+                    title={modelReady ? undefined : t('openhub.chat.modelUnset')}
                   />
                 </div>
                 <div className='flex flex-col gap-1px min-w-0 flex-1'>

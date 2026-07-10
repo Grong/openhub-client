@@ -172,7 +172,7 @@ const WecomConfigForm: React.FC<WecomConfigFormProps> = ({
           : { plugin_id: 'wecom', config }
       );
       if (!result.success) {
-        throw new Error(result.error || result.message || t('nomi.settings.remoteEnableFailed', { defaultValue: 'Failed to enable channel' }));
+        throw new Error(result.error || result.message || t('openhub.settings.remoteEnableFailed', { defaultValue: 'Failed to enable channel' }));
       }
 
       Message.success(t('settings.wecom.pluginEnabled', 'WeCom channel enabled'));

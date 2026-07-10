@@ -710,7 +710,7 @@ mod tests {
         ];
         for text in all_text {
             assert!(
-                !text.contains("~/.config/nomi"),
+                !text.contains("~/.config/openhub"),
                 "should not hardcode platform-specific path"
             );
             assert!(

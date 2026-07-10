@@ -7,7 +7,7 @@
 import { WEBUI_DEFAULT_PORT } from '@/common/config/constants';
 import { shell, webui } from '@/common/adapter/ipcBridge';
 import { isBackendHttpError } from '@/common/adapter/httpBridge';
-import NomiModal from '@/renderer/components/base/NomiModal';
+import OpenHubModal from '@/renderer/components/base/OpenHubModal';
 import { useWebuiServer } from '@/renderer/hooks/context/WebuiServerContext';
 import { Button, Form, Input, Message, Select, Switch, Tooltip } from '@arco-design/web-react';
 import { Copy, Earth, EditTwo, Info, Refresh } from '@icon-park/react';
@@ -492,7 +492,7 @@ const WebuiControlPanel: React.FC<WebuiControlPanelProps> = ({ mode = 'popover' 
       )}
 
       {/* 设置新用户名弹窗 / Set New Username Modal */}
-      <NomiModal
+      <OpenHubModal
         visible={setUsernameModalVisible}
         onCancel={() => setSetUsernameModalVisible(false)}
         onOk={handleSetNewUsername}
@@ -542,10 +542,10 @@ const WebuiControlPanel: React.FC<WebuiControlPanelProps> = ({ mode = 'popover' 
             <Input placeholder={t('settings.webui.newUsernamePlaceholder')} />
           </Form.Item>
         </Form>
-      </NomiModal>
+      </OpenHubModal>
 
       {/* 设置新密码弹窗 / Set New Password Modal */}
-      <NomiModal
+      <OpenHubModal
         visible={setPasswordModalVisible}
         onCancel={() => setSetPasswordModalVisible(false)}
         onOk={handleSetNewPassword}
@@ -583,7 +583,7 @@ const WebuiControlPanel: React.FC<WebuiControlPanelProps> = ({ mode = 'popover' 
             <Input.Password placeholder={t('settings.webui.confirmPasswordPlaceholder')} />
           </Form.Item>
         </Form>
-      </NomiModal>
+      </OpenHubModal>
     </div>
   );
 };

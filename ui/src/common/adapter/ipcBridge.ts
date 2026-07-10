@@ -863,7 +863,7 @@ export const googleAuth = {
 };
 
 // ---------------------------------------------------------------------------
-// Google subscription status (Google OAuth provider path, used by nomi)
+// Google subscription status (Google OAuth provider path, used by openhub)
 // ---------------------------------------------------------------------------
 
 export const google = {
@@ -1797,7 +1797,7 @@ export interface ICreateConversationParams {
      *  LLM). Absent ⇒ Auto (every enabled model). */
     orchestrator_model_range?: TModelRange;
     /** 「agent 集群」意图标记（需求1）：composer 顶部 toggle 选中后落此键。后端
-     *  nomi 工厂据此在常驻 subagent 提示之上追加 CLUSTER_MODE_HINT（对每个任务
+     *  openhub 工厂据此在常驻 subagent 提示之上追加 CLUSTER_MODE_HINT（对每个任务
      *  刻意评估是否开集群、太简单先向用户说明原因）。 */
     agent_cluster_mode?: boolean;
     /** 节点级审批模式（需求5，迁移 030）：'manual' = 集群节点遇关键决策挂起向
@@ -2970,7 +2970,7 @@ export const orchestrator = {
   },
 };
 
-// ─────────────────────────── Companion (nomi 桌面伙伴) ───────────────────────────
+// ─────────────────────────── Companion (openhub 桌面伙伴) ───────────────────────────
 
 export interface ICompanionCollectConfig {
   chat_user_messages: boolean;

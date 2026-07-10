@@ -90,7 +90,7 @@ async fn seed_user_and_conversation_with_extra(
 }
 
 /// Seed an enabled provider so tools that resolve a default model (e.g.
-/// `openhub_cron_create` auto-filling a model-less nomi conversation) can
+/// `openhub_cron_create` auto-filling a model-less openhub conversation) can
 /// complete their fallback chain.
 async fn seed_provider(services: &openhub_app::AppServices, provider_id: &str, model: &str) {
     sqlx::query(

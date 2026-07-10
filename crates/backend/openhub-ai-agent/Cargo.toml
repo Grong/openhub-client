@@ -73,9 +73,9 @@ ts-rs = "12.0.1"
 # introduces a `dyn IAgentTask` branch that defeats the enum's zero-dispatch
 # guarantee.
 test-support = []
-# Desktop control tools for the nomi engine (desktop host only).
+# Desktop control tools for the openhub engine (desktop host only).
 computer-use = ["openhub-agent/computer-use"]
-# Browser-automation tools for the nomi engine (desktop host only).
+# Browser-automation tools for the openhub engine (desktop host only).
 browser-use = ["openhub-agent/browser-use", "dep:openhub-browser-engine", "dep:openhub-browser"]
 
 [dev-dependencies]

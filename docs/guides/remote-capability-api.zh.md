@@ -98,7 +98,7 @@ OPENHUB_COMPANION_TOKEN="$(openssl rand -hex 32)" \
 ## 当前可用面
 
 - ✅ **MCP**：`/mcp`（全量 ~140 工具）+ `/mcp-agent`（curated 干活子集）。
-- ✅ **委派目标**：`openhub_agent_run(goal,workspace?,model?,timeout_secs?)` 一句话把任务交给一个自治 nomi agent，跑完返回终稿；长任务返回 `{status:running}` 句柄，用 `openhub_agent_result(conversation_id)` 轮询。
+- ✅ **委派目标**：`openhub_agent_run(goal,workspace?,model?,timeout_secs?)` 一句话把任务交给一个自治 openhub agent，跑完返回终稿；长任务返回 `{status:running}` 句柄，用 `openhub_agent_result(conversation_id)` 轮询。
 - ✅ **HTTP REST**：`POST /v1/tools/{name}`、`GET /v1/tools[?profile=agent]`、`GET /v1/openapi.json[?profile=agent]`（OpenAPI 3.1，同令牌）。
 - ✅ **CLI**：`nomicore tools`（离线列能力）、`nomicore call <name> [json]`、`nomicore agent "<目标>"`（读 `OPENHUB_URL`/`OPENHUB_COMPANION_TOKEN` 或 `--url`/`--token`）。
 - ✅ **Skill**：`docs/skills/drive-openhub/SKILL.md` —— 教外部 agent 如何连上并驱动 OpenHub（可发布到技能市场）。

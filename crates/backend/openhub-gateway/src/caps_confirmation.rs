@@ -34,7 +34,7 @@ struct ResolveConfirmationParams {
 }
 
 /// Build the `ConfirmRequest.data` for a resolved option, writing the chosen
-/// option under BOTH keys so either backend resolves it: the nomi agent reads
+/// option under BOTH keys so either backend resolves it: the openhub agent reads
 /// `data.get("value")` (and defaults to "cancel" when the key is absent — a
 /// bare `Value::String` was therefore silently DENIED), while ACP's
 /// `confirm_option_id` reads `option_id` (falling back to `value`). Mirrors the
@@ -131,15 +131,15 @@ mod tests {
     #[test]
     fn confirm_data_carries_option_under_both_keys_so_openhub_does_not_read_cancel() {
         // REGRESSION: the gateway previously sent ConfirmRequest.data as a bare
-        // Value::String(option). The nomi agent's confirm reads data.get("value")
+        // Value::String(option). The openhub agent's confirm reads data.get("value")
         // and defaults to "cancel" when absent → every relayed approval on a Nomi
         // worker was silently DENIED. The payload must carry the option under
-        // BOTH keys (nomi reads `value`; ACP's confirm_option_id reads
+        // BOTH keys (openhub reads `value`; ACP's confirm_option_id reads
         // `option_id`, falling back to `value`).
         let d = confirm_data("proceed_once");
         assert_eq!(d.get("value").and_then(|v| v.as_str()), Some("proceed_once"));
         assert_eq!(d.get("option_id").and_then(|v| v.as_str()), Some("proceed_once"));
-        // The nomi consumer's exact read must NOT collapse to cancel.
+        // The openhub consumer's exact read must NOT collapse to cancel.
         assert_ne!(
             d.get("value").and_then(|v| v.as_str()).unwrap_or("cancel"),
             "cancel"
@@ -149,7 +149,7 @@ mod tests {
     #[test]
     fn bare_string_payload_is_read_as_cancel_by_openhub_consumer() {
         // Characterizes WHY the old shape was broken: a bare Value::String is
-        // invisible to the nomi consumer's `data.get("value")`.
+        // invisible to the openhub consumer's `data.get("value")`.
         let bare = Value::String("proceed_once".into());
         assert_eq!(bare.get("value").and_then(|v| v.as_str()).unwrap_or("cancel"), "cancel");
     }

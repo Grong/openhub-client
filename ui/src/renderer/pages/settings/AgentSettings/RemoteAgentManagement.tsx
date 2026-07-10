@@ -8,7 +8,7 @@ import { ipcBridge } from '@/common';
 import type { RemoteAgentConfig, RemoteAgentInput } from '@/common/types/agent/remoteAgentTypes';
 import EmojiPicker from '@/renderer/components/chat/EmojiPicker';
 import { openExternalUrl } from '@/renderer/utils/platform';
-import { useNomiQuickStart } from '@/renderer/hooks/agent/useNomiQuickStart';
+import { useOpenHubQuickStart } from '@/renderer/hooks/agent/useOpenHubQuickStart';
 import {
   Avatar,
   Button,
@@ -23,7 +23,7 @@ import {
   Tag,
   Typography,
 } from '@arco-design/web-react';
-import NomiModal from '@/renderer/components/base/NomiModal';
+import OpenHubModal from '@/renderer/components/base/OpenHubModal';
 import { Attention, Edit, Plus, ReduceOne, Robot, Speed } from '@icon-park/react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -224,7 +224,7 @@ const RemoteAgentFormModal: React.FC<{
   // Render pairing waiting UI
   if (pairingState === 'pending' || pairingState === 'timeout') {
     return (
-      <NomiModal
+      <OpenHubModal
         visible={visible}
         onCancel={handleCancelPairing}
         header={{
@@ -267,12 +267,12 @@ const RemoteAgentFormModal: React.FC<{
             </>
           )}
         </div>
-      </NomiModal>
+      </OpenHubModal>
     );
   }
 
   return (
-    <NomiModal
+    <OpenHubModal
       visible={visible}
       onCancel={onClose}
       header={{
@@ -410,7 +410,7 @@ const RemoteAgentFormModal: React.FC<{
           </Button>
         </Form>
       </div>
-    </NomiModal>
+    </OpenHubModal>
   );
 };
 
@@ -451,7 +451,7 @@ const RemoteAgentManagement: React.FC = () => {
     await mutate();
   }, [mutate]);
 
-  const { start: startRemoteSetup } = useNomiQuickStart();
+  const { start: startRemoteSetup } = useOpenHubQuickStart();
   const [settingUp, setSettingUp] = useState<string | null>(null);
 
   const handleRemoteSetup = useCallback(

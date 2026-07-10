@@ -1,7 +1,7 @@
 # 外呼员工：桌面伙伴对外公共服务的安全隔离设计
 
 > 状态：设计待评审。作者：架构（Opus 4.8）。日期：2026-07-02。
-> 前置事实基线：8 路并行只读审计（`companion-external-service-security-audit`）+ 对 `capability.rs` / `factory/nomi.rs` / `agent_build_extra.rs` / `caps_knowledge.rs` 的一手核对。
+> 前置事实基线：8 路并行只读审计（`companion-external-service-security-audit`）+ 对 `capability.rs` / `factory/openhub.rs` / `agent_build_extra.rs` / `caps_knowledge.rs` 的一手核对。
 > 关联（姿态相反，取其管线弃其取舍）：`2026-06-22-external-capability-exposure-design.md`、`2026-06-23-companion-bound-external-access-and-robot-design.md`（二者均为"全有或全无信任、安全次要"，只适合**对外自用**，不适合本设计的**对外公共服务**）。
 
 ## 0. 目标与用户定调
@@ -113,7 +113,7 @@ struct ExposurePolicy {
 
 ## 7. 复用 / 必新建 / 必修
 
-- **直接复用**：`retain_named`/`allowed_tools`（`registry.rs:73`、`agent_build_extra.rs:330`）、`tool_specs_for`/域档（`registry/mod.rs:136`）、烘环境 scoped KB bridge（`NOMI_KB_MCP_KB_IDS`）、companion 令牌（`openhub-auth/companion_token.rs`）、per-surface 写策略（`factory/nomi.rs:95-123`）、配对门、`desktopGateway` 剥离。
+- **直接复用**：`retain_named`/`allowed_tools`（`registry.rs:73`、`agent_build_extra.rs:330`）、`tool_specs_for`/域档（`registry/mod.rs:136`）、烘环境 scoped KB bridge（`NOMI_KB_MCP_KB_IDS`）、companion 令牌（`openhub-auth/companion_token.rs`）、per-surface 写策略（`factory/openhub.rs:95-123`）、配对门、`desktopGateway` 剥离。
 - **必新建**：`ExposurePolicy` 抽象与全链路穿线、网关默认拒绝白名单模式（权威层强制）、由对外伙伴驱动原生白名单、安全网搜工具、对外隔离伙伴 + 独立记忆/数据目录、"外呼员工" Tab + 审计。
 - **必修 bug**：C3（build-后工具绕过白名单）、C7（网关档权威/广告不一致）。
 - **旧分支**：`feat/per-companion-capabilities` / `feat/external-capability-exposure` 取其令牌/管线，**换掉"全有或全无"取舍**，不原样合并。

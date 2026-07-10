@@ -4,8 +4,8 @@
 //! ## Why this exists
 //!
 //! AutoWork drives ACP sessions, but ACP CLIs have no in-process tool bus we
-//! can register the native `KnowledgeSearchTool` into (only the nomi engine
-//! does). To give ACP agents the same knowledge-retrieval surface the nomi
+//! can register the native `KnowledgeSearchTool` into (only the openhub engine
+//! does). To give ACP agents the same knowledge-retrieval surface the openhub
 //! engine has natively, this server exposes ONE scoped tool, `knowledge_search`,
 //! over authenticated HTTP. Scope resolution has two paths:
 //!
@@ -213,7 +213,7 @@ async fn handle_tool_request(
         "knowledge_write" => {
             let (bound_kb_ids, binding, wp_key) = service.resolve_write_context_for_cwd(&cwd).await;
             // Staged inbox scope: prefer an explicit conversation id (per-session
-            // inbox, matching the nomi engine) when the bridge forwards one;
+            // inbox, matching the openhub engine) when the bridge forwards one;
             // otherwise fall back to the workpath key (per-workspace inbox).
             let scope = body
                 .get("conversation_id")

@@ -88,7 +88,7 @@
 ### Task F1: 前端类型/桥 + `useConversationRun` 钩子
 
 **Files:**
-- Modify: `ui/src/common/config/storage.ts`(nomi extra 类型 `:425-460` 加 `orchestrator_run_id?: string`;如缺再加 `orchestrator_task_id?: string`)
+- Modify: `ui/src/common/config/storage.ts`(openhub extra 类型 `:425-460` 加 `orchestrator_run_id?: string`;如缺再加 `orchestrator_task_id?: string`)
 - Modify: `ui/src/common/types/orchestrator/orchestratorTypes.ts`(`TCreateAdhocRun` 加 `lead_conv_id?: number`)
 - Modify: `ui/src/common/adapter/ipcBridge.ts`(`orchestrator.runs.createAdhoc` 透传 `lead_conv_id`——若已是整体 body 透传则无需改,确认即可)
 - Create: `ui/src/renderer/pages/conversation/orchestration/useConversationRun.ts`
@@ -179,7 +179,7 @@
 - `projectTask` 存 `payload.task.id` + 缓存 payload(供内容区解析 conversation_id);换 run / `returnToMain` 重置 `projectedTaskId=null`。**默认 `projectedTaskId=null`(即 main)、`canvasOpen=false`。**
 
 - [ ] 实现 context（state：projectedTaskId / canvasOpen；接 useConversationRun）。
-- [ ] `NomiConversationPanel` 外层包 `OrchestrationProvider`（仅 nomi 会话）。
+- [ ] `NomiConversationPanel` 外层包 `OrchestrationProvider`（仅 openhub 会话）。
 - [ ] `npm run typecheck` = 0 新错。
 - [ ] 提交 `feat(conversation/ui): 会话域 OrchestrationProvider(run/投射/画布状态)`。
 
@@ -206,7 +206,7 @@
 
 **Files:**
 - Create: `ui/src/renderer/pages/conversation/orchestration/OrchestrationRailTab.tsx`
-- Modify: `ui/src/renderer/pages/conversation/components/ChatSlider.tsx`(nomi 分支 `extraTabs` 追加 `{ key:'orchestration', title:t('...'), content:<OrchestrationRailTab/> }`,`:56-62`)
+- Modify: `ui/src/renderer/pages/conversation/components/ChatSlider.tsx`(openhub 分支 `extraTabs` 追加 `{ key:'orchestration', title:t('...'), content:<OrchestrationRailTab/> }`,`:56-62`)
 - Test: `npm run typecheck` 0 新错 + 手测
 
 **Interfaces:**
@@ -216,7 +216,7 @@
   - **无 run**:空态文案 + `OrchestratorComposer`(模型范围 + 自主度 pill,800px 不强制——rail 窄,用紧凑布局)→ 提交调 `createAdhoc({ goal, model_range:buildModelRange(...), autonomy, lead_conv_id: conversationId })`(后端写 extra+广播 → 会话重取 → runId 点亮)。
 - 视觉:rd 卡 + CSS 变量主题;与 文件/变更/指标 tab 同观感。
 
-- [ ] 实现 OrchestrationRailTab(两态);ChatSlider 注入 extraTab(仅 nomi)。
+- [ ] 实现 OrchestrationRailTab(两态);ChatSlider 注入 extraTab(仅 openhub)。
 - [ ] icon-park 具名禁别名;发送/按钮用 `<div role=button>` 或 Arco Button;Arco 弹窗经 useArcoMessage;无 any。
 - [ ] `npm run typecheck` = 0 新错;手测:无 run 见发起卡、有 run 见实时预览 + 展开钮。
 - [ ] 提交 `feat(conversation/ui): 右栏「编排」tab 实时预览 + 空态发起`。
@@ -256,12 +256,12 @@
 **Interfaces:**
 - Consumes:`useOrchestration()`(`projectedTaskId`/缓存 payload/`returnToMain`)、`ipcBridge.conversation.get`、`ReadOnlyConversationView`(`conversation`,`hideSendBox`,`agent_name`)、`ipcBridge.orchestrator.runs.{rerunTask,steer}`。
 - Produces:
-  - `ConversationContentSwitcher`:**始终挂载 `NomiChat`(props.children)**,投射时 `display:none` 隐藏(保状态);`projectedTaskId!=null` 时**覆盖渲染** `ProjectedWorkerView`。
+  - `ConversationContentSwitcher`:**始终挂载 `OpenHubChat`(props.children)**,投射时 `display:none` 隐藏(保状态);`projectedTaskId!=null` 时**覆盖渲染** `ProjectedWorkerView`。
   - `ProjectedWorkerView{ payload: OpenTaskPayload }`:用 `payload.task.conversation_id` → `conversation.get.invoke({id})` → `ReadOnlyConversationView`;`conversation_id==null` → 「该 agent 尚未开始」空态。顶部 banner(rd + CSS 变量):`查看:<task.title>` · `[重跑]`(`runs.rerunTask`)· `[转向…]`(弹小输入→`runs.steer`)· `[← 返回 main]`(`returnToMain`)。
-- **默认 main**:`projectedTaskId===null` → 只见 `NomiChat`。
+- **默认 main**:`projectedTaskId===null` → 只见 `OpenHubChat`。
 
-- [ ] 实现 switcher + ProjectedWorkerView(NomiChat 常挂、worker 只读覆盖、banner 三动作)。
-- [ ] NomiConversationPanel 内容包 switcher;`NomiChat` 仍在同一 PreviewProvider/Conversation 作用域内。
+- [ ] 实现 switcher + ProjectedWorkerView(OpenHubChat 常挂、worker 只读覆盖、banner 三动作)。
+- [ ] NomiConversationPanel 内容包 switcher;`OpenHubChat` 仍在同一 PreviewProvider/Conversation 作用域内。
 - [ ] `npm run typecheck` = 0 新错;手测:点节点 → 内容区变 worker 只读 + banner;返回 main → 复原且主会话状态保留。
 - [ ] 提交 `feat(conversation/ui): 内容区投射(默认 main / worker 只读 / 返回)`。
 
@@ -327,7 +327,7 @@
 
 ## Self-Review / 风险
 **覆盖:** 发起(两路)→ B2/B3 + F5(空态)/F8;画布入口 → F5(rail)/F8(header);悬浮画布 → F6 + F4(main 节点);投射 + 默认 main → F7;调整能力 → F6(run 级 + adjust)/F7(per-node 重跑/转向);移除 Tab → F9;视觉对齐 → F5/F6/F7/F8 全 CSS 变量 + 玻璃头 + 复用会话观感;接线 → B1 + F1/F3。
-**不变量:** 引擎零改;per-run 锁不触;无 IR/节点图;`link_orchestrator_run` 只 extra+广播(不杀 task);侧栏过滤键不动;`ReadOnlyConversationView` 独立 PreviewProvider;DagCanvas main 节点向后兼容;NomiChat 投射时仅隐藏不卸载;无新迁移/无新编排 WS 事件。
+**不变量:** 引擎零改;per-run 锁不触;无 IR/节点图;`link_orchestrator_run` 只 extra+广播(不杀 task);侧栏过滤键不动;`ReadOnlyConversationView` 独立 PreviewProvider;DagCanvas main 节点向后兼容;OpenHubChat 投射时仅隐藏不卸载;无新迁移/无新编排 WS 事件。
 **风险:** ① 重蹈塞会话——三受控形态 + 内容区默认纯净;② live 不同步——extra+广播复用既有订阅;③ B3 路由缺 ConversationService 句柄——任务内先核对/补;④ overlay 拖拽 z-index 与 Modal/Preview 冲突——限定层级 + 限内容区范围;⑤ 嵌套 PreviewProvider——独立 namespace;⑥ 主题硬编码——全 CSS 变量审查。
 
 ## Execution Handoff

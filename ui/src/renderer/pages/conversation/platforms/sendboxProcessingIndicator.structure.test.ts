@@ -9,7 +9,7 @@ import { describe, expect, test } from 'bun:test';
 
 const sendBoxFiles = [
   './acp/AcpSendBox.tsx',
-  './openhub/NomiSendBox.tsx',
+  './openhub/OpenHubSendBox.tsx',
   './remote/RemoteSendBox.tsx',
   './nanobot/NanobotSendBox.tsx',
   './openclaw/OpenClawSendBox.tsx',

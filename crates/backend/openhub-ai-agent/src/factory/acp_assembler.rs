@@ -390,7 +390,7 @@ fn computer_mcp_server(cfg: &ComputerMcpConfig) -> McpServer {
 /// over the in-tree BrowserTool), so it needs no env (no port/token/conv id) —
 /// stateless fail-safe, symmetric with the open/computer bridges. R2: carrying
 /// NO env-borne session context is deliberate (secret:NAME fails closed, downloads
-/// land in the data-dir sandbox; per-pet context stays on the nomi engine path).
+/// land in the data-dir sandbox; per-pet context stays on the openhub engine path).
 fn browser_mcp_server(cfg: &BrowserMcpConfig) -> McpServer {
     let stdio = McpServerStdio::new(BrowserMcpConfig::SERVER_NAME, &cfg.binary_path)
         .args(vec!["mcp-browser-stdio".to_owned()])

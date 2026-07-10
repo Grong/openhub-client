@@ -6,8 +6,8 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Check } from '@icon-park/react';
 import { iconColors } from '@/renderer/styles/colors';
-import NomiSteps from '@/renderer/components/base/NomiSteps';
-import NomiModal from '@/renderer/components/base/NomiModal';
+import OpenHubSteps from '@/renderer/components/base/OpenHubSteps';
+import OpenHubModal from '@/renderer/components/base/OpenHubModal';
 
 type DetectedMcpServer = IMcpServer & {
   importable: boolean;
@@ -420,7 +420,7 @@ const OneClickImportModal: React.FC<OneClickImportModalProps> = ({
   );
 
   return (
-    <NomiModal
+    <OpenHubModal
       header={{ title: t('settings.mcpOneKeyImport'), showClose: true }}
       visible={visible}
       onCancel={onCancel}
@@ -438,17 +438,17 @@ const OneClickImportModal: React.FC<OneClickImportModalProps> = ({
         <div className='mb-6 text-t-secondary text-sm'>{t('settings.mcpImportDescription')}</div>
 
         <div className='mb-6'>
-          <NomiSteps current={currentStep} size='small'>
-            <NomiSteps.Step
+          <OpenHubSteps current={currentStep} size='small'>
+            <OpenHubSteps.Step
               title={t('settings.mcpStepSelectAgent')}
               icon={currentStep > 1 ? <Check theme='filled' size={16} fill='var(--color-primary)' /> : undefined}
             />
-            <NomiSteps.Step
+            <OpenHubSteps.Step
               title={t('settings.mcpStepFetchTools')}
               icon={currentStep > 2 ? <Check theme='filled' size={16} fill='var(--color-primary)' /> : undefined}
             />
-            <NomiSteps.Step title={t('settings.mcpStepImportSuccess')} />
-          </NomiSteps>
+            <OpenHubSteps.Step title={t('settings.mcpStepImportSuccess')} />
+          </OpenHubSteps>
         </div>
 
         <div className={`mb-6 min-h-0 flex-1 overflow-hidden ${currentStep === 1 ? 'min-h-[60px]' : 'min-h-[180px]'}`}>
@@ -457,7 +457,7 @@ const OneClickImportModal: React.FC<OneClickImportModalProps> = ({
           {currentStep === 3 && renderStep3()}
         </div>
       </div>
-    </NomiModal>
+    </OpenHubModal>
   );
 };
 

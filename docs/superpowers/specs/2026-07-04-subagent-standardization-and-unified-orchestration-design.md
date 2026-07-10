@@ -62,22 +62,22 @@
 
 三个入口（均可选、互不为门）：
 1. 首页 composer 的「智能编排」开关（`ComposerEntryStrip.tsx` / `GuidPage.orchestrationMode`）——**主入口**；
-2. 全局设置开关 `nomi.autoOrchestration`（`SystemModalContent.tsx`）；
+2. 全局设置开关 `openhub.autoOrchestration`（`SystemModalContent.tsx`）；
 3. 伙伴域 `smart_orchestration`（`LearnTab.tsx`，独立领域）。
 
 ### 2.2 变更
 
 **删除（桌面会话域）**
-- FE：`ComposerEntryStrip` 的 orchestrate 按钮；`GuidPage.orchestrationMode` 状态/handler；`GuidActionRow` orchestration 分支；`useGuidSend.ts` 的 orchestration 发送分支（181–233）；`SystemModalContent` 的 `nomi.autoOrchestration` Switch；`configKeys.ts` 的 `nomi.autoOrchestration`；相关 i18n（`guid.entry.orchestrate` / `conversation.orchestration.startTitle` / `settings.autoOrchestration*`）。
-- 后端：`factory/nomi.rs` 的 `LEAD_ORCHESTRATOR_PROMPT`、`is_orchestration_lead`、`compose_lead_prompt`、`auto_orchestration` 读取块（187–197）、`PREF_AUTO_ORCHESTRATION`；`NomiBuildExtra.orchestrator_role`（若无其它读者）。
+- FE：`ComposerEntryStrip` 的 orchestrate 按钮；`GuidPage.orchestrationMode` 状态/handler；`GuidActionRow` orchestration 分支；`useGuidSend.ts` 的 orchestration 发送分支（181–233）；`SystemModalContent` 的 `openhub.autoOrchestration` Switch；`configKeys.ts` 的 `openhub.autoOrchestration`；相关 i18n（`guid.entry.orchestrate` / `conversation.orchestration.startTitle` / `settings.autoOrchestration*`）。
+- 后端：`factory/openhub.rs` 的 `LEAD_ORCHESTRATOR_PROMPT`、`is_orchestration_lead`、`compose_lead_prompt`、`auto_orchestration` 读取块（187–197）、`PREF_AUTO_ORCHESTRATION`；`NomiBuildExtra.orchestrator_role`（若无其它读者）。
 
 **保留不动（= 被保留的 subagent 能力本体）**
 - `caps_orchestrator.rs` 全部网关工具；整个 `openhub-orchestrator` crate；迁移 018 表；`link_orchestrator_run` + `extra.orchestrator_run_id`；会话原生画布（`OrchestrationProvider`/`OrchestrationTopPanel`/`ConversationContentSwitcher`/`PlanApprovalBanner`/`useConversationRun`）；`pages/orchestrator/*` 组件库；`engine_spawn_enabled` 路由。
 - 伙伴 `smart_orchestration`（独立领域，**保留**，见决策 B）。
 
 **新增：常驻轻量提示（关键，防能力空置）**
-- 把一段**精简的 subagent 使用提示**并入基础 nomi system prompt（`factory/nomi.rs` 组装处），常驻、极短，语义类似：「遇到可并行的独立子任务或需要成体系分解的复杂任务时，可用 `openhub_spawn`/`openhub_run_create` 派发 subagent 并在画布可视化；简单问题直接回答。」
-- 这替代原 `LEAD_ORCHESTRATOR_PROMPT` 的**可发现性**职责，但不制造「模式」概念——它对所有桌面 nomi 会话一视同仁。
+- 把一段**精简的 subagent 使用提示**并入基础 openhub system prompt（`factory/openhub.rs` 组装处），常驻、极短，语义类似：「遇到可并行的独立子任务或需要成体系分解的复杂任务时，可用 `openhub_spawn`/`openhub_run_create` 派发 subagent 并在画布可视化；简单问题直接回答。」
+- 这替代原 `LEAD_ORCHESTRATOR_PROMPT` 的**可发现性**职责，但不制造「模式」概念——它对所有桌面 openhub 会话一视同仁。
 
 **协作模型通道迁移（衔接 §6）**
 - 原 `extra.orchestrator_model_range` 由首页 orchestration 分支写入；删该分支后，改由**会话内协作模型选择器**写入 + 更新（§6.1）。这样「主/协作模型」从「编排专属」变成「所有会话可用」。
@@ -86,7 +86,7 @@
 - 孤儿前门 `POST /api/orchestrator/runs/adhoc`（`create_adhoc_run`，交互审批路径）+ `ipcBridge.orchestrator.runs.createAdhoc`：**无 FE 调用者**。默认**保留为后端/程序化入口**（WebUI/未来外部调用可能用），标注 `@internal`，不在本期删（低风险、删了要回退成本高）。审阅可改为一并删除。
 
 ### 2.3 验收
-- 任意普通桌面 nomi 会话中，模型在合适场景自发调 `openhub_spawn`，画布点亮、run 正常执行、终态回报 lead——**全程无「智能编排」字样**。
+- 任意普通桌面 openhub 会话中，模型在合适场景自发调 `openhub_spawn`，画布点亮、run 正常执行、终态回报 lead——**全程无「智能编排」字样**。
 - 首页与设置不再出现「智能编排」入口；伙伴页 `smart_orchestration` 仍在。
 
 ---
@@ -215,7 +215,7 @@
 **变更**：
 - 在会话 composer 主模型选择器**旁**新增**协作模型选择器**（复用 `GuidCollaboratorSelector` 组件 + `useModelRange`/`useModelProviderList`；主模型钉为禁用的必选项 `· 主`，其余为协作池）。
 - 新增**活跃会话更新 `extra.orchestrator_model_range` 的路径**（现只在 `create` 时写）：选择器变更即 `update_extra`（走 `orchestrator_model_range` 约定：`models[0]=主模型=lead/planner`，其余=协作池）。`caps_orchestrator.read_conversation_model_range` 已能读回，无需改后端读侧。
-- 默认值：主模型 = 会话当前模型；协作池默认空（= 后端 `Auto` 兜底，即所有启用模型）。持久化沿用 `nomi.orchestrationCollaborators` 或改为会话级偏好。
+- 默认值：主模型 = 会话当前模型；协作池默认空（= 后端 `Auto` 兜底，即所有启用模型）。持久化沿用 `openhub.orchestrationCollaborators` 或改为会话级偏好。
 
 ### 6.2 自动模型路由（决策 D 的「自动选」部分）
 
@@ -347,7 +347,7 @@
 - worker：`run_restricted`/`build_worker_extra`/`role_allowed_tools`/`read_final_text`/`last_error_retryable`（`worker.rs`）
 - 读模型：`list_ready_tasks`/`reset_orphaned_running_tasks`/`reconcile_run_plan`（`sqlite_orch_run.rs`）
 - 网关：`caps_orchestrator.rs`（`openhub_spawn`/`openhub_run_create`/`read_conversation_model_range`/`expand_auto_range`/`build_adhoc_request`）、`tools_provider.rs`（`summarize_provider`/`ProviderSummary`）
-- 工厂：`factory/nomi.rs`（`LEAD_ORCHESTRATOR_PROMPT`/`is_orchestration_lead`/`compose_lead_prompt`/`engine_spawn_enabled`）
+- 工厂：`factory/openhub.rs`（`LEAD_ORCHESTRATOR_PROMPT`/`is_orchestration_lead`/`compose_lead_prompt`/`engine_spawn_enabled`）
 - 链接：`link_orchestrator_run`/`apply_knowledge_mounts`/`session_workpath_key`（`openhub-conversation/src/service.rs`、`openhub-knowledge/src/workpath.rs`）
 - 自主循环：`openhub-requirement/src/orchestrator.rs`（`run_loop`/`resume_persisted_bindings`/`start_sweeper`/`failure_backoff`）
 - 模型元数据：迁移 `021_model_descriptions.sql`/`025_model_context_limits.sql`/`026`（每节点覆盖）；`ModelType`/`ModelCapability`/`ProviderResponse`（`openhub-api-types/src/provider.rs`）；`ModelDescriptionEditor`（`ModelModalContent.tsx`）

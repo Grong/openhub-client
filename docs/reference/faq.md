@@ -41,7 +41,7 @@ For the full lifecycle and `work-dir` semantics, see [Configuration Reference](.
 
 ## Which agents and providers are supported?
 
-The "Agent CLIs" OpenHub runs as ACP (Agent Client Protocol) backends include `claude`, `codex`, `gemini`, `nomi`, `codebuddy`, `qwen`, and `opencode`. Each one is a separate CLI you install on your system; OpenHub discovers them on `PATH` and the registry hydrates from there. Run `openhub-core doctor` to see what your install detects.
+The "Agent CLIs" OpenHub runs as ACP (Agent Client Protocol) backends include `claude`, `codex`, `gemini`, `openhub`, `codebuddy`, `qwen`, and `opencode`. Each one is a separate CLI you install on your system; OpenHub discovers them on `PATH` and the registry hydrates from there. Run `openhub-core doctor` to see what your install detects.
 
 For raw model access (e.g. provider keys, custom OpenAI-compatible endpoints), the system supports configurable providers via `/api/providers/*` and the in-app settings UI. You bring the API keys; OpenHub stores them encrypted at rest in the data directory.
 

@@ -13,7 +13,7 @@
 
 排查发现"找不到记忆编辑入口"是三个问题叠加：
 
-1. **入口埋得深**：记忆 UI（`MemoriesTab.tsx`）藏在 nomi 页"共享(Shared)"域下，页面默认落"伙伴/概览"域，需先切换无"记忆"字样的域单选才看得到（`openhub/index.tsx:53,167-171`）。
+1. **入口埋得深**：记忆 UI（`MemoriesTab.tsx`）藏在 openhub 页"共享(Shared)"域下，页面默认落"伙伴/概览"域，需先切换无"记忆"字样的域单选才看得到（`openhub/index.tsx:53,167-171`）。
 2. **悬浮伙伴到不了记忆**：悬浮窗右键菜单只有 4 项（打开对话/打开设置/清除未读/隐藏），"打开设置"跳 `tab=settings` 而非 memories（`companionNativeMenu.ts:16-23`、`companion/index.tsx:1304-1321`）。
 3. **没有编辑按钮**：`MemoriesTab` 只能 增/置顶/归档/删除，内容是只读 `<div>`（`MemoriesTab.tsx:146`）。但 `updateMemory` IPC 已支持 `content?`，后端 PUT 已用 COALESCE 落库（`store.rs` update_memory）——所以"编辑内容"本是纯前端缺口。
 
@@ -28,7 +28,7 @@
 
 1. 伙伴记忆区分**共享**（所有伙伴可见）与**私有**（仅归属伙伴可见），两者皆可编辑。
 2. 编辑可改 **内容 + 共享/私有归属**（不改 kind/tags/importance/strength）。
-3. 三个入口：**悬浮伙伴右键菜单**、**侧边栏/nomi 页一级可见**、**对话窗口内**。
+3. 三个入口：**悬浮伙伴右键菜单**、**侧边栏/openhub 页一级可见**、**对话窗口内**。
 4. 顺带修复上述后端安全/事件隐患。
 
 非目标：语义检索/embedding；手动编辑 strength/importance/kind/tags；回溯改写进行中对话已烘焙的 prompt。
@@ -78,10 +78,10 @@
 
 ### D. 前端
 - **D1 编辑（`MemoriesTab.tsx`）**：每行加"编辑"按钮 → 弹窗改 content + 归属选择器（共享/私有给某伙伴）；工具栏加作用域筛选（全部/共享/仅当前伙伴）；每行作用域徽标；新增弹窗也带归属选择器；订阅 updated/deleted 实时刷新；加"编辑只影响新对话+实时 recall"的说明文案。
-- **D2 入口① 悬浮伙伴右键菜单**（`companionNativeMenu.ts` / `companion/index.tsx`）：`CompanionMenuAction` 加 `'open-memories'`；菜单加"打开记忆"项 → `openMainAt('/nomi?companion={id}&tab=memories')`；更新 `companionNativeMenu.test.ts`。
-- **D3 入口② 侧边栏/nomi 可发现性**（`openhub/index.tsx`）：把 `memories` 从"共享"域移到"**伙伴**"域，成为一级"记忆"标签；scope-aware：选中伙伴时默认显示 共享+该伙伴私有，作用域筛选保留"全部伙伴"。
-- **D4 入口③ 对话窗口内**（`companion/index.tsx`）：对话中 `onMemoryCreated`/updated 触发显示低调小条"记下了：<摘要>"+"编辑/管理"动作 → `openMainAt('/nomi?companion={id}&tab=memories')`；聊天栏加"记忆"小入口同样跳主窗口。不在 240×214 小窗内行内编辑。
-- **i18n**：新 key（`nomi.memories.edit`/`saved`/`scope`/`scopeShared`/`scopePrivate`/`scopeFilterAll|Shared|Private`/`editHint`、`nomi.menuOpenMemories` 等）补 en-US + zh-CN `nomi.json`，重新生成 `i18n-keys.d.ts`。
+- **D2 入口① 悬浮伙伴右键菜单**（`companionNativeMenu.ts` / `companion/index.tsx`）：`CompanionMenuAction` 加 `'open-memories'`；菜单加"打开记忆"项 → `openMainAt('/openhub?companion={id}&tab=memories')`；更新 `companionNativeMenu.test.ts`。
+- **D3 入口② 侧边栏/openhub 可发现性**（`openhub/index.tsx`）：把 `memories` 从"共享"域移到"**伙伴**"域，成为一级"记忆"标签；scope-aware：选中伙伴时默认显示 共享+该伙伴私有，作用域筛选保留"全部伙伴"。
+- **D4 入口③ 对话窗口内**（`companion/index.tsx`）：对话中 `onMemoryCreated`/updated 触发显示低调小条"记下了：<摘要>"+"编辑/管理"动作 → `openMainAt('/openhub?companion={id}&tab=memories')`；聊天栏加"记忆"小入口同样跳主窗口。不在 240×214 小窗内行内编辑。
+- **i18n**：新 key（`openhub.memories.edit`/`saved`/`scope`/`scopeShared`/`scopePrivate`/`scopeFilterAll|Shared|Private`/`editHint`、`openhub.menuOpenMemories` 等）补 en-US + zh-CN `openhub.json`，重新生成 `i18n-keys.d.ts`。
 
 ## 数据流
 
@@ -116,7 +116,7 @@
 后端：`store.rs / service.rs / routes.rs / events.rs / companion.rs / learner.rs / export.rs`（+ 迁移）。
 IPC：`ipcBridge.ts`。
 前端：`MemoriesTab.tsx / openhub/index.tsx / companion/index.tsx / companionNativeMenu.ts(+test) /`（必要时 Sider）。
-i18n：`locales/en-US/nomi.json`、`locales/zh-CN/nomi.json` + 重新生成 `i18n-keys.d.ts`。
+i18n：`locales/en-US/openhub.json`、`locales/zh-CN/openhub.json` + 重新生成 `i18n-keys.d.ts`。
 
 ## 实现备注（落地时的取舍，与上文设计一致，细节微调）
 

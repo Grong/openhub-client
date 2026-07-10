@@ -9,7 +9,7 @@
 //!    default-deny：没有任何 session 默认能跑 evaluate。
 //!
 //! 2. **opt-in「全权模式」**（full-power / unrestricted mode）：用户**显式** opt-in 的配置开关
-//!    （[`EvaluateGate::full_power`]，**LIVE 读**——参考 `openhub-ai-agent::factory::nomi::read_bool_pref`
+//!    （[`EvaluateGate::full_power`]，**LIVE 读**——参考 `openhub-ai-agent::factory::openhub::read_bool_pref`
 //!    的 `client_preferences` 范式；E3 是引擎层纯逻辑门，实际 LIVE 读接线在 services.rs / F 阶段，见
 //!    [`EvaluateGate`] 的 `TODO(F1-wire-live-read)`）。仅当全权显式开启，evaluate 才放行。
 //!

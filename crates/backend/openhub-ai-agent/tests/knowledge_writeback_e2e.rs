@@ -1,4 +1,4 @@
-//! E2E regression for the unified write stack (P1). Drives the REAL nomi tool
+//! E2E regression for the unified write stack (P1). Drives the REAL openhub tool
 //! → `LiveKnowledge*Sink` → `KnowledgeService::write_document` chain to prove:
 //!   1. the reported bug is dead — a staged write-back where the model passes
 //!      the workspace-mount path lands in the review inbox mirroring the

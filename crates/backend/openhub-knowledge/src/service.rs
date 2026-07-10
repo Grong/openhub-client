@@ -266,9 +266,9 @@ pub struct MountOutcome {
     /// `writeback` is true.
     pub writeback_eagerness: String,
     /// Raw `channel_write_enabled` opt-in from the binding. Carried verbatim
-    /// (independent of `writeback`) so the nomi factory can resolve the
+    /// (independent of `writeback`) so the openhub factory can resolve the
     /// external-IM-channel write policy with the SAME value the ACP path reads
-    /// at write time — without it the nomi path reconstructs the binding with a
+    /// at write time — without it the openhub path reconstructs the binding with a
     /// `false` default and channel write-back is permanently disabled.
     pub channel_write_enabled: bool,
 }
@@ -6200,12 +6200,12 @@ mod tests {
         // Workspace == data root → skipped, no scaffolding created.
         let outcome = service.ensure_mounts_for_target("conversation", "1", &data_dir).await;
         assert!(outcome.mounts.is_empty());
-        assert!(!data_dir.join(".nomi").exists());
+        assert!(!data_dir.join(".openhub").exists());
 
         // Workspace is an ancestor of the data root → skipped too.
         let outcome = service.ensure_mounts_for_target("conversation", "1", dir.path()).await;
         assert!(outcome.mounts.is_empty());
-        assert!(!dir.path().join(".nomi").exists());
+        assert!(!dir.path().join(".openhub").exists());
 
         // Reverse direction: a workspace INSIDE the managed knowledge root
         // (here: the base's own directory) must be skipped as well — the
@@ -6213,7 +6213,7 @@ mod tests {
         let kb_root = PathBuf::from(&kb.root_path);
         let outcome = service.ensure_mounts_for_target("conversation", "1", &kb_root).await;
         assert!(outcome.mounts.is_empty());
-        assert!(!kb_root.join(".nomi").exists());
+        assert!(!kb_root.join(".openhub").exists());
 
         // A sibling workspace mounts normally (guard must not overfire).
         let ws = dir.path().join("ws");

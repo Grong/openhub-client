@@ -40,7 +40,7 @@ pub struct GatewayDeps {
     /// Singleton terminal service (owns the live PTY map shared with the
     /// terminal routes + AutoWork orchestrator).
     pub terminal_service: Arc<TerminalService>,
-    /// Main-db provider rows: model listing + the nomi model resolution chain.
+    /// Main-db provider rows: model listing + the openhub model resolution chain.
     pub provider_repo: Arc<dyn IProviderRepository>,
     /// IDMM supervision config (same instance as `/api/idmm` so save also
     /// arms/stops the live supervisor).

@@ -16,7 +16,7 @@
 - per-run 锁绝不跨 LLM await；lead 回执 best-effort（失败只 warn）；`lead_conv_id=None` 不回执。
 - 迁移 append-only 纯 ADD COLUMN；旧行读回 NULL 零回归。下一个迁移号：**030**。
 - 编排能力对 Remote 面硬拒（ORCHESTRATOR_DENY_SURFACES）；新工具同样 deny。
-- NomiChat 必须始终挂载（display:none 切换）；无 Provider 表面直通/渲染 null（伙伴零改动）。
+- OpenHubChat 必须始终挂载（display:none 切换）；无 Provider 表面直通/渲染 null（伙伴零改动）。
 - commit author=openhub<rika00@qq.com>`，无 Co-Authored-By；分支 feature/agent-cluster。
 
 ---
@@ -27,7 +27,7 @@
 
 **Files:**
 - Modify: `crates/backend/openhub-api-types/src/agent_build_extra.rs`（NomiBuildExtra，~line 342 后加字段）
-- Modify: `crates/backend/openhub-ai-agent/src/factory/nomi.rs`（~line 190 注入点 + ~line 777 纯函数区 + tests mod）
+- Modify: `crates/backend/openhub-ai-agent/src/factory/openhub.rs`（~line 190 注入点 + ~line 777 纯函数区 + tests mod）
 
 **Interfaces:**
 - Produces: `NomiBuildExtra.agent_cluster_mode: bool`（serde default，alias `agentClusterMode`）；
@@ -42,7 +42,7 @@
 #[serde(default, alias = "agentClusterMode")]
 pub agent_cluster_mode: bool,
 ```
-- [ ] Step 2: nomi.rs 加常量（放 SUBAGENT_STANDARD_HINT 之后）：
+- [ ] Step 2: openhub.rs 加常量（放 SUBAGENT_STANDARD_HINT 之后）：
 ```rust
 /// 「agent 集群」模式增强提示（需求1）。仅当会话 extra.agent_cluster_mode=true 且
 /// 常驻 subagent 提示已注入（同一网关前提）时，追加在其后。
@@ -221,7 +221,7 @@ RunOutcome::NodeQuestion => format!(
 
 **Files:**
 - Create: `ui/src/renderer/pages/conversation/components/ClusterModePill.tsx`
-- Modify: `ui/src/renderer/pages/conversation/components/ChatConversation.tsx`（与 collaboratorSelectorNode 同路注入 NomiChat composer）
+- Modify: `ui/src/renderer/pages/conversation/components/ChatConversation.tsx`（与 collaboratorSelectorNode 同路注入 OpenHubChat composer）
 
 **Interfaces:**
 - 读 conversation.extra.agent_cluster_mode / orchestrator_approval_mode；popover 内两开关：「agent 集群」（写 extra.agent_cluster_mode）+「节点审批模式」（写 extra.orchestrator_approval_mode: 'manual'|删除）；写回走 `ipcBridge.conversation.update`（extra 顶层浅合并，只覆盖本键——照抄 orchestrator_model_range 写法 ChatConversation.tsx:177-189）。

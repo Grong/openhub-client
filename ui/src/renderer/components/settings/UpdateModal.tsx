@@ -8,7 +8,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Button, Progress, Message } from '@arco-design/web-react';
 import { CheckOne, Download, FolderOpen, Refresh, CloseOne, Install } from '@icon-park/react';
 import { ipcBridge } from '@/common';
-import NomiModal from '@/renderer/components/base/NomiModal';
+import OpenHubModal from '@/renderer/components/base/OpenHubModal';
 import MarkdownView from '@/renderer/components/Markdown';
 import type { UpdateDownloadProgressEvent, UpdateReleaseInfo, AutoUpdateStatus } from '@/common/update/updateTypes';
 import { useTranslation } from 'react-i18next';
@@ -533,7 +533,7 @@ const UpdateModal: React.FC = () => {
   };
 
   return (
-    <NomiModal
+    <OpenHubModal
       visible={visible}
       onCancel={handleClose}
       size={status === 'available' ? 'medium' : 'small'}
@@ -554,7 +554,7 @@ const UpdateModal: React.FC = () => {
           'shrink-0 border-t border-solid border-[rgba(var(--warning-6),0.18)] bg-fill-1/60 px-20px py-10px text-center'
         )}
       </div>
-    </NomiModal>
+    </OpenHubModal>
   );
 };
 

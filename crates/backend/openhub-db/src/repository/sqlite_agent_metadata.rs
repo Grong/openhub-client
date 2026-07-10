@@ -319,8 +319,8 @@ mod tests {
         let claude = repo.get("agent_builtin_claude").await.unwrap().expect("seeded claude row");
         assert_eq!(claude.icon.as_deref(), Some("/api/assets/logos/ai-major/claude.svg"));
 
-        let nomi = repo.get("agent_builtin_nomi").await.unwrap().expect("seeded nomi row");
-        assert_eq!(nomi.icon.as_deref(), Some("/api/assets/logos/brand/nomi.svg"));
+        let openhub = repo.get("agent_builtin_openhub").await.unwrap().expect("seeded openhub row");
+        assert_eq!(openhub.icon.as_deref(), Some("/api/assets/logos/brand/openhub.svg"));
 
         let kiro = repo.get("agent_builtin_kiro").await.unwrap().expect("seeded kiro row");
         assert!(kiro.icon.is_none());

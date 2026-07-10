@@ -198,7 +198,7 @@ impl OAuthManager {
             return Ok(new_creds.access_token);
         }
 
-        anyhow::bail!("Token expired and no refresh token available. Run 'nomi --login'")
+        anyhow::bail!("Token expired and no refresh token available. Run 'openhub --login'")
     }
 
     /// Refresh the access token
@@ -255,7 +255,7 @@ impl OAuthManager {
 
     fn load_credentials(&self) -> anyhow::Result<OAuthCredentials> {
         let json = std::fs::read_to_string(&self.credentials_path)
-            .map_err(|_| anyhow::anyhow!("No saved credentials. Run 'nomi --login'"))?;
+            .map_err(|_| anyhow::anyhow!("No saved credentials. Run 'openhub --login'"))?;
         let creds: OAuthCredentials = serde_json::from_str(&json)?;
         Ok(creds)
     }

@@ -238,7 +238,7 @@ impl CronService {
         Ok(job)
     }
 
-    /// Validate that a nomi agent job has a usable model source before it is
+    /// Validate that a openhub agent job has a usable model source before it is
     /// created or updated.
     ///
     /// The model source depends on the execution mode (see [`openhub_model_check`]):
@@ -249,7 +249,7 @@ impl CronService {
     ///   `agent_config.backend`. The desktop "指定会话" flow deliberately omits
     ///   `agent_config` (passing it would clobber the conversation's own
     ///   workspace), so demanding `agent_config.backend` here wrongly rejected
-    ///   every nomi specified-conversation job. Validate the bound conversation
+    ///   every openhub specified-conversation job. Validate the bound conversation
     ///   actually carries a model instead — only then is the "no model
     ///   configured" message accurate.
     /// * An [`ExecutionMode::NewConversation`] job — or an `Existing` job with
@@ -272,7 +272,7 @@ impl CronService {
                         let model = openhub_conversation::task_options::provider_model_from_conversation_row(&row);
                         if model.provider_id.trim().is_empty() {
                             return Err(CronError::InvalidAgentConfig(
-                                "the bound nomi conversation has no model configured; \
+                                "the bound openhub conversation has no model configured; \
                              open the conversation and choose a model first, then create the job"
                                     .into(),
                             ));
@@ -288,7 +288,7 @@ impl CronService {
                         warn!(
                             conversation_id,
                             error = %err,
-                            "Could not load conversation to validate nomi cron model; deferring to run time"
+                            "Could not load conversation to validate openhub cron model; deferring to run time"
                         );
                         Ok(())
                     }
@@ -1336,7 +1336,7 @@ fn get_string(extra: &serde_json::Value, keys: &[&str]) -> Option<String> {
 
 /// Nomi cron jobs require `agent_config.backend` (provider_id) to be set —
 /// the executor uses it to look up the provider row and build the agent.
-/// Reject add/update requests that would produce an invalid nomi job.
+/// Reject add/update requests that would produce an invalid openhub job.
 ///
 /// The literal `"openhub"` is ALSO rejected: it is the cached vendor-label
 /// fallback `build_agent_config_from_conversation` emits when the bound
@@ -1353,7 +1353,7 @@ fn validate_openhub_agent_config(
     let backend = agent_config.map(|c| c.backend.trim()).unwrap_or("");
     if backend.is_empty() || backend == "openhub" {
         return Err(CronError::InvalidAgentConfig(
-            "the bound nomi conversation has no model configured (agent_config.backend must be a provider_id); \
+            "the bound openhub conversation has no model configured (agent_config.backend must be a provider_id); \
              set the conversation's model first, then create the job"
                 .into(),
         ));
@@ -1361,12 +1361,12 @@ fn validate_openhub_agent_config(
     Ok(())
 }
 
-/// Where a nomi cron job's model comes from. Used to pick the right validation
+/// Where a openhub cron job's model comes from. Used to pick the right validation
 /// without performing any I/O, so the routing decision is unit-testable on its
 /// own.
 #[derive(Debug, PartialEq, Eq)]
 enum NomiModelCheck {
-    /// Not a nomi job — no model validation applies.
+    /// Not a openhub job — no model validation applies.
     Skip,
     /// `agent_config.backend` is the model source; apply the static check.
     AgentConfig,
@@ -1375,7 +1375,7 @@ enum NomiModelCheck {
     BoundConversation,
 }
 
-/// Decide how a nomi agent job's model must be validated. Pure (no I/O).
+/// Decide how a openhub agent job's model must be validated. Pure (no I/O).
 ///
 /// An `Existing` job bound to a non-empty `conversation_id` resolves its model
 /// from that conversation at run time (`executor::execute_inner`), so
@@ -1711,7 +1711,7 @@ mod tests {
 
     #[test]
     fn validate_openhub_placeholder_check_trims_whitespace() {
-        let cfg = agent_cfg_dto("  nomi  ");
+        let cfg = agent_cfg_dto("  openhub  ");
         let err = validate_openhub_agent_config("openhub", Some(&cfg)).unwrap_err();
         assert!(matches!(err, CronError::InvalidAgentConfig(_)));
     }
@@ -1727,8 +1727,8 @@ mod tests {
     // -- openhub_model_check (execution-mode-aware routing) ----------------------
 
     #[test]
-    fn openhub_model_check_skips_non_nomi() {
-        // Non-nomi jobs never carry a nomi model requirement, regardless of mode.
+    fn openhub_model_check_skips_non_openhub() {
+        // Non-openhub jobs never carry a openhub model requirement, regardless of mode.
         assert_eq!(
             openhub_model_check("acp", ExecutionMode::Existing, "42"),
             NomiModelCheck::Skip

@@ -4,11 +4,11 @@
 //! ## Why this exists
 //!
 //! AutoWork drives ACP sessions, but ACP CLIs have no in-process tool bus we
-//! can register `RequirementCompleteTool` into (only the nomi engine does).
+//! can register `RequirementCompleteTool` into (only the openhub engine does).
 //! Without a declaration channel, a clean turn that did NOT actually finish the
 //! requirement is silently recorded as `done` — the original "失败却标成成功"
 //! bug. This server gives ACP agents the SAME `requirement_complete` /
-//! `requirement_update_status` surface the nomi engine has natively, so the
+//! `requirement_update_status` surface the openhub engine has natively, so the
 //! orchestrator can park an un-declared clean turn as `needs_review` instead of
 //! assuming success (`expects_verdict`).
 //!

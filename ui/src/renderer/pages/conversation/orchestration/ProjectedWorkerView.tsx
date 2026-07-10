@@ -37,15 +37,15 @@ const TOAST_ERR_MS = 2500;
 /**
  * ProjectedWorkerView — projects one DAG worker node into the conversation content
  * area (「会话原生编排」F7; left chat column of the 左右分屏). Rendered by
- * {@link ConversationContentSwitcher} ON TOP of the (display:none) main NomiChat
+ * {@link ConversationContentSwitcher} ON TOP of the (display:none) main OpenHubChat
  * whenever a node is projected, so the user can inspect a worker's record, talk to
  * it, and rerun it — then return to the main agent.
  *
  * Layout:
  *  - a thin banner (left「查看:<title>」; right [采用为该节点产出] / [重跑] / [← 返回 main]);
  *  - the worker conversation, rendered via {@link ReadOnlyConversationView}
- *    WITHOUT `hideSendBox` — so the worker's OWN full composer (NomiChat →
- *    NomiSendBox) is reused: current-model pill, `+` attachments, @-file mentions,
+ *    WITHOUT `hideSendBox` — so the worker's OWN full composer (OpenHubChat →
+ *    OpenHubSendBox) is reused: current-model pill, `+` attachments, @-file mentions,
  *    slash commands, autonomy pill, multi-line auto-grow, circular send. The user
  *    types a 局部调整 by talking to the worker directly (a normal turn in the
  *    worker's conversation) — the fullest, most familiar input surface, instead of
@@ -422,7 +422,7 @@ const ProjectedWorkerView: React.FC<ProjectedWorkerViewProps> = ({ payload }) =>
         </div>
       )}
 
-      {/* ── Body: the worker conversation, EDITABLE (full NomiSendBox reused) ──
+      {/* ── Body: the worker conversation, EDITABLE (full OpenHubSendBox reused) ──
           Not-started / loading covered; otherwise the worker's own conversation
           with its full composer (model pill, attachments, @, slash, send). */}
       <div className={styles.body}>
@@ -454,7 +454,7 @@ const ProjectedWorkerView: React.FC<ProjectedWorkerViewProps> = ({ payload }) =>
             // Settled node — the config folds INTO the worker's OWN composer: the
             // model selector writes the per-node override through (nodeBinding), and
             // the 预置要求 pill is injected into the composer toolbar (extraRightTools).
-            // No separate panel. ReadOnlyConversationView (NomiChat, flex-1) fills the
+            // No separate panel. ReadOnlyConversationView (OpenHubChat, flex-1) fills the
             // pane exactly as before.
             <ReadOnlyConversationView
               conversation={conversation}

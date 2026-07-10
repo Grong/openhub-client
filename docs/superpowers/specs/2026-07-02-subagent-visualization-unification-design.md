@@ -12,7 +12,7 @@
 
 **为什么 Spawn「堵住、没输出」**：引擎内 `AgentSpawner`（`crates/agent/openhub-agent/src/spawner.rs`）给每个子 agent 用 `NullSink`——不落库、不流式、无 `conversation_id`、不发任何事件；`spawn_parallel` **同步**等所有子 agent 跑完（每个上限 300s）才把结果作为**一条** `tool_result` 返回。所以主会话全程静默、像卡死。前端**根本没有可订阅的东西**。
 
-**为什么编排器天然有可视化**：`openhub-orchestrator` 的每个任务节点 = 一条**真实 nomi worker 会话**（`ConversationWorkerRunner`，落库 + 流式 + `conversation_id` + WS 事件 + `orchestrator_task_id` 关联），前端 `DagCanvas` / `RunDecisionFeed` / `ProjectedWorkerView` 整套可视化已就绪，且**纯数据驱动、与 planner 无关**。
+**为什么编排器天然有可视化**：`openhub-orchestrator` 的每个任务节点 = 一条**真实 openhub worker 会话**（`ConversationWorkerRunner`，落库 + 流式 + `conversation_id` + WS 事件 + `orchestrator_task_id` 关联），前端 `DagCanvas` / `RunDecisionFeed` / `ProjectedWorkerView` 整套可视化已就绪，且**纯数据驱动、与 planner 无关**。
 
 **结论**：把编排器作为子 agent 的统一执行 + 可视化底座（方案 A）。桌面会话的「快速并行扇出」不再走静默的进程内 Spawn，而是走一个**扁平 fan-out run**（跳过 planner LLM 的 N 个独立 worker 任务），link 回当前会话 → 复用整套编排可视化。进程内 Spawn 仅保留给 CLI / 独立模式。
 
@@ -43,7 +43,7 @@ recon（6 路并行 + 严格评审，实测核对关键行）裁定：**needs-wo
         │  link_orchestrator_run(conversation_id, run_id)  ← 复用既有写点（只 merge extra + 广播）
         ▼
    RunEngine.run_loop  ← 零改动：N 个无依赖任务被 list_ready_tasks 立即判就绪、按 max_parallel 扇出
-        │  每任务 = ConversationWorkerRunner → 一条真实 nomi worker 会话（落库/流式/conversation_id/WS）
+        │  每任务 = ConversationWorkerRunner → 一条真实 openhub worker 会话（落库/流式/conversation_id/WS）
         ▼
    前端（零改动或轻打磨）：extra.orchestrator_run_id → DagCanvas + worker 转录投射 + 决策流
 ```
@@ -81,7 +81,7 @@ recon（6 路并行 + 严格评审，实测核对关键行）裁定：**needs-wo
 
 - `openhub-config/src/config.rs` `ToolsConfig` 加 `#[serde(default = default_true)] in_process_spawn: bool`（Default = true，保 CLI）。
 - `bootstrap.rs:580-593`：`if self.config.tools.in_process_spawn { register(SpawnTool) }`（`ToolRegistry` 无 unregister，必须注册前拦截）。
-- `NomiResolvedConfig`（types.rs）+ `factory/nomi.rs`：桌面**网关**会话（`desktop_gateway` 且非 companion/remote）置 `false` → 改走 `openhub_spawn`；`manager/openhub/agent.rs` 紧邻 browser/computer 开关灌入。**须同步补齐所有 `make_test_config`/`NomiAgentManager::new` 调用点**（漏改编译失败）。
+- `NomiResolvedConfig`（types.rs）+ `factory/openhub.rs`：桌面**网关**会话（`desktop_gateway` 且非 companion/remote）置 `false` → 改走 `openhub_spawn`；`manager/openhub/agent.rs` 紧邻 browser/computer 开关灌入。**须同步补齐所有 `make_test_config`/`NomiAgentManager::new` 调用点**（漏改编译失败）。
 - CLI / 独立模式 / 子 agent 独立 registry 不受影响（子 agent registry 本就不含 Spawn）。
 - `LEAD_ORCHESTRATOR_PROMPT` 及伙伴智能编排提示：引导「复杂/多步用 `openhub_run_create`，多个独立小任务并行用 `openhub_spawn`」，避免模型退回 Bash 手搓并行。
 

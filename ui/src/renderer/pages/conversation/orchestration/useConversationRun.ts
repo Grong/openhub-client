@@ -35,7 +35,7 @@ export interface ConversationRunState {
  * threads it into {@link useRunLive} (run detail + run-engine WS refetch) and
  * {@link useLeadThinking} (lead-agent planning stream).
  *
- * The field only exists on the `nomi` variant of the discriminated union, so we
+ * The field only exists on the `openhub` variant of the discriminated union, so we
  * narrow on `conversation.type === 'openhub'` before reading it (no `as any`). When
  * there is no run, `runId` is `null` and both hooks are called with their silent
  * sentinels (`useRunLive(undefined)` / `useLeadThinking(null)`) so they hold no

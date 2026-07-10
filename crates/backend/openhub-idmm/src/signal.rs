@@ -66,7 +66,7 @@ pub struct PermissionConfirm {
     pub call_id: String,
     /// `(label, submit-value)` per option, in order. The submit-value is the
     /// per-backend token (`option_id` for ACP, `proceed_once`/`cancel`/… for
-    /// nomi) — IDMM submits it as both `option_id` and `value` so either backend
+    /// openhub) — IDMM submits it as both `option_id` and `value` so either backend
     /// resolves it.
     pub options: Vec<(String, String)>,
     /// The conservatively-safe "approve once" option's submit-value, set ONLY

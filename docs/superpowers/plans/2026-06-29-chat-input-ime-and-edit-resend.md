@@ -955,7 +955,7 @@ git -c user.nameopenhub-c user.email=rika00@qq.com commit --author=openhub<rika0
     async (msgId: string, message: string) => {
       const filesToSend = collectSelectedFiles(uploadFile, atPath);
       clearFiles();
-      emitter.emit('nomi.selected.file.clear');
+      emitter.emit('openhub.selected.file.clear');
       setWaitingResponse(true);
       try {
         const res = await ipcBridge.conversation.editResubmit.invoke({
@@ -967,7 +967,7 @@ git -c user.nameopenhub-c user.email=rika00@qq.com commit --author=openhub<rika0
         // 截断点之后本地立即移除旧消息，避免 DB 对齐前的闪烁。
         // 用新插入用户消息的 msg_id 之外，统一靠 history.refresh 兜底。
         emitter.emit('chat.history.refresh');
-        if (filesToSend.length > 0) emitter.emit('nomi.workspace.refresh');
+        if (filesToSend.length > 0) emitter.emit('openhub.workspace.refresh');
         setActiveMsgId(res.msg_id);
       } catch (error) {
         setWaitingResponse(false);
@@ -993,7 +993,7 @@ Expected: 通过
 
 ```bash
 git add ui/src/renderer/pages/conversation/platforms/openhub/NomiSendBox.tsx
-git -c user.nameopenhub-c user.email=rika00@qq.com commit --author=openhub<rika00@qq.com>" -m "feat(nomi): NomiSendBox 接入 editResubmit 提交编辑重跑"
+git -c user.nameopenhub-c user.email=rika00@qq.com commit --author=openhub<rika00@qq.com>" -m "feat(openhub): NomiSendBox 接入 editResubmit 提交编辑重跑"
 ```
 
 ## Task B9：MessageText 用户气泡「编辑」按钮（Nomi + 最近一条 + idle）

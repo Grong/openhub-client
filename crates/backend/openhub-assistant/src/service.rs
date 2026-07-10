@@ -1773,7 +1773,7 @@ mod tests {
     /// `claude` on `PATH`. CLI-based agents must be opted into
     /// explicitly.
     #[tokio::test]
-    async fn resolve_default_agent_type_routes_anthropic_provider_to_nomi() {
+    async fn resolve_default_agent_type_routes_anthropic_provider_to_openhub() {
         let fx = fixture_with_options(FixtureOpts {
             seed_platform: Some("anthropic"),
             ..Default::default()
@@ -1799,7 +1799,7 @@ mod tests {
     /// Custom (non-anthropic, non-openai) platform also routes to Nomi,
     /// which handles OpenAI-compatible custom URLs.
     #[tokio::test]
-    async fn resolve_default_agent_type_handles_custom_platform_as_nomi() {
+    async fn resolve_default_agent_type_handles_custom_platform_as_openhub() {
         let fx = fixture_with_options(FixtureOpts {
             seed_platform: Some("custom"),
             ..Default::default()
@@ -1901,7 +1901,7 @@ mod tests {
             );
             assert_eq!(
                 created.preset_agent_type, "openhub",
-                "{platform} provider should resolve to nomi"
+                "{platform} provider should resolve to openhub"
             );
         }
     }

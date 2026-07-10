@@ -730,7 +730,7 @@ async fn create_with_custom_name_and_source() {
 async fn create_stores_model_as_json() {
     let (svc, _broadcaster, _repo, _task_mgr) = make_service();
 
-    // Top-level model is only valid for nomi conversations.
+    // Top-level model is only valid for openhub conversations.
     let req: CreateConversationRequest = serde_json::from_value(json!({
         "type": "openhub",
         "model": { "provider_id": "p1", "model": "m1" },
@@ -932,7 +932,7 @@ async fn update_extra_merge() {
 async fn update_model() {
     let (svc, _broadcaster, _repo, task_mgr) = make_service();
 
-    // Top-level model updates are only valid on nomi conversations
+    // Top-level model updates are only valid on openhub conversations
     // (Task 8 enforces the openhub-only rule in update).
     let create_req: CreateConversationRequest = serde_json::from_value(json!({
         "type": "openhub",
@@ -3117,7 +3117,7 @@ async fn send_message_does_not_evict_non_acp_task_after_terminal_error() {
         ScriptedAgent::new(
             &conv.id.to_string(),
             vec![vec![AgentStreamEvent::Error(ErrorEventData::legacy(
-                "nomi terminal error",
+                "openhub terminal error",
                 Some(AgentErrorCode::UnknownUpstreamError),
             ))]],
         )
@@ -3869,7 +3869,7 @@ async fn insert_raw_message_persists_row_and_broadcasts_stream() {
 
 // ── Phase 3 model failover (plan D3) integration tests ──────────────
 //
-// These drive the send loop end to end through a nomi `ScriptedAgent`: turn 1
+// These drive the send loop end to end through a openhub `ScriptedAgent`: turn 1
 // emits a (pre-response) provider-fault terminal error, the seam picks the next
 // queued model, rebuilds, and resends the SAME content. We assert on the
 // `sent_contents` of a PERSISTENT scripted agent (returned across rebuilds), the
@@ -4034,7 +4034,7 @@ impl IWorkerTaskManager for PersistentScriptedTaskManager {
     }
 }
 
-/// Seed a nomi conversation row with a model + a session-level `model_failover`
+/// Seed a openhub conversation row with a model + a session-level `model_failover`
 /// override, returning the allocated id. `failover` is merged verbatim into
 /// `extra.model_failover`.
 async fn seed_openhub_failover_conversation(
@@ -4479,7 +4479,7 @@ async fn failover_is_bounded_by_max_switches() {
     assert_eq!(model.provider_id, "p2", "stopped at the first switch, not p3");
 }
 
-// ── review #11: ACP exclusion (send-loop) + IDMM/perform direct on non-nomi ──
+// ── review #11: ACP exclusion (send-loop) + IDMM/perform direct on non-openhub ──
 
 /// Seed an ACP conversation row with a model + a session-level `model_failover`
 /// override (mirror of [`seed_openhub_failover_conversation`] but `type: "acp"`).
@@ -4595,7 +4595,7 @@ async fn idmm_failover_conversation_returns_false_for_acp_conversation() {
 
 #[tokio::test]
 async fn perform_model_failover_returns_none_for_acp_conversation() {
-    // review #11(2): calling the bottleneck directly on a non-nomi conversation
+    // review #11(2): calling the bottleneck directly on a non-openhub conversation
     // returns None (the review #9 ACP gate), with no kill and no model write.
     let (svc, _broadcaster, repo, provider_repo) =
         make_failover_service(vec![test_provider("p1", &["m1"]), test_provider("p2", &["m2"])]);
@@ -4617,7 +4617,7 @@ async fn perform_model_failover_returns_none_for_acp_conversation() {
     let result = svc
         .perform_model_failover(&conv_id.to_string(), &config, &[], &task_mgr_dyn)
         .await;
-    assert!(result.is_none(), "perform_model_failover must reject a non-nomi conversation");
+    assert!(result.is_none(), "perform_model_failover must reject a non-openhub conversation");
     assert_eq!(task_mgr.kill_count(), 0);
     let row = repo.get(conv_id).await.unwrap().unwrap();
     let model: ProviderWithModel = serde_json::from_str(row.model.as_deref().unwrap()).unwrap();
@@ -4629,7 +4629,7 @@ async fn perform_model_failover_returns_none_for_acp_conversation() {
 
 /// 非 Nomi 会话调用 edit_and_resubmit → BadRequest（Nomi 门禁在取 agent/查消息之前）。
 #[tokio::test]
-async fn edit_and_resubmit_rejects_non_nomi() {
+async fn edit_and_resubmit_rejects_non_openhub() {
     let (svc, _broadcaster, _repo, _task_mgr) = make_service();
     let task_mgr: Arc<dyn IWorkerTaskManager> = Arc::new(MockTaskManager::new());
     // make_create_req() 建的是 acp 会话

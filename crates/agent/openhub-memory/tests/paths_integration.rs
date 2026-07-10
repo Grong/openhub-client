@@ -29,7 +29,7 @@ fn tc_2_1_default_base_dir_uses_platform_config() {
     // Should end with "openhub" (the brand, not "claude")
     assert!(
         base.to_string_lossy().contains("openhub"),
-        "base dir should use nomi brand: {base:?}"
+        "base dir should use openhub brand: {base:?}"
     );
 
     restore_env(saved);

@@ -256,7 +256,7 @@ pub(super) async fn build(
 
     // Open the ACP session eagerly so `POST /warmup` returns only after
     // session/new (or claude-meta-resume / session/load) and the first
-    // reconcile pass have completed. Matches nomi factory behaviour:
+    // reconcile pass have completed. Matches openhub factory behaviour:
     // the caller sees "warmed up" == "ready for PUT /mode | /model".
     arc.warmup_session().await?;
 

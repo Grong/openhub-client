@@ -1,7 +1,7 @@
-//! Sanitize a resumed nomi session's message history before it is replayed
+//! Sanitize a resumed openhub session's message history before it is replayed
 //! to a provider.
 //!
-//! Background: when the user clicks "Stop" on a tool-call mid-stream, nomi
+//! Background: when the user clicks "Stop" on a tool-call mid-stream, openhub
 //! may persist an assistant message that contains `ToolUse` content blocks
 //! but whose tool calls were never followed up by the matching `ToolResult`
 //! blocks. On the next turn, the engine replays history verbatim and strict

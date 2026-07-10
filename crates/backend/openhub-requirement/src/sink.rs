@@ -8,7 +8,7 @@ use openhub_common::RequirementCreator;
 use crate::service::RequirementService;
 
 /// Backend implementation of the agent-side `RequirementSink` trait, delegating
-/// to `RequirementService`. Injected into the nomi engine via the agent factory.
+/// to `RequirementService`. Injected into the openhub engine via the agent factory.
 pub struct RequirementServiceSink {
     service: Arc<RequirementService>,
 }
@@ -79,7 +79,7 @@ impl RequirementSink for RequirementServiceSink {
     }
 }
 
-/// Parse the requirement id the nomi engine passes from the prompt (an integer,
+/// Parse the requirement id the openhub engine passes from the prompt (an integer,
 /// single-track per spec §2.3) — carried as a string across the agent-engine
 /// seam. A non-numeric id (e.g. a stale id replayed from a persisted transcript,
 /// spec §2.5/§7.4) is rejected explicitly rather than silently coerced.

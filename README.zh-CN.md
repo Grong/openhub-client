@@ -131,7 +131,7 @@
 
 - **专属形象。** 上传自定义伙伴形象（DIY），或从与具体伙伴解耦的独立**形象库**中挑选。
 - **一脑多面。** 运行多个伙伴，共享统一记忆中枢，同时各自保留**专属**私有记忆，并可挂载不同领域的知识库。你只需教好*一个*伙伴，再让它去教其他伙伴。
-- **聊天入口回到主会话。** 伙伴聊天现在直接进入主 **会话** 体系，并在侧边栏拥有独立的「桌面伙伴」分组；`/nomi` 则专注于伙伴管理。
+- **聊天入口回到主会话。** 伙伴聊天现在直接进入主 **会话** 体系，并在侧边栏拥有独立的「桌面伙伴」分组；`/openhub` 则专注于伙伴管理。
 - **它在学你（默认开启，首启动一次性确认）。** 后台 Learner 把你的使用蒸馏为长期记忆；确定性的进化引擎从你反复出现的多步工具序列中挖掘出 **skill 草稿**，提交给你审阅。记忆**完全可见、可编辑**。
 - **会传播的 skill。** 伙伴自动总结、生成 skill 并与你商议，还能把 skill **赠予**另一个伙伴（对方得到一份副本）—— 开启跨伙伴的共享学习。
 - **不只是伙伴，更是超级网关。** 每个伙伴都是完整、独立的个体，可连接多个 IM 渠道。只要有网络和社交平台，随时随地一条消息，就能指挥伙伴帮你操作电脑。每个伙伴都能完整驱动桌面的系统能力。
@@ -196,7 +196,7 @@ OpenHub 的每一项能力都经由单一、强类型的能力注册表对外开
 
 > 指南：[`docs/guides/model-routing.zh.md`](docs/guides/model-routing.zh.md)
 
-- **内置 `nomi` 智能体** —— 无需额外安装。支持 **26+ 模型供应商/预设**（OpenAI、Anthropic、Gemini + Vertex AI、AWS Bedrock、DeepSeek、OpenRouter、Moonshot/Kimi、通义千问/Dashscope、智谱/GLM、MiniMax、SiliconFlow、xAI、火山/豆包 等），覆盖 **4 种线缆协议**，并支持 **New API** 聚合网关。
+- **内置 `openhub` 智能体** —— 无需额外安装。支持 **26+ 模型供应商/预设**（OpenAI、Anthropic、Gemini + Vertex AI、AWS Bedrock、DeepSeek、OpenRouter、Moonshot/Kimi、通义千问/Dashscope、智谱/GLM、MiniMax、SiliconFlow、xAI、火山/豆包 等），覆盖 **4 种线缆协议**，并支持 **New API** 聚合网关。
 - **经 ACP 直连约 19 个外部智能体** —— Claude Code、Codex、Gemini、Qwen、Kimi、Cursor、Copilot、Goose、OpenCode、Droid 等，OpenHub 为它们提供模型*以及*自家的原生能力（computer/browser/knowledge/gateway，经注入的 MCP 桥）。
 - **处处可用** —— 这些原生能力对内置智能体、ACP 智能体、聊天界面**以及**终端一律可用。
 - **多模态失败会优雅降级。** 如果当前模型/供应商不接受图片输入，OpenHub 会自动剔除图片、在同一会话里重试，并给出一条可见提示，而不是直接把整段会话打断。
@@ -225,7 +225,7 @@ OpenHub 不绑定任何一家模型厂商。你可以按地区、价格、额度
 
 > 指南：[`docs/guides/terminal.zh.md`](docs/guides/terminal.zh.md)
 
-在应用内 PTY 会话里运行各种 agent CLI（或独立的 `nomi` CLI）。OpenHub 会把原生能力 —— 知识检索、需求完成、生命周期 hooks —— 经各 CLI *自己的*原生配置注入进去，从而保留完整保真度与 OAuth。
+在应用内 PTY 会话里运行各种 agent CLI（或独立的 `openhub` CLI）。OpenHub 会把原生能力 —— 知识检索、需求完成、生命周期 hooks —— 经各 CLI *自己的*原生配置注入进去，从而保留完整保真度与 OAuth。
 
 ### 📱 WebUI 远程操控 —— 一扫即用
 
@@ -270,7 +270,7 @@ apps/
   web/          API + SPA 的独立 web 宿主
 crates/
   agent/        15 个 openhub-* crate：引擎、供应商、工具、MCP、skills、记忆、
-                browser/computer use，以及独立 nomi CLI
+                browser/computer use，以及独立 openhub CLI
   backend/      29 个 openhub-* crate：应用组装、鉴权、数据库、会话、
                 MCP、知识库、需求、终端、伙伴、网关等
   shared/       2 个跨层 crate：openhub-net 与 openhub-redact

@@ -12,7 +12,7 @@ import { channel } from '@/common/adapter/ipcBridge';
 import type { IPublicAgent } from '@/common/adapter/ipcBridge';
 import { isBackendHttpError } from '@/common/adapter/httpBridge';
 import type { IChannelPluginStatus } from '@/common/types/channel/channel';
-import NomiModal from '@/renderer/components/base/NomiModal';
+import OpenHubModal from '@/renderer/components/base/OpenHubModal';
 import type { MasterAgentPlatform } from '@renderer/components/settings/SettingsModal/contents/channels/channelTarget';
 import {
   CHANNEL_PLATFORMS,
@@ -137,7 +137,7 @@ const ChannelsSection: React.FC<Props> = ({ agent, message }) => {
             throw new Error(
               result.error ||
                 result.message ||
-                t('nomi.settings.remoteEnableFailed', { defaultValue: 'Failed to enable channel' })
+                t('openhub.settings.remoteEnableFailed', { defaultValue: 'Failed to enable channel' })
             );
           }
           message.success(t(PLUGIN_ENABLED_KEY[platform]));
@@ -168,7 +168,7 @@ const ChannelsSection: React.FC<Props> = ({ agent, message }) => {
                 defaultValue: '已改由「{{name}}」接待,该渠道会话已重置',
                 name: agent.name,
               })
-            : t('nomi.settings.remoteUnbindSuccess')
+            : t('openhub.settings.remoteUnbindSuccess')
         );
         await refreshStatuses();
       } catch (error) {
@@ -178,7 +178,7 @@ const ChannelsSection: React.FC<Props> = ({ agent, message }) => {
         if (isBackendHttpError(error) && error.backendMessage) {
           message.error(error.backendMessage);
         } else {
-          message.error(t('nomi.settings.remoteBindFailed'));
+          message.error(t('openhub.settings.remoteBindFailed'));
         }
       } finally {
         setBusyRowId(null);
@@ -204,7 +204,7 @@ const ChannelsSection: React.FC<Props> = ({ agent, message }) => {
   const confirmUnbind = useCallback(
     (row: IChannelPluginStatus) => {
       Modal.confirm({
-        title: t('nomi.settings.remoteUnbindRow'),
+        title: t('openhub.settings.remoteUnbindRow'),
         content: t('publicCompanion.channels.unbindConfirm', {
           defaultValue: '解绑后该机器人不再由此对外伙伴接待,并重置该渠道的活跃会话。',
         }),
@@ -219,8 +219,8 @@ const ChannelsSection: React.FC<Props> = ({ agent, message }) => {
   const confirmMove = useCallback(
     (row: IChannelPluginStatus) => {
       Modal.confirm({
-        title: t('nomi.settings.remoteMoveHere'),
-        content: t('nomi.settings.remoteMoveConfirm', {
+        title: t('openhub.settings.remoteMoveHere'),
+        content: t('openhub.settings.remoteMoveConfirm', {
           from: t('publicCompanion.channels.otherOwner', { defaultValue: '其他对象' }),
           to: agent.name,
         }),
@@ -233,8 +233,8 @@ const ChannelsSection: React.FC<Props> = ({ agent, message }) => {
   const confirmDelete = useCallback(
     (row: IChannelPluginStatus) => {
       Modal.confirm({
-        title: t('nomi.settings.remoteDeleteBot'),
-        content: t('nomi.settings.remoteDeleteConfirm'),
+        title: t('openhub.settings.remoteDeleteBot'),
+        content: t('openhub.settings.remoteDeleteConfirm'),
         okButtonProps: { status: 'danger' },
         onOk: async () => {
           try {
@@ -254,27 +254,27 @@ const ChannelsSection: React.FC<Props> = ({ agent, message }) => {
     if (!row?.hasToken) {
       return (
         <Tag size='small' color='gray'>
-          {t('nomi.settings.remoteStatusNotConfigured')}
+          {t('openhub.settings.remoteStatusNotConfigured')}
         </Tag>
       );
     }
     if (row.enabled && row.connected) {
       return (
         <Tag size='small' color='green'>
-          {t('nomi.settings.remoteStatusRunning')}
+          {t('openhub.settings.remoteStatusRunning')}
         </Tag>
       );
     }
     if (row.enabled) {
       return (
         <Tag size='small' bordered={false} className='!bg-primary-1 !text-primary-6'>
-          {t('nomi.settings.remoteStatusEnabled')}
+          {t('openhub.settings.remoteStatusEnabled')}
         </Tag>
       );
     }
     return (
       <Tag size='small' color='gray'>
-        {t('nomi.settings.remoteStatusDisabled')}
+        {t('openhub.settings.remoteStatusDisabled')}
       </Tag>
     );
   };
@@ -282,7 +282,7 @@ const ChannelsSection: React.FC<Props> = ({ agent, message }) => {
   /** Bot identity line (botUsername preferred over raw botKey), empty when unknown. */
   const botIdentityOf = (row: IChannelPluginStatus | null) => {
     const bot = row?.botUsername || row?.botKey;
-    return bot ? t('nomi.settings.remoteBotIdentity', { bot }) : '';
+    return bot ? t('openhub.settings.remoteBotIdentity', { bot }) : '';
   };
 
   const allRows = useMemo(() => Object.values(statuses), [statuses]);
@@ -332,19 +332,19 @@ const ChannelsSection: React.FC<Props> = ({ agent, message }) => {
                     onChange={(checked: boolean) => void handleToggleEnabled(myRow, id, checked)}
                   />
                   <Button size='small' onClick={() => setConfigTarget({ platform: id, channelId: myRow.id })}>
-                    {t('nomi.settings.remoteConfigure')}
+                    {t('openhub.settings.remoteConfigure')}
                   </Button>
                   <Button size='small' onClick={() => confirmUnbind(myRow)}>
-                    {t('nomi.settings.remoteUnbindRow')}
+                    {t('openhub.settings.remoteUnbindRow')}
                   </Button>
                   <Button size='small' status='danger' onClick={() => confirmDelete(myRow)}>
-                    {t('nomi.settings.remoteDeleteBot')}
+                    {t('openhub.settings.remoteDeleteBot')}
                   </Button>
                 </>
               );
             } else if (unboundRows.length > 0) {
               const bindable = unboundRows[0];
-              subtitle = [t('nomi.settings.remoteUnboundBot'), botIdentityOf(bindable)].filter(Boolean).join(' · ');
+              subtitle = [t('openhub.settings.remoteUnboundBot'), botIdentityOf(bindable)].filter(Boolean).join(' · ');
               actions = (
                 <>
                   <Button
@@ -356,7 +356,7 @@ const ChannelsSection: React.FC<Props> = ({ agent, message }) => {
                     {t('publicCompanion.channels.bindRow', { defaultValue: '绑定到此对外伙伴' })}
                   </Button>
                   <Button size='small' onClick={() => setConfigTarget({ platform: id, channelId: bindable.id })}>
-                    {t('nomi.settings.remoteConfigure')}
+                    {t('openhub.settings.remoteConfigure')}
                   </Button>
                 </>
               );
@@ -369,7 +369,7 @@ const ChannelsSection: React.FC<Props> = ({ agent, message }) => {
               actions = (
                 <>
                   <Button size='small' type='primary' loading={busyRowId === movable.id} onClick={() => confirmMove(movable)}>
-                    {t('nomi.settings.remoteMoveHere')}
+                    {t('openhub.settings.remoteMoveHere')}
                   </Button>
                   <Button size='small' onClick={() => setConfigTarget({ platform: id })}>
                     {t('publicCompanion.channels.createBot', { defaultValue: '连接机器人' })}
@@ -398,7 +398,7 @@ const ChannelsSection: React.FC<Props> = ({ agent, message }) => {
                     </div>
                     {pending > 0 && (
                       <Tag size='small' color='orangered' className='mt-4px'>
-                        {t('nomi.settings.remotePending', { num: pending })}
+                        {t('openhub.settings.remotePending', { num: pending })}
                       </Tag>
                     )}
                   </div>
@@ -417,7 +417,7 @@ const ChannelsSection: React.FC<Props> = ({ agent, message }) => {
         })}
       </div>
 
-      <NomiModal
+      <OpenHubModal
         visible={Boolean(configTarget)}
         onCancel={() => {
           setConfigTarget(null);
@@ -426,7 +426,7 @@ const ChannelsSection: React.FC<Props> = ({ agent, message }) => {
           void refreshStatuses();
         }}
         header={{
-          title: t('nomi.settings.remoteConfigTitle', {
+          title: t('openhub.settings.remoteConfigTitle', {
             channel: configChannel ? t(configChannel.titleKey, configChannel.fallback) : '',
           }),
           showClose: true,
@@ -453,7 +453,7 @@ const ChannelsSection: React.FC<Props> = ({ agent, message }) => {
             refreshStatuses={refreshStatuses}
           />
         )}
-      </NomiModal>
+      </OpenHubModal>
     </SectionCard>
   );
 };

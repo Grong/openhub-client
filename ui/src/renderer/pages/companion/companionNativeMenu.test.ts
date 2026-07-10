@@ -12,17 +12,17 @@ describe('buildCompanionMenuEntries', () => {
     const entries = buildCompanionMenuEntries({
       name: '团团',
       t: (key, params) => {
-        if (key === 'nomi.companion.menuOpenConfig') return `打开 ${params?.name} 的设置`;
+        if (key === 'openhub.companion.menuOpenConfig') return `打开 ${params?.name} 的设置`;
         return key;
       },
     });
 
     expect(entries).toEqual([
-      { action: 'open-chat', text: 'nomi.companion.menuOpenChat' },
-      { action: 'open-memories', text: 'nomi.companion.menuOpenMemories' },
+      { action: 'open-chat', text: 'openhub.companion.menuOpenChat' },
+      { action: 'open-memories', text: 'openhub.companion.menuOpenMemories' },
       { action: 'open-config', text: '打开 团团 的设置' },
-      { action: 'clear-unread', text: 'nomi.companion.menuClearUnread' },
-      { action: 'hide', text: 'nomi.companion.menuHide' },
+      { action: 'clear-unread', text: 'openhub.companion.menuClearUnread' },
+      { action: 'hide', text: 'openhub.companion.menuHide' },
     ]);
   });
 });

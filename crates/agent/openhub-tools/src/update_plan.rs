@@ -36,7 +36,7 @@ pub struct UpdatePlanArgs {
 /// codex-style todo/checklist tool. Stateless: the model submits the full step
 /// list every call.
 ///
-/// This is a different concept from nomi's Plan Mode
+/// This is a different concept from openhub's Plan Mode
 /// (`EnterPlanMode`/`ExitPlanMode`), which is a *mode* that restricts the tool
 /// allow-list. `update_plan` is a *progress declaration* tool.
 pub struct UpdatePlanTool;

@@ -793,7 +793,7 @@ impl RequirementService {
     ///   `failed` and pause the tag.
     ///
     /// `expects_verdict` is true when the engine WAS given an explicit way to
-    /// declare the outcome (nomi native tools, ACP requirement MCP, terminal
+    /// declare the outcome (openhub native tools, ACP requirement MCP, terminal
     /// marker). Returns the final DTO (or None if the row vanished).
     pub async fn finalize_if_needed(
         &self,
@@ -806,7 +806,7 @@ impl RequirementService {
             return Ok(None);
         };
         // Agent already reached a terminal state itself → respect it (its own
-        // note, e.g. from the nomi `requirement_complete` tool, wins).
+        // note, e.g. from the openhub `requirement_complete` tool, wins).
         if row.status == "done" || row.status == "failed" || row.status == "cancelled" {
             return Ok(Some(row_to_dto(&row)));
         }

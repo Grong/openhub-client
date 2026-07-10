@@ -1,6 +1,6 @@
 # Companions
 
-Nomi's virtual companion has grown from "a single nomi" into a **multi-companion
+Nomi's virtual companion has grown from "a single openhub" into a **multi-companion
 family**: you can create several companions, use them side by side, raise
 them separately, and give each its own name, character, persona, and
 chat model. Each companion can also be bound to its own **dedicated knowledge
@@ -11,7 +11,7 @@ family remembers. Memories, companions, and knowledge bases can each be
 packed into a `.zip` bundle for export/import, making machine-to-machine
 migration painless.
 
-> The entry point is the **Desktop Companion** page in the sidebar (the `/nomi`
+> The entry point is the **Desktop Companion** page in the sidebar (the `/openhub`
 > route); the right-click menu of any desktop companion window ("Open chat")
 > deep-links there too.
 
@@ -148,7 +148,7 @@ all per-companion, while memory stays shared.
 
 Each IM platform (Telegram / Lark / DingTalk / WeChat) can bind its own
 greeter companion for remote messages: open the companion's **Remote**
-tab (`/nomi?companion=<id>&tab=remote`) and connect or rebind the bot
+tab (`/openhub?companion=<id>&tab=remote`) and connect or rebind the bot
 there. The binding is still persisted as `assistant.{platform}.companionId`
 for legacy platform-level preferences when a channel row has no direct
 companion binding. With no binding the **default companion** takes over;

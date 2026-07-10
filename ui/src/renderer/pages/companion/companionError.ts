@@ -10,7 +10,7 @@
  * 同一套 code 出现在两处:
  *  - 流式 `message.stream` 的 `type:"error"` 事件 → `data.code`(`AgentStreamErrorData`)。
  *  - 发送握手失败抛出的 `BackendHttpError.code`。
- * 未知/缺失 code → 退回通用兜底 `nomi.companion.chatError`(原"走神"文案)。
+ * 未知/缺失 code → 退回通用兜底 `openhub.companion.chatError`(原"走神"文案)。
  */
 
 /** 从流式错误事件的 `data`(unknown)里取出 error code,缺失则空串。 */
@@ -29,27 +29,27 @@ export function companionErrorKey(code: string): string {
     case 'USER_LLM_PROVIDER_PERMISSION_DENIED':
     case 'USER_LLM_PROVIDER_BILLING_REQUIRED':
     case 'USER_LLM_PROVIDER_CONFIG_ERROR':
-      return 'nomi.companion.err.auth';
+      return 'openhub.companion.err.auth';
     case 'USER_LLM_PROVIDER_MODEL_NOT_FOUND':
     case 'USER_LLM_PROVIDER_UNSUPPORTED_MODEL':
     case 'USER_LLM_PROVIDER_ENDPOINT_NOT_FOUND':
     case 'USER_LLM_PROVIDER_INVALID_REQUEST':
     case 'USER_LLM_PROVIDER_INVALID_TOOL_SCHEMA':
-      return 'nomi.companion.err.model';
+      return 'openhub.companion.err.model';
     case 'USER_LLM_PROVIDER_NETWORK_ERROR':
-      return 'nomi.companion.err.network';
+      return 'openhub.companion.err.network';
     case 'USER_LLM_PROVIDER_RATE_LIMITED':
-      return 'nomi.companion.err.rateLimited';
+      return 'openhub.companion.err.rateLimited';
     case 'USER_LLM_PROVIDER_TIMEOUT':
-      return 'nomi.companion.err.timeout';
+      return 'openhub.companion.err.timeout';
     case 'USER_LLM_PROVIDER_GATEWAY_ERROR':
     case 'UNKNOWN_UPSTREAM_ERROR':
-      return 'nomi.companion.err.gateway';
+      return 'openhub.companion.err.gateway';
     case 'USER_LLM_PROVIDER_CONTEXT_TOO_LARGE':
-      return 'nomi.companion.err.contextTooLarge';
+      return 'openhub.companion.err.contextTooLarge';
     case 'USER_LLM_PROVIDER_EMPTY_RESPONSE':
-      return 'nomi.companion.err.empty';
+      return 'openhub.companion.err.empty';
     default:
-      return 'nomi.companion.chatError';
+      return 'openhub.companion.chatError';
   }
 }

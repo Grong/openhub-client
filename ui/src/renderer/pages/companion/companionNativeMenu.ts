@@ -15,10 +15,10 @@ type Translate = (key: string, params?: Record<string, string>) => string;
 
 export function buildCompanionMenuEntries(opts: { name: string; t: Translate }): CompanionMenuEntry[] {
   return [
-    { action: 'open-chat', text: opts.t('nomi.companion.menuOpenChat') },
-    { action: 'open-memories', text: opts.t('nomi.companion.menuOpenMemories') },
-    { action: 'open-config', text: opts.t('nomi.companion.menuOpenConfig', { name: opts.name }) },
-    { action: 'clear-unread', text: opts.t('nomi.companion.menuClearUnread') },
-    { action: 'hide', text: opts.t('nomi.companion.menuHide') },
+    { action: 'open-chat', text: opts.t('openhub.companion.menuOpenChat') },
+    { action: 'open-memories', text: opts.t('openhub.companion.menuOpenMemories') },
+    { action: 'open-config', text: opts.t('openhub.companion.menuOpenConfig', { name: opts.name }) },
+    { action: 'clear-unread', text: opts.t('openhub.companion.menuClearUnread') },
+    { action: 'hide', text: opts.t('openhub.companion.menuHide') },
   ];
 }

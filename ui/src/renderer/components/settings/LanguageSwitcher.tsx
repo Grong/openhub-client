@@ -1,4 +1,4 @@
-import NomiSelect from '@/renderer/components/base/NomiSelect';
+import OpenHubSelect from '@/renderer/components/base/OpenHubSelect';
 import type { SelectHandle } from '@arco-design/web-react/es/Select/interface';
 import React, { useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -29,10 +29,10 @@ const LanguageSwitcher: React.FC = () => {
 
   return (
     <div className='flex items-center gap-8px'>
-      <NomiSelect ref={selectRef} className='w-160px' value={i18n.language} onChange={handleLanguageChange}>
-        <NomiSelect.Option value='zh-CN'>简体中文</NomiSelect.Option>
-        <NomiSelect.Option value='en-US'>English</NomiSelect.Option>
-      </NomiSelect>
+      <OpenHubSelect ref={selectRef} className='w-160px' value={i18n.language} onChange={handleLanguageChange}>
+        <OpenHubSelect.Option value='zh-CN'>简体中文</OpenHubSelect.Option>
+        <OpenHubSelect.Option value='en-US'>English</OpenHubSelect.Option>
+      </OpenHubSelect>
     </div>
   );
 };

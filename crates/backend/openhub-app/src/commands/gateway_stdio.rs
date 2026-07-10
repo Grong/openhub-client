@@ -4,7 +4,7 @@
 //! Spawned by agent sessions entitled to the Desktop Gateway. Uses the `rmcp`
 //! crate for protocol handling so it is byte-compatible with each CLI's MCP
 //! client (claude / codex / gemini advertise stdio-only MCP capabilities) and
-//! with the nomi engine's MCP manager.
+//! with the openhub engine's MCP manager.
 //!
 //! This bridge is now FULLY REGISTRY-DRIVEN: it declares no per-tool parameter
 //! struct or `#[tool]` method. `tools/list` is projected from the capability

@@ -11,8 +11,8 @@ import type { AgentSource } from '@/renderer/utils/model/agentTypes';
 export async function savePreferredMode(agentKey: string, mode: string): Promise<void> {
   try {
     if (agentKey === 'openhub') {
-      const config = configService.get('nomi.config');
-      await configService.set('nomi.config', { ...config, preferredMode: mode });
+      const config = configService.get('openhub.config');
+      await configService.set('openhub.config', { ...config, preferredMode: mode });
     } else if (agentKey !== 'custom') {
       const config = configService.get('acp.config');
       const backendConfig = config?.[agentKey as string] || {};
@@ -34,10 +34,10 @@ export async function savePreferredModelId(agentKey: string, model_id: string): 
   }
 }
 
-/** Save default nomi provider/model so the Guid page restores it next session. */
+/** Save default openhub provider/model so the Guid page restores it next session. */
 export async function saveNomiDefaultModel(provider_id: string, use_model: string): Promise<void> {
   try {
-    await configService.set('nomi.defaultModel', { id: provider_id, use_model });
+    await configService.set('openhub.defaultModel', { id: provider_id, use_model });
   } catch {
     /* silent */
   }

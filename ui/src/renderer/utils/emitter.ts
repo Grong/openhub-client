@@ -18,11 +18,11 @@ export type ReplyQuote = {
 };
 
 interface EventTypes {
-  'nomi.selected.file': [Array<string | FileOrFolderItem>];
-  'nomi.selected.file.append': [Array<string | FileOrFolderItem>];
-  'nomi.selected.file.clear': void;
-  'nomi.workspace.refresh': void;
-  'nomi.usage.updated': [{ conversation_id: number; tokenUsage: TokenUsageData }];
+  'openhub.selected.file': [Array<string | FileOrFolderItem>];
+  'openhub.selected.file.append': [Array<string | FileOrFolderItem>];
+  'openhub.selected.file.clear': void;
+  'openhub.workspace.refresh': void;
+  'openhub.usage.updated': [{ conversation_id: number; tokenUsage: TokenUsageData }];
   'acp.selected.file': [Array<string | FileOrFolderItem>];
   'acp.selected.file.append': [Array<string | FileOrFolderItem>];
   'acp.selected.file.clear': void;

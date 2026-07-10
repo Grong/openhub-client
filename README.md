@@ -132,7 +132,7 @@ The companion you talk to every day quietly becomes the assistant who *gets* you
 
 - **Make it yours.** Upload a custom companion figure (DIY), or pick from an independent figure library decoupled from any single companion.
 - **One brain, many faces.** Run multiple companions that share a common memory hub, while each keeps its own **private** memory and can mount different domain knowledge bases. Teach *one* companion well, then have it teach the others.
-- **Chat with them where you already work.** Companion chats now live in the main **Sessions** UI under a dedicated desktop-companion group, while `/nomi` stays focused on companion management.
+- **Chat with them where you already work.** Companion chats now live in the main **Sessions** UI under a dedicated desktop-companion group, while `/openhub` stays focused on companion management.
 - **It learns you (opt-in, on by default after a one-time consent).** A background learner distills your usage into durable memories; a deterministic evolution engine mines your recurring multi-step tool sequences into **draft skills** it proposes for your review. Memory is fully **visible and editable**.
 - **Skills that spread.** Companions generate their own skills, discuss them with you, and can **gift** a skill to another companion (the recipient gets a copy) — opt-in shared learning across your roster.
 - **A super gateway, not just a buddy.** Each companion is a complete, independent individual that can connect to multiple IM channels. From anywhere with a network and a chat app, message your companion to drive your computer for you. Each companion can fully operate the desktop's capabilities.
@@ -197,7 +197,7 @@ Every capability OpenHub has is exposed through a single, typed capability regis
 
 > Guide: [`docs/guides/model-routing.md`](docs/guides/model-routing.md)
 
-- **Built-in `nomi` agent** — no extra install. Works with **26+ model providers/presets** (OpenAI, Anthropic, Gemini + Vertex AI, AWS Bedrock, DeepSeek, OpenRouter, Moonshot/Kimi, Qwen/Dashscope, Zhipu/GLM, MiniMax, SiliconFlow, xAI, Volcengine/Doubao, and more) across **4 wire protocols**, plus the **New API** aggregator gateway.
+- **Built-in `openhub` agent** — no extra install. Works with **26+ model providers/presets** (OpenAI, Anthropic, Gemini + Vertex AI, AWS Bedrock, DeepSeek, OpenRouter, Moonshot/Kimi, Qwen/Dashscope, Zhipu/GLM, MiniMax, SiliconFlow, xAI, Volcengine/Doubao, and more) across **4 wire protocols**, plus the **New API** aggregator gateway.
 - **~19 external agents over ACP** — connect Claude Code, Codex, Gemini, Qwen, Kimi, Cursor, Copilot, Goose, OpenCode, Droid, and more, and OpenHub feeds them models *and* its native capabilities (computer/browser/knowledge/gateway) over injected MCP bridges.
 - **Everywhere** — the native capabilities are available to the built-in agent, to ACP agents, in the chat UI, **and** in the terminal.
 - **Graceful multimodal fallback** — if a selected provider/model rejects image input, OpenHub strips the images, retries in the same conversation, and leaves an inline notice instead of killing the session.
@@ -226,7 +226,7 @@ OpenHub does not lock you into a single model vendor. Pick providers by region, 
 
 > Guide: [`docs/guides/terminal.md`](docs/guides/terminal.md)
 
-Run agent CLIs inside in-app PTY sessions (or the standalone `nomi` CLI). OpenHub injects native capabilities — knowledge search, requirement completion, and lifecycle hooks — into known CLIs through their *own* native config, so you keep full fidelity and OAuth.
+Run agent CLIs inside in-app PTY sessions (or the standalone `openhub` CLI). OpenHub injects native capabilities — knowledge search, requirement completion, and lifecycle hooks — into known CLIs through their *own* native config, so you keep full fidelity and OAuth.
 
 ### 📱 WebUI remote control — scan, and you're in
 
@@ -271,7 +271,7 @@ apps/
   web/          standalone web host for API + SPA
 crates/
   agent/        15 openhub-* crates: engine, providers, tools, MCP, skills, memory,
-                browser/computer use, and the standalone nomi CLI
+                browser/computer use, and the standalone openhub CLI
   backend/      29 openhub-* crates: app composition, auth, database, sessions,
                 MCP, knowledge, requirements, terminal, companion, gateway, etc.
   shared/       2 cross-layer crates: openhub-net and openhub-redact

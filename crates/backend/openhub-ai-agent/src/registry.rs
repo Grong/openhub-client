@@ -242,7 +242,7 @@ impl AgentRegistry {
     /// probe rules.
     ///
     /// Reasons are only attached to rows whose `available` flag is
-    /// `false`. Internal rows (e.g. the nomi row) intentionally
+    /// `false`. Internal rows (e.g. the openhub row) intentionally
     /// have an empty `command`, so the underlying probe always
     /// reports `NoCommand` for them — surfacing that as a "reason"
     /// when `available = true` would just confuse the caller, so we
@@ -653,7 +653,7 @@ mod tests {
         // Nomi (internal, no spawn command) is always available.
         assert!(
             visible.iter().any(|m| m.agent_type == AgentType::Nomi),
-            "internal nomi row should survive the filter"
+            "internal openhub row should survive the filter"
         );
     }
 
@@ -674,15 +674,15 @@ mod tests {
     #[tokio::test]
     async fn openhub_internal_row_is_available_without_command() {
         let reg = registry().await;
-        let nomi = reg
+        let openhub = reg
             .list_by_agent_type(AgentType::Nomi)
             .await
             .into_iter()
             .next()
             .unwrap();
-        assert_eq!(nomi.agent_source, AgentSource::Internal);
-        assert!(nomi.command.is_none());
-        assert!(nomi.available);
+        assert_eq!(openhub.agent_source, AgentSource::Internal);
+        assert!(openhub.command.is_none());
+        assert!(openhub.available);
     }
 
     #[tokio::test]
@@ -790,15 +790,15 @@ mod tests {
             }
         }
 
-        // The internal nomi row is always available — its reason
+        // The internal openhub row is always available — its reason
         // slot must be None (sanity check that "available" doesn't
         // accidentally co-occur with a reason).
-        let nomi = snapshot
+        let openhub = snapshot
             .iter()
             .find(|(m, _)| m.agent_type == AgentType::Nomi)
-            .expect("nomi seed row");
-        assert!(nomi.0.available);
-        assert!(nomi.1.is_none());
+            .expect("openhub seed row");
+        assert!(openhub.0.available);
+        assert!(openhub.1.is_none());
     }
 
     /// The `apply_handshake` path still backfills NULL `agent_capabilities`

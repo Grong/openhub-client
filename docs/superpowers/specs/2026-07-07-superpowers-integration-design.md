@@ -22,12 +22,12 @@
 **superpowers 的本质**：不是可执行插件，而是一组带 `name` + `description`（"Use when…" 触发语）的 markdown 技能。真正让它"活"起来的是会话开始时注入的 `using-superpowers` 引导——它确立"动手前先检查是否有匹配技能"的铁律，技能才会自动触发。仅把 md 拷进目录、或要求逐会话手动开启，按其自身定义**不算真集成**。
 
 *openhub已有的两套技能系统（互不读取对方目录）**
-- **nomi 引擎内核** `openhub-skills`：`SKILL.md` 同构格式；`load_all_skills(cwd, add_dirs, bare, mcp)` 读取 bundled + `~/openhub/skills` + `.openhub/skills` + **`add_dirs`（额外根）**；`AgentBootstrap` 已有 **`extra_skill_dirs` builder**；技能清单以 `<system-reminder>…skills…</system-reminder>` 注入 system prompt；`SkillTool` 供模型按需加载技能正文（**仅 inline；nomi 后端未挂 spawner，fork 技能不可用**）。还提供 `ConditionalSkillManager`（按 `paths:` glob 激活，已实现但**未接入引擎循环**）与 `SkillWatcher`（防抖热重载）。
+- **openhub 引擎内核** `openhub-skills`：`SKILL.md` 同构格式；`load_all_skills(cwd, add_dirs, bare, mcp)` 读取 bundled + `~/openhub/skills` + `.openhub/skills` + **`add_dirs`（额外根）**；`AgentBootstrap` 已有 **`extra_skill_dirs` builder**；技能清单以 `<system-reminder>…skills…</system-reminder>` 注入 system prompt；`SkillTool` 供模型按需加载技能正文（**仅 inline；openhub 后端未挂 spawner，fork 技能不可用**）。还提供 `ConditionalSkillManager`（按 `paths:` glob 激活，已实现但**未接入引擎循环**）与 `SkillWatcher`（防抖热重载）。
 - **后端技能 Hub** `openhub-extension`：内置技能语料库 `include_dir!(assets/builtin-skills)`；`startup_materialize::materialize_if_needed` 以 **指纹 + 版本门控 + fs2 锁 + staging 原子 rename + Windows 重试** 物化到 `{data_dir}/builtin-skills`；`link_workspace_skills(workspace, [".claude/skills"], skills)` 把技能软链（Windows 用 NTFS junction，失败回退拷贝）进 ACP 工作区供外部 Claude Code/codex 用；Hub `installer.rs` 有安装/更新/热重载脚手架，但**远程下载是 stub**（`installer.rs:99`）。
 
-**关键差异（决定架构）**：nomi 引擎**不读** `{data_dir}/builtin-skills`。故"单一来源统一分发"必须是：**一个物化目录 + 两条喂入通道**（nomi 用 `extra_skill_dirs`，ACP 用 `link_workspace_skills`）。
+**关键差异（决定架构）**：openhub 引擎**不读** `{data_dir}/builtin-skills`。故"单一来源统一分发"必须是：**一个物化目录 + 两条喂入通道**（openhub 用 `extra_skill_dirs`，ACP 用 `link_workspace_skills`）。
 
-**编码场景检测**：仓库内**没有**运行时"自然语言意图分类器"。会话级已具备"按条件注入常驻行为提示"的先例（`factory/nomi.rs` 的 `compose_subagent_hint`）。superpowers 属通用编码方法论，会话级"是否编码场景"是恰当粒度；按 `*.rs` 等文件 glob 的细粒度激活对 superpowers 无额外收益且代价高。
+**编码场景检测**：仓库内**没有**运行时"自然语言意图分类器"。会话级已具备"按条件注入常驻行为提示"的先例（`factory/openhub.rs` 的 `compose_subagent_hint`）。superpowers 属通用编码方法论，会话级"是否编码场景"是恰当粒度；按 `*.rs` 等文件 glob 的细粒度激活对 superpowers 无额外收益且代价高。
 
 ## 3. 架构总览（方案 A：单一来源 + 双路径分发 + 场景引导）
 
@@ -43,13 +43,13 @@
                                   │                                   │  GitHub Release
              ┌────────────────────┴───────────────────┐             │  → 校验 → 原子替换
              ▼                                          ▼             │  → 触发 reload
-   nomi 引擎 (extra_skill_dirs)              ACP (link_workspace_skills)
+   openhub 引擎 (extra_skill_dirs)              ACP (link_workspace_skills)
    → 技能清单注入 system prompt               → 软链进 .claude/skills
              │                                          │
              └──────────────┬───────────────────────────┘
                             ▼
               编码场景判定 → 注入 `using-superpowers` 引导
-              （nomi: factory/nomi.rs 追加 system_prompt；
+              （openhub: factory/openhub.rs 追加 system_prompt；
                 ACP: 新增 PreSendHook / first_message_injector）
 ```
 
@@ -61,12 +61,12 @@
 - 在仓库内新增 superpowers 语料库（14 个技能的 `SKILL.md` 及其 `references/`；保留上游 `LICENSE`/署名）。放置于独立资产目录（**不**混入 `assets/builtin-skills/`，避免污染现有 ACP 内置技能语义与 `skill-tags.json`），例如 `crates/backend/openhub-extension/assets/superpowers/`，以新的 `include_dir!` 常量嵌入。
 - 复用 `startup_materialize` 同型逻辑（指纹门控 + 原子写 + 回退），物化 baseline 到 `{data_dir}/superpowers-baseline/`。
 - "有效目录"解析：若存在 overlay（`{data_dir}/superpowers/`，来自热更新且校验通过）则用之，否则用 baseline。对外暴露 `effective_superpowers_dir(data_dir) -> PathBuf`。
-- 平台适配：仅内联方法论所需的 md；上游的 `scripts/`（visual companion server、sdd 脚本等）对 nomi 引擎无意义且 fork 不可用，物化时可保留但不激活（不注册为可执行）。`using-superpowers` 的平台 `references/` 保留（ACP=Claude Code 时有用）。
+- 平台适配：仅内联方法论所需的 md；上游的 `scripts/`（visual companion server、sdd 脚本等）对 openhub 引擎无意义且 fork 不可用，物化时可保留但不激活（不注册为可执行）。`using-superpowers` 的平台 `references/` 保留（ACP=Claude Code 时有用）。
 
-### 4.2 nomi 引擎喂入
+### 4.2 openhub 引擎喂入
 - `NomiAgentManager::new`（`manager/openhub/agent.rs`）构建 `AgentBootstrap` 时，若判定编码场景，调用 `.extra_skill_dirs(vec![effective_superpowers_dir])`，使 `load_all_skills` 纳入 superpowers，技能清单经 `build_system_prompt`（`context.rs:247`）自动进入 `<system-reminder>`。
-- 引导注入：在 `factory/nomi.rs` 的 system_prompt 组装链（`compose_subagent_hint` 同款位置）追加 `using-superpowers` 引导文本（按平台改写为 nomi 语气：说明"编码前先检查并使用匹配技能；用 Skill 工具加载"）。仅编码场景注入。
-- 约束：superpowers 技能一律 **inline**（nomi 后端无 spawner）。
+- 引导注入：在 `factory/openhub.rs` 的 system_prompt 组装链（`compose_subagent_hint` 同款位置）追加 `using-superpowers` 引导文本（按平台改写为 openhub 语气：说明"编码前先检查并使用匹配技能；用 Skill 工具加载"）。仅编码场景注入。
+- 约束：superpowers 技能一律 **inline**（openhub 后端无 spawner）。
 
 ### 4.3 ACP 喂入
 - 对 ACP 会话，将有效 superpowers 目录下的技能经 `materialize_skills_for_agent` + `link_workspace_skills(workspace, [".claude/skills"], …)` 链入工作区，外部 Claude Code/codex 原生识别。
@@ -95,15 +95,15 @@
 
 ## 5. 分期交付
 
-- **Phase 1（核心，先交付）**：内置语料库 + baseline 物化 + 有效目录解析 + nomi 喂入(`extra_skill_dirs`) + 场景判定(L1) + nomi 引导注入。→ 满足"内置 + 编码场景自动启用（nomi 路径）"。全 cargo 可测。
+- **Phase 1（核心，先交付）**：内置语料库 + baseline 物化 + 有效目录解析 + openhub 喂入(`extra_skill_dirs`) + 场景判定(L1) + openhub 引导注入。→ 满足"内置 + 编码场景自动启用（openhub 路径）"。全 cargo 可测。
 - **Phase 2（热更新）**：共享化 zip 安全解压 + superpowers 下载/校验/原子替换模块 + 周期 janitor + WS 广播 + 环境变量开关。→ 满足"定期自动热更新"。全 cargo 可测（mock GitHub + 坏包用例）。
 - **Phase 2.5（ACP 路径）**：`link_workspace_skills` 链入 + ACP 引导 `PreSendHook`。→ 补齐"统一"的 ACP 半边；逻辑单测可覆盖，端到端需真机联调。
 - **Phase 3（可选增强）**：`ConditionalSkillManager` 接入引擎循环 + `SkillWatcher` 活会话热切 + settings-UI 开关（含 DB 迁移与前端）。
 
-## 6. 数据流（编码会话，nomi 路径）
+## 6. 数据流（编码会话，openhub 路径）
 1. 启动：embedded baseline 物化到 `{data_dir}/superpowers-baseline/`（指纹未变则跳过）。
 2. janitor 首 tick：查 GitHub → 有新版则下载校验替换 overlay。
-3. 新会话构建：判定编码场景 → `effective_superpowers_dir` 传入 `extra_skill_dirs` → `load_all_skills` 纳入 → 技能清单入 system prompt；`factory/nomi.rs` 追加 `using-superpowers` 引导。
+3. 新会话构建：判定编码场景 → `effective_superpowers_dir` 传入 `extra_skill_dirs` → `load_all_skills` 纳入 → 技能清单入 system prompt；`factory/openhub.rs` 追加 `using-superpowers` 引导。
 4. 运行：模型见到引导与技能清单 → 命中场景时用 `Skill` 工具加载 brainstorming/TDD 等正文并遵循。
 
 ## 7. 错误处理与降级
@@ -117,9 +117,9 @@
 - **物化/指纹/有效目录**：baseline 首次物化、指纹未变跳过、overlay 优先、缺 overlay 回退。
 - **下载模块**：mock GitHub（wiremock/本地）→ 正常安装；坏 zip（zip-slip/符号链接/`..`）被拒；host 不在白名单被拒；sha256 不符被拒；下载失败保留旧副本；原子替换在 Windows 路径成立（重试逻辑）。
 - **场景判定**：各 L1 信号命中/不命中；非编码场景不注入。
-- **nomi 喂入**：`extra_skill_dirs` 含 superpowers 时技能清单出现对应条目；引导文本仅在编码场景出现（可查 system_prompt 片段，参考 `context.rs` 现有排序测试）。
+- **openhub 喂入**：`extra_skill_dirs` 含 superpowers 时技能清单出现对应条目；引导文本仅在编码场景出现（可查 system_prompt 片段，参考 `context.rs` 现有排序测试）。
 - **ACP**：`link_workspace_skills` 幂等、Windows junction/拷贝回退；PreSendHook 在编码场景前置引导。
-- **验收测试（交付判定）**：编码场景会话收到"帮我做个 React todo list"应触发 brainstorming（先设计后写码）而非直接开写；nomi 路径以单测/脚本近似验证引导生效；ACP 路径真机联调。
+- **验收测试（交付判定）**：编码场景会话收到"帮我做个 React todo list"应触发 brainstorming（先设计后写码）而非直接开写；openhub 路径以单测/脚本近似验证引导生效；ACP 路径真机联调。
 - 前端若涉改：以 `bun run build` 验证（非仅 tsc）。
 
 ## 9. 决策记录
@@ -140,6 +140,6 @@
 - 条件激活/watcher/发现：`openhub-skills/src/conditional.rs:39,79,107,155`；`watcher.rs:63,100`；`discovery.rs:56,130`。
 - 加载/bundled/预算：`openhub-skills/src/loader.rs:42`；`bundled/mod.rs:50,62,78,108`；`prompt.rs:60`；`types.rs:107`。
 - SkillTool/bootstrap：`openhub-agent/src/skill_tool.rs:24,38,101,185`；`bootstrap.rs:282,288,385,396,545,554,574`。
-- nomi 工厂/ACP 管线：`openhub-ai-agent/src/factory/nomi.rs:55-211,787`；`manager/openhub/agent.rs:~190,371-373,411-414`；`capability/prompt_pipeline.rs:24,46`；`first_message_injector.rs:34`；`skill_manager/mod.rs:12,264`。
+- openhub 工厂/ACP 管线：`openhub-ai-agent/src/factory/openhub.rs:55-211,787`；`manager/openhub/agent.rs:~190,371-373,411-414`；`capability/prompt_pipeline.rs:24,46`；`first_message_injector.rs:34`；`skill_manager/mod.rs:12,264`。
 - Hub/物化/zip/链接/路径：`openhub-extension/src/hub/installer.rs:83,99,134,150,235,274`；`hub/index_manager.rs:33-52,86,92`；`startup_materialize.rs:47,148-198,227,268`；`registry.rs:153`；`skill_service.rs:22,41,47,115,735,789,982,1026,1433,1459,1485`；`error.rs:5`；`Cargo.toml`。
 - 更新/调度/总线/配置/目录：`openhub-system/src/version.rs:23,31,54,98`；`openhub-net/src/lib.rs:3`，`proxy.rs:51`；`openhub-realtime/src/broadcaster.rs:27,47`；`openhub-app/src/router/routes.rs:67-73`，`state.rs:320,1481,1767`，`config.rs:11`，`cli.rs:29`；`openhub-system/src/settings.rs:12`。

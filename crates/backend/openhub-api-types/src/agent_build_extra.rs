@@ -79,7 +79,7 @@ pub struct AcpBuildExtra {
     /// knowledge-search tool over the session's bound knowledge bases. The bound
     /// `kb_ids` ride the bridge env (`NOMI_KB_MCP_KB_IDS`), not this struct, so
     /// the agent tool takes only a query and cannot widen the bound base set.
-    /// Injected at build time; the nomi engine has `knowledge_search` natively
+    /// Injected at build time; the openhub engine has `knowledge_search` natively
     /// and so carries no equivalent field.
     #[serde(default)]
     pub knowledge_mcp_config: Option<KnowledgeMcpConfig>,
@@ -278,7 +278,7 @@ pub struct NomiBuildExtra {
     #[serde(default, alias = "companionId")]
     pub companion_id: Option<String>,
     /// Knowledge bases mounted into this session's workspace, computed at
-    /// task start by the conversation service. The nomi factory renders
+    /// task start by the conversation service. The openhub factory renders
     /// these into a system-prompt section so the agent knows what extended
     /// knowledge is available and where it lives. Same serde shape as
     /// `AcpBuildExtra::knowledge_mounts`.
@@ -303,17 +303,17 @@ pub struct NomiBuildExtra {
     #[serde(default)]
     pub knowledge_writeback_eagerness: Option<String>,
     /// Opt-in for unattended IM-channel (bot) sessions to write back. Off by
-    /// default; channel writes are always staged. The nomi factory reconstructs
+    /// default; channel writes are always staged. The openhub factory reconstructs
     /// the knowledge binding from this build-extra to resolve the per-surface
     /// write policy, so this MUST be threaded through — otherwise the
     /// reconstructed binding defaults it to `false` and `WriteSurface::ExternalChannel`
-    /// is permanently `Disabled` on the nomi engine. (The ACP path doesn't need
+    /// is permanently `Disabled` on the openhub engine. (The ACP path doesn't need
     /// a mirror: it resolves channel writes at write time from the live binding
     /// via the scoped knowledge MCP bridge.)
     #[serde(default)]
     pub knowledge_channel_write_enabled: bool,
     /// Orchestration role marker. When `"lead"`, the conversation was created
-    /// from the 会话 entry with "auto/range" models selected: the nomi factory
+    /// from the 会话 entry with "auto/range" models selected: the openhub factory
     /// injects a server-authored 编排主管 (orchestration lead) system prompt so
     /// the conversation knows to decompose complex requirements via the
     /// `openhub_run_create` tool. Client-supplied (the WebUI sets it on the new
@@ -328,20 +328,20 @@ pub struct NomiBuildExtra {
     /// `build_worker_extra`）设置；普通会话恒空 = 不限制。
     #[serde(default)]
     pub allowed_tools: Vec<String>,
-    /// 对外服务信任档（正交于 Surface）。后端设定；`PublicService` 令 nomi 工厂把
+    /// 对外服务信任档（正交于 Surface）。后端设定；`PublicService` 令 openhub 工厂把
     /// 会话硬钳到安全白名单（关网关 / computer / browser / spawn），覆盖任何上游
     /// 传入的工具授予——execution-time 后端权威闸。缺省 `Private` = 今日行为，零回归。
     #[serde(default)]
     pub exposure: crate::ExposureMode,
     /// 对外伙伴（public agent / 对外服务）绑定 id。置位即标记本会话为对外服务：
-    /// nomi 工厂据此把 `exposure` 升到 `PublicService`（硬钳，安全边界），并从
+    /// openhub 工厂据此把 `exposure` 升到 `PublicService`（硬钳，安全边界），并从
     /// `PublicAgentConfig` LIVE 解析人格 / 服务守则 / grounded / 知识库范围。后端
     /// 设定 only —— HTTP 会话路由像 `desktop_gateway` 一样从 client extra 中剥离，
     /// 防止自授权。接受驼峰 (`publicAgentId`) 与蛇形。缺省 `None` = 非对外会话。
     #[serde(default, alias = "publicAgentId")]
     pub public_agent_id: Option<String>,
     /// 「agent 集群」意图标记（需求1）。用户在 composer 显式点选后写到会话 extra；
-    /// nomi 工厂据此在常驻 subagent 提示之上追加更强的 `CLUSTER_MODE_HINT`（必须
+    /// openhub 工厂据此在常驻 subagent 提示之上追加更强的 `CLUSTER_MODE_HINT`（必须
     /// 刻意评估是否开集群、太简单须先说明原因再作答）。仅塑形提示、不授予能力——
     /// 编排工具仍随独立门控的桌面网关走。缺省 `false` = 既有会话零变化。
     #[serde(default, alias = "agentClusterMode")]
@@ -408,7 +408,7 @@ mod tests {
 
     /// Task 4: a conversation marked as the orchestration lead carries
     /// `extra.orchestrator_role = "lead"`, which must deserialize onto
-    /// `NomiBuildExtra` so the nomi factory can inject the 主管 system prompt.
+    /// `NomiBuildExtra` so the openhub factory can inject the 主管 system prompt.
     #[test]
     fn openhub_build_extra_deserializes_orchestrator_role_lead() {
         let extra: NomiBuildExtra =

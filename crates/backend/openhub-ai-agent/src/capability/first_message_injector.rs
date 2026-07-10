@@ -18,7 +18,7 @@ pub struct InjectionConfig<'a> {
     /// True iff the agent's native CLI reads skills from the workspace
     /// without needing prompt injection. Derived by callers from
     /// `AcpBackend::native_skills_dirs().is_some()` for ACP, or hardcoded
-    /// `false` for nomi / custom workspace scenarios.
+    /// `false` for openhub / custom workspace scenarios.
     pub native_skill_support: bool,
     /// True iff the user chose a custom workspace (symlinks may not exist).
     pub custom_workspace: bool,

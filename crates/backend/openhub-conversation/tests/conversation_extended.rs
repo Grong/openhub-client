@@ -508,7 +508,7 @@ async fn t9_5_preview_text_extracts_from_json_content() {
 async fn t9_6_search_result_includes_conversation_model() {
     let (svc, repo, _b) = setup().await;
 
-    // Search surfaces conversation.model only for nomi (the only type that
+    // Search surfaces conversation.model only for openhub (the only type that
     // carries a top-level model under the openhub-only rule).
     let openhub_req: CreateConversationRequest = serde_json::from_value(json!({
         "type": "openhub",

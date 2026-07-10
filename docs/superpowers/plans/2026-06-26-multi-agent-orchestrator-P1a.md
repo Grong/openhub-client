@@ -4,7 +4,7 @@
 
 **Goal:** 让「智能编排」真正跑起来（后端）：一个 Run 从目标 → 主管规划出任务 DAG → 串行调度器在真实 worker 会话上逐个执行 → 产物回流解阻塞 → 聚合完成。纯后端 + gateway 暴露 + 集成测试；前端画布是 P1b。
 
-**Architecture:** 新 crate `openhub-orchestrator` 扩 Run 引擎。**worker = 真实 nomi 会话**（复用 `openhub_agent_run` 配方：create yolo+desktopGateway → send → await_turn(is_processing) → read_final_text）。**两个可注入 trait 解耦引擎与重依赖**：`PlanProducer`（真实=一次性结构化 LLM 规划调用；测试=mock 固定 DAG）和 `WorkerRunner`（真实=spawn-and-await 配方；测试=mock 产物）。调度器 `RunEngine` 复刻 AutoWork `Orchestrator`（DashMap 按 run_id 注册表 + generation 守卫 + start/stop/run_loop + boot-resume），P1 先**串行**（并行是 P2）。
+**Architecture:** 新 crate `openhub-orchestrator` 扩 Run 引擎。**worker = 真实 openhub 会话**（复用 `openhub_agent_run` 配方：create yolo+desktopGateway → send → await_turn(is_processing) → read_final_text）。**两个可注入 trait 解耦引擎与重依赖**：`PlanProducer`（真实=一次性结构化 LLM 规划调用；测试=mock 固定 DAG）和 `WorkerRunner`（真实=spawn-and-await 配方；测试=mock 产物）。调度器 `RunEngine` 复刻 AutoWork `Orchestrator`（DashMap 按 run_id 注册表 + generation 守卫 + start/stop/run_loop + boot-resume），P1 先**串行**（并行是 P2）。
 
 **Tech Stack:** Rust（axum/sqlx/async-trait/tokio）、SQLite、gateway Registry、EventBroadcaster WS。
 

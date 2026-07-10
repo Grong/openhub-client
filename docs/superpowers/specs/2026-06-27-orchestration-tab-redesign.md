@@ -18,7 +18,7 @@
 | 概念 | 说明 | 变化 |
 |---|---|---|
 | **Run** | 一次多 agent 执行 | 引擎不变 |
-| **Worker** | 每任务 = 一个真实会话(nomi yolo+desktopGateway)，从主侧栏隐藏(`orchestrator_task_id` 过滤) | 不变(仍隐藏;但不再有 lead 会话) |
+| **Worker** | 每任务 = 一个真实会话(openhub yolo+desktopGateway)，从主侧栏隐藏(`orchestrator_task_id` 过滤) | 不变(仍隐藏;但不再有 lead 会话) |
 | **Agent/角色** | = 助手(assistant)，含偏好模型/人设/技能 | 沿用 P4 统一 |
 | **模型范围** | 单一/自动/范围 | 沿用,但移到 **Tab 表单**(不在会话) |
 | **自主级别** | interactive(默认,审批闸)/supervised | 沿用 |
@@ -84,7 +84,7 @@
 - 删 `OrchestrationStatusStrip.tsx`、`DagRailTab.tsx`、`useOrchestrationStatus.ts`、`GuidOrchestrationMode.tsx`。
 - `ChatSlider.tsx`：去掉「编排」extraTab(orchestration-dag)。
 - `ChatConversation.tsx`(NomiConversationPanel)：去掉状态条挂载。
-- `useGuidSend.ts`：去掉 lead 标记 + model_range 注入(会话创建回到普通 nomi)。
+- `useGuidSend.ts`：去掉 lead 标记 + model_range 注入(会话创建回到普通 openhub)。
 - `GuidModelSelector.tsx` + `useGuidModelSelection.ts`：**回退为单选**(去三态/主管模型/leadLabel/leadHint);`GuidPage.tsx`：去 orchestrationModeNode + 隐藏/主管模型逻辑。
 - `workspaceEvents.ts`：去 `WORKSPACE_SELECT_TAB_EVENT`(仅右栏 DAG 用过) + `WorkspaceRailBody` 对应监听。
 - i18n：清 guid.orchestration.* / guid.modelSelector.lead* / orchestrator.status.* 等死键 + gen:i18n。

@@ -40,7 +40,7 @@ import AddModelModal from '@/renderer/pages/settings/components/AddModelModal';
 import AddPlatformModal from '@/renderer/pages/settings/components/AddPlatformModal';
 import { isNewApiPlatform, NEW_API_PROTOCOL_OPTIONS } from '@/renderer/utils/model/modelPlatforms';
 import EditModeModal from '@/renderer/pages/settings/components/EditModeModal';
-import NomiScrollArea from '@/renderer/components/base/NomiScrollArea';
+import OpenHubScrollArea from '@/renderer/components/base/OpenHubScrollArea';
 import { useProvidersQuery } from '@/renderer/hooks/agent/useModelProviderList';
 import { useModelProfiles } from '@/renderer/hooks/agent/useModelProfiles';
 import { useContainerWidth } from '@/renderer/hooks/ui/useContainerWidth';
@@ -865,7 +865,7 @@ const ModelModalContent: React.FC = () => {
       </div>
 
       {/* Content Area */}
-      <NomiScrollArea className='flex-1 min-h-0' disableOverflow={isPageMode}>
+      <OpenHubScrollArea className='flex-1 min-h-0' disableOverflow={isPageMode}>
         {!data || data.length === 0 ? (
           <div className='flex flex-col items-center justify-center py-40px'>
             <Info theme='outline' size='48' className='text-t-secondary mb-16px' />
@@ -1244,7 +1244,7 @@ const ModelModalContent: React.FC = () => {
             </SortableContext>
           </DndContext>
         )}
-      </NomiScrollArea>
+      </OpenHubScrollArea>
     </div>
   );
 };

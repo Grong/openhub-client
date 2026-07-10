@@ -16,7 +16,7 @@
   - 对外伙伴 JSON 文件 `public-agents/{id}/config.json` → `PublicAgentModel.provider_id`
   - 智能决策 IDMM：`client_preferences: idmm_backup_provider_id` + `conversations.extra.idmm` / `terminal_sessions.idmm` 内各 watch 的 `bypass_model.provider_id`
   - 智能编排：`fleet_members.provider_id`（真实列）
-  - 软引用（会自愈）：`nomi.defaultModel`（前端配置）、`knowledge.autogenModel`、`agent.model_failover`、`assistant.{platform}.defaultModel`（渠道默认模型，后端 client_preferences）
+  - 软引用（会自愈）：`openhub.defaultModel`（前端配置）、`knowledge.autogenModel`、`agent.model_failover`、`assistant.{platform}.defaultModel`（渠道默认模型，后端 client_preferences）
 - **删除无任何 in-use 检查**：`ProviderService::delete`（`openhub-system/src/provider.rs:110`）直接 `DELETE FROM providers WHERE id=?`（`sqlite_provider.rs:143`）。唯一守卫是 id 不存在返回 404。
 - **报错来源**：字符串 `Provider '{id}' not found` 由 `factory/provider_config.rs:61`（`resolve_provider_fields`）产生 → `AppError::BadRequest`，Display 自动加 `Bad request:` 前缀（`openhub-common/src/error.rs:14`）。另一处 `services/provider_health.rs:68` 只在设置页手动健康检查触达，非首页来源。
 - **两条 toast**：`NomiSendBox` 打开会话时并发触发 (1) mount warmup（`.catch` 弹 toast）+ (2) 自动发送首条消息（`catch` 弹 toast），各 build 一次 Nomi agent → 同一错误 → 弹两次。前端 `getConversationRuntimeWorkspaceErrorMessage`（`conversationCreateError.ts`）把 `backendMessage` 原样返回，无 i18n 映射。
@@ -37,9 +37,9 @@
 ### 目标
 
 1. **根因**：模型供应商被"硬绑定"功能使用时，禁止删除；提示被哪些功能使用并给跳转入口去解绑/更换（硬阻止，无强制删除逃生通道）。硬绑定范围 = 桌面伙伴、对外伙伴、智能决策(IDMM)、智能编排(fleet)。
-2. **普通会话不强制关联**：会话绑定的 provider 没了时优雅回退，不再硬报错；前端自愈把会话模型改为用户默认（`nomi.defaultModel`）或首个可用，并轻提示。
+2. **普通会话不强制关联**：会话绑定的 provider 没了时优雅回退，不再硬报错；前端自愈把会话模型改为用户默认（`openhub.defaultModel`）或首个可用，并轻提示。
 3. **友好文案兜底**：任何残留的"provider 找不到 / 无可用模型"报错，前端按 code→i18n 展示可操作文案，绝不出现裸 `prov_xxx`。
-4. **软引用自动清理**：删除（未被硬绑定拦截）后，把死 id 从软引用（`nomi.defaultModel` 由前端清、`knowledge.autogenModel`、`agent.model_failover`）剔除。
+4. **软引用自动清理**：删除（未被硬绑定拦截）后，把死 id 从软引用（`openhub.defaultModel` 由前端清、`knowledge.autogenModel`、`agent.model_failover`）剔除。
 
 ### 非目标
 
@@ -82,7 +82,7 @@ pub enum ProviderUsageFeature { DesktopCompanion, PublicCompanion, SmartDecision
       async fn cleanup_soft_refs(&self, provider_id: &str) -> Result<(), AppError>;
   }
   ```
-- 具体实现放 `openhub-app`（唯一能看到全部子系统），聚合四路 `providers_in_use`，并实现软清理（清 `knowledge.autogenModel`、`agent.model_failover` 里的死 id；`nomi.defaultModel` 是前端配置由前端清）。
+- 具体实现放 `openhub-app`（唯一能看到全部子系统），聚合四路 `providers_in_use`，并实现软清理（清 `knowledge.autogenModel`、`agent.model_failover` 里的死 id；`openhub.defaultModel` 是前端配置由前端清）。
 - 在 `state.rs:299` 把 `Arc<dyn ProviderDeletionCoordinator>` 注入 `ProviderService`（构造签名新增该依赖）。
 - `ProviderService::delete` 改为：先 `coordinator.usages(id)`；非空 → 返回 `AppError::ProviderInUse { usages }`；空 → `repo.delete(id)`，成功后 `coordinator.cleanup_soft_refs(id)`（清理失败仅告警不回滚删除）。
 
@@ -115,9 +115,9 @@ AppError::ProviderInUse(ProviderInUseDetails)   // { usages: Vec<ProviderUsage> 
 
 ## 4. 组件 B — 普通会话优雅回退
 
-### B.1 后端"永不崩"兜底（`factory/nomi.rs`）
+### B.1 后端"永不崩"兜底（`factory/openhub.rs`）
 
-把 `nomi.rs` 约 235 行处直接的
+把 `openhub.rs` 约 235 行处直接的
 `resolve_provider_fields(&deps.provider_repo, &deps.encryption_key, provider_id, &model_id).await?`
 换成 fallback-aware 解析（新增 helper，`resolve_provider_fields` 本身保持严格，供 health/编排/IDMM/knowledge 等显式调用方不变）：
 
@@ -129,10 +129,10 @@ AppError::ProviderInUse(ProviderInUseDetails)   // { usages: Vec<ProviderUsage> 
 
 ### B.2 前端自愈 + 轻提示（honoring 用户默认）
 
-`nomi.defaultModel` 是前端配置、后端读不到，因此让前端负责"改回用户默认"：
+`openhub.defaultModel` 是前端配置、后端读不到，因此让前端负责"改回用户默认"：
 
-- `useNomiModelSelection` / 会话加载路径：当会话 `conversations.model.provider_id` 不在当前 provider 列表中（选择器已过滤缺失 provider）时：
-  1. 计算目标模型 = `nomi.defaultModel` 指向的可用模型；无效则第一个可用模型。
+- `useOpenHubModelSelection` / 会话加载路径：当会话 `conversations.model.provider_id` 不在当前 provider 列表中（选择器已过滤缺失 provider）时：
+  1. 计算目标模型 = `openhub.defaultModel` 指向的可用模型；无效则第一个可用模型。
   2. 通过既有会话模型持久化路径（NomiModelSelector `onChange` / updateConversation）写回 `conversations.model`。
   3. 轻提示 toast「已回退到默认模型 {name}」。
 - 这样既兑现"默认模型→首个可用"，又清掉悬空、下次不再 stale。后端 B.1 是覆盖前端未走到路径（渠道/伙伴绑定/其他客户端）的安全网。

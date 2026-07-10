@@ -119,7 +119,7 @@ from silently tying themselves to engine internals.
 | [`openhub-skills`](../../crates/agent/openhub-skills) | Skills system: discovery, frontmatter, loader, executor, hooks, conditional / context modifiers, bundled. |
 | [`openhub-memory`](../../crates/agent/openhub-memory) | Long-term cross-session memory — preferences, feedback, project context, external references. |
 | [`openhub-agent`](../../crates/agent/openhub-agent) | Core engine: session orchestration, bootstrap, commands, compaction, confirm, output sinks. |
-| [`openhub-cli`](../../crates/agent/openhub-cli) | Standalone `nomi` binary that drives the engine without a host process. |
+| [`openhub-cli`](../../crates/agent/openhub-cli) | Standalone `openhub` binary that drives the engine without a host process. |
 | [`openhub-computer`](../../crates/agent/openhub-computer) | Desktop computer-use tool implementation. |
 | [`openhub-a11y`](../../crates/agent/openhub-a11y) | Accessibility helpers used by computer-use flows. |
 | [`openhub-browser-engine`](../../crates/agent/openhub-browser-engine) | Self-hosted browser/CDP automation engine. |

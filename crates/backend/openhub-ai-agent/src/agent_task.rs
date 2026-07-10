@@ -18,7 +18,7 @@ use tokio::sync::broadcast;
 
 use crate::manager::acp::AcpAgentManager;
 use crate::manager::nanobot::NanobotAgentManager;
-use crate::manager::nomi::NomiAgentManager;
+use crate::manager::openhub::NomiAgentManager;
 use crate::manager::openclaw::OpenClawAgentManager;
 use crate::manager::remote::RemoteAgentManager;
 use crate::protocol::events::AgentStreamEvent;

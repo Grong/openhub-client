@@ -536,7 +536,7 @@ git -c user.nameopenhubcommit -m "feat(ai-agent): 分类 image 类 400 为 UserL
 **Files:**
 - Modify: `crates/backend/openhub-ai-agent/src/types.rs`（`NomiCompatOverrides` line 51-55 加字段）
 - Modify: `crates/backend/openhub-ai-agent/src/factory/provider_config.rs`（`resolve_provider_fields` 查 registry 设 override）
-- Modify: `crates/backend/openhub-ai-agent/src/factory/nomi.rs`（`resolve_openhub_url_and_compat` 构造 `NomiCompatOverrides` 的字面量补 `supports_image`）
+- Modify: `crates/backend/openhub-ai-agent/src/factory/openhub.rs`（`resolve_openhub_url_and_compat` 构造 `NomiCompatOverrides` 的字面量补 `supports_image`）
 - Modify: `crates/backend/openhub-ai-agent/src/manager/openhub/agent.rs`（line 211-216 应用 override 到 `config.compat`）
 
 **Interfaces:**
@@ -588,7 +588,7 @@ pub struct NomiCompatOverrides {
 }
 ```
 
-`nomi.rs` 里 `resolve_openhub_url_and_compat` 构造 `NomiCompatOverrides { ... }` 的字面量补一行 `supports_image: None,`（grep `NomiCompatOverrides {` 找全部字面量，逐个补；因 `Default` 已派生，也可改用 `..Default::default()`）。
+`openhub.rs` 里 `resolve_openhub_url_and_compat` 构造 `NomiCompatOverrides { ... }` 的字面量补一行 `supports_image: None,`（grep `NomiCompatOverrides {` 找全部字面量，逐个补；因 `Default` 已派生，也可改用 `..Default::default()`）。
 
 `provider_config.rs`：加上 Step 1 的 `image_support_override` 函数（放在 `use` 之后、`resolve_provider_fields` 之前），并在 `resolve_provider_fields` 内把 `compat_overrides` 改为可变并注入：
 
@@ -616,7 +616,7 @@ Expected: 编译通过；若 `NomiCompatOverrides { ... }` 字面量报"missing 
 - [ ] **Step 5: 提交**
 
 ```bash
-git add crates/backend/openhub-ai-agent/src/types.rs crates/backend/openhub-ai-agent/src/factory/provider_config.rs crates/backend/openhub-ai-agent/src/factory/nomi.rs crates/backend/openhub-ai-agent/src/manager/openhub/agent.rs
+git add crates/backend/openhub-ai-agent/src/types.rs crates/backend/openhub-ai-agent/src/factory/provider_config.rs crates/backend/openhub-ai-agent/src/factory/openhub.rs crates/backend/openhub-ai-agent/src/manager/openhub/agent.rs
 git -c user.nameopenhubcommit -m "feat(ai-agent): 工厂按 VisionUnsupportedRegistry 注入 compat.supports_image(主动剔除)"
 ```
 
@@ -705,7 +705,7 @@ Expected: 编译失败（`images_stripped_tip_content` 未定义）。
 ```rust
     /// 同模型"剔图重建":标记 registry(该 provider+model 不支持图片)→ kill →
     /// 用同一行重建任务。重建时工厂重新读 registry → compat.supports_image=false →
-    /// build_messages 剔图。仅 nomi 会话放行;返回新句柄或 None(不可重建)。
+    /// build_messages 剔图。仅 openhub 会话放行;返回新句柄或 None(不可重建)。
     pub(crate) async fn strip_images_and_rebuild(
         &self,
         conversation_id: &str,
@@ -791,7 +791,7 @@ git -c user.nameopenhubcommit -m "feat(conversation): 图片剔除会话提示 +
 把 line 1859-1866 的整个 `if let Some(config) = failover_config.as_ref() { ... }` 块替换为：
 
 ```rust
-                // 为 nomi 轮安装 pre-response 错误抑制器:既隐藏"将被换模型重试"的
+                // 为 openhub 轮安装 pre-response 错误抑制器:既隐藏"将被换模型重试"的
                 // provider fault(在切换上限内),也隐藏"将被同模型剔图重试"的
                 // image-unsupported 400(每轮一次)。被吞的错误进 outcome.suppressed_error,
                 // 若两种重试都未触发,则下方原样 re-surface。
@@ -819,7 +819,7 @@ git -c user.nameopenhubcommit -m "feat(conversation): 图片剔除会话提示 +
 ```rust
                 // 图片不支持降级:pre-response 的 image-unsupported 400 → 记忆 + 提示 +
                 // 同模型剔图重跑(每轮一次)。重跑因命中 registry 而剔图,通常成功。
-                // 未触发(已重跑过 / 非 nomi / 有响应 / 码不符 / 重建失败)则落到下方
+                // 未触发(已重跑过 / 非 openhub / 有响应 / 码不符 / 重建失败)则落到下方
                 // re-surface,把原始错误显示给用户。
                 if image_strip_retries_done == 0
                     && agent.agent_type() == AgentType::Nomi

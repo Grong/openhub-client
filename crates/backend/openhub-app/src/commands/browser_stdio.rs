@@ -6,12 +6,12 @@
 //! here translates to a `BrowserTool` action and forwards the result — so codex
 //! gets the exact same self-hosted-CDP automation (own Rust CDP engine + the
 //! vendored Playwright InjectedScript aria tree, multi-frame / shadow-DOM stitch,
-//! `observe`→`[ref]`→act loop) that the nomi engine gets, with zero duplicated
+//! `observe`→`[ref]`→act loop) that the openhub engine gets, with zero duplicated
 //! logic. Injected when the `browser-use` feature is built (see `BrowserMcpConfig`,
 //! P4-2 wiring); compiled only with that feature so headless/web builds never
 //! pull the browser engine / Chromium stack.
 //!
-//! Discrete tools (vs the nomi engine's single `Browser(action)` tool) match the
+//! Discrete tools (vs the openhub engine's single `Browser(action)` tool) match the
 //! shape models are trained on, which raises adoption — the same form picked for
 //! the computer-use bridge.
 //!
@@ -21,7 +21,7 @@
 //! OpenHub orchestration / supervision layer. The `BrowserTool` redline gate runs
 //! with default policy (`session_bypasses_approval() == false` → normal-session
 //! semantics: it does NOT hard-deny irreversible actions, leaving them to the
-//! orchestration approval the nomi engine path provides). For the ACP path the
+//! orchestration approval the openhub engine path provides). For the ACP path the
 //! human-in-the-loop is the **ACP CLI's own per-tool approval UI** (claude / codex
 //! prompt before each tool call). A stricter openhub-side hard-deny for the bridge is
 //! deferred to P6.
@@ -39,7 +39,7 @@
 //!   per-pet workspace.
 //! - the egress firewall (IP block + cross-origin POST gate) is on by default.
 //!
-//! Per-pet credentials / workspace / persistent login stay on the nomi engine
+//! Per-pet credentials / workspace / persistent login stay on the openhub engine
 //! path (the desktop companion uses it).
 
 use std::path::PathBuf;

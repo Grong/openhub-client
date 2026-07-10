@@ -54,7 +54,7 @@ pub struct AppServices {
     pub agent_registry: Arc<AgentRegistry>,
     pub conversation_repo: Arc<dyn IConversationRepository>,
     /// Singleton requirement service (shares its repo + WS emitter with the
-    /// nomi native-tool sink). The router state attaches a `ConversationService`
+    /// openhub native-tool sink). The router state attaches a `ConversationService`
     /// to a clone of this for AutoWork config persistence.
     pub requirement_service: Arc<openhub_requirement::RequirementService>,
     /// Singleton terminal service: owns the live PTYs (one in-memory map). Shared
@@ -103,7 +103,7 @@ pub struct AppServices {
     /// never grants the gateway reach. `None` when the server failed to start
     /// (graceful degradation — sessions then lack `knowledge_search`).
     pub(crate) _knowledge_mcp_server: Option<openhub_knowledge::KnowledgeMcpServer>,
-    /// Singleton companion service (nomi desktop companion). Built before the agent
+    /// Singleton companion service (openhub desktop companion). Built before the agent
     /// factory so the factory can register the companion memory tools for
     /// companionSession conversations; the router reuses this same instance.
     pub companion_service: Arc<openhub_companion::CompanionService>,
@@ -251,7 +251,7 @@ impl AppServices {
         let event_bus = Arc::new(BroadcastEventBus::new(256));
 
         // Requirement service + sink. Built before the agent factory because the
-        // factory needs the sink to register the nomi native requirement tools.
+        // factory needs the sink to register the openhub native requirement tools.
         let requirement_repo: Arc<dyn openhub_db::IRequirementRepository> = Arc::new(
             openhub_db::SqliteRequirementRepository::new(database.pool().clone()),
         );
@@ -353,7 +353,7 @@ impl AppServices {
         // `mcp-computer-stdio` is a stub, so we'd inject a bridge the binary
         // can't serve). Lets codex/ACP sessions drive the desktop (snapshot /
         // click / type / launch) via `nomicore mcp-computer-stdio`, mirroring the
-        // in-process `ComputerTool` the nomi engine already gets on all platforms
+        // in-process `ComputerTool` the openhub engine already gets on all platforms
         // (`openhub-a11y` implements macOS AX / Windows UIA / Linux AT-SPI backends).
         // Platform reality the bridge surfaces honestly: macOS needs the user to
         // grant TCC (Accessibility + Screen Recording) or ops error out; Linux
@@ -370,7 +370,7 @@ impl AppServices {
         // feature (else `mcp-browser-stdio` is a stub, so we'd inject a bridge the
         // binary can't serve). Lets codex/ACP sessions drive a managed Chromium
         // (navigate / observe / click / type) via `nomicore mcp-browser-stdio`,
-        // mirroring the in-process `BrowserTool` the nomi engine gets. The bridge
+        // mirroring the in-process `BrowserTool` the openhub engine gets. The bridge
         // is stateless fail-safe (R2: no per-pet context over the env boundary;
         // `secret:NAME` fails closed and downloads land in the data-dir sandbox).
         let browser_mcp_config =
@@ -573,7 +573,7 @@ impl AppServices {
         // survives a restart (dirty live sessions only; never per chunk).
         terminal_service.spawn_scrollback_flusher();
 
-        // Companion service (nomi companion): built BEFORE the agent factory so the
+        // Companion service (openhub companion): built BEFORE the agent factory so the
         // factory gets the companion memory sink (recall/save memory tools for
         // companionSession conversations). The companion router state reuses this same
         // instance via `services.companion_service`.
@@ -691,7 +691,7 @@ impl AppServices {
                 database.pool().clone(),
             ))
                 as Arc<dyn openhub_db::IClientPreferenceRepository>),
-            // System settings repo: lets the nomi factory read the app UI language
+            // System settings repo: lets the openhub factory read the app UI language
             // live per build so companion-owned sessions reply in the app's
             // language instead of the old hardcoded Chinese (mirrors client_prefs).
             settings_repo: Some(Arc::new(openhub_db::SqliteSettingsRepository::new(

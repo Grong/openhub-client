@@ -4,7 +4,7 @@ pub mod provider_config;
 mod acp;
 mod context;
 mod nanobot;
-pub(crate) mod nomi;
+pub(crate) mod openhub;
 mod openclaw;
 mod remote;
 
@@ -165,7 +165,7 @@ pub struct AgentFactoryDeps {
     /// `computer_mcp_config`.
     pub browser_mcp_config: Option<BrowserMcpConfig>,
     /// Client-preferences repo for reading user-facing settings at session-build
-    /// time — currently the `agent.computerUse` toggle that gates the nomi
+    /// time — currently the `agent.computerUse` toggle that gates the openhub
     /// Computer tool. `Option` so tests can omit it (then the default applies).
     /// Read live per session so toggling the setting affects new sessions without
     /// a restart.
@@ -182,7 +182,7 @@ pub struct AgentFactoryDeps {
     /// inject enabled servers into `session/new` (ELECTRON-1JG fix).
     /// `None` for tests/composition paths that do not need MCP injection.
     pub mcp_server_repo: Option<Arc<dyn IMcpServerRepository>>,
-    /// Optional sink enabling nomi native requirement tools. When `Some`,
+    /// Optional sink enabling openhub native requirement tools. When `Some`,
     /// `requirement_complete` / `requirement_update_status` are registered into
     /// the in-process engine. `None` (e.g. standalone) leaves them unregistered.
     pub requirement_sink: Option<Arc<dyn RequirementSink>>,
@@ -199,11 +199,11 @@ pub struct AgentFactoryDeps {
     /// (`companion_skill` tool + per-turn when_to_use ContextContributor). Only
     /// registered for companion sessions (`extra.companionSession` true).
     pub companion_skill_sink: Option<Arc<dyn CompanionSkillSink>>,
-    /// Optional sink enabling the nomi native `knowledge_search` tool. When
+    /// Optional sink enabling the openhub native `knowledge_search` tool. When
     /// `Some` AND the session has bound knowledge bases, the tool is registered
     /// into the in-process engine. `None` (standalone) leaves it unregistered.
     pub knowledge_retrieval: Option<Arc<dyn openhub_agent::knowledge_tools::KnowledgeRetrievalSink>>,
-    /// Optional sink enabling the nomi native `knowledge_write` (回血) tool. When
+    /// Optional sink enabling the openhub native `knowledge_write` (回血) tool. When
     /// `Some` AND the session has bound knowledge bases with write-back enabled,
     /// the tool is registered into the in-process engine and allow-listed past
     /// the approval gate. `None` (standalone) leaves it unregistered.
@@ -252,7 +252,7 @@ async fn build_agent(
         AgentType::OpenclawGateway => openclaw::build(deps, options, ctx).await,
         AgentType::Nanobot => nanobot::build(deps, options, ctx).await,
         AgentType::Remote => remote::build(deps, options, ctx).await,
-        AgentType::Nomi => nomi::build(deps, options, ctx).await,
+        AgentType::Nomi => openhub::build(deps, options, ctx).await,
     }
 }
 

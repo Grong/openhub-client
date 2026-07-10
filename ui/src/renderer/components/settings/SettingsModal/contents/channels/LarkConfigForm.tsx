@@ -212,7 +212,7 @@ const LarkConfigForm: React.FC<LarkConfigFormProps> = ({
           : { plugin_id: 'lark', config }
       );
       if (!result.success) {
-        throw new Error(result.error || result.message || t('nomi.settings.remoteEnableFailed', { defaultValue: 'Failed to enable channel' }));
+        throw new Error(result.error || result.message || t('openhub.settings.remoteEnableFailed', { defaultValue: 'Failed to enable channel' }));
       }
 
       Message.success(t('settings.lark.pluginEnabled', 'Lark bot enabled'));

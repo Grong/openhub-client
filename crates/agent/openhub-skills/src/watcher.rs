@@ -225,7 +225,7 @@ fn should_ignore(event: &Event) -> bool {
     // Filter hidden files (editor swap/temp files, .DS_Store, etc.).
     // Only check the final path component (file name), not intermediate
     // directory components — otherwise paths like `.openhub/skills/SKILL.md`
-    // would be incorrectly filtered because `.nomi` starts with `.`.
+    // would be incorrectly filtered because `.openhub` starts with `.`.
     event.paths.iter().all(|p| {
         p.file_name()
             .map(|n| n.to_string_lossy().starts_with('.'))

@@ -66,7 +66,7 @@ pub enum PathAuthority {
 ### 单元 3:`openhub-ai-agent` — 原生工具 write_root 按 surface
 
 - `NomiResolvedConfig` 新增 `write_root: Option<String>`。
-- `factory/nomi.rs`:据 `overrides.exposure`/`channel_platform`/`remote`(与 gateway surface 同源的纯函数 `resolve_file_authority_surface`)解析:Desktop → `None`;Channel/Remote → `Some(workspace)`。Public 已 clamp。
+- `factory/openhub.rs`:据 `overrides.exposure`/`channel_platform`/`remote`(与 gateway surface 同源的纯函数 `resolve_file_authority_surface`)解析:Desktop → `None`;Channel/Remote → `Some(workspace)`。Public 已 clamp。
 - `manager/openhub/agent.rs`:把它写进 `config.tools.write_root`(在现有 override 段)。
 - 净效果:Desktop 原生工具维持不限(今日行为);Channel/Remote 原生写收窄到工作区(**顺带修掉原生工具对对外面过度开放的隐患**)。
 - 依赖:纯 surface 判定函数(可单测)。

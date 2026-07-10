@@ -551,7 +551,7 @@ mod tests {
         // The prompt hands the model paths like "./.openhub/requirement-attachments/…" —
         // a ./-prefixed nested relative path must resolve under the session cwd.
         let dir = tempdir().unwrap();
-        let sub = dir.path().join(".nomi").join("requirement-attachments");
+        let sub = dir.path().join(".openhub").join("requirement-attachments");
         std::fs::create_dir_all(&sub).unwrap();
         std::fs::write(sub.join("note.txt"), "staged attachment\n").unwrap();
 

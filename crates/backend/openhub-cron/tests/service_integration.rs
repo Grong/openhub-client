@@ -283,7 +283,7 @@ impl IConversationRepository for StubConvRepo {
                 updated_at: 1000,
             }
         } else if id == 14 {
-            // conv_mode_nomi
+            // conv_mode_openhub
             openhub_db::models::ConversationRow {
                 id,
                 user_id: "u1".into(),
@@ -594,7 +594,7 @@ async fn setup_with_conv_repo() -> (
     // 5=conv_cascade, 6=conv_trait_del, 7=conv-existing,
     // 8=conv-that-no-longer-exists, 9=missing-conv-1, 10=conv_mode,
     // 11=conv_mode_default, 12=conv_mode_codex, 13=conv_mode_claude,
-    // 14=conv_mode_nomi.
+    // 14=conv_mode_openhub.
     {
         let real_conv_repo = SqliteConversationRepository::new(pool.clone());
         for _ in 1..=14 {
@@ -1477,8 +1477,8 @@ async fn icron_service_create_job_forces_full_auto_mode_for_generated_crons() {
     let claude = ICronService::create_job(&svc, "user_1", "13", &params).await;
     assert!(claude.success);
 
-    let nomi = ICronService::create_job(&svc, "user_1", "14", &params).await;
-    assert!(nomi.success);
+    let openhub = ICronService::create_job(&svc, "user_1", "14", &params).await;
+    assert!(openhub.success);
 
     let gemini_jobs = svc
         .list_jobs(&ListCronJobsQuery {

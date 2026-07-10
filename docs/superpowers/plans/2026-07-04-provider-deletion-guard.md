@@ -13,7 +13,7 @@
 - **提交署名**：所有提交用 `git -c user.nameopenhubcommit ...`（复用已配置 email）；**不加** `Co-Authored-By` / "Generated with Claude Code" 尾注。
 - **DTO 落位**：`ProviderUsage` 系列放 `openhub-common`（`openhub-api-types` 依赖 `openhub-common`，反之不行；`AppError` 在 `openhub-common` 需引用它）。
 - **前端验证**：改动前端后跑 `cd ui && bun run build`（不能只靠 tsc）。前端单测用 `bun:test`（`import { describe, expect, test } from 'bun:test'`），逻辑函数就地 `*.test.ts`。
-- **`knowledge.autogenModel` 与 `nomi.defaultModel` 是纯前端配置**，后端不可清理/读取；归前端自愈。
+- **`knowledge.autogenModel` 与 `openhub.defaultModel` 是纯前端配置**，后端不可清理/读取；归前端自愈。
 - **IDMM 拦截 v1 仅覆盖全局备份** `idmm_backup_provider_id`（单键）；per-conversation watch 的 `bypass_model` 不在 v1 扫描范围（无跨用户列举会话的仓库方法），由组件 B 兜底——务必 `log` 说明此范围。
 - **后端软清理 v1 仅 `agent.model_failover` 队列**；`idmm_backup_*` 是被保护引用（拦截删除、不清理）；渠道 `assistant.{platform}.defaultModel` 由组件 B 兜底，不在 v1 清理。
 - 供应商 id 形如 `prov_{uuidv7}`；空 `provider_id` 视为未配置。
@@ -759,7 +759,7 @@ git -c user.nameopenhubcommit -m "feat(app): aggregate provider-in-use guard + f
 
 **Files:**
 - Modify: `crates/backend/openhub-ai-agent/src/factory/provider_config.rs`（新 helper + 测试）
-- Modify: `crates/backend/openhub-ai-agent/src/factory/nomi.rs`（改用 helper）
+- Modify: `crates/backend/openhub-ai-agent/src/factory/openhub.rs`（改用 helper）
 
 **Interfaces:**
 - Consumes: `resolve_provider_fields`（现有）、`crate::resolve_default_model`（现有，`Option<(String,String)>`）、`AppError::ProviderUnavailable`（T1）。
@@ -847,9 +847,9 @@ pub(crate) async fn resolve_provider_fields_with_fallback(
 }
 ```
 
-- [ ] **Step 4: nomi.rs 改用 helper**
+- [ ] **Step 4: openhub.rs 改用 helper**
 
-`nomi.rs:235` 处，把
+`openhub.rs:235` 处，把
 
 ```rust
     let fields = super::provider_config::resolve_provider_fields(
@@ -865,7 +865,7 @@ pub(crate) async fn resolve_provider_fields_with_fallback(
     ).await?;
 ```
 
-`model_id` 在回退时不再等于 `fields.model`；后续 `NomiResolvedConfig { model: model_id, .. }`（nomi.rs:416）应改用解析后的模型，避免用到已删模型名：把该行改为 `model: fields.model.clone(),`（`ResolvedProviderFields.model` 已是最终解析模型）。
+`model_id` 在回退时不再等于 `fields.model`；后续 `NomiResolvedConfig { model: model_id, .. }`（openhub.rs:416）应改用解析后的模型，避免用到已删模型名：把该行改为 `model: fields.model.clone(),`（`ResolvedProviderFields.model` 已是最终解析模型）。
 
 - [ ] **Step 5: 运行确认通过 + crate 编译**
 
@@ -877,7 +877,7 @@ Expected: 成功。
 - [ ] **Step 6: 提交**
 
 ```bash
-git add crates/backend/openhub-ai-agent/src/factory/provider_config.rs crates/backend/openhub-ai-agent/src/factory/nomi.rs
+git add crates/backend/openhub-ai-agent/src/factory/provider_config.rs crates/backend/openhub-ai-agent/src/factory/openhub.rs
 git -c user.nameopenhubcommit -m "feat(ai-agent): send-time provider fallback to first enabled model (no hard crash)"
 ```
 
@@ -908,7 +908,7 @@ describe('providerInUse helpers', () => {
     expect(featureRoute('desktopCompanion')).toBe('/companion');
     expect(featureRoute('publicCompanion', 'pa_1')).toBe('/public-companions/pa_1');
     expect(featureRoute('publicCompanion')).toBe('/public-companions');
-    expect(featureRoute('smartDecision')).toBe('/nomi');
+    expect(featureRoute('smartDecision')).toBe('/openhub');
     expect(featureRoute('orchestrator')).toBe('/guid');
   });
 
@@ -951,7 +951,7 @@ export function featureRoute(feature: ProviderUsageFeature, targetId?: string): 
     case 'publicCompanion':
       return targetId ? `/public-companions/${targetId}` : '/public-companions';
     case 'smartDecision':
-      return '/nomi';
+      return '/openhub';
     case 'orchestrator':
       return '/guid';
   }
@@ -1182,7 +1182,7 @@ git -c user.nameopenhubcommit -m "feat(ui): friendly PROVIDER_UNAVAILABLE messag
 - Modify: `ui/src/renderer/pages/conversation/components/ChatConversation.tsx`（加自愈 effect）
 
 **Interfaces:**
-- Consumes: `IProvider`、`TProviderWithModel`、`getAvailableModels`、`configService.get('nomi.defaultModel')`。
+- Consumes: `IProvider`、`TProviderWithModel`、`getAvailableModels`、`configService.get('openhub.defaultModel')`。
 - Produces: `resolveHealModel(bound, providers, getAvailableModels, savedDefault): { provider: IProvider; use_model: string } | null`——当 `bound` 的 provider 在列表中不可用时，返回默认(或首个可用)模型；否则返回 `null`（无需自愈）。
 
 - [ ] **Step 1: 写失败测试**
@@ -1280,7 +1280,7 @@ Expected: 4 测试 PASS。
   const { providers: healProviders, getAvailableModels: healGetAvailable } = useModelProviderList();
   useEffect(() => {
     if (!healProviders.length) return;
-    const saved = configService.get('nomi.defaultModel');
+    const saved = configService.get('openhub.defaultModel');
     const heal = resolveHealModel(
       conversation.model,
       healProviders,
@@ -1355,5 +1355,5 @@ git -c user.nameopenhubcommit -am "fix(provider-guard): manual-regression follow
 
 - **Spec 覆盖**：组件 A=Task1–6/8；组件 B=Task7（后端不崩）+Task10（前端自愈+提示）；组件 C=Task1（ProviderUnavailable 码）+Task9（i18n 文案）。软清理=Task6（failover）。✅
 - **范围偏移修正**：`knowledge.autogenModel` 改判为前端-only（后端不清理）；IDMM 拦截 v1 缩到全局备份；渠道 defaultModel 由 B 兜底——均在 Global Constraints 标注。
-- **类型一致性**：`ProviderUsage/ProviderUsageFeature/ProviderInUseDetails` 后端（openhub-common）与前端（providerInUse.ts）镜像，camelCase 对齐（`desktopCompanion` 等）；`resolve_provider_fields_with_fallback` 在 T7 定义、nomi.rs 调用同名；`fleets_using_provider`/`providers_in_use`/`with_deletion_coordinator`/`cleanup_soft_refs` 全计划一致。
+- **类型一致性**：`ProviderUsage/ProviderUsageFeature/ProviderInUseDetails` 后端（openhub-common）与前端（providerInUse.ts）镜像，camelCase 对齐（`desktopCompanion` 等）；`resolve_provider_fields_with_fallback` 在 T7 定义、openhub.rs 调用同名；`fleets_using_provider`/`providers_in_use`/`with_deletion_coordinator`/`cleanup_soft_refs` 全计划一致。
 - **占位符**：Task3 的 `sample_fleet_params()`/`sample_member()` 明确标注为"以本文件既有测试真实构造替换"，非交付占位。

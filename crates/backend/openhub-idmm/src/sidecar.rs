@@ -33,7 +33,7 @@ pub trait Completer: Send + Sync {
     async fn complete(&self, provider_id: &str, model: &str, system: &str, user: &str) -> Result<String, ()>;
 }
 
-/// Production completer: provider row → nomi Config → one-shot completion.
+/// Production completer: provider row → openhub Config → one-shot completion.
 pub struct LiveCompleter {
     pub provider_repo: Arc<dyn IProviderRepository>,
     pub encryption_key: [u8; 32],

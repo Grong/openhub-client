@@ -257,7 +257,7 @@ pub struct SharedCompanionConfig {
     /// Which companion new/unattributed activity defaults to.
     pub default_companion_id: String,
     /// Opt-in (default None = off): when set to a directory path, companion
-    /// `save` memories are ALSO mirrored into the nomi agent's file-memory there
+    /// `save` memories are ALSO mirrored into the openhub agent's file-memory there
     /// (the §3.4 "消两库割裂" bridge), so the agent recalls companion-learned
     /// facts. Enabling it intentionally surfaces companion memories in agent
     /// sessions — that is the feature; default-off keeps the libraries separate.

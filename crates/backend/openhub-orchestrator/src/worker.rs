@@ -1,5 +1,5 @@
 //! WorkerRunner（worker = 真实会话）: the scheduler primitive that runs ONE task
-//! on a fresh nomi conversation, blocking until the turn completes or `timeout`,
+//! on a fresh openhub conversation, blocking until the turn completes or `timeout`,
 //! and returns the agent's final assistant text.
 //!
 //! [`ConversationWorkerRunner`] is the production implementation. It **replicates
@@ -13,7 +13,7 @@
 //! 2. Assemble the conversation `extra` (yolo + desktopGateway + orchestrator
 //!    correlation ids + the supervisor brief as `system_prompt` + optional
 //!    `workspace`).
-//! 3. `conv.create(...)` a fresh nomi conversation, then `conv.send_message(...)`
+//! 3. `conv.create(...)` a fresh openhub conversation, then `conv.send_message(...)`
 //!    the task spec (origin `"orchestrator"`).
 //! 4. `await_turn` (coarse 500ms poll until `!is_processing` or timeout) → settle
 //!    (fine 25ms poll, 5s budget — avoids the reasoning-model `text:null` gotcha
@@ -51,7 +51,7 @@ pub struct WorkerOutcome {
     /// Total tokens (`input + output`, summed across the turns this worker
     /// conversation ran) reported by the agent's `TurnCompleted` metrics and
     /// accumulated in the conversation runtime state. `None` when no usage was
-    /// observed — a non-nomi member, a turn that never completed, or a runner
+    /// observed — a non-openhub member, a turn that never completed, or a runner
     /// (the mock) with no live token source. Written to `orch_run_tasks.tokens`
     /// by the engine's `settle_task_outcome` for the DAG/inspector per-node
     /// token display. NEVER fabricated: it is the real provider count or `None`.
@@ -161,7 +161,7 @@ pub trait WorkerRunner: Send + Sync {
     }
 }
 
-/// Production [`WorkerRunner`]: runs the task on a real nomi conversation via
+/// Production [`WorkerRunner`]: runs the task on a real openhub conversation via
 /// [`ConversationService`], replicating the gateway `openhub_agent_run` recipe.
 pub struct ConversationWorkerRunner {
     conv: ConversationService,
@@ -476,7 +476,7 @@ impl ConversationWorkerRunner {
 /// **Persona inheritance (P4 Task 3, Change 1):** when the member is
 /// assistant-backed it carries the assistant's persona/rule text in
 /// `system_prompt` (Task 2 snapshot). We set it as `extra.preset_rules` — the
-/// nomi factory (`factory/nomi.rs`) merges `preset_rules` AFTER `system_prompt`,
+/// openhub factory (`factory/openhub.rs`) merges `preset_rules` AFTER `system_prompt`,
 /// yielding `brief\n\npersona`, so the supervisor brief leads and the assistant
 /// persona follows. We deliberately do NOT overwrite `extra.system_prompt`
 /// (that is the brief). A blank/whitespace-only persona is dropped (no key).
@@ -528,7 +528,7 @@ fn build_worker_extra(
     if let Some(tools) = restricted {
         extra["allowed_tools"] = json!(tools);
     }
-    // Persona: assistant rule text appended after the brief by the nomi factory.
+    // Persona: assistant rule text appended after the brief by the openhub factory.
     if let Some(persona) = persona.map(str::trim).filter(|s| !s.is_empty()) {
         extra["preset_rules"] = json!(persona);
     }
@@ -893,7 +893,7 @@ mod tests {
     }
 
     // (Change 1) An assistant-backed member's persona is set as `extra.preset_rules`
-    // (NOT system_prompt — that stays the brief). The nomi factory merges
+    // (NOT system_prompt — that stays the brief). The openhub factory merges
     // preset_rules after system_prompt → `brief\n\npersona`.
     #[test]
     fn build_worker_extra_sets_persona_as_preset_rules_without_touching_brief() {

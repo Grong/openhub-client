@@ -4,7 +4,7 @@
 //! tier: the engine is hard-clamped to a safe allowlist, no gateway, no OS tools.
 //!
 //! This is the backbone of the "外呼员工 / 对外服务" feature. The clamp is applied
-//! at execution time in the nomi factory as a backend-authoritative gate — it
+//! at execution time in the openhub factory as a backend-authoritative gate — it
 //! overrides any client- or host-supplied tool grants, so an untrusted stranger
 //! messaging a published companion physically cannot reach dangerous tools,
 //! regardless of prompt injection.

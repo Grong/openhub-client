@@ -38,11 +38,11 @@ fn make_project() -> (TempDir, PathBuf) {
     fs::create_dir(root.join(".git")).unwrap();
 
     // Skills directory
-    let skills_dir = root.join(".nomi").join("skills");
+    let skills_dir = root.join(".openhub").join("skills");
     fs::create_dir_all(&skills_dir).unwrap();
 
     // Commands directory (legacy)
-    let commands_dir = root.join(".nomi").join("commands");
+    let commands_dir = root.join(".openhub").join("commands");
     fs::create_dir_all(&commands_dir).unwrap();
 
     // --- greet skill ---

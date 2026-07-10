@@ -743,7 +743,7 @@ async fn inject_and_wait(
         model,
         conversation_id: conversation_id.to_string(),
         extra,
-        // Stamp/validate the nomi session against this conversation instance so
+        // Stamp/validate the openhub session against this conversation instance so
         // a reused integer id never resumes a stale (e.g. deleted) conversation.
         conversation_created_at: Some(row.created_at),
     };

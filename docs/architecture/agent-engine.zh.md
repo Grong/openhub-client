@@ -18,7 +18,7 @@ Agent 引擎位于 [`crates/agent/`](../../crates/agent/)，后端主要通过
 | `openhub-skills` | Skill 发现、frontmatter、加载与 skill-index 支持。 |
 | `openhub-memory` | 记忆存储与检索原语。 |
 | `openhub-agent` | 核心 engine loop、session、压缩粘合、confirmations、output sinks、skill tool、requirement tools 与 subagent spawning。 |
-| `openhub-cli` | 使用同一引擎的独立 `nomi` CLI。 |
+| `openhub-cli` | 使用同一引擎的独立 `openhub` CLI。 |
 | `openhub-computer` | 桌面 computer-use 工具实现。 |
 | `openhub-a11y` | computer-use 流程使用的 accessibility helper。 |
 | `openhub-browser-engine` | 自托管 browser/CDP 自动化引擎。 |
@@ -42,7 +42,7 @@ OpenHub 支持几类运行时：
 
 Factory 行为的源码真相来源：
 
-- `crates/backend/openhub-ai-agent/src/factory/nomi.rs`
+- `crates/backend/openhub-ai-agent/src/factory/openhub.rs`
 - `crates/backend/openhub-ai-agent/src/factory/acp.rs`
 - `crates/backend/openhub-ai-agent/src/factory/acp_assembler.rs`
 

@@ -49,7 +49,7 @@ const ExtensionSettingsTabContent: React.FC<ExtensionSettingsTabContentProps> = 
 
       frameWindow.postMessage(
         {
-          type: 'nomi:init',
+          type: 'openhub:init',
           locale: i18n.language,
           extensionName,
           translations,
@@ -72,7 +72,7 @@ const ExtensionSettingsTabContent: React.FC<ExtensionSettingsTabContentProps> = 
       const data = event.data as { type?: string; reqId?: string } | undefined;
       if (!data) return;
 
-      if (data.type === 'nomi:get-locale') {
+      if (data.type === 'openhub:get-locale') {
         void postLocaleInit();
         return;
       }

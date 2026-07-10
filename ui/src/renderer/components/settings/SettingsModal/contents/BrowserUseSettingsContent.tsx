@@ -6,7 +6,7 @@
 
 import { configService } from '@/common/config/configService';
 import { ipcBridge } from '@/common';
-import NomiScrollArea from '@/renderer/components/base/NomiScrollArea';
+import OpenHubScrollArea from '@/renderer/components/base/OpenHubScrollArea';
 import { Alert, Button, Message, Modal, Radio, Switch } from '@arco-design/web-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -207,7 +207,7 @@ const BrowserUseSettingsContent: React.FC = () => {
 
   return (
     <div className='flex flex-col h-full w-full'>
-      <NomiScrollArea className='flex-1 min-h-0 pb-16px' disableOverflow={isPageMode}>
+      <OpenHubScrollArea className='flex-1 min-h-0 pb-16px' disableOverflow={isPageMode}>
         <div className='space-y-16px'>
           <div className='px-[12px] md:px-[32px] py-16px bg-2 rd-16px space-y-12px'>
             <div className='text-13px font-600 text-t-secondary'>{t('settings.browserUseSection')}</div>
@@ -272,7 +272,7 @@ const BrowserUseSettingsContent: React.FC = () => {
 
           <Alert type='warning' showIcon content={t('settings.browserUseRiskHint')} />
         </div>
-      </NomiScrollArea>
+      </OpenHubScrollArea>
     </div>
   );
 };

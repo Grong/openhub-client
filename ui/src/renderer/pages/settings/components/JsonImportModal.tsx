@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import CodeMirror from '@uiw/react-codemirror';
 import { json } from '@codemirror/lang-json';
 import { useThemeContext } from '@/renderer/hooks/context/ThemeContext';
-import NomiModal from '@/renderer/components/base/NomiModal';
+import OpenHubModal from '@/renderer/components/base/OpenHubModal';
 import { parseMcpJsonImport, type ParsedMcpJsonServer } from '../ToolsSettings/mcpJsonImport';
 
 interface JsonImportModalProps {
@@ -323,7 +323,7 @@ const JsonImportModal: React.FC<JsonImportModalProps> = ({ visible, server, onCa
   if (!visible) return null;
 
   return (
-    <NomiModal
+    <OpenHubModal
       visible={visible}
       onCancel={onCancel}
       onOk={handleSubmit}
@@ -443,7 +443,7 @@ const JsonImportModal: React.FC<JsonImportModalProps> = ({ visible, server, onCa
           }
         />
       </div>
-    </NomiModal>
+    </OpenHubModal>
   );
 };
 

@@ -9,7 +9,7 @@ import { useArcoMessage } from '@/renderer/utils/ui/useArcoMessage';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import ChatWorkspace from '../Workspace';
-import NomiSessionMetricsPanel from '../platforms/nomi/NomiSessionMetricsPanel';
+import OpenHubSessionMetricsPanel from '../platforms/openhub/OpenHubSessionMetricsPanel';
 
 const ChatSlider: React.FC<{
   conversation?: TChatConversation;
@@ -50,13 +50,13 @@ const ChatSlider: React.FC<{
         isTemporaryWorkspace={
           (conversation.extra as { is_temporary_workspace?: boolean } | undefined)?.is_temporary_workspace
         }
-        eventPrefix='nomi'
+        eventPrefix='openhub'
         messageApi={messageApi}
         extraTabs={[
           {
             key: 'openhub-session-metrics',
             title: t('conversation.sessionMetrics.tab'),
-            content: <NomiSessionMetricsPanel conversation={conversation} />,
+            content: <OpenHubSessionMetricsPanel conversation={conversation} />,
           },
         ]}
       ></ChatWorkspace>

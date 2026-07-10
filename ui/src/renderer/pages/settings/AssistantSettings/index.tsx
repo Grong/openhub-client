@@ -23,7 +23,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { useArcoMessage } from '@/renderer/utils/ui/useArcoMessage';
 import coworkSvg from '@/renderer/assets/icons/cowork.svg';
-import NomiScrollArea from '@/renderer/components/base/NomiScrollArea';
+import OpenHubScrollArea from '@/renderer/components/base/OpenHubScrollArea';
 import HubPageShell from '@/renderer/components/layout/HubPageShell';
 import { useDetectedAgents, useAssistantEditor, useAssistantList, useAssistantTags } from '@/renderer/hooks/assistant';
 import SkillsHubSettings from '../SkillsHubSettings';
@@ -154,7 +154,7 @@ const AssistantSettings: React.FC = () => {
 
   const assistantManagementContent = (
     <div className='flex flex-col h-full w-full'>
-      <NomiScrollArea className='flex-1 min-h-0 pb-16px scrollbar-hide' disableOverflow>
+      <OpenHubScrollArea className='flex-1 min-h-0 pb-16px scrollbar-hide' disableOverflow>
         <AssistantListPanel
           assistants={assistants}
           localeKey={localeKey}
@@ -246,7 +246,7 @@ const AssistantSettings: React.FC = () => {
           setSelectedSkills={editor.setSelectedSkills}
           message={message}
         />
-      </NomiScrollArea>
+      </OpenHubScrollArea>
 
       <TagManagementModal
         visible={tagModalVisible}

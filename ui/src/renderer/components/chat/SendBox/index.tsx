@@ -888,7 +888,7 @@ const SendBox: React.FC<{
   }, []);
 
   useAddEventListener(
-    'nomi.selected.file.append',
+    'openhub.selected.file.append',
     (items: FileSelectionItem[]) => {
       if (conversationContext?.type === 'openhub') {
         handleExternalSelectionAppend(items);
@@ -946,7 +946,7 @@ const SendBox: React.FC<{
     (item: FileOrFolderItem) => {
       switch (conversationContext?.type) {
         case 'openhub':
-          emitter.emit('nomi.selected.file.append', [item]);
+          emitter.emit('openhub.selected.file.append', [item]);
           break;
         case 'acp':
           emitter.emit('acp.selected.file.append', [item]);

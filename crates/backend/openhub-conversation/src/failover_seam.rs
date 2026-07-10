@@ -143,7 +143,7 @@ impl ConversationService {
             }
         };
 
-        // ACP 边界(review #9,plan D7)的**唯一强制闸**:仅 nomi 自有引擎的普通会话
+        // ACP 边界(review #9,plan D7)的**唯一强制闸**:仅 openhub 自有引擎的普通会话
         // 可换模型重建。ACP / 终端 / 远程等 agent 自管模型(独立 reconcile),在此被
         // fail-safe 拒绝——不 kill、不写 model。send-loop 与 IDMM inject 都走这条
         // 路径,故两处都被这一道闸覆盖。
@@ -158,7 +158,7 @@ impl ConversationService {
             warn!(
                 conversation_id,
                 agent_type = ?agent_type,
-                "Failover skipped: not a nomi conversation (ACP/terminal self-manage their model)"
+                "Failover skipped: not a openhub conversation (ACP/terminal self-manage their model)"
             );
             return None;
         }
@@ -247,7 +247,7 @@ impl ConversationService {
 
     /// 同模型"剔图重建":标记 registry(该 provider+model 不支持图片)→ kill →
     /// 用同一行重建任务。重建时工厂重新读 registry → compat.supports_image=false →
-    /// build_messages 剔图。仅 nomi 会话放行;返回新句柄或 None(不可重建)。
+    /// build_messages 剔图。仅 openhub 会话放行;返回新句柄或 None(不可重建)。
     pub(crate) async fn strip_images_and_rebuild(
         &self,
         conversation_id: &str,
@@ -300,7 +300,7 @@ impl ConversationService {
     ///    重复副作用 / 重复计费;
     /// 3. 故障转移启用(会话级覆盖否则全局,`enabled == true`);
     /// 4. `switches_done < min(max_switches, queue.len())` —— bounded;
-    /// 5. agent 是 **nomi** 实例(plan D7;终端 CLI / ACP 自管模型,排除)。
+    /// 5. agent 是 **openhub** 实例(plan D7;终端 CLI / ACP 自管模型,排除)。
     ///
     /// 命中且挑到可用候选 → 换模型 + 重建,返回 `Some(FailoverSwitch)`;
     /// 任一条件不满足 / 队列耗尽 → `None`。
@@ -318,7 +318,7 @@ impl ConversationService {
         extra_json: &str,
         task_manager: &Arc<dyn IWorkerTaskManager>,
     ) -> Option<FailoverSwitch> {
-        // (5) 仅 nomi 自有引擎的普通会话。便宜的早闸(避免无谓加载);真正的强制点
+        // (5) 仅 openhub 自有引擎的普通会话。便宜的早闸(避免无谓加载);真正的强制点
         //     在 `perform_model_failover` 的 ACP 边界闸(review #9),send-loop 与 IDMM
         //     共用那一处。
         if agent_type != AgentType::Nomi {
@@ -374,7 +374,7 @@ impl ConversationService {
     /// 重新驱动本轮(发一条 hidden 续聊消息,镜像 inject 的 Retry 路径)。
     ///
     /// 返回 `Ok(true)` = 成功切到下一候选并已重新驱动;`Ok(false)` = 未转移
-    /// (故障转移关闭 / 队列耗尽 / 依赖未注册 / 非 nomi),调用方据此回落(不无限切换)。
+    /// (故障转移关闭 / 队列耗尽 / 依赖未注册 / 非 openhub),调用方据此回落(不无限切换)。
     ///
     /// **IDMM 切换次数边界(review #3)**:本方法**每次** `WakeAction::Failover` 只执行
     /// **一次**模型切换(调一次 `perform_model_failover`),不持有任何跨回合计数器,也
@@ -386,7 +386,7 @@ impl ConversationService {
     /// **不变量**:与 send-loop 共用 `perform_model_failover` 这一份实现(no
     /// duplicate);队列耗尽 → `Ok(false)`(IDMM 不再自动切换,值守 ladder 继续按
     /// 现状把它当 provider 故障处理 / 升级 / 兜底)。ACP 边界由 `perform_model_failover`
-    /// 内部统一闸守(review #9):非 nomi 会话在那里返回 `None` → 本方法 `Ok(false)`。
+    /// 内部统一闸守(review #9):非 openhub 会话在那里返回 `None` → 本方法 `Ok(false)`。
     pub async fn idmm_failover_conversation(
         &self,
         user_id: &str,

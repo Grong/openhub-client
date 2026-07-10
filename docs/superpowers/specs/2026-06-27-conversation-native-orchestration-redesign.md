@@ -35,7 +35,7 @@
 |---|---|---|
 | **Run** | 一次有目标的多 agent 执行，宿主在一个**主管会话**里 | `orch_runs`（复用）；新增 `lead_conv_id` 关联 + `work_dir` |
 | **主管会话（Lead）** | 用户直接对话的 Nomi 会话，武装了 `caps_orchestrator` 工具 + 主管提示词；它创建/规划/驱动 Run，可被用户 steer | 一个 `type='openhub'` 会话，`extra` 带 `orchestrator_role='lead'` + `model_range` + （创建 Run 后）`orchestrator_run_id` |
-| **Worker（节点）** | DAG 的一个任务节点 = 一个真实子会话（nomi yolo + desktopGateway） | `orch_run_tasks`（复用）；worker conversation `extra.orchestrator_run_id/task_id`（复用，已从主侧栏过滤） |
+| **Worker（节点）** | DAG 的一个任务节点 = 一个真实子会话（openhub yolo + desktopGateway） | `orch_run_tasks`（复用）；worker conversation `extra.orchestrator_run_id/task_id`（复用，已从主侧栏过滤） |
 | **角色资产 = 助手** | 可复用的命名角色（规划/前端/后端/测试/设计…）= 一个 `assistants` 记录：name + description + 系统提示 + 技能 + 标签 + 偏好模型 | `assistants`（复用 + 补字段）；管理面复用助手页 |
 | **模型范围** | 本次 Run 允许使用的模型集合：`单一` / `自动`（全部启用） / `范围`（勾选若干） | 会话 `extra.model_range`；可存为可选预设 |
 | **模型描述** | 用户注册模型时自填的自由文本，描述该模型擅长什么 | **新增** `providers.model_descriptions`（按 model id 的 JSON map）|
@@ -51,7 +51,7 @@
 复用 `ui/src/renderer/pages/guid/GuidPage.tsx` 全套：`GuidWorkspaceFootnote`（工作路径）+ `GuidInputCard`（需求文本 + 附件）+ 模型选择器。提交链路 `useGuidSend.handleSend()` → `ipcBridge.conversation.create.invoke({type:'openhub', ...})` → 跳 `/conversation/{id}`。**不新增入口页**。
 
 ### 3.2 模型选择器三态（替换单选）
-`GuidModelSelector` / `useGuidModelSelection`（nomi 路径）从"单选 `current_model`"扩展为三态：
+`GuidModelSelector` / `useGuidModelSelection`（openhub 路径）从"单选 `current_model`"扩展为三态：
 - **单一模型**（默认，今日行为）：选定一个模型，普通单 agent 会话。
 - **自动**：不指定具体模型，允许编排；范围 = 当前所有启用模型。
 - **范围**：多选若干模型，允许编排；范围 = 勾选集合。
@@ -68,7 +68,7 @@
 UI：选择器加一个分段控件（单一 / 自动 / 范围）。`范围`态下模型项变多选 checkbox。视觉对齐既有 Arco 下拉风格（点 #UI 硬底线）。
 
 ### 3.3 主管会话的武装
-当 `model_range.mode ∈ {auto, range}`，`useGuidSend` 在创建 nomi 会话时于 `extra` 注入：
+当 `model_range.mode ∈ {auto, range}`，`useGuidSend` 在创建 openhub 会话时于 `extra` 注入：
 - `orchestrator_role: 'lead'`
 - `model_range`（上面的结构）
 - `session_mode: 'yolo'`、`desktopGateway: true`（主管需要工具权限）
@@ -226,8 +226,8 @@ Run 结束（或主管收尾）时，对本次出现的**临时角色**（即 `a
 
 ## 12. 不变量（实施期硬约束）
 
-1. worker = 真实子会话（nomi yolo + desktopGateway + `orchestrator_run_id/task_id` 标记 + 从主侧栏过滤）。
-2. Run = 分裂过的主管会话；主管会话 = 普通 nomi 会话 + caps_orchestrator + 主管提示词，由用户对话驱动。
+1. worker = 真实子会话（openhub yolo + desktopGateway + `orchestrator_run_id/task_id` 标记 + 从主侧栏过滤）。
+2. Run = 分裂过的主管会话；主管会话 = 普通 openhub 会话 + caps_orchestrator + 主管提示词，由用户对话驱动。
 3. 引擎只吃 `fleet_snapshot`（`Vec<FleetMember>`），不依赖 Fleet/Workspace 实体。
 4. 角色资产 = 助手（统一，不再造平行概念）；`fleet_members.agent_id` 承载助手引用。
 5. 模型选择三态：单一=普通会话；自动/范围=允许编排，主管按复杂度决定是否真拆。

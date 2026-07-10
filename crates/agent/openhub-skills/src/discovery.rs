@@ -80,7 +80,7 @@ impl RuntimeDiscovery {
                     break;
                 }
 
-                let skill_dir = current.join(".nomi").join("skills");
+                let skill_dir = current.join(".openhub").join("skills");
 
                 if !self.checked_dirs.contains(&skill_dir) {
                     self.checked_dirs.insert(skill_dir.clone());

@@ -30,7 +30,7 @@
 - **`ProviderWithModel { provider_id, model, use_model }`**：解耦引擎与凭证/模型——任意子 agent 可被赋予任意 provider/model。
 - **`AgentStreamEvent` 广播 + `StreamRelay`**：与 agent 类型无关的通用事件扇出（WS + DB 持久化 + 续写/failover）。
 - **IDMM**（`openhub-idmm`）：通用监督层。一个 agent 只要实现 `SessionProbe` 就能获得「规则→模型→halt」自动决策；三个 seam trait（`IdmmHandle` / `ConversationSupervisionHook` / `TerminalSupervisionHook`）展示了单向依赖倒置的接入范式。
-- **Gateway 能力内核**（`openhub-gateway`）：单一能力 Registry（~132 工具，DangerTier×Surface 权限矩阵），`openhub_agent_run`/`openhub_agent_result` **已实现** fire-and-poll 委派（生成一个自主 nomi 子会话、流式回传进度）；`openhub_create_conversation`+`openhub_send_to_conversation`+`openhub_conversation_status` 让「主管」可创建/驱动/观察子会话。Remote 前门 + per-companion 令牌已就位。
+- **Gateway 能力内核**（`openhub-gateway`）：单一能力 Registry（~132 工具，DangerTier×Surface 权限矩阵），`openhub_agent_run`/`openhub_agent_result` **已实现** fire-and-poll 委派（生成一个自主 openhub 子会话、流式回传进度）；`openhub_create_conversation`+`openhub_send_to_conversation`+`openhub_conversation_status` 让「主管」可创建/驱动/观察子会话。Remote 前门 + per-companion 令牌已就位。
 - **会话引擎**（`openhub-conversation`）：`ConversationService`（串行 TurnClaim，每会话至多一个活回合）、`IWorkerTaskManager`（每会话一个 `AgentInstance`，`Arc<OnceCell>` 语义）、steering inbox、协作式取消。
 - **DB/接线规范**：仓库模式（`I*Repository`+`Sqlite*Repository`）、迁移 append-only（最新 017）、设备边界 ID 规则、ts-rs `#[ts(type="number")]` 防 bigint、realtime（`EventBroadcaster`+`WebSocketManager`+域 `*EventEmitter`）。模板 = `openhub-webhook` / `openhub-cron`。
 - **前端**：`ChatLayout`（三栏壳）、`ContentSider`、`MessageList`+流式 store、`useNomiMessage` 订阅、`MessageToolGroupSummary`/`MessageText`/`MermaidBlock`、`NomiModal`、`AssistantTagFilterBar`（chip 筛选）、`ContextUsagePill`、CSS 变量主题、`react-flow`（无限画布调研选型）。
@@ -322,7 +322,7 @@ ContentSider（二级侧栏）+ 主区 hero：
   - 任务节点：状态色（CSS 变量）、分派 agent 头像 + 模型 chip、进度、重试/改派动作。
   - 依赖边、顶部主管节点。WS 实时刷新（`task.statusChanged` 等）。
   - 节点可拖（落 `graph_x/graph_y`）。
-  - **点节点 → 右侧滑出该 worker 实时对话**：复用 `ChatLayout`/`NomiChat`/`MessageList`，只读 + 可 steer 模式（`hideAdvancedControls`、`hideSendBox` 视模式；参照 SubagentDrawer 但升级为可交互）。
+  - **点节点 → 右侧滑出该 worker 实时对话**：复用 `ChatLayout`/`OpenHubChat`/`MessageList`，只读 + 可 steer 模式（`hideAdvancedControls`、`hideSendBox` 视模式；参照 SubagentDrawer 但升级为可交互）。
   - 顶栏：目标、自主级别选择、编队选择、Run 控制（暂停/恢复/取消/fork）、聚合进度 + 成本/token 表（复用 `ContextUsagePill` 风格）。
 - **编队管理视图**：组建编队（从已配 providers 选 agent+model、填角色/标签/约束），看每成员能力画像。卡片网格 + `AssistantTagFilterBar` 风格。**同时满足**「对用户清晰配置」+「对 agent 清晰展示信息/编排/生命周期」两个视角。
 

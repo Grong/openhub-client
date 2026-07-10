@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { mutate as mutateSWR } from 'swr';
 import useModeModeList from '@renderer/hooks/agent/useModeModeList';
 import useProtocolDetection from '@renderer/hooks/system/useProtocolDetection';
-import NomiModal from '@/renderer/components/base/NomiModal';
+import OpenHubModal from '@/renderer/components/base/OpenHubModal';
 import ApiKeyEditorModal from './ApiKeyEditorModal';
 import {
   MODEL_PLATFORMS,
@@ -507,7 +507,7 @@ const AddPlatformModal = ModalHOC<{
   };
 
   return (
-    <NomiModal
+    <OpenHubModal
       visible={modalProps.visible}
       onCancel={modalCtrl.close}
       header={{ title: t('settings.addModel'), showClose: true }}
@@ -988,7 +988,7 @@ const AddPlatformModal = ModalHOC<{
           return testApiKeyForProvider(key, actualBaseUrl);
         }}
       />
-    </NomiModal>
+    </OpenHubModal>
   );
 });
 

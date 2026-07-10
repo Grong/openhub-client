@@ -23,7 +23,7 @@ type NodeConfigBarProps = {
 
 /**
  * NodeConfigBar — the PENDING node's 启动前配置 surface. A pending node has no worker
- * conversation (hence no NomiSendBox to reuse), so we mirror the composer's bottom
+ * conversation (hence no OpenHubSendBox to reuse), so we mirror the composer's bottom
  * toolbar as a slim bar carrying the SAME two controls (model + 预置要求 pills) a
  * settled node gets INSIDE its real composer. No text-send affordance — there is
  * nothing to chat with until the node is dispatched; both pills persist through the

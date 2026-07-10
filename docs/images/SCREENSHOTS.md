@@ -79,7 +79,7 @@ see notes).
 | `readme-02-terminal-create.png` | `#/terminal-new` | desktop | Create terminal flow with expanded capability handoff panel | README / README.zh-CN | live |
 | `readme-03-assistants.png` | `#/assistants?tab=assistants` | desktop | Assistants and Skills capability library | README / README.zh-CN | live |
 | `readme-04-model-agents.png` | `#/models` | desktop | Models and Agents management with installed and supported CLI agents | README / README.zh-CN | live |
-| `readme-05-companions.png` | `#/nomi` | desktop | Desktop companion overview with memory and growth state | README / README.zh-CN | live |
+| `readme-05-companions.png` | `#/openhub` | desktop | Desktop companion overview with memory and growth state | README / README.zh-CN | live |
 | `readme-06-knowledge.png` | `#/knowledge` | desktop | Knowledge base list and local domain context | README / README.zh-CN | live |
 | `readme-07-requirements.png` | `#/requirements` | desktop | Requirements platform list and AutoWork entry | README / README.zh-CN | live |
 | `gs-01-introduction-hero.png` | `#/guid` | web | Home / new-session page | getting-started/introduction | live |
@@ -103,8 +103,8 @@ see notes).
 | `cron-01-list.png` | `#/scheduled` | web | Scheduled Tasks list + keep-awake banner | guides/scheduled-tasks | live |
 | `cron-02-create-dialog.png` | `#/scheduled` (New task) | web | Create scheduled task dialog | guides/scheduled-tasks | live |
 | `cron-03-detail.png` | `#/scheduled/:job_id` | web | Job detail: schedule, Run now, history | guides/scheduled-tasks | live |
-| `channels-01-overview.png` | `#/nomi?tab=remote` | web | Companion Remote tab — channel overview | guides/channels | live |
-| `channels-02-pairing.png` | `#/nomi?tab=remote` (connect) | web | Channel connect / settings dialog | guides/channels | live |
+| `channels-01-overview.png` | `#/openhub?tab=remote` | web | Companion Remote tab — channel overview | guides/channels | live |
+| `channels-02-pairing.png` | `#/openhub?tab=remote` (connect) | web | Channel connect / settings dialog | guides/channels | live |
 | `mcp-01-capabilities.png` | `#/mcp` | web | MCP page | guides/mcp-and-skills | live |
 | `mcp-03-skills.png` | `#/assistants?tab=skills` | web | Skills tab | guides/mcp-and-skills | live |
 | `assistants-01-list.png` | `#/assistants?tab=assistants` | web | Assistants list (builtin library) | guides/assistants | live |

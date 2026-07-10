@@ -59,7 +59,7 @@ impl RunService {
 **Files:** Modify app `build_orchestrator_state`(state.rs)（给 engine 的 conv_service 挂 IDMM 监督 hook）;可能 `engine.rs`(若用 ensure_supervising 每 worker);Test/build。
 
 **设计:**
-- 目标:worker(nomi yolo)会话遇 decision/open-question 时由 IDMM 自动作答,不卡到 timeout。机制二选一:
+- 目标:worker(openhub yolo)会话遇 decision/open-question 时由 IDMM 自动作答,不卡到 timeout。机制二选一:
   - (A) `conv_service.with_supervision_hook(idmm_manager)`:engine 的独立 conv_service 挂上 IdmmManager（它实现 ConversationSupervisionHook，on_turn_start 武装）。需把 idmm_manager 传进 build_orchestrator_state（build_idmm_state 产出 idmm_state.service.manager()）。
   - (B) engine 每 worker 起 turn 后 `idmm_handle.ensure_supervising((kind, conv_id))`（AutoWork 范式）。
   - **优先 (A)**（一行 with_supervision_hook，最小侵入），需 build_module_states 把 idmm manager 传给 build_orchestrator_state。

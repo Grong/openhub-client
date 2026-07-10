@@ -531,7 +531,7 @@ async fn tc_e2e_11_legacy_commands_loaded() {
 
     // Create the legacy commands directory structure under a fake project root.
     // load_all_skills looks for .openhub/commands/ relative to cwd.
-    let commands_dir = tmp.path().join(".nomi").join("commands");
+    let commands_dir = tmp.path().join(".openhub").join("commands");
     fs::create_dir_all(&commands_dir).unwrap();
 
     // Flat .md file (no subdirectory, no SKILL.md) — legacy format

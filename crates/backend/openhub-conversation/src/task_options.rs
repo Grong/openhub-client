@@ -3,7 +3,7 @@
 //!
 //! The two execution entry points — interactive `send_message` and the
 //! cron executor — must derive the same `(provider_id, model)` for a
-//! given conversation; otherwise an nomi job that runs fine
+//! given conversation; otherwise an openhub job that runs fine
 //! interactively can fail under cron with `Provider '<vendor>' not
 //! found` (Sentry ELECTRON-1HM). Centralising the lookup here forces
 //! both paths through one parser.
@@ -11,8 +11,8 @@
 //! The parser intentionally accepts both the canonical `ProviderWithModel`
 //! shape and a few legacy variants (camelCase keys, `id` instead of
 //! `provider_id`). When the row holds an unparseable or missing model,
-//! we return an empty `ProviderWithModel`; non-nomi factory branches
-//! ignore the field, and the nomi branch surfaces a clear "provider
+//! we return an empty `ProviderWithModel`; non-openhub factory branches
+//! ignore the field, and the openhub branch surfaces a clear "provider
 //! not found" error against an empty id rather than a stale vendor
 //! label.
 
@@ -35,8 +35,8 @@ pub fn provider_model_from_conversation_row(row: &ConversationRow) -> ProviderWi
 /// Canonical sentinel `ProviderWithModel` used when a conversation row has
 /// no parseable model. Shared by both the interactive `send_message` path
 /// and the cron executor so they agree on the "no model selected" shape:
-/// `provider_id: ""`, `model: ""`, `use_model: None`. Non-nomi factories
-/// ignore the field, while the nomi factory surfaces a clear "Provider
+/// `provider_id: ""`, `model: ""`, `use_model: None`. Non-openhub factories
+/// ignore the field, while the openhub factory surfaces a clear "Provider
 /// '' not found" error against the empty id rather than silently using a
 /// stale vendor label.
 pub fn empty_provider_model() -> ProviderWithModel {

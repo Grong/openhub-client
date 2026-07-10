@@ -143,7 +143,7 @@ const DISPLACED_DIR_PREFIX: &str = ".migrating-displaced-";
 /// source dirs.
 const DB_FILES: [&str; 3] = ["memory.db", "memory.db-wal", "memory.db-shm"];
 
-/// One-shot legacy migration: companion/nomi -> companion/shared + first companion "Nomi".
+/// One-shot legacy migration: companion/openhub -> companion/shared + first companion "Nomi".
 /// Idempotent and crash-safe via staging:
 ///
 /// 1. Gate: only `legacy` missing or the `.migrated` marker skip the run.
@@ -425,7 +425,7 @@ fn copy_dir_recursive(from: &Path, to: &Path) -> std::io::Result<()> {
 mod tests {
     use super::*;
 
-    /// A legacy `companion/nomi` install: old-format config.json, a fake db file
+    /// A legacy `companion/openhub` install: old-format config.json, a fake db file
     /// and one events JSONL.
     fn build_legacy(data_dir: &Path) {
         let legacy = data_dir.join(crate::COMPANION_REL_DIR);

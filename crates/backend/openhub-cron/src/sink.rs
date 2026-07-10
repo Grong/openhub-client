@@ -1,6 +1,6 @@
 //! Backend implementation of the agent-side `CronSink` trait, delegating to
 //! `CronService`. Built per-conversation by the agent factory so the in-process
-//! nomi agent can schedule / list / delete its own recurring prompts. Mirrors
+//! openhub agent can schedule / list / delete its own recurring prompts. Mirrors
 //! `openhub_requirement::RequirementServiceSink`.
 
 use std::sync::Arc;
@@ -53,7 +53,7 @@ impl CronSink for UnavailableCronSink {
     }
 }
 
-/// `CronSink` bound to one (nomi) conversation.
+/// `CronSink` bound to one (openhub) conversation.
 pub struct CronServiceSink {
     service: Arc<CronService>,
     /// The agent's conversation id (numeric string).
@@ -80,7 +80,7 @@ impl CronServiceSink {
 impl CronSink for CronServiceSink {
     async fn create(&self, name: &str, cron_expr: &str, prompt: &str) -> Result<String, String> {
         // Bound to the agent's own conversation: agent_type "openhub" +
-        // execution_mode Existing makes the job re-run this conversation's nomi
+        // execution_mode Existing makes the job re-run this conversation's openhub
         // agent (model resolved from the conversation at run time, so no
         // agent_config needed). Validated by CronService::add_job.
         let req = CreateCronJobRequest {

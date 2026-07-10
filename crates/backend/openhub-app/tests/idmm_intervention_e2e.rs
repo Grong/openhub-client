@@ -7,7 +7,7 @@
 //! WITHOUT a single failing test, because the only IDMM integration tests
 //! covered config persistence and never the arm → detect → intervene path.
 //!
-//! This test reproduces the user's exact gesture — a plain desktop nomi
+//! This test reproduces the user's exact gesture — a plain desktop openhub
 //! conversation whose agent is BLOCKED on a tool-permission "选择项" that was
 //! emitted BEFORE 智能决策 was enabled — and asserts the decision watch recovers
 //! that pending confirmation on arm and auto-confirms it. `observe()` only sees
@@ -150,7 +150,7 @@ async fn idmm_recovers_and_confirms_on_arm_pending_tool_confirmation() {
     let (mut app, services, confirmed) = build_app_blocked_on_confirmation().await;
     let (token, csrf) = setup_and_login(&mut app, &services, "admin", "StrongP@ss1").await;
 
-    // A plain desktop nomi conversation (no channel/companion markers, no
+    // A plain desktop openhub conversation (no channel/companion markers, no
     // channel_chat_id → is_plain_desktop / not-routed → IDMM may auto-answer).
     let conv = {
         let body = json!({ "type": "openhub", "name": "idmm-intervene", "extra": { "workspace": "/project" } });

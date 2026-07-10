@@ -208,17 +208,17 @@ mod opencode {
 // Nomi adapter (CLI + TOML-backed)
 // ===========================================================================
 
-// Note: Full lifecycle tests for Nomi require the `nomi` CLI to be
-// installed (for `--config-path`). The unit tests in nomi.rs thoroughly
+// Note: Full lifecycle tests for Nomi require the `openhub` CLI to be
+// installed (for `--config-path`). The unit tests in openhub.rs thoroughly
 // cover TOML parsing, serialization, and roundtrip behavior. Here we
 // verify the public API surface.
 
-mod nomi {
+mod openhub {
     use super::*;
     use openhub_mcp::NomiAdapter;
 
     #[test]
-    fn source_is_nomi() {
+    fn source_is_openhub() {
         assert_eq!(NomiAdapter.source(), McpSource::Nomi);
     }
 

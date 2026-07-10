@@ -46,7 +46,7 @@ pub struct DistilledMemory {
 /// the four file-based memory types (no raw/summary intermediate stage), and
 /// it forbids storing secrets (redaction is the second gate, applied by the
 /// orchestrator before write).
-pub const DISTILL_SYSTEM: &str = r#"你是 nomi 的记忆蒸馏器。读完一段已结束的工作会话转写，提炼出对"未来会话"有持久价值的记忆。
+pub const DISTILL_SYSTEM: &str = r#"你是 openhub 的记忆蒸馏器。读完一段已结束的工作会话转写，提炼出对"未来会话"有持久价值的记忆。
 
 只保留高信号记忆（满足才写，否则宁缺毋滥）：
 - 稳定的用户偏好/操作习惯（用户反复要求或纠正的）

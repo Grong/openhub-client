@@ -77,7 +77,7 @@ The server pings every 30 s and considers a client dead at 60 s. If the network 
 
 ### Conversation fails immediately with "agent not available" / "command not found"
 
-The agent engine spawns ACP agent CLIs (`claude`, `codex`, `gemini`, `nomi`, `codebuddy`, …) and they must be on the **process** `PATH`. The process PATH is enhanced at startup (`openhub_runtime::enhance_process_path`) but if the binary lives somewhere unusual it can still be missed.
+The agent engine spawns ACP agent CLIs (`claude`, `codex`, `gemini`, `openhub`, `codebuddy`, …) and they must be on the **process** `PATH`. The process PATH is enhanced at startup (`openhub_runtime::enhance_process_path`) but if the binary lives somewhere unusual it can still be missed.
 
 Run the doctor:
 

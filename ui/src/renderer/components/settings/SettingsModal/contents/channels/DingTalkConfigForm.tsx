@@ -201,7 +201,7 @@ const DingTalkConfigForm: React.FC<DingTalkConfigFormProps> = ({
           : { plugin_id: 'dingtalk', config }
       );
       if (!result.success) {
-        throw new Error(result.error || result.message || t('nomi.settings.remoteEnableFailed', { defaultValue: 'Failed to enable channel' }));
+        throw new Error(result.error || result.message || t('openhub.settings.remoteEnableFailed', { defaultValue: 'Failed to enable channel' }));
       }
 
       Message.success(t('settings.dingtalk.pluginEnabled', 'DingTalk bot enabled'));

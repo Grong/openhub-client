@@ -4,13 +4,13 @@
 
 **Goal:** 落地"对外服务档"的**原生工具安全内核**——让一个标记为 `PublicService` 的伙伴会话在引擎层被**硬性收窄**到只剩安全工具（问答 + 知识库检索），并修复使白名单失效的 C3 绕过 bug。
 
-**Architecture:** 新增正交于 `Surface` 的 `ExposureMode` 枚举（`openhub-api-types`），穿过 `NomiBuildExtra` 进入 nomi 工厂；工厂对 `PublicService` 施加**钳制**（安全白名单 + 关网关/computer/browser/spawn）。引擎侧修复 C3：post-build 注册的 knowledge/memory 工具此前绕过 `retain_named`，改为在全部注册完成后再收口一次。
+**Architecture:** 新增正交于 `Surface` 的 `ExposureMode` 枚举（`openhub-api-types`），穿过 `NomiBuildExtra` 进入 openhub 工厂；工厂对 `PublicService` 施加**钳制**（安全白名单 + 关网关/computer/browser/spawn）。引擎侧修复 C3：post-build 注册的 knowledge/memory 工具此前绕过 `retain_named`，改为在全部注册完成后再收口一次。
 
 **Tech Stack:** Rust 2024、`serde`/`schemars`、`nextest`。
 
 ## Global Constraints
 
-- 语言/命名：产品面 OpenHub；内部 companion/pet/nomi 不动。
+- 语言/命名：产品面 OpenHub；内部 companion/pet/openhub 不动。
 - **默认拒绝**：`ExposureMode` 缺省 = `Private`（今日行为，零回归）；`PublicService` 是唯一收窄档。
 - **不信客户端**：exposure 是后端设定字段；HTTP 会话路由既有的 `strip_desktop_gateway_flag` 语义延伸——exposure 亦不可由客户端 extra 抬升（本 P0 只加字段+钳制；入口盖章在 P1）。
 - **白名单非空不变量**：`retain_named(&[])` = no-op = **不限制**（`registry.rs:73`）。故 `PublicService` 的安全工具集**必须非空**，否则会意外放开全部工具。测试须钉死此不变量。
@@ -192,7 +192,7 @@ fn public_allowlist_strips_postbuild_memory_tools() {
 
 **Files:**
 - Modify: `crates/backend/openhub-api-types/src/agent_build_extra.rs`（`NomiBuildExtra` 加字段）
-- Modify: `crates/backend/openhub-ai-agent/src/factory/nomi.rs`（应用 `exposure_clamp`）
+- Modify: `crates/backend/openhub-ai-agent/src/factory/openhub.rs`（应用 `exposure_clamp`）
 - Test: `crates/backend/openhub-ai-agent/tests/agent_types_integration.rs`
 
 **Interfaces:**
@@ -231,7 +231,7 @@ fn openhub_build_extra_deserializes_public_service_exposure() {
 
 - [ ] **Step 3: 跑测试确认失败** — `cargo nextest run -p openhub-ai-agent openhub_build_extra_deserializes_public_service_exposure`；Expected: 编译失败（无 exposure 字段）。
 
-- [ ] **Step 4: 工厂施加钳制** — 在 `factory/nomi.rs` 组装最终配置处（`browser_use_enabled`/`computer_use` 解析之后、构造 `config_extra`/`allowed_tools`/`desktop_gateway` 之前），插入钳制：
+- [ ] **Step 4: 工厂施加钳制** — 在 `factory/openhub.rs` 组装最终配置处（`browser_use_enabled`/`computer_use` 解析之后、构造 `config_extra`/`allowed_tools`/`desktop_gateway` 之前），插入钳制：
 
 ```rust
 // 对外服务钳制：PublicService 硬性覆盖为安全白名单 + 关网关/computer/browser/spawn。

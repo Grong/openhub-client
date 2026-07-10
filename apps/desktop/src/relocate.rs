@@ -100,7 +100,7 @@ const EXCLUDED_ENTRIES: &[&str] = &[
     "builtin-skills",              // re-materialized from embedded assets
     "logs",                        // tracing output
     "preview-history",             // office preview snapshots
-    "openhub-sessions",               // nomi agent scratch sessions
+    "openhub-sessions",               // openhub agent scratch sessions
     "openhub-health-check-sessions",  // provider health-check scratch
     "browser-profile",             // legacy chromium profile (pre-Playwright-MCP);
                                    // no longer created — kept to relocate/clean

@@ -26,13 +26,13 @@ import RemoteChat from '../platforms/remote/RemoteChat';
 import { saveNomiDefaultModel } from '@/renderer/pages/guid/hooks/agentSelectionUtils';
 import { configService } from '@/common/config/configService';
 import { useModelProviderList } from '@/renderer/hooks/agent/useModelProviderList';
-import { resolveHealModel } from '../platforms/nomi/healConversationModel';
+import { resolveHealModel } from '../platforms/openhub/healConversationModel';
 import { getConversationOrNull, seedConversationCache } from '@/renderer/pages/conversation/utils/conversationCache';
 import { getConversationCreateErrorMessage } from '@/renderer/pages/conversation/utils/conversationCreateError';
 import { isConversationProcessing } from '@/renderer/pages/conversation/utils/conversationRuntime';
-import NomiChat from '../platforms/nomi/NomiChat';
-import { useNomiModelSelection } from '../platforms/nomi/useNomiModelSelection';
-import CompanionChatPanel from '@/renderer/pages/nomi/companion/CompanionChatPanel';
+import OpenHubChat from '../platforms/openhub/OpenHubChat';
+import { useOpenHubModelSelection } from '../platforms/openhub/useOpenHubModelSelection';
+import CompanionChatPanel from '@/renderer/pages/openhub/companion/CompanionChatPanel';
 import GuidCollaboratorSelector from '@/renderer/pages/guid/components/GuidCollaboratorSelector';
 import ClusterModePill from './ClusterModePill';
 import type { TModelRange, TModelRef } from '@/common/types/orchestrator/orchestratorTypes';
@@ -147,9 +147,9 @@ const _AddNewConversation: React.FC<{ conversation: TChatConversation }> = ({ co
   );
 };
 
-type NomiConversation = Extract<TChatConversation, { type: 'openhub' }>;
+type OpenHubConversation = Extract<TChatConversation, { type: 'openhub' }>;
 
-const NomiConversationPanel: React.FC<{ conversation: NomiConversation; sliderTitle: React.ReactNode }> = ({
+const NomiConversationPanel: React.FC<{ conversation: OpenHubConversation; sliderTitle: React.ReactNode }> = ({
   conversation,
   sliderTitle,
 }) => {
@@ -210,7 +210,7 @@ const NomiConversationPanel: React.FC<{ conversation: NomiConversation; sliderTi
     [conversation.id, persistModelRange, collaborators]
   );
 
-  const modelSelection = useNomiModelSelection({
+  const modelSelection = useOpenHubModelSelection({
     initialModel: conversation.model,
     onSelectModel,
   });
@@ -246,7 +246,7 @@ const NomiConversationPanel: React.FC<{ conversation: NomiConversation; sliderTi
   const { providers: healProviders, getAvailableModels: healGetAvailable } = useModelProviderList();
   useEffect(() => {
     if (!healProviders.length) return;
-    const saved = configService.get('nomi.defaultModel');
+    const saved = configService.get('openhub.defaultModel');
     const heal = resolveHealModel(
       conversation.model,
       healProviders,
@@ -306,13 +306,13 @@ const NomiConversationPanel: React.FC<{ conversation: NomiConversation; sliderTi
             {/* 智能编排「编排后不自动执行」提示条:仅当本会话关联的 run 停在
                 awaiting_plan_approval 时显示,复用批准 IPC;其余情况渲染 null。 */}
             <PlanApprovalBanner />
-            {/* Content-area projection (会话原生编排, F7): keeps NomiChat ALWAYS
+            {/* Content-area projection (会话原生编排, F7): keeps OpenHubChat ALWAYS
                 mounted and just toggles its visibility, overlaying a clicked DAG
                 worker node's read-only transcript when a node is projected. Node
                 clicks in the right canvas pane project the worker transcript into
                 this chat region; default main. */}
             <ConversationContentSwitcher>
-              <NomiChat
+              <OpenHubChat
                 conversation_id={conversation.id}
                 workspace={conversation.extra.workspace}
                 modelSelection={modelSelection}
@@ -485,7 +485,7 @@ const ChatConversation: React.FC<{
           backend:
             conversation?.type === 'acp'
               ? conversation?.extra?.backend
-              : // `nomi` conversations are handled by the early return above and can
+              : // `openhub` conversations are handled by the early return above and can
                 // never reach this branch, so the chain starts at `codex`.
                 conversation?.type === 'codex'
                 ? 'codex'

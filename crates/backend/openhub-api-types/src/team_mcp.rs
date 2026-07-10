@@ -249,7 +249,7 @@ impl OpenMcpConfig {
 /// mcp-computer-stdio` — an MCP server exposing the desktop computer-use
 /// capability as discrete tools (snapshot / click / type / launch / …), a thin
 /// facade over the in-tree `ComputerTool`, so codex/ACP get the same automation
-/// the nomi engine has (macOS AX / Windows UIA / Linux AT-SPI via `openhub-a11y`).
+/// the openhub engine has (macOS AX / Windows UIA / Linux AT-SPI via `openhub-a11y`).
 ///
 /// Like the open bridge this is STATELESS at the protocol level (no HTTP
 /// callback): it drives the local desktop directly, so it needs only the
@@ -273,7 +273,7 @@ impl ComputerMcpConfig {
 /// (P4-2 wiring). The session assembler injects `nomicore mcp-browser-stdio` —
 /// an MCP server exposing the browser-use capability as discrete tools
 /// (navigate / observe / click / type / …), a thin facade over the in-tree
-/// `BrowserTool`, so codex/ACP get the same self-hosted-CDP automation the nomi
+/// `BrowserTool`, so codex/ACP get the same self-hosted-CDP automation the openhub
 /// engine has.
 ///
 /// Like the open/computer bridges this is STATELESS at the protocol level (no
@@ -283,7 +283,7 @@ impl ComputerMcpConfig {
 /// R2 (no per-pet context): the bridge carries NO env-borne session context —
 /// it constructs `BrowserTool::new(&BrowserConfig::default())`, so `secret:NAME`
 /// fails closed (empty store) and downloads land in the data-dir sandbox. Per-pet
-/// credentials / workspace / persistent-login stay on the nomi engine path. See
+/// credentials / workspace / persistent-login stay on the openhub engine path. See
 /// `browser_stdio.rs` and the P4 plan decision D2.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct BrowserMcpConfig {

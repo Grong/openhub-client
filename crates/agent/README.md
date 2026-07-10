@@ -16,7 +16,7 @@ Current crates:
 | `openhub-skills` | Skill discovery, loading, and execution support. |
 | `openhub-memory` | Long-term project/user memory. |
 | `openhub-agent` | Core session engine and orchestration. |
-| `openhub-cli` | Standalone `nomi` CLI. |
+| `openhub-cli` | Standalone `openhub` CLI. |
 | `openhub-computer` | Desktop computer-use tool implementation. |
 | `openhub-a11y` | Accessibility helpers used by computer-use flows. |
 | `openhub-browser-engine` | Self-hosted browser/CDP automation engine. |

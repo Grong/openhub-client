@@ -82,7 +82,7 @@ pub struct FleetMember {
 **Files:** Modify `openhub-orchestrator/src/worker.rs`（build_worker_extra + run 透传成员富化）、`engine.rs`（compose_brief/dispatch 透传）、`plan.rs`（build_plan_user_prompt 读 member.description）；测试内联。
 
 **改动：**
-1. **worker persona**：`ConversationWorkerRunner::run` 已持 `member: &FleetMember`。`build_worker_extra` 增参，当 `member.system_prompt` 非空 → 设 `extra.preset_rules = member.system_prompt`（工厂 nomi.rs:29-34 会把 preset_rules 接在 system_prompt 后，得 `brief\n\npersona`）。
+1. **worker persona**：`ConversationWorkerRunner::run` 已持 `member: &FleetMember`。`build_worker_extra` 增参，当 `member.system_prompt` 非空 → 设 `extra.preset_rules = member.system_prompt`（工厂 openhub.rs:29-34 会把 preset_rules 接在 system_prompt 后，得 `brief\n\npersona`）。
 2. **worker 模型**：已天然继承（member.model 来自助手偏好，Task2 已解析）。无需改。
 3. **worker 技能**：调查最简 seam 并接入：
    - 优先尝试 (c) `send_message` 的 `inject_skills`（worker.rs:163 现传空 `vec![]`）→ 改传 `member.enabled_skills`。**先查 inject_skills 语义**（send_message 参数；若它确实把技能注入该回合则用之）。
@@ -106,7 +106,7 @@ pub struct FleetMember {
 
 ## Self-Review（spec §5）
 **覆盖：** 助手偏好模型可编辑→T1；agent_id→助手 + 自动纳入启用助手为角色→T2；worker 继承 persona/模型(+技能 if 可行)→T3；规划读助手描述→T3；capability 派生→T2。
-**风险：** 技能 seam 缺失(nomi 无 extra-key)→T3 调查+允许 BLOCKED 延后(persona+模型仍交付);FleetMember 富化向后兼容→serde default + 旧快照测试;caps 加 assistant 依赖无环(assistant 不依赖 gateway)→T2 build 闸;快照体积(persona 文本)→可接受。
+**风险：** 技能 seam 缺失(openhub 无 extra-key)→T3 调查+允许 BLOCKED 延后(persona+模型仍交付);FleetMember 富化向后兼容→serde default + 旧快照测试;caps 加 assistant 依赖无环(assistant 不依赖 gateway)→T2 build 闸;快照体积(persona 文本)→可接受。
 **自包含快照：** 引擎/worker 不依赖 assistant crate,属性在 caps 层富化进成员。
 
 ## Execution Handoff

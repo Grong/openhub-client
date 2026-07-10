@@ -19,10 +19,10 @@ import { usePendingConversation } from './PendingConversationContext';
  * right-aligned user bubble (same skin/position as the real one) plus a left
  * "正在创建会话…" loading bubble. When the backend id arrives the flow seeds the
  * SWR cache and navigates to the real conversation, which renders the same user
- * bubble (via NomiSendBox's optimistic echo) in the same place — so uncovering
+ * bubble (via OpenHubSendBox's optimistic echo) in the same place — so uncovering
  * this overlay is seamless.
  *
- * Layout mirrors {@link ChatLayout} + {@link NomiChat}: a header-height top
+ * Layout mirrors {@link ChatLayout} + {@link OpenHubChat}: a header-height top
  * spacer (min-h-44px + pt-8/pb-10 ≈ the real header) so the message area sits
  * at the same Y, a `px-20px` content column, and a composer-height bottom
  * spacer. Covers only the content region (mounted inside ConversationShell's

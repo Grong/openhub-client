@@ -136,7 +136,7 @@ impl ConversationRuntimeStateService {
 
     /// Read AND remove the conversation's accumulated token total. Returns
     /// `None` when nothing was recorded (no `TurnCompleted` seen — e.g. a
-    /// non-nomi engine, a turn that errored before completing, or a relay not
+    /// non-openhub engine, a turn that errored before completing, or a relay not
     /// wired with the runtime state). The orchestrator worker calls this once,
     /// after its turn settles, to populate the task's `tokens` — removing the
     /// entry keeps the map bounded and prevents a stale read on conversation-id

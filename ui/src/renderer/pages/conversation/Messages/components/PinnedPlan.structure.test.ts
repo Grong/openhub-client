@@ -8,8 +8,8 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, test } from 'bun:test';
 
 const source = readFileSync(new URL('./PinnedPlan.tsx', import.meta.url), 'utf8');
-const nomiChatSource = readFileSync(new URL('../../platforms/nomi/NomiChat.tsx', import.meta.url), 'utf8');
-const nomiSendBoxSource = readFileSync(new URL('../../platforms/nomi/NomiSendBox.tsx', import.meta.url), 'utf8');
+const nomiChatSource = readFileSync(new URL('../../platforms/openhub/OpenHubChat.tsx', import.meta.url), 'utf8');
+const nomiSendBoxSource = readFileSync(new URL('../../platforms/openhub/OpenHubSendBox.tsx', import.meta.url), 'utf8');
 const sendBoxSource = readFileSync(new URL('../../../../components/chat/SendBox/index.tsx', import.meta.url), 'utf8');
 
 describe('PinnedPlan compact composer layout', () => {

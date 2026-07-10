@@ -58,7 +58,7 @@ async def main():
 # 列能力（精瘦 agent 档）
 curl -s "http://$HOST:25808/v1/tools?profile=agent" -H "Authorization: Bearer $TOKEN"
 
-# 委派一个目标（一句话把活交给一个自治 nomi agent）
+# 委派一个目标（一句话把活交给一个自治 openhub agent）
 curl -s -X POST "http://$HOST:25808/v1/tools/openhub_agent_run" \
   -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
   -d '{"goal":"调研竞品定价并写入 notes.md","timeout_secs":600}'

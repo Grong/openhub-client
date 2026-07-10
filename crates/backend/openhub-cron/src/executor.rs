@@ -555,7 +555,7 @@ impl JobExecutor {
         // The interactive `send_message` path resolves the model by parsing
         // `conversation.model` via
         // `openhub_conversation::task_options::provider_model_from_conversation_row`.
-        // Cron routes through the same helper so that an nomi job whose
+        // Cron routes through the same helper so that an openhub job whose
         // cached `agent_config.backend` is a stale vendor label (`"openhub"`)
         // cannot reach the factory and raise `Provider 'openhub' not found`
         // (Sentry ELECTRON-1HM). `resolve_conversation` (called by
@@ -611,7 +611,7 @@ impl JobExecutor {
         let requested_workspace_missing = workspace.trim().is_empty();
 
         // Resolve this conversation instance's identity (row `created_at`) for
-        // nomi session ownership validation; best-effort (None skips it).
+        // openhub session ownership validation; best-effort (None skips it).
         let conversation_created_at = self
             .get_conversation_row(conversation_id)
             .await
@@ -1097,14 +1097,14 @@ async fn parse_agent_type(registry: &AgentRegistry, agent_type_str: &str) -> Age
         .unwrap_or(AgentType::Acp)
 }
 
-/// Only nomi conversations carry meaningful model info in `conversations.model`;
+/// Only openhub conversations carry meaningful model info in `conversations.model`;
 /// ACP and other agent types ignore this field and resolve the model via their own
 /// mechanisms (catalog defaults, CLI flags, etc.). Returning `None` lets the
 /// `CreateConversationRequest.model` stay `None` for those types, which is the
 /// correct semantic.
 ///
-/// For nomi, `agent_config.backend` holds the provider_id (a DB hash, not a
-/// vendor label). `CronService::add_job`/`update_job` already rejects nomi
+/// For openhub, `agent_config.backend` holds the provider_id (a DB hash, not a
+/// vendor label). `CronService::add_job`/`update_job` already rejects openhub
 /// jobs lacking this field, so the `None` return here is defensive for any
 /// legacy in-memory row that somehow slipped through.
 fn resolve_model(job: &CronJob) -> Option<ProviderWithModel> {
@@ -1172,7 +1172,7 @@ async fn inject_agent_identity(
     }
 }
 
-/// Inject the cron-configured model into `extra` for ACP (non-nomi) agents.
+/// Inject the cron-configured model into `extra` for ACP (non-openhub) agents.
 ///
 /// ACP agents do **not** read `conversations.model` — `resolve_model`
 /// deliberately returns `None` for them. They pick up their model from the
@@ -1180,7 +1180,7 @@ async fn inject_agent_identity(
 /// seeds into its desired model and reconciles via `session/set_model` once
 /// the session advertises its model catalog.
 ///
-/// nomi is excluded: it resolves its model through the top-level
+/// openhub is excluded: it resolves its model through the top-level
 /// `CreateConversationRequest.model` provider path instead, so emitting
 /// `current_model_id` here would be both redundant and off-channel.
 fn inject_acp_current_model(extra: &mut serde_json::Map<String, serde_json::Value>, job: &CronJob) {
@@ -1749,7 +1749,7 @@ mod tests {
 
     #[test]
     fn resolve_model_returns_none_for_acp() {
-        // Model info only applies to nomi; ACP ignores it.
+        // Model info only applies to openhub; ACP ignores it.
         let job = sample_job();
         assert!(resolve_model(&job).is_none());
     }
@@ -1791,7 +1791,7 @@ mod tests {
             }),
             ..sample_job()
         };
-        let model = resolve_model(&job).expect("nomi + full config returns Some");
+        let model = resolve_model(&job).expect("openhub + full config returns Some");
         assert_eq!(model.provider_id, "4056cdea");
         assert_eq!(model.model, "gpt-5");
     }
@@ -1815,7 +1815,7 @@ mod tests {
             }),
             ..sample_job()
         };
-        let model = resolve_model(&job).expect("nomi without model_id still returns Some");
+        let model = resolve_model(&job).expect("openhub without model_id still returns Some");
         assert_eq!(model.provider_id, "4056cdea");
         assert_eq!(model.model, "default");
     }
@@ -1930,10 +1930,10 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn build_task_extra_omits_current_model_id_for_nomi() {
-        // nomi resolves model via the top-level conversation.model provider
+    async fn build_task_extra_omits_current_model_id_for_openhub() {
+        // openhub resolves model via the top-level conversation.model provider
         // path, never `current_model_id`. The ACP injection must not bleed
-        // into the nomi branch.
+        // into the openhub branch.
         let registry = hydrated_registry().await;
         let job = CronJob {
             agent_type: "openhub".into(),
@@ -2057,8 +2057,8 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn build_conversation_extra_omits_current_model_id_for_nomi() {
-        // nomi must keep resolving its model through the top-level
+    async fn build_conversation_extra_omits_current_model_id_for_openhub() {
+        // openhub must keep resolving its model through the top-level
         // conversation.model provider path, never `current_model_id`.
         let registry = hydrated_registry().await;
         let job = CronJob {

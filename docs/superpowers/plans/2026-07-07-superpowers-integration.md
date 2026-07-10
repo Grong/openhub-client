@@ -4,7 +4,7 @@
 
 **Goal:** 把 obra/superpowers 技能库内置进openhub按周期从 GitHub Release 自动热更新、并在编码场景自动注入引导使技能自动触发。
 
-**Architecture:** 单一物化目录（embedded baseline + 热更新 overlay，overlay 优先）→ 两条喂入（nomi 走 `AgentBootstrap::extra_skill_dirs`，ACP 走 `link_workspace_skills` → `.claude/skills`）→ 会话级编码场景判定决定是否注入 `using-superpowers` 引导。热更新是 `openhub-extension` 内的下载/校验/原子替换模块 + `openhub-app` 的周期 janitor。
+**Architecture:** 单一物化目录（embedded baseline + 热更新 overlay，overlay 优先）→ 两条喂入（openhub 走 `AgentBootstrap::extra_skill_dirs`，ACP 走 `link_workspace_skills` → `.claude/skills`）→ 会话级编码场景判定决定是否注入 `using-superpowers` 引导。热更新是 `openhub-extension` 内的下载/校验/原子替换模块 + `openhub-app` 的周期 janitor。
 
 **Tech Stack:** Rust（tokio, include_dir, zip, sha2, fs2, reqwest via openhub-net）；工作区 crate：`openhub-extension`、`openhub-ai-agent`、`openhub-app`、`openhub-agent`。
 
@@ -12,7 +12,7 @@
 - 提交作者 = openhub（openhubusers.noreply.github.com`），**禁止** Co-Authored-By trailer。
 - 交流中文；平台 Windows x64，路径需处理 `\`/drive-letter；复用现有 `retry_startup_file_op`（容忍 os error 5/32/33）。
 - 不 panic、不阻断：热更新/场景判定任何失败都 warn 并降级，绝不影响既有会话。
-- superpowers 技能一律 **inline**（nomi 后端无 spawner，fork 不可用）；保留上游 `LICENSE` 与署名，不改技能正文。
+- superpowers 技能一律 **inline**（openhub 后端无 spawner，fork 不可用）；保留上游 `LICENSE` 与署名，不改技能正文。
 - 前端若涉改用 `bun run build` 验证（本期 P1/P2 预期不涉前端）。
 - 每任务：写失败测试 → 看它失败 → 最小实现 → 看它通过 → `cargo test -p <crate>` 绿 → 提交。
 
@@ -26,13 +26,13 @@
 - 新增 `crates/backend/openhub-extension/src/zip_safe.rs`：从 `skill_service.rs` 提升的 `extract_zip_archive`/`safe_zip_entry_path`/`reject_zip_symlink`。
 - 修改 `crates/backend/openhub-extension/src/{lib.rs,error.rs,constants.rs,Cargo.toml}`。
 - 新增 `crates/backend/openhub-ai-agent/src/capability/superpowers_scenario.rs`：`is_coding_scenario` + 引导文本常量。
-- 修改 `crates/backend/openhub-ai-agent/src/factory/nomi.rs` + `manager/openhub/agent.rs`：编码场景→`extra_skill_dirs` + 追加引导。
+- 修改 `crates/backend/openhub-ai-agent/src/factory/openhub.rs` + `manager/openhub/agent.rs`：编码场景→`extra_skill_dirs` + 追加引导。
 - 修改 `crates/backend/openhub-app/src/router/{routes.rs,state.rs}`：`spawn_superpowers_updater` janitor。
 - 修改 `crates/backend/openhub-ai-agent/src/capability/{prompt_pipeline 相关}`：ACP `PreSendHook` 引导（P2.5）。
 
 ---
 
-## Phase 1 — 内置 + nomi 喂入 + 场景引导（核心，先交付）
+## Phase 1 — 内置 + openhub 喂入 + 场景引导（核心，先交付）
 
 ### Task 1: 内置 superpowers 语料库 + 嵌入常量 + 指纹
 **Files:** Create `assets/superpowers/**`（从本机缓存 `~/.claude/plugins/.../superpowers/6.0.3/skills` + `LICENSE` 拷入）、`src/superpowers/mod.rs`；Modify `src/lib.rs`、`Cargo.toml`(若需 include_dir 已在依赖则免)。Test: `src/superpowers/mod.rs` 内 `#[cfg(test)]`。
@@ -63,21 +63,21 @@
 
 ### Task 4: 编码场景判定
 **Files:** Create `crates/backend/openhub-ai-agent/src/capability/superpowers_scenario.rs`；Modify `capability/mod.rs`(声明) 。
-**Interfaces — Produces:** `pub struct ScenarioSignals { pub workspace: Option<PathBuf>, pub file_tools_enabled: bool, pub scenario_tags: Vec<String> }`；`pub fn is_coding_scenario(sig:&ScenarioSignals) -> bool`；`pub const SUPERPOWERS_BOOTSTRAP: &str`（nomi 语气的 using-superpowers 引导，精炼版）。
+**Interfaces — Produces:** `pub struct ScenarioSignals { pub workspace: Option<PathBuf>, pub file_tools_enabled: bool, pub scenario_tags: Vec<String> }`；`pub fn is_coding_scenario(sig:&ScenarioSignals) -> bool`；`pub const SUPERPOWERS_BOOTSTRAP: &str`（openhub 语气的 using-superpowers 引导，精炼版）。
 - [ ] Step1 失败测试：workspace 含 `Cargo.toml`/`package.json`→true；`file_tools_enabled=true`→true；`scenario_tags=["coding"]`→true；三者皆空/否→false。
 - [ ] Step2 FAIL。
 - [ ] Step3 实现纯函数（检测 workspace 下已知工程清单文件；或 file_tools_enabled；或含 coding tag）。
 - [ ] Step4 绿。
 - [ ] Step5 提交 `feat(superpowers): coding-scenario detector + bootstrap text`。
 
-### Task 5: nomi 喂入 + 引导注入
-**Files:** Modify `factory/nomi.rs`、`manager/openhub/agent.rs`（先精读确认 `extra_skill_dirs` 挂载点与 system_prompt 组装点）。Test: `factory/nomi.rs` 内单测（近似）。
+### Task 5: openhub 喂入 + 引导注入
+**Files:** Modify `factory/openhub.rs`、`manager/openhub/agent.rs`（先精读确认 `extra_skill_dirs` 挂载点与 system_prompt 组装点）。Test: `factory/openhub.rs` 内单测（近似）。
 **Interfaces — Consumes:** Task3 `effective_superpowers_dir`、Task4 `is_coding_scenario`/`SUPERPOWERS_BOOTSTRAP`、既有 `AgentBootstrap::extra_skill_dirs`。
 - [ ] Step1 失败测试：给定编码场景的 resolved config，组装后的 `system_prompt` 含 `SUPERPOWERS_BOOTSTRAP` 标记串；非编码场景不含；且 bootstrap 编码场景下追加于 persona 之后（可查子串顺序）。
 - [ ] Step2 FAIL。
 - [ ] Step3 实现：在 system_prompt 组装链（`compose_subagent_hint` 同款位置）按场景追加引导；把 `effective_superpowers_dir(data_dir)` 经 config/overrides 传到 `NomiAgentManager`→`AgentBootstrap::extra_skill_dirs`。
 - [ ] Step4 `cargo test -p openhub-ai-agent` 相关绿。
-- [ ] Step5 提交 `feat(superpowers): feed skills to nomi engine + inject bootstrap on coding scenarios`。
+- [ ] Step5 提交 `feat(superpowers): feed skills to openhub engine + inject bootstrap on coding scenarios`。
 
 ### Task 6: 启动物化接线
 **Files:** Modify 后端启动装配处（`openhub-app` bootstrap，与既有 builtin-skills `materialize_if_needed` 调用相邻）。
@@ -167,7 +167,7 @@
 ---
 
 ## 交付状态（2026-07-07）
-- ✅ **Phase 1 已交付**（T1–T6）：内置语料库 + 启动物化 + 有效目录 + 编码场景判定 + nomi `extra_skill_dirs` 喂入 + `using-superpowers` 引导注入。openhub-ai-agent 619 / openhub-extension 403 lib 测试全绿，openhub-app 编译通过。
+- ✅ **Phase 1 已交付**（T1–T6）：内置语料库 + 启动物化 + 有效目录 + 编码场景判定 + openhub `extra_skill_dirs` 喂入 + `using-superpowers` 引导注入。openhub-ai-agent 619 / openhub-extension 403 lib 测试全绿，openhub-app 编译通过。
 - ✅ **Phase 2 已交付**（T7–T11）：zip 安全共享化 + Download/Verify 错误 + GitHub 下载/校验/原子替换 overlay + 查询最新 Release + 周期 janitor（默认开，env 可调）。全部纯逻辑单测覆盖。
 - ⏸️ **Phase 2.5（ACP）未实现，作为后续项**（已评估成本/风险）：真实 ACP 编码场景 = 用户选自己的仓库（custom workspace）。
   - **MVP（light/temp 工作区）**：成本低(~70-90 LOC，复用 `link_workspace_skills`+`compose_superpowers_bootstrap`)、风险低（条件注入 + 幂等 first-write-wins 不覆盖用户技能），但**基本打不中**——ACP temp 工作区创建时为空目录判不出编码场景；custom 工作区被现有 `!is_custom_workspace` 门控禁链且强制 heavy 模式。低价值。

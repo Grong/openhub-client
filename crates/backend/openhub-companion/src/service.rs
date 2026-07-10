@@ -122,7 +122,7 @@ pub struct CompanionService {
     /// Resolved skill paths (`{data_dir}/skills/...`), shared with the evolution
     /// engine and the agent-facing skill sink.
     skill_paths: Arc<SkillPaths>,
-    /// Companion thread management (real nomi conversations). Unset when the
+    /// Companion thread management (real openhub conversations). Unset when the
     /// host wires the companion without a conversation service (tests).
     companion: tokio::sync::OnceCell<CompanionThreads>,
     /// Session-window archiver; late-wired (with a real conversation port) in
@@ -147,7 +147,7 @@ impl CompanionService {
         // Pre-rename installs keep their data under `{data}/pet`; move it to
         // `{data}/companion` before anything reads the new paths. Best-effort.
         crate::migrate::migrate_pet_dir_to_companion(data_dir);
-        // Legacy companion/nomi → companion/shared + first companion. Idempotent; an io error
+        // Legacy companion/openhub → companion/shared + first companion. Idempotent; an io error
         // must never brick boot (the legacy data stays where it was).
         let first_companion_id = match crate::migrate::migrate_legacy_layout(data_dir) {
             Ok(id) => id,
@@ -1292,7 +1292,7 @@ impl CompanionService {
 }
 
 /// The factory-facing persona prompt provider: channel master-agent sessions
-/// carry `companionSession` but no persisted `system_prompt`, so the nomi factory
+/// carry `companionSession` but no persisted `system_prompt`, so the openhub factory
 /// asks the bound companion for a fresh persona (with current memory snapshot) at
 /// every agent build. The persona is built **only** for an explicitly-bound, live
 /// companion; `companion_id: None` or a dead id yields no persona — an unbound

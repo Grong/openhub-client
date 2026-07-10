@@ -146,7 +146,7 @@ pub struct TurnCompletedEventData {
 
 /// Cross-backend normalized "why did the turn end" reason. Deliberately NOT the
 /// ACP SDK's `StopReason` so the shared event type does not couple to ACP
-/// (nomi / openclaw / remote are not ACP); each backend maps its own outcome.
+/// (openhub / openclaw / remote are not ACP); each backend maps its own outcome.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[ts(export, export_to = "../../../../ui/src/common/protocolBindings/")]
 #[serde(rename_all = "snake_case")]

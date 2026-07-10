@@ -48,7 +48,7 @@ pub use store::CompanionStore;
 /// Legacy single-companion directory (under the backend data dir). Kept only so
 /// boot can detect and migrate a pre-multi-companion install; new code must use
 /// [`COMPANION_SHARED_REL_DIR`] / [`COMPANION_COMPANIONS_REL_DIR`].
-pub const COMPANION_REL_DIR: &str = "companion/nomi";
+pub const COMPANION_REL_DIR: &str = "companion/openhub";
 
 /// Shared multi-companion artifacts (under the backend data dir): shared
 /// `config.json`, `events/*.jsonl`, `memory.db`.

@@ -17,7 +17,7 @@ use openhub_db::{IModelProfileRepository, IProviderRepository, models::Provider}
 use regex::Regex;
 use tracing::{info, warn};
 
-use crate::factory::nomi::{
+use crate::factory::openhub::{
     map_openhub_provider, resolve_bedrock_config, resolve_openhub_url_and_compat,
 };
 use crate::types::NomiResolvedConfig;

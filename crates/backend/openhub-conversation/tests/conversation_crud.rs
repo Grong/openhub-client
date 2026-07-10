@@ -155,7 +155,7 @@ async fn t1_1_create_with_defaults() {
     assert!(resp.created_at > 0);
     assert_eq!(resp.created_at, resp.modified_at);
 
-    // Non-nomi: top-level model is None.
+    // Non-openhub: top-level model is None.
     assert!(resp.model.is_none(), "ACP response should not carry top-level model");
 
     // WebSocket event
@@ -259,7 +259,7 @@ async fn t1_2_create_each_agent_type() {
         let resp = svc.create(USER_ID, req).await.unwrap();
         assert_eq!(resp.r#type, expected_type, "Type mismatch for {type_str}");
         if type_str == "openhub" {
-            assert!(resp.model.is_some(), "nomi should keep top-level model");
+            assert!(resp.model.is_some(), "openhub should keep top-level model");
         } else {
             assert!(resp.model.is_none(), "{type_str} should have no top-level model");
         }
@@ -497,7 +497,7 @@ async fn t4_4_extra_merge_preserves_existing_keys() {
 async fn t4_5_update_model() {
     let (svc, _, task_mgr) = setup().await;
 
-    // Top-level model updates are only valid on nomi conversations
+    // Top-level model updates are only valid on openhub conversations
     // (Task 8 enforces the openhub-only rule in update).
     let create_req: CreateConversationRequest = serde_json::from_value(json!({
         "type": "openhub",
@@ -745,7 +745,7 @@ async fn create_rejects_top_level_model_for_remote() {
 }
 
 #[tokio::test]
-async fn create_accepts_top_level_model_for_nomi() {
+async fn create_accepts_top_level_model_for_openhub() {
     let (svc, _, _task_mgr) = setup().await;
 
     let req: CreateConversationRequest = serde_json::from_value(json!({
@@ -757,7 +757,7 @@ async fn create_accepts_top_level_model_for_nomi() {
 
     let resp = svc.create(USER_ID, req).await.unwrap();
     assert_eq!(resp.r#type, AgentType::Nomi);
-    let model = resp.model.expect("nomi response should carry top-level model");
+    let model = resp.model.expect("openhub response should carry top-level model");
     assert_eq!(model.provider_id, "p1");
     assert_eq!(model.model, "gpt-4o");
 }
@@ -779,7 +779,7 @@ async fn create_openhub_strips_extra_model_field() {
     let resp = svc.create(USER_ID, req).await.unwrap();
     assert!(
         !resp.extra.as_object().unwrap().contains_key("model"),
-        "nomi create must strip extra.model to avoid dual source of truth; got {:?}",
+        "openhub create must strip extra.model to avoid dual source of truth; got {:?}",
         resp.extra
     );
     // Top-level model is still present and wins.
@@ -804,7 +804,7 @@ async fn update_rejects_top_level_model_for_acp() {
 }
 
 #[tokio::test]
-async fn update_accepts_top_level_model_for_nomi() {
+async fn update_accepts_top_level_model_for_openhub() {
     let (svc, _, task_mgr) = setup().await;
 
     let create_req: CreateConversationRequest = serde_json::from_value(json!({
@@ -825,7 +825,7 @@ async fn update_accepts_top_level_model_for_nomi() {
 
 #[tokio::test]
 async fn update_non_openhub_extra_model_does_not_kill_task() {
-    // Verifies the explicit rule that `extra.model` changes for non-nomi
+    // Verifies the explicit rule that `extra.model` changes for non-openhub
     // do NOT trigger task_manager.kill. Since our `NoopTaskManager::kill` is
     // a no-op we can't assert the negative directly; we assert the update
     // succeeds and the merged extra carries the new field, and that top-level
@@ -854,7 +854,7 @@ async fn update_openhub_strips_extra_model_from_patch() {
     .unwrap();
     let conv = svc.create(USER_ID, create_req).await.unwrap();
 
-    // Client mistakenly sends extra.model on an nomi PATCH. It should be
+    // Client mistakenly sends extra.model on an openhub PATCH. It should be
     // silently stripped from the merged extra, not persisted.
     let req: UpdateConversationRequest = serde_json::from_value(json!({
         "extra": { "model": "legacy-value", "last_token_usage": { "total_tokens": 42 } }
@@ -864,7 +864,7 @@ async fn update_openhub_strips_extra_model_from_patch() {
 
     assert!(
         !updated.extra.as_object().unwrap().contains_key("model"),
-        "nomi PATCH must strip extra.model; got {:?}",
+        "openhub PATCH must strip extra.model; got {:?}",
         updated.extra
     );
     // Other extra keys from the patch are merged as usual.

@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { ipcBridge } from '@/common';
 import type { IMcpRegisterTemplate } from '@/common/adapter/ipcBridge';
 import CopyIconButton from '@/renderer/components/base/CopyIconButton';
-import NomiCollapse from '@/renderer/components/base/NomiCollapse';
+import OpenHubCollapse from '@/renderer/components/base/OpenHubCollapse';
 
 /**
  * Collapsible panel showing copyable MCP registration templates for
@@ -39,8 +39,8 @@ const PlatformMcpRegisterPanel: React.FC = () => {
 
   return (
     <div>
-      <NomiCollapse onChange={handleCollapseChange} bordered={false}>
-        <NomiCollapse.Item
+      <OpenHubCollapse onChange={handleCollapseChange} bordered={false}>
+        <OpenHubCollapse.Item
           name='mcp-register'
           header={
             <span className='text-13px text-t-tertiary'>
@@ -90,8 +90,8 @@ const PlatformMcpRegisterPanel: React.FC = () => {
               {t('terminal.create.mcpPanel.loading', { defaultValue: '加载中...' })}
             </p>
           )}
-        </NomiCollapse.Item>
-      </NomiCollapse>
+        </OpenHubCollapse.Item>
+      </OpenHubCollapse>
     </div>
   );
 };

@@ -23,8 +23,8 @@ import { Help, Down, Plus } from '@icon-park/react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useConfigModelListWithImage from '@/renderer/hooks/agent/useConfigModelListWithImage';
-import NomiScrollArea from '@/renderer/components/base/NomiScrollArea';
-import NomiSelect from '@/renderer/components/base/NomiSelect';
+import OpenHubScrollArea from '@/renderer/components/base/OpenHubScrollArea';
+import OpenHubSelect from '@/renderer/components/base/OpenHubSelect';
 import AddMcpServerModal from '@/renderer/pages/settings/components/AddMcpServerModal';
 import McpServerItem from '@/renderer/pages/settings/ToolsSettings/McpServerItem';
 import { useMcpServers, useMcpConnection, useMcpModal, useMcpServerCRUD, useMcpOAuth } from '@/renderer/hooks/mcp';
@@ -155,10 +155,10 @@ const SpeechToTextSettingsSection: React.FC<{
 
           <Form layout='horizontal' labelAlign='left' className='space-y-12px'>
             <Form.Item label={t('settings.speechToTextProvider')}>
-              <NomiSelect value={config.provider} onChange={handleProviderChange}>
-                <NomiSelect.Option value='openai'>{t('settings.speechToTextProviderOpenAI')}</NomiSelect.Option>
-                <NomiSelect.Option value='deepgram'>{t('settings.speechToTextProviderDeepgram')}</NomiSelect.Option>
-              </NomiSelect>
+              <OpenHubSelect value={config.provider} onChange={handleProviderChange}>
+                <OpenHubSelect.Option value='openai'>{t('settings.speechToTextProviderOpenAI')}</OpenHubSelect.Option>
+                <OpenHubSelect.Option value='deepgram'>{t('settings.speechToTextProviderDeepgram')}</OpenHubSelect.Option>
+              </OpenHubSelect>
             </Form.Item>
 
             {config.provider === 'openai' ? (
@@ -428,7 +428,7 @@ const ModalMcpManagementSection: React.FC<{
             {t('settings.mcpNoServersFound')}
           </div>
         ) : (
-          <NomiScrollArea
+          <OpenHubScrollArea
             className={classNames('max-h-360px', isPageMode && 'max-h-none')}
             disableOverflow={isPageMode}
           >
@@ -462,7 +462,7 @@ const ModalMcpManagementSection: React.FC<{
                 />
               ))}
             </div>
-          </NomiScrollArea>
+          </OpenHubScrollArea>
         )}
       </div>
 
@@ -731,12 +731,12 @@ const ToolsModalContent: React.FC = () => {
       {mcpMessageContext}
 
       {/* Content Area */}
-      <NomiScrollArea className='flex-1 min-h-0 pb-16px' disableOverflow={isPageMode}>
+      <OpenHubScrollArea className='flex-1 min-h-0 pb-16px' disableOverflow={isPageMode}>
         <div className='space-y-16px'>
           {/* MCP 工具配置 */}
           <div className='px-[12px] md:px-[32px] py-[24px] bg-2 rd-12px md:rd-16px flex flex-col min-h-0 border border-border-2'>
             <div className='flex-1 min-h-0'>
-              <NomiScrollArea
+              <OpenHubScrollArea
                 className={classNames('h-full', isPageMode && 'overflow-visible')}
                 disableOverflow={isPageMode}
               >
@@ -748,7 +748,7 @@ const ToolsModalContent: React.FC = () => {
                   saveMcpServers={saveMcpServers}
                   isPageMode={isPageMode}
                 />
-              </NomiScrollArea>
+              </OpenHubScrollArea>
             </div>
           </div>
           {/* 图像生成 */}
@@ -786,7 +786,7 @@ const ToolsModalContent: React.FC = () => {
                 }
               >
                 {imageGenerationModelList.length > 0 ? (
-                  <NomiSelect
+                  <OpenHubSelect
                     value={
                       imageGenerationModel?.id && imageGenerationModel?.use_model
                         ? `${imageGenerationModel.id}|${imageGenerationModel.use_model}`
@@ -804,15 +804,15 @@ const ToolsModalContent: React.FC = () => {
                     }}
                   >
                     {imageGenerationModelList.map(({ models, ...platform }) => (
-                      <NomiSelect.OptGroup label={platform.name} key={platform.id}>
+                      <OpenHubSelect.OptGroup label={platform.name} key={platform.id}>
                         {models.map((modelName) => (
-                          <NomiSelect.Option key={platform.id + modelName} value={platform.id + '|' + modelName}>
+                          <OpenHubSelect.Option key={platform.id + modelName} value={platform.id + '|' + modelName}>
                             {modelName}
-                          </NomiSelect.Option>
+                          </OpenHubSelect.Option>
                         ))}
-                      </NomiSelect.OptGroup>
+                      </OpenHubSelect.OptGroup>
                     ))}
-                  </NomiSelect>
+                  </OpenHubSelect>
                 ) : (
                   <div className='text-t-secondary flex items-center'>
                     {t('settings.noAvailable')}
@@ -849,7 +849,7 @@ const ToolsModalContent: React.FC = () => {
           </div>
           <SpeechToTextSettingsSection config={speechToTextConfig} onChange={updateSpeechToTextConfig} />
         </div>
-      </NomiScrollArea>
+      </OpenHubScrollArea>
     </div>
   );
 };

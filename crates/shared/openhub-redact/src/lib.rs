@@ -20,7 +20,7 @@ static BEARER_TOKEN_REGEX: LazyLock<Regex> =
 static SECRET_ASSIGNMENT_REGEX: LazyLock<Regex> = LazyLock::new(|| {
     compile(r#"(?i)\b(api[_-]?key|token|secret|password)\b(\s*[:=]\s*)(["']?)[^\s"']{8,}"#)
 });
-// nomi 增量第 5 条：PEM 私钥块。命中即把整块 BEGIN..END 抹掉。
+// openhub 增量第 5 条：PEM 私钥块。命中即把整块 BEGIN..END 抹掉。
 static PEM_PRIVATE_KEY_REGEX: LazyLock<Regex> = LazyLock::new(|| {
     compile(
         r"(?s)-----BEGIN (?:RSA |EC |OPENSSH |DSA |PGP )?PRIVATE KEY-----.*?-----END (?:RSA |EC |OPENSSH |DSA |PGP )?PRIVATE KEY-----",

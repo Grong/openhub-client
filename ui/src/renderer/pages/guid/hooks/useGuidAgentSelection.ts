@@ -82,7 +82,7 @@ export type GuidAgentSelectionResult = {
  *   1. Handshake `available_modes.current_mode_id` from `/api/agents`
  *   2. First entry of handshake `available_modes`
  *   3. First entry of the static `AGENT_MODES` table
- *   4. Literal `'default'` (legacy fallback — only correct for claude/qwen/gemini/nomi)
+ *   4. Literal `'default'` (legacy fallback — only correct for claude/qwen/gemini/openhub)
  *
  * This mirrors the runtime fallback inside `AgentModeSelector` so the
  * parent-held `selectedMode` stays in sync with what the UI shows.
@@ -472,7 +472,7 @@ export const useGuidAgentSelection = ({
         let yoloMode = false;
 
         if (configKey === 'openhub') {
-          const config = configService.get('nomi.config');
+          const config = configService.get('openhub.config');
           preferred = config?.preferredMode;
         } else {
           const config = configService.get('acp.config');

@@ -59,7 +59,7 @@ pub use workpath::{DEFAULT_WORKPATH_KEY, WORKPATH_BINDING_KIND, session_workpath
 /// `.gitignore`, see `mount.rs`).
 pub const KB_MOUNT_REL_DIR: &str = ".openhub/knowledge";
 
-/// Pre-`.nomi` mount location. Kept solely so `mount::sync_mounts` can sweep
+/// Pre-`.openhub` mount location. Kept solely so `mount::sync_mounts` can sweep
 /// leftover links/scaffolding out of workspaces created before the rename —
 /// never mount anything here.
 pub const KB_LEGACY_MOUNT_REL_DIR: &str = ".openhub/knowledge";

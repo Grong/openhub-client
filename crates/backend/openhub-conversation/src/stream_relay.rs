@@ -376,7 +376,7 @@ pub struct StreamRelay {
     /// error AT SOURCE — it does NOT forward the WS error event NOR persist the
     /// error `tips` row — so a recovered fault shows only the backup model's turn,
     /// never the swallowed error. `None` (the default) = never suppress. The
-    /// send loop is the only caller that wires this (it knows nomi + enabled +
+    /// send loop is the only caller that wires this (it knows openhub + enabled +
     /// within-bound up front; pre-response + provider-fault are evaluated here).
     #[allow(clippy::type_complexity)]
     failover_suppressor: Option<Arc<dyn Fn(AgentErrorCode) -> bool + Send + Sync>>,

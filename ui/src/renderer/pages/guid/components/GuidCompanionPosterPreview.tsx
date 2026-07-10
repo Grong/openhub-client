@@ -9,7 +9,7 @@ import CompanionAvatar from '@/renderer/pages/companion/CompanionAvatar';
 import { CHARACTERS } from '@/renderer/pages/companion/characters';
 import type { CompanionActivity, CompanionMood, CustomFigureMeta } from '@/renderer/pages/companion/characters';
 import { customFigureMetaOf } from '@/renderer/pages/companion/characters/customMeta';
-import { useCompanions } from '@/renderer/pages/nomi/useNomi';
+import { useCompanions } from '@/renderer/pages/openhub/useOpenHub';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from '../index.module.css';
@@ -50,7 +50,7 @@ const GuidCompanionPosterPreview: React.FC = () => {
 
     return CHARACTERS.slice(0, 3).map((character, index) => ({
       id: character.id,
-      name: t(`nomi.characters.${character.nameKey}.name`),
+      name: t(`openhub.characters.${character.nameKey}.name`),
       character: character.id,
       mood: POSTER_MOODS[index % POSTER_MOODS.length],
       activity: 'idle' as const,

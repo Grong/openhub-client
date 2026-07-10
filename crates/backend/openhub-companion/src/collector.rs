@@ -39,7 +39,7 @@ pub type SharedConfig = Arc<RwLock<SharedCompanionConfig>>;
 pub struct Collector {
     companion_dir: PathBuf,
     config: SharedConfig,
-    /// Companion-thread membership + XP. Companion conversations are nomi
+    /// Companion-thread membership + XP. Companion conversations are openhub
     /// talking — they must never feed the learner (self-learning loop), but
     /// each completed companion turn earns XP.
     store: crate::store::CompanionStore,
@@ -135,7 +135,7 @@ impl Collector {
         }
     }
 
-    /// True when the conversation is a companion thread (nomi's own chats).
+    /// True when the conversation is a companion thread (openhub's own chats).
     /// Errors degrade to `false` — collection proceeds, XP is skipped.
     async fn is_companion(&self, conversation_id: &str) -> bool {
         self.store
@@ -723,7 +723,7 @@ mod tests {
         collector
             .handle(&WebSocketMessage::new(
                 "message.userCreated",
-                serde_json::json!({"conversation_id": "conv_companion", "content": "你好 nomi"}),
+                serde_json::json!({"conversation_id": "conv_companion", "content": "你好 openhub"}),
             ))
             .await;
         // Normal conversation user message: collected.

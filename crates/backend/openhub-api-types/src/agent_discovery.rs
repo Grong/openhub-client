@@ -19,7 +19,7 @@ use std::path::PathBuf;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum AgentSource {
-    /// Ships with the backend binary (no CLI install required — e.g. `nomi`).
+    /// Ships with the backend binary (no CLI install required — e.g. `openhub`).
     Internal,
     /// Seeded from the migration (ACP vendors, nanobot, openclaw).
     Builtin,

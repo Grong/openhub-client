@@ -14,7 +14,7 @@
 //! "master agent": one conversation through which the user can see and drive
 //! everything running on the desktop. Agents reach this server through the
 //! `nomicore mcp-gateway-stdio` bridge (claude / codex / gemini advertise
-//! stdio-only MCP capabilities; the nomi engine consumes the same bridge), and
+//! stdio-only MCP capabilities; the openhub engine consumes the same bridge), and
 //! every tool call is forwarded back here as an authenticated `POST /tool`.
 //!
 //! ## Shape (third instance of the house pattern)
@@ -33,7 +33,7 @@ pub mod browser_registry;
 pub mod computer_registry;
 
 // ── legacy helper modules retained for shared pure logic ─────────────────
-// `tools_provider` keeps the nomi model-resolution chain (used by the cron +
+// `tools_provider` keeps the openhub model-resolution chain (used by the cron +
 // conversation capabilities); `tools_terminal` keeps `preset_launch` (used by
 // the terminal capabilities). `tools_browser` is the not-yet-migrated browser
 // domain, still dispatched by the legacy match in `server.rs` under coexistence.

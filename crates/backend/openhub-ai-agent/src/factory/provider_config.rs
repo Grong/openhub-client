@@ -14,7 +14,7 @@ use openhub_db::IProviderRepository;
 
 use crate::types::NomiCompatOverrides;
 
-use super::nomi::{map_openhub_provider, resolve_bedrock_config, resolve_openhub_url_and_compat};
+use super::openhub::{map_openhub_provider, resolve_bedrock_config, resolve_openhub_url_and_compat};
 
 /// 依 registry 决定该 provider+model 的图片支持 override。
 /// `Some(false)` = 已知不支持(发送时剔图);`None` = 未知(默认支持,行为不变)。
@@ -30,7 +30,7 @@ pub(crate) fn image_support_override(provider_id: &str, model: &str) -> Option<b
 }
 
 /// Intermediate result of resolving a provider DB row before building a full
-/// `Config`. Used internally by both `resolve_provider_config` and the nomi
+/// `Config`. Used internally by both `resolve_provider_config` and the openhub
 /// agent factory to avoid duplicating the load+decrypt+map+url logic.
 pub(crate) struct ResolvedProviderFields {
     pub provider: String,
@@ -42,11 +42,11 @@ pub(crate) struct ResolvedProviderFields {
     pub context_limit: Option<i64>,
 }
 
-/// Load a provider row from the DB, decrypt its API key, map platform to nomi
+/// Load a provider row from the DB, decrypt its API key, map platform to openhub
 /// provider name, and resolve base URL / compat / bedrock fields.
 ///
 /// This is the shared extraction used by both the full `resolve_provider_config`
-/// (which also calls `Config::resolve`) and the nomi factory `build()` (which
+/// (which also calls `Config::resolve`) and the openhub factory `build()` (which
 /// passes the pieces into `NomiResolvedConfig`).
 pub(crate) async fn resolve_provider_fields(
     provider_repo: &Arc<dyn IProviderRepository>,
@@ -145,7 +145,7 @@ fn resolve_model_context_limit(
 
 /// Resolve a provider DB row into a base `Config` suitable for LLM calls.
 ///
-/// This performs: load provider row, decrypt API key, map platform to nomi
+/// This performs: load provider row, decrypt API key, map platform to openhub
 /// provider name, resolve base URL / compat overrides, build `CliArgs`,
 /// call `Config::resolve`, then apply bedrock and compat post-assignments.
 ///
@@ -187,7 +187,7 @@ pub async fn resolve_provider_config(
     }
     // NB: compat_overrides.supports_image is intentionally NOT applied here —
     // this one-shot path (IDMM sidecar) builds text-only messages, so image
-    // stripping is moot. Only the nomi agent manager applies it. Do not add it
+    // stripping is moot. Only the openhub agent manager applies it. Do not add it
     // for "consistency"; it would be dead config on this path.
 
     Ok(config)

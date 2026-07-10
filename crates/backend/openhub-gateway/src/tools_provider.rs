@@ -1,8 +1,8 @@
-//! Provider/model gateway tools + the shared nomi model resolution chain.
+//! Provider/model gateway tools + the shared openhub model resolution chain.
 //!
 //! The chain exists to kill the "cron job silently bound to a model-less
 //! conversation, blows up at execution time with Provider '' not found"
-//! class of bug: nomi sessions get a model AT CREATION, resolved as
+//! class of bug: openhub sessions get a model AT CREATION, resolved as
 //! explicit args → calling companion's own profile model → first configured
 //! provider's first model → hard error with guidance.
 
@@ -68,7 +68,7 @@ pub(crate) async fn load_provider_summaries(deps: &GatewayDeps) -> Result<Vec<Pr
 }
 
 /// `openhub_list_providers` lives in `caps_provider`; this module retains only the
-/// shared provider summaries + the nomi model-resolution chain.
+/// shared provider summaries + the openhub model-resolution chain.
 
 /// Outcome of the model resolution chain, with the step that produced it
 /// (surfaced to the calling agent so it can tell the owner what was picked).
@@ -79,7 +79,7 @@ pub(crate) struct ResolvedModel {
     pub source: &'static str,
 }
 
-/// The pure nomi model resolution chain:
+/// The pure openhub model resolution chain:
 /// 1. explicit provider+model → as given (provider must exist and be enabled)
 /// 2. explicit provider only → that provider's first available model
 /// 3. explicit model only → first enabled provider offering it
@@ -163,7 +163,7 @@ pub(crate) fn resolve_model_chain(
         });
     }
 
-    Err("no model available: no provider is configured/enabled on this desktop. Call openhub_list_providers to confirm, then ask the owner to configure one in Settings → Providers — do NOT create nomi sessions or cron jobs without a model.".to_owned())
+    Err("no model available: no provider is configured/enabled on this desktop. Call openhub_list_providers to confirm, then ask the owner to configure one in Settings → Providers — do NOT create openhub sessions or cron jobs without a model.".to_owned())
 }
 
 /// Async wrapper around [`resolve_model_chain`]: loads the provider rows and

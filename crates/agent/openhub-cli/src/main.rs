@@ -62,7 +62,7 @@ struct Cli {
     #[arg(long)]
     auto_approve: bool,
 
-    /// Project directory to load .nomi.toml from (defaults to CWD)
+    /// Project directory to load .openhub.toml from (defaults to CWD)
     #[arg(long)]
     project_dir: Option<std::path::PathBuf>,
 
@@ -157,7 +157,7 @@ async fn main() -> anyhow::Result<()> {
         let oauth = auth::OAuthManager::new(auth::AuthConfig::default());
         if cli.login {
             oauth.login().await?;
-            eprintln!("Login successful! You can now use nomi without --api-key.");
+            eprintln!("Login successful! You can now use openhub without --api-key.");
         } else {
             oauth.logout()?;
         }

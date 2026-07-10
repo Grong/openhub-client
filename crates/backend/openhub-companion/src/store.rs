@@ -143,7 +143,7 @@ pub struct CompanionLearnRun {
     pub memories_added: i64,
     pub suggestions_added: i64,
     pub error: Option<String>,
-    /// nomi's one-line diary for this run, shown on the overview tab.
+    /// openhub's one-line diary for this run, shown on the overview tab.
     pub summary: Option<String>,
 }
 

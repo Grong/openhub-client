@@ -504,7 +504,7 @@ async fn t4_4_update_model() {
     let (mut app, services) = build_app().await;
     let (token, csrf) = setup_and_login(&mut app, &services, "admin", "StrongP@ss1").await;
 
-    // nomi — only type that allows top-level model updates
+    // openhub — only type that allows top-level model updates
     let create = json!({
         "type": "openhub",
         "name": "Model Test",

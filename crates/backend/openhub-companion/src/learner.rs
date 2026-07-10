@@ -32,7 +32,7 @@ pub trait CompanionCompleter: Send + Sync {
     -> Result<String, AppError>;
 }
 
-/// Production completer: provider row → nomi Config → one-shot completion.
+/// Production completer: provider row → openhub Config → one-shot completion.
 pub struct LiveCompanionCompleter {
     pub provider_repo: Arc<dyn IProviderRepository>,
     pub encryption_key: [u8; 32],
@@ -238,15 +238,15 @@ impl Learner {
                 .await?;
             run.memories_added += 1;
         }
-        // First-preference milestone: the moment nomi visibly "gets" you.
+        // First-preference milestone: the moment openhub visibly "gets" you.
         if prior_active == 0 && run.memories_added > 0 {
             let milestone = self
                 .store
                 .insert_suggestion(
                     "insight",
-                    "nomi 学会了关于你的第一条记忆！",
+                    "openhub 学会了关于你的第一条记忆！",
                     "我开始懂你了，快来记忆页看看吧～",
-                    Some(&serde_json::json!({"type": "navigate", "to": "/nomi?tab=memories"})),
+                    Some(&serde_json::json!({"type": "navigate", "to": "/openhub?tab=memories"})),
                 )
                 .await?;
             run.suggestions_added += 1;

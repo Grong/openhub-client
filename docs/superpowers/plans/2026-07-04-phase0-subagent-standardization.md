@@ -4,7 +4,7 @@
 
 **Goal:** 移除「智能编排」独立入口、把 subagent 能力做成所有桌面会话标配（常驻轻量提示）；修好 DAG 画布运行控制在各状态下的可见性与反馈；在会话 composer 内新增「协作模型」选择器并打通对活跃会话 `extra.orchestrator_model_range` 的更新。
 
-**Architecture:** 纯剪除 + 复用现有原语，零新引擎、零迁移。后端仅动 `factory/nomi.rs`（把编排 lead 提示词从「按开关/角色注入」改为「常驻轻量注入」）与新增一个 FE 更新路径调用（复用已有 `PATCH /api/conversations/{id}`）。FE 删除首页编排入口 + 全局设置开关，重构 `RunControls` 使主控在所有 run 状态下都可见可用，把 `GuidCollaboratorSelector` 复用进 `NomiSendBox` 会话工具条。
+**Architecture:** 纯剪除 + 复用现有原语，零新引擎、零迁移。后端仅动 `factory/openhub.rs`（把编排 lead 提示词从「按开关/角色注入」改为「常驻轻量注入」）与新增一个 FE 更新路径调用（复用已有 `PATCH /api/conversations/{id}`）。FE 删除首页编排入口 + 全局设置开关，重构 `RunControls` 使主控在所有 run 状态下都可见可用，把 `GuidCollaboratorSelector` 复用进 `NomiSendBox` 会话工具条。
 
 **Tech Stack:** Rust（`openhub-ai-agent`、`openhub-orchestrator`、`openhub-conversation`，cargo-nextest 测试）；TypeScript + React + Arco Design + @icon-park/react + @xyflow/react（前端，`bun run typecheck` 为唯一门槛，无可跑单测）。
 
@@ -20,14 +20,14 @@
 - **Arco 弹窗必经 `useArcoMessage`**，勿裸 `Message.useMessage`。（[[typecheck-zero-and-arco-conventions]]）
 - **无 button reset**：新增可点元素沿用既有约定（`role='button'` 的 `div`，或 Arco `Button`），避免真 `<button>` 的 WebView2 黑框。（[[no-unocss-button-reset]]）
 - **Git**：先在新分支工作（勿在 `main` 直接提交）；每次提交前 `git pull --rebase`。（[[pull-before-commit]]）分支名：`feat/phase0-subagent-standardization`。
-- **品牌**：一律 OpenHub；用户可见文案用「桌面伙伴」，内部 `companion`/`nomi` 标识不动。（[[brand-naming]]）
+- **品牌**：一律 OpenHub；用户可见文案用「桌面伙伴」，内部 `companion`/`openhub` 标识不动。（[[brand-naming]]）
 - **保留不动**（这是被保留的 subagent 能力本体，任何任务都不得删）：`caps_orchestrator.rs` 网关工具、`openhub-orchestrator` crate、迁移 018、`link_orchestrator_run`/`extra.orchestrator_run_id`、会话原生画布组件、`engine_spawn_enabled`、`read_conversation_model_range`。
 
 ---
 
 ## 任务总览
 
-- **Task 1**（后端 TDD）：`factory/nomi.rs` 把编排提示从「按 `autoOrchestration` 开关 / `orchestrator_role` 角色」注入改为**常驻轻量 subagent 提示**（非伙伴、非渠道/远程会话）。
+- **Task 1**（后端 TDD）：`factory/openhub.rs` 把编排提示从「按 `autoOrchestration` 开关 / `orchestrator_role` 角色」注入改为**常驻轻量 subagent 提示**（非伙伴、非渠道/远程会话）。
 - **Task 2**（FE）：删除**首页**「智能编排」入口（`ComposerEntryStrip` 按钮 + `GuidPage` 状态 + `GuidActionRow` 分支 + `useGuidSend` 编排分支）+ 相关 i18n。
 - **Task 3**（FE）：删除**全局设置**「智能编排（普通会话）」开关 + `configKeys` + 相关 i18n。
 - **Task 4**（FE）：重构 `RunControls`/`OrchestrationTopPanel`，使主控在**所有 run 状态**下可见可用（含 planning/终态/加载态），暂停显示「进行中 N · 排空中」，折叠态保留迷你主控。
@@ -41,7 +41,7 @@
 ### Task 1: 常驻轻量 subagent 提示（去除智能编排 lead 门控）
 
 **Files:**
-- Modify: `crates/backend/openhub-ai-agent/src/factory/nomi.rs`（常量 757-763、765-771 保留、852-862、864-884、177-197、605-608）
+- Modify: `crates/backend/openhub-ai-agent/src/factory/openhub.rs`（常量 757-763、765-771 保留、852-862、864-884、177-197、605-608）
 - Test: 同文件 `#[cfg(test)] mod tests`（新增纯函数单测）
 
 **Interfaces:**
@@ -53,7 +53,7 @@
 - 保留：`engine_spawn_enabled`（与本任务无关，是标配能力的一部分）。
 - `orchestrator_role` 字段（`agent_build_extra.rs`）**保留不删**（`#[serde(default)]`，旧会话 extra 仍可反序列化；不再被读取即可，零风险）。
 
-- [ ] **Step 1: 写失败测试**（新增到 `factory/nomi.rs` 的 `mod tests`）
+- [ ] **Step 1: 写失败测试**（新增到 `factory/openhub.rs` 的 `mod tests`）
 
 ```rust
     #[test]
@@ -91,10 +91,10 @@ Expected: FAIL（`should_inject_subagent_hint` / `compose_subagent_hint` / `SUBA
 
 - [ ] **Step 3: 实现常量 + 两个纯函数**
 
-在 `factory/nomi.rs`，删除 `LEAD_ORCHESTRATOR_PROMPT`（757-763）、`is_orchestration_lead`（852-862）、`compose_lead_prompt`（864-884）、`PREF_AUTO_ORCHESTRATION`（605-608），新增：
+在 `factory/openhub.rs`，删除 `LEAD_ORCHESTRATOR_PROMPT`（757-763）、`is_orchestration_lead`（852-862）、`compose_lead_prompt`（864-884）、`PREF_AUTO_ORCHESTRATION`（605-608），新增：
 
 ```rust
-/// 常驻轻量 subagent 使用提示。追加到每个普通桌面 nomi 会话的附加系统提示末尾，
+/// 常驻轻量 subagent 使用提示。追加到每个普通桌面 openhub 会话的附加系统提示末尾，
 /// 让模型在合适场景自发用编排工具把活拆给子 agent 并在画布可视化。伙伴走各自的
 /// smart_orchestration 人格提示、渠道/远程会话网关拒 Remote，故不注入。取代原
 /// 「智能编排」lead 提示（不再需要 autoOrchestration 开关或 orchestrator_role 角色）。
@@ -120,7 +120,7 @@ pub(crate) fn compose_subagent_hint(base: Option<String>, inject: bool) -> Optio
 
 - [ ] **Step 4: 替换装配处的门控块**
 
-把 `factory/nomi.rs` 的 lead 注入块（当前 177-197：`let auto_orchestration = …; let lead = is_orchestration_lead(…); overrides.system_prompt = compose_lead_prompt(…);`）替换为：
+把 `factory/openhub.rs` 的 lead 注入块（当前 177-197：`let auto_orchestration = …; let lead = is_orchestration_lead(…); overrides.system_prompt = compose_lead_prompt(…);`）替换为：
 
 ```rust
     // 常驻 subagent 提示：让普通桌面会话默认懂得在合适场景用 openhub_spawn / openhub_run_create
@@ -147,8 +147,8 @@ Expected: 无错误、无「未使用」告警（确认 `LEAD_ORCHESTRATOR_PROMP
 - [ ] **Step 6: 提交**
 
 ```bash
-git add crates/backend/openhub-ai-agent/src/factory/nomi.rs
-git commit -m "feat(nomi): 常驻 subagent 提示取代智能编排 lead 门控"
+git add crates/backend/openhub-ai-agent/src/factory/openhub.rs
+git commit -m "feat(openhub): 常驻 subagent 提示取代智能编排 lead 门控"
 ```
 
 ---
@@ -179,7 +179,7 @@ git commit -m "feat(nomi): 常驻 subagent 提示取代智能编排 lead 门控"
 - [ ] **Step 3: `useGuidSend.ts`**
   - 类型导入 24：删 `import type { TModelRange, TModelRef } …`（仅编排分支用）。
   - 删 deps `orchestrationMode`（87 + docstring 79-87）、`collaborators`（94 + docstring 89-94）、解构（154-155）、dep 数组项（550）。
-  - 删整个 `if (orchestrationMode) { … }` 编排分支（171-233）。删后首页 send 直接落入既有 nomi 常规分支（385-441，不动）。
+  - 删整个 `if (orchestrationMode) { … }` 编排分支（171-233）。删后首页 send 直接落入既有 openhub 常规分支（385-441，不动）。
 
 - [ ] **Step 4: `GuidPage.tsx`**
   - 删状态 `orchestrationMode`（76-80）。
@@ -223,18 +223,18 @@ git commit -m "feat(guid): 移除首页智能编排入口"
 
 **Files:**
 - Modify: `ui/src/renderer/components/settings/SettingsModal/contents/SystemModalContent/index.tsx`（state 59；init 92；handler 191-197；preferenceItem 296-301）
-- Modify: `ui/src/common/config/configKeys.ts`（`'nomi.autoOrchestration'` 46-49）
+- Modify: `ui/src/common/config/configKeys.ts`（`'openhub.autoOrchestration'` 46-49）
 - Modify: `ui/src/renderer/services/i18n/locales/{zh-CN,en-US}/settings.json`（`autoOrchestration` + `autoOrchestrationDesc` 222-223）
 
 - [ ] **Step 1: `SystemModalContent/index.tsx`**
   - 删 state（59 `const [autoOrchestration, setAutoOrchestration] = useState(false);`）。
-  - 删 init 读（92 `setAutoOrchestration(configService.get('nomi.autoOrchestration') ?? false);`）。
+  - 删 init 读（92 `setAutoOrchestration(configService.get('openhub.autoOrchestration') ?? false);`）。
   - 删 handler `handleAutoOrchestrationChange`（191-197）。
   - 删 `preferenceItems` 中 `key: 'autoOrchestration'` 项（296-301）。
 
 - [ ] **Step 2: `configKeys.ts`**
-  - 删 `'nomi.autoOrchestration': boolean | undefined;`（46-49，含上方注释）。
-  - **核查** `'nomi.orchestrationCollaborators'`（43-45）：Task 2 已删 `useGuidCollaborators`（其唯一读者）。但 Task 6 的会话协作选择器改用 `conversation.extra`（不复用此全局键）。故此键成为死键——**保留声明不删**（配置袋里可能有历史值，删类型无收益且 configService 泛型需保持宽松）。若 typecheck 报未使用可加注释说明，勿强删。
+  - 删 `'openhub.autoOrchestration': boolean | undefined;`（46-49，含上方注释）。
+  - **核查** `'openhub.orchestrationCollaborators'`（43-45）：Task 2 已删 `useGuidCollaborators`（其唯一读者）。但 Task 6 的会话协作选择器改用 `conversation.extra`（不复用此全局键）。故此键成为死键——**保留声明不删**（配置袋里可能有历史值，删类型无收益且 configService 泛型需保持宽松）。若 typecheck 报未使用可加注释说明，勿强删。
 
 - [ ] **Step 3: i18n + 重新生成**
   - `settings.json`（zh-CN + en-US）删 `autoOrchestration` 与 `autoOrchestrationDesc` 两行。
@@ -433,7 +433,7 @@ Run（cwd `ui/`）：`bun run typecheck`
 Expected: exit 0（注意 `conversation.extra?.orchestrator_model_range` 的类型在 `storage.ts:478-487` 已声明，`models.slice(1)` 类型可用）。
 
 - [ ] **Step 4: 行为验收**（人工）
-  - 打开一个普通桌面 nomi 会话：主模型选择器旁出现「协作模型」pill；主模型以 `· 主` 钉选、不可从协作列表移除。
+  - 打开一个普通桌面 openhub 会话：主模型选择器旁出现「协作模型」pill；主模型以 `· 主` 钉选、不可从协作列表移除。
   - 选几个协作模型 → 关闭 → 重开会话：选择被 `conversation.extra.orchestrator_model_range` 记住（水合正确）。
   - 切换主模型 → 确认 `models[0]` 随之更新（用 devtools 看 PATCH body 或后续 `openhub_run_create` 落库的 fleet）。
   - 桌面伙伴锁定聊天表面（`hideModeSelector`）：**不出现**协作选择器。

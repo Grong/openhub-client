@@ -128,7 +128,7 @@ impl Tool for ExecCommandTool {
             .unwrap_or(DEFAULT_YIELD_MS)
             .clamp(MIN_YIELD_MS, MAX_YIELD_MS);
 
-        // Run through the platform shell, mirroring nomi's Bash tool.
+        // Run through the platform shell, mirroring openhub's Bash tool.
         let params = PtyParams {
             program: self.shell_program.clone(),
             args: shell_command_args(&cmd),

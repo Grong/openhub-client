@@ -19,7 +19,7 @@ implementation map for the current workspace, not an extraction plan.
 | `openhub-skills` | Skill discovery, frontmatter, loading, and skill-index support. |
 | `openhub-memory` | Memory storage and retrieval primitives. |
 | `openhub-agent` | Core engine loop, sessions, compaction glue, confirmations, output sinks, skill tool, requirement tools, and subagent spawning. |
-| `openhub-cli` | Standalone `nomi` CLI consumer of the engine. |
+| `openhub-cli` | Standalone `openhub` CLI consumer of the engine. |
 | `openhub-computer` | Desktop computer-use tool implementation. |
 | `openhub-a11y` | Accessibility helpers for computer-use flows. |
 | `openhub-browser-engine` | Self-hosted browser/CDP automation engine. |
@@ -43,7 +43,7 @@ OpenHub supports several runtime families:
 
 The implementation source of truth for factory behavior is:
 
-- `crates/backend/openhub-ai-agent/src/factory/nomi.rs`
+- `crates/backend/openhub-ai-agent/src/factory/openhub.rs`
 - `crates/backend/openhub-ai-agent/src/factory/acp.rs`
 - `crates/backend/openhub-ai-agent/src/factory/acp_assembler.rs`
 

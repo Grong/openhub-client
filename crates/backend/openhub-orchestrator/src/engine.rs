@@ -2023,7 +2023,7 @@ async fn settle_task_outcome(
                         // worker conversation's turns), surfaced via the conversation
                         // runtime-state accumulator the stream relay fills from each
                         // `TurnCompleted` metrics event. `None` when no usage was
-                        // observed (non-nomi member / turn never completed / mock
+                        // observed (non-openhub member / turn never completed / mock
                         // runner) — task.tokens stays None, the prior behaviour. The
                         // `orch_run_tasks.tokens` column + RunTask DTO + UI are already
                         // plumbed; this is the real source. Never fabricated.

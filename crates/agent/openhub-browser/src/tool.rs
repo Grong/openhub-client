@@ -87,7 +87,7 @@ const SECRET_PREFIX: &str = "secret:";
 /// **信任边界（关键不变量）**：本 key 的唯一合法置位者是**网关 dispatch 层**——它在带外审批通道（手机/
 /// 前端）拿到用户批准后才注入。LLM 给的 `act` 参数里若带这个 key 必须被**剥除**（网关
 /// `tools_browser::sanitize_out_of_band` 在分类前剥除），否则模型能自我授权不可逆动作、绕过红线门。
-/// facade 这侧只**读**它（不剥）：因为 P0-P2 的引擎内 nomi 会话从不注入此 key（恒缺 = false = 现行
+/// facade 这侧只**读**它（不剥）：因为 P0-P2 的引擎内 openhub 会话从不注入此 key（恒缺 = false = 现行
 /// fail-closed 行为不变），而网关侧的注入已过信任边界。`__` 前缀标记其为内部协议字段（非用户/模型可见
 /// 动作参数）。
 pub const OUT_OF_BAND_CONFIRMED_KEY: &str = "__out_of_band_confirmed";
@@ -256,7 +256,7 @@ pub struct BrowserTool {
     /// orchestration 审批被旁路时为 `true`——
     /// - yolo 会话：`session_mode == "yolo"` → `CliArgs.auto_approve = true`（manager/openhub/agent.rs）
     ///   → `Config::resolve` 置 `config.tools.auto_approve = true`（config.rs §7）；
-    /// - companion-forced-yolo / desktopGateway 会话：工厂（factory/nomi.rs）把 `session_mode` pin
+    /// - companion-forced-yolo / desktopGateway 会话：工厂（factory/openhub.rs）把 `session_mode` pin
     ///   成 `"yolo"`，同样落到上面这条链；
     /// - `--auto-approve` CLI：直接置 `config.tools.auto_approve = true`。
     /// - 而 `AutoEdit` 模式**不**置它（只自动批 info/edit 类别，从不批 Irreversible），故 AutoEdit
@@ -1740,7 +1740,7 @@ impl BrowserTool {
     /// `true`（仅网关 dispatch 层在带外审批通过后注入，见 key 文档的信任边界）时返 `true`，让
     /// [`redline::enforce_redline`] 对旁路会话的不可逆动作放行。
     ///
-    /// **fail-closed 默认**：引擎内 nomi 会话从不注入此 key（恒缺）→ 返 `false` → 现行 P2 行为不变
+    /// **fail-closed 默认**：引擎内 openhub 会话从不注入此 key（恒缺）→ 返 `false` → 现行 P2 行为不变
     /// （旁路会话不可逆动作仍 hard-deny）。带外放行仅经网关已确认的注入发生。facade 不剥此 key
     /// （剥除是网关分类前的职责，过了信任边界）；这里只读。
     fn out_of_band_confirmed(&self, input: &Value) -> bool {

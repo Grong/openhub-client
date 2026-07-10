@@ -27,7 +27,7 @@ import team from './team.json';
 import terminal from './terminal.json';
 import webhook from './webhook.json';
 import autowork from './autowork.json';
-import nomi from './nomi.json';
+import openhub from './openhub.json';
 import knowledge from './knowledge.json';
 import publicCompanion from './publicCompanion.json';
 import assetLibrary from './assetLibrary.json';
@@ -68,7 +68,7 @@ export default {
   terminal,
   webhook,
   autowork,
-  nomi,
+  openhub,
   knowledge,
   publicCompanion,
   assetLibrary,

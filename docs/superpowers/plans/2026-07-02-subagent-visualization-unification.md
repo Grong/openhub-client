@@ -251,14 +251,14 @@ git -c user.nameopenhub-c user.email=rika00@qq.com commit -m "feat(openhub-agent
 **Files:**
 - Modify: `crates/backend/openhub-api-types/src/agent_build_extra.rs`（`NomiBuildExtra` 加 `allowed_tools`）
 - Modify: `crates/backend/openhub-ai-agent/src/types.rs:61-144`（`NomiResolvedConfig` 加两字段）
-- Modify: `crates/backend/openhub-ai-agent/src/factory/nomi.rs`（计算 + 填充；~:377-433 `NomiResolvedConfig` 构造处）
+- Modify: `crates/backend/openhub-ai-agent/src/factory/openhub.rs`（计算 + 填充；~:377-433 `NomiResolvedConfig` 构造处）
 - Modify: `crates/backend/openhub-ai-agent/src/manager/openhub/agent.rs:236-261`（灌入 config.tools，紧邻 browser/computer）
 
 **Interfaces:**
 - Consumes: Task 2 的 `ToolsConfig` 字段。
 - Produces: `NomiBuildExtra.allowed_tools: Vec<String>`（serde default 空；worker extra JSON 的 `allowed_tools` 键反序列化到此）；`NomiResolvedConfig.in_process_spawn: bool` + `allowed_tools: Vec<String>`；纯函数 `pub(crate) fn engine_spawn_enabled(desktop_gateway: bool, channel_platform: Option<&str>) -> bool`。
 
-- [ ] **Step 1: 写纯函数失败测试**（加到 `factory/nomi.rs` 既有 `mod tests`，紧邻 `is_orchestration_lead_policy`）
+- [ ] **Step 1: 写纯函数失败测试**（加到 `factory/openhub.rs` 既有 `mod tests`，紧邻 `is_orchestration_lead_policy`）
 
 ```rust
 #[test]
@@ -297,7 +297,7 @@ Expected: FAIL（函数未定义）
     pub allowed_tools: Vec<String>,
 ```
 
-(c) `factory/nomi.rs`——在 `is_orchestration_lead` 函数旁加纯函数：
+(c) `factory/openhub.rs`——在 `is_orchestration_lead` 函数旁加纯函数：
 
 ```rust
 /// 进程内 Spawn 门控（纯函数，可单测）：本地桌面网关会话（desktop_gateway 且
@@ -338,7 +338,7 @@ Expected: 全部 PASS（581+ 项）
 - [ ] **Step 5: Commit**
 
 ```bash
-git add crates/backend/openhub-api-types/src/agent_build_extra.rs crates/backend/openhub-ai-agent/src/types.rs crates/backend/openhub-ai-agent/src/factory/nomi.rs crates/backend/openhub-ai-agent/src/manager/openhub/agent.rs
+git add crates/backend/openhub-api-types/src/agent_build_extra.rs crates/backend/openhub-ai-agent/src/types.rs crates/backend/openhub-ai-agent/src/factory/openhub.rs crates/backend/openhub-ai-agent/src/manager/openhub/agent.rs
 git -c user.nameopenhub-c user.email=rika00@qq.com commit -m "feat(ai-agent): 工厂计算进程内 Spawn 门控 + per-session 工具白名单灌入引擎 config"
 ```
 
@@ -830,7 +830,7 @@ git -c user.nameopenhub-c user.email=rika00@qq.com commit -m "feat(gateway): ope
 ### Task 8: Prompt 引导（lead + 伙伴）
 
 **Files:**
-- Modify: `crates/backend/openhub-ai-agent/src/factory/nomi.rs`（`LEAD_ORCHESTRATOR_PROMPT` ~:664）
+- Modify: `crates/backend/openhub-ai-agent/src/factory/openhub.rs`（`LEAD_ORCHESTRATOR_PROMPT` ~:664）
 - Modify: `crates/backend/openhub-companion/src/companion.rs`（智能编排 nudge，grep `调度子 agent`）
 
 **Interfaces:** 纯文案；既有测试断言 `openhub_run_create` 在 prompt 里，新增断言 `openhub_spawn`。
@@ -859,7 +859,7 @@ Expected: PASS
 - [ ] **Step 4: Commit**
 
 ```bash
-git add crates/backend/openhub-ai-agent/src/factory/nomi.rs crates/backend/openhub-companion/src/companion.rs
+git add crates/backend/openhub-ai-agent/src/factory/openhub.rs crates/backend/openhub-companion/src/companion.rs
 git -c user.nameopenhub-c user.email=rika00@qq.com commit -m "feat(prompt): lead/伙伴提示引导独立并行小任务用 openhub_spawn"
 ```
 

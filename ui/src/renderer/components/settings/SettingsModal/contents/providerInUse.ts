@@ -18,7 +18,7 @@ export function featureRoute(feature: ProviderUsageFeature, targetId?: string): 
     case 'desktopCompanion':
       // Desktop-companion model control (CompanionModelControl → profile.model)
       // lives on the Nomi config page; /companion is the transparent pet overlay.
-      return '/nomi';
+      return '/openhub';
     case 'publicCompanion':
       return targetId ? `/public-companions/${targetId}` : '/public-companions';
     case 'smartDecision':

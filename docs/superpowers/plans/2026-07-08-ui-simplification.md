@@ -758,7 +758,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 
 - [ ] **Step 1: 查找并修改新建会话入口**
 
-找到新建会话的触发逻辑。将默认行为改为直接创建会话，使用默认配置：`nomi` Agent + 通用助手 + 我的知识库。
+找到新建会话的触发逻辑。将默认行为改为直接创建会话，使用默认配置：`openhub` Agent + 通用助手 + 我的知识库。
 
 高级配置（模型/Agent/知识库/MCP）折叠在可展开的面板中。
 
@@ -973,7 +973,7 @@ bun run typecheck
 - [ ] 首次安装（清除 localStorage）→ Wizard 弹出
 - [ ] Wizard 完整走完 3 步 → 进入主界面
 - [ ] Wizard 点击跳过 → 进入主界面，刷新不再弹出
-- [ ] 所有旧路由直接 URL 访问仍工作（`/mcp`、`/assistants`、`/nomi` 等）
+- [ ] 所有旧路由直接 URL 访问仍工作（`/mcp`、`/assistants`、`/openhub` 等）
 
 - [ ] **Step 3: 运行现有测试**
 
