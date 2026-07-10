@@ -83,9 +83,9 @@ const UpdateModal = React.lazy(() => import('@/renderer/components/settings/Upda
 // resizable by dragging its right edge (clamped to [RAIL_MIN, RAIL_MAX]) and the
 // chosen width persists per device. Dragging narrower than RAIL_COLLAPSE_THRESHOLD
 // snaps the rail collapsed (collapse is also toggled from the titlebar).
-const DEFAULT_SIDER_WIDTH = 184;
-const RAIL_MIN_WIDTH = 160;
-const RAIL_MAX_WIDTH = 300;
+const DEFAULT_SIDER_WIDTH = 260;
+const RAIL_MIN_WIDTH = 200;
+const RAIL_MAX_WIDTH = 360;
 const DESKTOP_COLLAPSED_WIDTH = 0;
 const RAIL_COLLAPSE_THRESHOLD = 140;
 const SIDER_DRAG_HYSTERESIS = 6;
