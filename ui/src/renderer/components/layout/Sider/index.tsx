@@ -19,7 +19,6 @@ import { addRecentWorkspace } from '@renderer/components/workspace';
 import WorkpathSessionList from '@renderer/pages/conversation/SessionList';
 import { useSidebarDisplayPreferences } from '@renderer/pages/conversation/SessionList/hooks/useSidebarDisplayPreferences';
 import { addProjectWorkpath } from '@renderer/pages/conversation/SessionList/utils/projectWorkpaths';
-import ConversationSearchPopover from '@renderer/pages/conversation/SessionList/ConversationSearchPopover';
 import SessionCreateBar from '@renderer/pages/conversation/components/ConversationShell/SessionCreateBar';
 import {
   SiderKnowledgeEntry,
@@ -208,14 +207,6 @@ const Sider: React.FC<SiderProps> = ({ onSessionClick, collapsed = false }) => {
                   onSessionClick={isMobile ? handleSessionClick : undefined}
                   onConversationSelect={handleConversationSelect}
                 />
-                <div className='px-8px'>
-                  <ConversationSearchPopover
-                    onSessionClick={isMobile ? handleSessionClick : undefined}
-                    onConversationSelect={handleConversationSelect}
-                    label={t('conversation.historySearch.shortTitle')}
-                    fullWidth
-                  />
-                </div>
               </div>
             )}
 
