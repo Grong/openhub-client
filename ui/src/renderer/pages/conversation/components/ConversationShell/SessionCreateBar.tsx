@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { ExpandLeft, FolderPlus, ListCheckbox, Plus, Terminal } from '@icon-park/react';
+import { FolderPlus, ListCheckbox, Plus, Terminal } from '@icon-park/react';
 import classNames from 'classnames';
 import InstantHoverTooltip from '@renderer/components/base/InstantHoverTooltip';
 import ConversationSearchPopover from '@renderer/pages/conversation/SessionList/ConversationSearchPopover';
@@ -22,8 +22,6 @@ export interface SessionCreateBarProps {
   displayPreferences: SidebarDisplayPreferences;
   onDisplayPresetChange: (preset: Exclude<SidebarDisplayPreset, 'custom'>) => void;
   onDisplayPreferenceChange: (patch: Partial<Omit<SidebarDisplayPreferences, 'preset'>>) => void;
-  /** Collapse the secondary sidebar. The stable primary toggle lives in the titlebar. */
-  onCollapse: () => void;
   /** Mobile-only: close the overlay when a session is chosen from search. */
   onSessionClick?: () => void;
   /** Clear batch mode / close preview when a search result is opened. */
@@ -49,7 +47,6 @@ const SessionCreateBar: React.FC<SessionCreateBarProps> = ({
   displayPreferences,
   onDisplayPresetChange,
   onDisplayPreferenceChange,
-  onCollapse,
   onSessionClick,
   onConversationSelect,
 }) => {
@@ -73,22 +70,6 @@ const SessionCreateBar: React.FC<SessionCreateBarProps> = ({
             onPresetChange={onDisplayPresetChange}
             onPreferenceChange={onDisplayPreferenceChange}
           />
-          <InstantHoverTooltip content={t('sessionList.collapseList')} position='bottom'>
-            <div
-              data-testid='session-sider-collapse'
-              className='size-22px rd-6px flex items-center justify-center cursor-pointer shrink-0 transition-colors text-t-secondary hover:text-t-primary hover:bg-fill-3'
-              onClick={onCollapse}
-              aria-label={t('sessionList.collapseList')}
-            >
-              <ExpandLeft
-                theme='outline'
-                size='15'
-                fill='currentColor'
-                className='block leading-none shrink-0'
-                style={{ lineHeight: 0 }}
-              />
-            </div>
-          </InstantHoverTooltip>
         </div>
       </div>
 

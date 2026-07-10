@@ -12,11 +12,6 @@ import TitlebarLanguageMenu from './TitlebarLanguageMenu';
 import WindowControls from '../WindowControls';
 import { WORKSPACE_STATE_EVENT, dispatchWorkspaceToggleEvent } from '@renderer/utils/workspace/workspaceEvents';
 import type { WorkspaceStateDetail } from '@renderer/utils/workspace/workspaceEvents';
-import {
-  SESSION_SIDER_STATE_EVENT,
-  dispatchSessionSiderToggleEvent,
-} from '@renderer/utils/workspace/sessionSiderEvents';
-import type { SessionSiderStateDetail } from '@renderer/utils/workspace/sessionSiderEvents';
 import { useLayoutContext } from '@/renderer/hooks/context/LayoutContext';
 import { useNavigationHistory } from '@/renderer/hooks/context/NavigationHistoryContext';
 import { isDesktopShell, isMacOS, isWindows } from '@/renderer/utils/platform';
@@ -67,7 +62,6 @@ const Titlebar: React.FC<TitlebarProps> = ({ workspaceAvailable }) => {
   const { t } = useTranslation();
   const appTitle = useMemo(() => 'NomiFun', []);
   const [workspaceCollapsed, setWorkspaceCollapsed] = useState(true);
-  const [sessionSiderCollapsed, setSessionSiderCollapsed] = useState(false);
   const [mobileCenterTitle, setMobileCenterTitle] = useState(appTitle);
   const [mobileCenterOffset, setMobileCenterOffset] = useState(0);
   const [drawerVisible, setDrawerVisible] = useState(false);
@@ -94,24 +88,6 @@ const Titlebar: React.FC<TitlebarProps> = ({ workspaceAvailable }) => {
     window.addEventListener(WORKSPACE_STATE_EVENT, handler as EventListener);
     return () => {
       window.removeEventListener(WORKSPACE_STATE_EVENT, handler as EventListener);
-    };
-  }, []);
-
-  // 同步会话二级侧栏折叠状态，使标题栏开关图标保持一致
-  // Sync session secondary-sidebar collapsed state for the titlebar toggle icon
-  useEffect(() => {
-    if (typeof window === 'undefined') {
-      return undefined;
-    }
-    const handler = (event: Event) => {
-      const customEvent = event as CustomEvent<SessionSiderStateDetail>;
-      if (typeof customEvent.detail?.collapsed === 'boolean') {
-        setSessionSiderCollapsed(customEvent.detail.collapsed);
-      }
-    };
-    window.addEventListener(SESSION_SIDER_STATE_EVENT, handler as EventListener);
-    return () => {
-      window.removeEventListener(SESSION_SIDER_STATE_EVENT, handler as EventListener);
     };
   }, []);
 
@@ -146,18 +122,6 @@ const Titlebar: React.FC<TitlebarProps> = ({ workspaceAvailable }) => {
   const showHistoryNav = Boolean(navigationHistory) && !layout?.isMobile;
   const historyBackTooltip = t('common.historyBack', { defaultValue: 'Back' });
   const historyForwardTooltip = t('common.forward', { defaultValue: 'Forward' });
-  // 会话二级侧栏开关：仅在会话区路由显示，桌面与移动端都给一个稳定的开/合入口
-  // Session secondary-sidebar toggle: shown on session routes only; a stable
-  // open/close entry on both desktop and mobile (mirrors the workspace toggle).
-  const isSessionRoute =
-    location.pathname === '/guid' ||
-    location.pathname.startsWith('/conversation/') ||
-    location.pathname === '/terminal-new' ||
-    location.pathname.startsWith('/terminal/');
-  const sessionToggleTooltip = sessionSiderCollapsed
-    ? t('sessionList.expandList', { defaultValue: 'Show conversations' })
-    : t('sessionList.collapseList', { defaultValue: 'Hide conversations' });
-
   const handleSiderToggle = () => {
     if (!showSiderToggle || !layout?.setSiderCollapsed) return;
     layout.setSiderCollapsed(!layout.siderCollapsed);
@@ -368,18 +332,6 @@ const Titlebar: React.FC<TitlebarProps> = ({ workspaceAvailable }) => {
               children: <Terminal theme='outline' size={iconSize} fill='currentColor' strokeWidth={desktopIconStroke} />,
             })}
           </>
-        )}
-        {isSessionRoute && (
-          renderIconButton({
-            tooltip: sessionToggleTooltip,
-            className: 'app-titlebar__button app-titlebar__button--nav',
-            onClick: () => dispatchSessionSiderToggleEvent(),
-            children: sessionSiderCollapsed ? (
-              <ExpandRight theme='outline' size={iconSize} fill='currentColor' strokeWidth={desktopIconStroke} />
-            ) : (
-              <ExpandLeft theme='outline' size={iconSize} fill='currentColor' strokeWidth={desktopIconStroke} />
-            ),
-          })
         )}
       </div>
       <div
