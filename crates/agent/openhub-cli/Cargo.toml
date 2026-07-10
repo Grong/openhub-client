@@ -19,7 +19,7 @@ openhub-config.workspace   = true
 openhub-memory.workspace   = true
 openhub-providers.workspace = true
 openhub-tools.workspace    = true
-openhub-mcp.workspace      = true
+openhub-agent-mcp.workspace      = true
 openhub-protocol.workspace = true
 openhub-skills.workspace   = true
 

@@ -9,7 +9,7 @@ repository.workspace = true
 [dependencies]
 openhub-types.workspace   = true
 openhub-config.workspace  = true
-openhub-mcp.workspace     = true
+openhub-agent-mcp.workspace     = true
 
 tracing.workspace      = true
 serde.workspace        = true
@@ -30,7 +30,7 @@ libc.workspace = true
 
 
 [dev-dependencies]
-openhub-mcp = { workspace = true, features = ["test-utils"] }
+openhub-agent-mcp = { workspace = true, features = ["test-utils"] }
 tempfile.workspace   = true
 rstest.workspace     = true
 serial_test.workspace = true

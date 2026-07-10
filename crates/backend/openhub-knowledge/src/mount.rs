@@ -376,7 +376,7 @@ mod tests {
         let legacy_root = ws.path().join("openhub);
         let legacy_knowledge = legacy_root.join("knowledge");
         std::fs::create_dir_all(&legacy_knowledge).unwrap();
-        std::fs::write(legacy_root.join(".gitignore"), "*\n").unwrap();
+        std::fs::write(legacy_rootjoin(".gitignore"), "*\n").unwrap();
         let legacy_link = legacy_knowledge.join("旧库");
         if create_link(&kb, &legacy_link).is_err() {
             // Platform refused the link (CI sandbox): a plain dir still
@@ -402,7 +402,7 @@ mod tests {
         // Scenario 2: `.openhub/` also holds an unrelated user file → only
         // our pieces go; the directory and the user file survive.
         std::fs::create_dir_all(&legacy_knowledge).unwrap();
-        std::fs::write(legacy_root.join(".gitignore"), "*\n").unwrap();
+        std::fs::write(legacy_rootjoin(".gitignore"), "*\n").unwrap();
         std::fs::write(legacy_root.join("user-note.txt"), "keep me").unwrap();
 
         sync_mounts(

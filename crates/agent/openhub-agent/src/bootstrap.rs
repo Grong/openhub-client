@@ -3,7 +3,7 @@ use std::sync::Arc;
 use std::sync::atomic::AtomicBool;
 
 use openhub_config::config::Config;
-use openhub_mcp::manager::McpManager;
+use openhub_agent_mcp::manager::McpManager;
 use openhub_providers::LlmProvider;
 
 use crate::engine::AgentEngine;

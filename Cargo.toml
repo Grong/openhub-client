@@ -54,7 +54,7 @@ openhub-compact = { path = "crates/agent/openhub-compact" }
 openhub-config = { path = "crates/agent/openhub-config" }
 openhub-providers = { path = "crates/agent/openhub-providers" }
 openhub-tools = { path = "crates/agent/openhub-tools" }
-openhub-mcp = { path = "crates/agent/openhub-mcp" }
+openhub-agent-mcp = { path = "crates/agent/openhub-agent-mcp" }
 openhub-skills = { path = "crates/agent/openhub-skills" }
 openhub-memory = { path = "crates/agent/openhub-memory" }
 openhub-agent = { path = "crates/agent/openhub-agent" }

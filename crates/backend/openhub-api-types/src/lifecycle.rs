@@ -77,15 +77,15 @@ mod tests {
     #[test]
     fn test_system_info_response_serialization() {
         let resp = SystemInfoResponse {
-            cache_dir: "/home/user/.cacheopenhub.into(),
-            work_dir: "/home/user/.local/shareopenhub.into(),
+            cache_dir: "/home/user/.cache/openhub".into(),
+            work_dir: "/home/user/.local/share/openhub".into(),
             log_dir: "/home/user/.local/state/openhub/logs".into(),
             platform: "linux".into(),
             arch: "x64".into(),
         };
         let json = serde_json::to_value(&resp).unwrap();
-        assert_eq!(json["cache_dir"], "/home/user/.cacheopenhub);
-        assert_eq!(json["work_dir"], "/home/user/.local/shareopenhub);
+        assert_eq!(json["cache_dir"], "/home/user/.cache/openhub");
+        assert_eq!(json["work_dir"], "/home/user/.local/share/openhub");
         assert_eq!(json["log_dir"], "/home/user/.local/state/openhub/logs");
         assert_eq!(json["platform"], "linux");
         assert_eq!(json["arch"], "x64");

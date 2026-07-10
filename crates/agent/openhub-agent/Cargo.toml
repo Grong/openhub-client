@@ -21,7 +21,7 @@ openhub-protocol.workspace  = true
 openhub-config.workspace    = true
 openhub-providers.workspace = true
 openhub-tools.workspace     = true
-openhub-mcp.workspace       = true
+openhub-agent-mcp.workspace       = true
 openhub-skills.workspace    = true
 openhub-memory.workspace    = true
 openhub-compact.workspace   = true
@@ -50,7 +50,7 @@ is-terminal.workspace = true
 
 
 [dev-dependencies]
-openhub-mcp = { path = "../openhub-mcp", features = ["test-utils"] }
+openhub-agent-mcp = { path = "../openhub-agent-mcp", features = ["test-utils"] }
 wiremock.workspace    = true
 tokio-test.workspace  = true
 tempfile.workspace    = true
