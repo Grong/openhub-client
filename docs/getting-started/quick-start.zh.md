@@ -1,10 +1,10 @@
 # 快速上手
 
-这页带你完成第一段 NomiFun 会话。若还没有安装，请先看
+这页带你完成第一段 OpenHub 会话。若还没有安装，请先看
 [安装](installation.zh.md)。
 
 桌面应用和 Web 服务使用同一份 UI。差异主要在鉴权：桌面 WebView 通过本地
-信任 token 免登录；`nomifun-web` 和 WebUI 远程访问需要登录。
+信任 token 免登录；`openhub-web` 和 WebUI 远程访问需要登录。
 
 ## 1. 启动
 
@@ -14,7 +14,7 @@
 bun run dev
 ```
 
-这会启动 Vite、编译 Tauri shell，并在桌面进程中嵌入 `nomifun-app` 后端。
+这会启动 Vite、编译 Tauri shell，并在桌面进程中嵌入 `openhub-app` 后端。
 后端会选择一个空闲 localhost 端口，桌面 WebView 自动携带本地信任 token。
 
 ### Web 服务模式
@@ -67,7 +67,7 @@ bun run serve:web
 
 5. 发送。
 
-NomiFun 会创建新会话并进入 `/conversation/:id`，随后开始流式输出。
+OpenHub 会创建新会话并进入 `/conversation/:id`，随后开始流式输出。
 
 ## 5. 使用会话工作区
 

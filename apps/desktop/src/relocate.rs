@@ -1,17 +1,17 @@
 //! One-shot relocation of the legacy temp-rooted data dir to the per-user
 //! application-data location.
 //!
-//! Historic builds defaulted the data dir to `<system temp>/nomifun-data/Nomi`
+//! Historic builds defaulted the data dir to `<system temp>/openhub-data/Nomi`
 //! — anything that cleans the temp dir (OS cleanup, reboot on some distros,
 //! disk-cleanup tools) silently destroyed all user data. The default now
 //! resolves through `dirs::data_local_dir()` (see `main.rs`); this module
 //! moves an existing temp-rooted install to the new default exactly once.
 //!
 //! Crash-safety follows the staging + marker pattern of
-//! `nomifun-companion/src/migrate.rs`, hardened with a cross-process lock and a
+//! `openhub-companion/src/migrate.rs`, hardened with a cross-process lock and a
 //! live-writer probe:
 //!
-//! 1. **Gate** — skip when `NOMIFUN_DATA_DIR` is set (checked by the caller in
+//! 1. **Gate** — skip when `OPENHUB_DATA_DIR` is set (checked by the caller in
 //!    [`effective_data_dir`]), when the new root already has a database, or
 //!    when the legacy root has no database (a cleaned temp dir must be
 //!    tolerated, it is the whole point of this exercise). The gate keys on
@@ -28,7 +28,7 @@
 //!    legacy dir (retried next launch). A lock file older than one hour is
 //!    considered abandoned by a dead process and is preempted — immediately
 //!    so when probe residue (step 3) proves its holder died mid-probe.
-//! 3. **Probe** — rename the legacy `nomifun-backend.db` to itself +
+//! 3. **Probe** — rename the legacy `openhub-backend.db` to itself +
 //!    `.probe` and back. On Windows a file held open by SQLite (no
 //!    `FILE_SHARE_DELETE`) cannot be renamed, so a rename failure means an
 //!    older instance is still writing — skip the relocation this launch and
@@ -37,14 +37,14 @@
 //! 4. **Stage** — copy (never move) every keeper entry into
 //!    `<new>/.relocating/`; the legacy dir stays complete the whole time.
 //!    Regenerable trees ([`EXCLUDED_ENTRIES`]) are skipped. Symlinks and
-//!    NTFS junctions (workspace `.claude/skills/*` and `.nomi/knowledge/*`
+//!    NTFS junctions (workspace `.claude/skills/*` and `.openhub/knowledge/*`
 //!    links) are skipped too — see [`copy_dir_recursive`].
 //! 5. **Commit** — rename staged entries into the new root: ordinary entries
 //!    first, then the `.relocated-from` marker, then the database family with
 //!    the bare `.db` last. The gate keys on that `.db`, so a crash anywhere
 //!    earlier simply re-runs the relocation from scratch; once the `.db` is in
 //!    place the marker is guaranteed to already be there for the backend's
-//!    path rewrite (`nomifun_app::bootstrap::rewrite_relocated_paths`).
+//!    path rewrite (`openhub_app::bootstrap::rewrite_relocated_paths`).
 //! 6. **Legacy dir is kept** as a backup for at least one release cycle.
 //!
 //! Any failure falls back to starting from the legacy dir — never block the
@@ -53,7 +53,7 @@
 //! (only while the new root has no `.db` — an adopted root keeps its marker
 //! for the backend rewrite).
 //!
-//! Outcomes are queued via `nomifun_app::bootstrap::record_boot_note` and
+//! Outcomes are queued via `openhub_app::bootstrap::record_boot_note` and
 //! logged by the backend right after tracing comes up, so the result is
 //! visible in `{data_dir}/logs/` and not only on the (usually invisible)
 //! stderr.
@@ -62,16 +62,16 @@ use std::ffi::{OsStr, OsString};
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
-use nomifun_app::bootstrap::{
+use openhub_app::bootstrap::{
     BootNoteLevel, RELOCATED_DONE_MARKER, RELOCATED_FROM_MARKER, RelocationMarker, record_boot_note,
 };
 
 /// The main database; its presence defines "this root holds real data".
-const DB_FILE: &str = "nomifun-backend.db";
+const DB_FILE: &str = "openhub-backend.db";
 
 /// The db plus its WAL sidecars (present only after an unclean shutdown).
 /// Staged together, renamed into place together, bare `.db` last.
-const DB_FILES: [&str; 3] = ["nomifun-backend.db", "nomifun-backend.db-wal", "nomifun-backend.db-shm"];
+const DB_FILES: [&str; 3] = ["openhub-backend.db", "openhub-backend.db-wal", "openhub-backend.db-shm"];
 
 /// Scratch dir inside the NEW root where everything is staged before the
 /// commit renames. Residue from a crashed run is wiped and redone — safe,
@@ -100,13 +100,13 @@ const EXCLUDED_ENTRIES: &[&str] = &[
     "builtin-skills",              // re-materialized from embedded assets
     "logs",                        // tracing output
     "preview-history",             // office preview snapshots
-    "nomi-sessions",               // nomi agent scratch sessions
-    "nomi-health-check-sessions",  // provider health-check scratch
+    "openhub-sessions",               // nomi agent scratch sessions
+    "openhub-health-check-sessions",  // provider health-check scratch
     "browser-profile",             // legacy chromium profile (pre-Playwright-MCP);
                                    // no longer created — kept to relocate/clean
                                    // residue from upgraded installs
-    "nomifun-backend.db.migrate.lock", // advisory lock, must stay with its db
-    "nomifun-backend.db.probe",    // transient quiescence-probe residue
+    "openhub-backend.db.migrate.lock", // advisory lock, must stay with its db
+    "openhub-backend.db.probe",    // transient quiescence-probe residue
     "server.lock",                 // per-data-dir server lock: lives on the open
                                    // handle, not the file; copying it can hit the
                                    // holder's LockFileEx range on Windows
@@ -132,9 +132,9 @@ pub enum RelocateOutcome {
 }
 
 /// Whether legacy-temp relocation should run at all. Skipped when the data dir
-/// is explicitly overridden (`NOMIFUN_DATA_DIR`) OR when this is a non-stable
+/// is explicitly overridden (`OPENHUB_DATA_DIR`) OR when this is a non-stable
 /// channel: dev/beta/canary run from an isolated sibling dir
-/// (`…/NomiFun/Nomi-dev`) and must NOT adopt the legacy temp-rooted *stable*
+/// (`…/OpenHub/Nomi-dev`) and must NOT adopt the legacy temp-rooted *stable*
 /// install, which would cross-contaminate the very state we isolated. Pure, for
 /// unit testing (the live channel is compile-time, so the predicate is tested
 /// directly rather than through `effective_data_dir`).
@@ -150,12 +150,12 @@ pub fn effective_data_dir(default_dir: PathBuf) -> PathBuf {
     // Skip relocation entirely under an explicit data-dir override or a
     // non-stable channel — either way the legacy stable install must not be
     // adopted into this root.
-    let env_override = std::env::var_os("NOMIFUN_DATA_DIR").is_some();
-    if !should_relocate(env_override, nomifun_app::channel::is_stable()) {
+    let env_override = std::env::var_os("OPENHUB_DATA_DIR").is_some();
+    if !should_relocate(env_override, openhub_app::channel::is_stable()) {
         return default_dir;
     }
 
-    let legacy_root = std::env::temp_dir().join("nomifun-data").join("Nomi");
+    let legacy_root = std::env::temp_dir().join("openhub-data").join("Nomi");
     match relocate(&legacy_root, &default_dir) {
         Ok(RelocateOutcome::Relocated) => {
             boot_note(
@@ -212,7 +212,7 @@ pub fn effective_data_dir(default_dir: PathBuf) -> PathBuf {
 /// Stderr immediately (visible in dev) + queued for the backend log (visible
 /// in production, where stderr goes nowhere — see module docs).
 fn boot_note(level: BootNoteLevel, message: String) {
-    eprintln!("nomifun-desktop: {message}");
+    eprintln!("openhub-desktop: {message}");
     record_boot_note(level, message);
 }
 
@@ -346,7 +346,7 @@ fn relocate_inner(old_root: &Path, new_root: &Path) -> std::io::Result<RelocateO
         move_into_place(&staging.join(&name), &new_root.join(&name))?;
     }
     move_into_place(&staging.join(RELOCATED_FROM_MARKER), &new_root.join(RELOCATED_FROM_MARKER))?;
-    for file in ["nomifun-backend.db-shm", "nomifun-backend.db-wal", DB_FILE] {
+    for file in ["openhub-backend.db-shm", "openhub-backend.db-wal", DB_FILE] {
         if db_family.iter().any(|name| name.as_os_str() == OsStr::new(file)) {
             move_into_place(&staging.join(file), &new_root.join(file))?;
         }
@@ -556,9 +556,9 @@ fn copy_dir_recursive(from: &Path, to: &Path) -> std::io::Result<()> {
         let file_type = entry.file_type()?;
         // Symlinks and NTFS junctions are SKIPPED, not copied. The legacy
         // tree contains them by design: `conversations/<ws>/.claude/skills/*`
-        // (junctions made by nomifun-extension's skill_service via
-        // junction::create) and `<ws>/.nomi/knowledge/*` mounts (plus their
-        // pre-rename `<ws>/.nomifun/knowledge/*` leftovers — equally links,
+        // (junctions made by openhub-extension's skill_service via
+        // junction::create) and `<ws>/.openhub/knowledge/*` mounts (plus their
+        // pre-rename `<ws>/.openhub/knowledge/*` leftovers — equally links,
         // equally skipped; the mount engine sweeps them at next sync). On
         // Windows a junction reports `is_symlink() == true` and
         // `is_dir() == false`, so it would land in the `fs::copy` branch and
@@ -603,7 +603,7 @@ mod tests {
         std::fs::create_dir_all(root.join("knowledge").join("kb_1")).unwrap();
         std::fs::write(root.join("knowledge").join("kb_1").join("doc.md"), "doc").unwrap();
         std::fs::write(root.join(DB_FILE), "main-db").unwrap();
-        std::fs::write(root.join("nomifun-backend.db-wal"), "wal").unwrap();
+        std::fs::write(root.join("openhub-backend.db-wal"), "wal").unwrap();
         std::fs::write(root.join("encryption_key"), "key").unwrap();
         // Regenerable: must not be copied.
         std::fs::create_dir_all(root.join("runtime")).unwrap();
@@ -611,14 +611,14 @@ mod tests {
         std::fs::create_dir_all(root.join("logs")).unwrap();
         std::fs::write(root.join("logs").join("app.log"), "log").unwrap();
         std::fs::create_dir_all(root.join("bun-cache")).unwrap();
-        std::fs::write(root.join("nomifun-backend.db.migrate.lock"), "").unwrap();
+        std::fs::write(root.join("openhub-backend.db.migrate.lock"), "").unwrap();
     }
 
     /// Directory link helper mirroring production primitives: NTFS junction
     /// on Windows (what skill_service creates — no privilege needed), plain
     /// dir symlink on Unix. Returns false when the platform/CI sandbox
     /// refuses link creation, so callers can skip (same pragmatic pattern as
-    /// nomifun-extension's symlink tests).
+    /// openhub-extension's symlink tests).
     #[cfg(windows)]
     fn create_dir_link(target: &Path, link: &Path) -> bool {
         junction::create(target, link).is_ok()
@@ -639,7 +639,7 @@ mod tests {
 
         // Data arrived.
         assert_eq!(std::fs::read_to_string(new.join(DB_FILE)).unwrap(), "main-db");
-        assert_eq!(std::fs::read_to_string(new.join("nomifun-backend.db-wal")).unwrap(), "wal");
+        assert_eq!(std::fs::read_to_string(new.join("openhub-backend.db-wal")).unwrap(), "wal");
         assert_eq!(
             std::fs::read_to_string(new.join("conversations").join("conv_1").join("notes.md")).unwrap(),
             "notes"
@@ -658,7 +658,7 @@ mod tests {
         assert!(!new.join("runtime").exists());
         assert!(!new.join("logs").exists());
         assert!(!new.join("bun-cache").exists());
-        assert!(!new.join("nomifun-backend.db.migrate.lock").exists());
+        assert!(!new.join("openhub-backend.db.migrate.lock").exists());
 
         // Marker points at the legacy root; staging and lock gone.
         let marker: RelocationMarker =
@@ -937,14 +937,14 @@ mod tests {
         let old = tmp.path().join("old");
         let new = tmp.path().join("new");
         build_legacy(&old);
-        std::fs::rename(old.join(DB_FILE), old.join("nomifun-backend.db.probe")).unwrap();
+        std::fs::rename(old.join(DB_FILE), old.join("openhub-backend.db.probe")).unwrap();
 
         assert_eq!(relocate(&old, &new).unwrap(), RelocateOutcome::Relocated);
 
         assert_eq!(std::fs::read_to_string(old.join(DB_FILE)).unwrap(), "main-db", "legacy db restored");
-        assert!(!old.join("nomifun-backend.db.probe").exists());
+        assert!(!old.join("openhub-backend.db.probe").exists());
         assert_eq!(std::fs::read_to_string(new.join(DB_FILE)).unwrap(), "main-db");
-        assert!(!new.join("nomifun-backend.db.probe").exists(), "probe name must never be staged");
+        assert!(!new.join("openhub-backend.db.probe").exists(), "probe name must never be staged");
     }
 
     /// P3: a crash mid-probe leaves BOTH the `.probe` rename and a fresh
@@ -957,7 +957,7 @@ mod tests {
         let old = tmp.path().join("old");
         let new = tmp.path().join("new");
         build_legacy(&old);
-        std::fs::rename(old.join(DB_FILE), old.join("nomifun-backend.db.probe")).unwrap();
+        std::fs::rename(old.join(DB_FILE), old.join("openhub-backend.db.probe")).unwrap();
         std::fs::create_dir_all(&new).unwrap();
         std::fs::write(new.join(LOCK_FILE_NAME), "").unwrap();
 
@@ -1037,10 +1037,10 @@ mod tests {
         // Only this test touches the env var, and only effective_data_dir
         // reads it — safe under the parallel test runner.
         // SAFETY: no other thread in this test binary mutates the env.
-        unsafe { std::env::set_var("NOMIFUN_DATA_DIR", r"X:\custom-root") };
+        unsafe { std::env::set_var("OPENHUB_DATA_DIR", r"X:\custom-root") };
         let dir = PathBuf::from(r"X:\custom-root\Nomi");
         let resolved = effective_data_dir(dir.clone());
-        unsafe { std::env::remove_var("NOMIFUN_DATA_DIR") };
+        unsafe { std::env::remove_var("OPENHUB_DATA_DIR") };
         assert_eq!(resolved, dir);
     }
 }

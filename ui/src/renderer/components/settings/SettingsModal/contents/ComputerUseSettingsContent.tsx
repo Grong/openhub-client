@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -60,7 +60,7 @@ const ComputerUseSettingsContent: React.FC = () => {
   }, []);
 
   const isMac = perm?.platform === 'macos';
-  const appLabel = perm?.app_label || 'NomiFun';
+  const appLabel = perm?.app_label || 'OpenHub';
 
   const permRow = (kind: ComputerPermissionKind, granted: boolean | null, label: string, description: string) => (
     <PreferenceRow label={label} description={description}>

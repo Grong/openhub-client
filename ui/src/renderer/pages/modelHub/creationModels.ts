@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -10,7 +10,7 @@
  * Answers "which providers/models can generate images / videos?" for the
  * Model Hub 创作模型 view AND for the workshop generation card (M7). The signal
  * is a NAME heuristic (`hasSpecificModelCapability`, twin of the backend
- * `nomifun_api_types::infer_generation_capabilities`), layered with an optional
+ * `openhub_api_types::infer_generation_capabilities`), layered with an optional
  * provider-level user override via the existing `capabilities` +
  * `is_user_selected` mechanism — no schema change, computed entirely in this
  * read layer.

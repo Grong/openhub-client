@@ -1,4 +1,4 @@
-# NomiFun
+# OpenHub
 
 ## Architect Agent — What I Got Wrong (2026-07-09 review of Tasks 1-7)
 
@@ -58,7 +58,7 @@ the answer was already given.**
 ## Architecture
 
 - Single React SPA in both Tauri desktop WebView and self-hosted web server.
-- Backend: Rust axum server (`nomifun-app`, binary `nomicore`) in-process.
+- Backend: Rust axum server (`openhub-app`, binary `nomicore`) in-process.
 - `/onboarding` and `/login` are outside `ProtectedLayout`; all other routes inside.
 - `SettingsSider.tsx` exports `BUILTIN_TAB_IDS` (tab order). `SettingsPageWrapper.tsx` imports it
   and has its own `builtinMap`. Both maps need entries for any new tab ID.

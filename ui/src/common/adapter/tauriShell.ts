@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -198,7 +198,7 @@ function parseDeepLink(url: string): { action: string; params: Record<string, st
 }
 
 /**
- * Subscribe to `nomifun://` deep links. The Rust shell (apps/desktop/src/main.rs)
+ * Subscribe to `openhub://` deep links. The Rust shell (apps/desktop/src/main.rs)
  * forwards opened URLs on the Tauri event `deep-link://received` as a string[].
  */
 export async function subscribeDeepLink(

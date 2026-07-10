@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -30,7 +30,7 @@ export interface NomiQuickStartOptions {
 export const useNomiQuickStart = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { current_model } = useGuidModelSelection('nomi');
+  const { current_model } = useGuidModelSelection('openhub');
 
   const start = useCallback(
     async ({ name, prompt }: NomiQuickStartOptions): Promise<boolean> => {
@@ -40,7 +40,7 @@ export const useNomiQuickStart = () => {
       }
       try {
         const conversation = await ipcBridge.conversation.create.invoke({
-          type: 'nomi',
+          type: 'openhub',
           name,
           model: current_model,
           extra: { workspace: '', custom_workspace: false, default_files: [] },
@@ -50,7 +50,7 @@ export const useNomiQuickStart = () => {
           return false;
         }
         emitter.emit('chat.history.refresh');
-        sessionStorage.setItem(`nomi_initial_message_${conversation.id}`, JSON.stringify({ input: prompt }));
+        sessionStorage.setItem(`openhub_initial_message_${conversation.id}`, JSON.stringify({ input: prompt }));
         seedConversationCache(conversation);
         await navigate(`/conversation/${conversation.id}`);
         return true;

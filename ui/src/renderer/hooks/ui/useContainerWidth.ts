@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 import { useEffect, useRef, useState, type RefObject } from 'react';

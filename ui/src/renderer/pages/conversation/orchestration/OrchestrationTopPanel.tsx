@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -41,12 +41,12 @@ function isSettledDone(status: string): boolean {
 }
 
 /** Resizable width of the canvas pane (px), persisted across sessions. */
-const CANVAS_WIDTH_KEY = 'nomifun:orchestration-canvas-width';
+const CANVAS_WIDTH_KEY = 'openhub:orchestration-canvas-width';
 const MIN_W = 320;
 const MAX_W = 860;
 const DEFAULT_W = 480;
 /** Collapsed (hidden) preference, persisted so the pane stays where the user left it. */
-const CANVAS_COLLAPSED_KEY = 'nomifun:orchestration-canvas-collapsed';
+const CANVAS_COLLAPSED_KEY = 'openhub:orchestration-canvas-collapsed';
 
 function readInitialWidth(): number {
   try {
@@ -382,7 +382,7 @@ const OrchestrationTopPanel: React.FC = () => {
           )}
 
           {tasks.length > 0 && (
-            <div className={`${styles.chips} nomi-roster-scroll`}>
+            <div className={`${styles.chips} openhub-roster-scroll`}>
               {tasks.map((task) => {
                 const meta = taskStatusMeta(task.status);
                 const isActive = projectedTaskId === task.id;

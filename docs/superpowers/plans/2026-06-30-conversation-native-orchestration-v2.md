@@ -8,7 +8,7 @@
 
 **Architecture:** 后端零改引擎,只点亮两条休眠链路(`orch_runs.lead_conv_id` + 会话 `extra.orchestrator_run_id`)并经一个 `link_orchestrator_run`(写 extra + 广播 `conversation.listChanged`)统一接线两条发起路径。前端复用 `DagCanvas`/`ReadOnlyConversationView`/`useRunLive`/`useLeadThinking`/`OpenTaskPayload`/`RunDecisionFeed`/`RunControls` 等,以「会话域 `OrchestrationProvider` + 右栏 tab + 悬浮画布 + 内容区投射切换」四件套呈现,并删除独立 `/orchestrator` 表面。**无 IR / 无节点图。**
 
-**Tech Stack:** Rust(nomifun-conversation / nomifun-gateway / nomifun-orchestrator)+ React + Arco + UnoCSS + @xyflow/react。
+**Tech Stack:** Rust(openhub-conversation / openhub-gateway / openhub-orchestrator)+ React + Arco + UnoCSS + @xyflow/react。
 
 ## Global Constraints
 - **无 IR / compile / 节点图**(已 archive,禁复活);编排表达仍为 `orch_run_tasks.kind`。**底层引擎零改动**(per-run 锁/调度/规划/worker)。
@@ -27,7 +27,7 @@
 ### Task B1: `ConversationService::link_orchestrator_run`(extra 写入 + 广播)
 
 **Files:**
-- Modify: `crates/backend/nomifun-conversation/src/service.rs`(新增 `pub async fn link_orchestrator_run`)
+- Modify: `crates/backend/openhub-conversation/src/service.rs`(新增 `pub async fn link_orchestrator_run`)
 - Test: 同 crate 既有 service 测试位置(`service.rs` 的 `#[cfg(test)]` 或既有 tests 模块)
 
 **Interfaces:**
@@ -42,7 +42,7 @@
 - [ ] 写失败测试:建一个会话 → `link_orchestrator_run(&conv_id, "run_abc")` → 重读会话断言 `extra["orchestrator_run_id"] == "run_abc"` 且其它 extra 键(如 workspace)保留(merge 非替换);用既有捕获 broadcaster mock 断言广播了一条 `conversation.listChanged`(payload `action=="updated"`,`conversation_id` 匹配)。再断言空串 `link_orchestrator_run("", "run_x")` 为 `Ok(())` 且无广播。
 - [ ] 运行确认失败(方法不存在)。
 - [ ] 实现:空 `conversation_id` 早返回 `Ok(())`;否则 `self.update_extra(conversation_id, json!({"orchestrator_run_id": run_id})).await?;` 然后 `self.broadcast_list_changed(conversation_id, "updated", Some("orchestrator"));`(对齐 `update` 的广播调用风格)。
-- [ ] 运行 `nextest -p nomifun-conversation` 相关用例,确认通过。
+- [ ] 运行 `nextest -p openhub-conversation` 相关用例,确认通过。
 - [ ] 提交 `feat(conversation): link_orchestrator_run 关联 run 到发起会话(extra+广播)`。
 
 ---
@@ -50,7 +50,7 @@
 ### Task B2: Path A — caps_orchestrator 关联发起会话(主 agent 自主)
 
 **Files:**
-- Modify: `crates/backend/nomifun-gateway/src/caps_orchestrator.rs`(`create` 读 `ctx.conversation_id` → `lead_conv_id` + 调 `link_orchestrator_run`)
+- Modify: `crates/backend/openhub-gateway/src/caps_orchestrator.rs`(`create` 读 `ctx.conversation_id` → `lead_conv_id` + 调 `link_orchestrator_run`)
 - Test: 同 crate 既有 caps_orchestrator 测试位置(已存在 `:672,:690` 等断言 `lead_conv_id` 的测试)
 
 **Interfaces:**
@@ -60,7 +60,7 @@
 - [ ] 写失败测试:用既有 caps 测试夹具,以非空 `ctx.conversation_id`(如 `"909"`)调 `create` → 断言返回 run 的 `lead_conv_id == Some(909)`;并断言对应会话被 `link_orchestrator_run`(extra 含 `orchestrator_run_id`,经捕获 conversation_service / broadcaster mock)。再以空 `ctx.conversation_id` 调用 → run 创建成功且 `lead_conv_id == None`、未写 extra(行为回归)。
 - [ ] 运行确认失败。
 - [ ] 实现:把 `build_adhoc_request` 的 `lead_conv_id` 由参数注入(签名加 `lead_conv_id: Option<i64>`,或在 `create` 内构造后覆写);`create` 内解析 `ctx.conversation_id` 一次,传给 request 构造并在 run 返回后调 `link_orchestrator_run`(`if let Err(e) = ... { warn!(...) }`)。autonomy 默认仍 `supervised`,Remote deny 不变。
-- [ ] 运行 `nextest -p nomifun-gateway` 相关用例,确认通过(含既有 `lead_conv_id` 断言已适配)。
+- [ ] 运行 `nextest -p openhub-gateway` 相关用例,确认通过(含既有 `lead_conv_id` 断言已适配)。
 - [ ] 提交 `feat(gateway): caps_orchestrator 把发起会话关联为 run lead(Path A)`。
 
 ---
@@ -68,8 +68,8 @@
 ### Task B3: Path B — create_adhoc_run 路由关联会话(用户显式)
 
 **Files:**
-- Modify: `crates/backend/nomifun-orchestrator/src/routes.rs`(`create_adhoc_run`:取 `body.lead_conv_id` → 调 `link_orchestrator_run`)
-- Modify(若需):`crates/backend/nomifun-orchestrator/src/...`(确认/补 orchestrator 路由 state 持有 `ConversationService` 句柄)
+- Modify: `crates/backend/openhub-orchestrator/src/routes.rs`(`create_adhoc_run`:取 `body.lead_conv_id` → 调 `link_orchestrator_run`)
+- Modify(若需):`crates/backend/openhub-orchestrator/src/...`(确认/补 orchestrator 路由 state 持有 `ConversationService` 句柄)
 - Test: 同 crate 既有 routes/run_service 测试位置
 
 **Interfaces:**
@@ -80,7 +80,7 @@
 - [ ] 写失败测试:以含 `lead_conv_id: Some(<conv>)` 的 `CreateAdhocRunRequest` 调 `create_adhoc_run`(用可阻塞 mock planner 保持 planning 态)→ 断言返回 run 的 `lead_conv_id==Some(conv)` 且该会话被 link(extra/broadcast,经 mock)。再以 `lead_conv_id: None` 调用 → 行为同今(不 link)。
 - [ ] 运行确认失败。
 - [ ] 实现:定位/补齐路由可达的 `ConversationService`;在 `create_adhoc_run` 返回前(或 spawn 外)对 `Some(lead_conv_id)` 调 `link_orchestrator_run`。不改 `spawn_plan_and_start` 的乐观返回时序。
-- [ ] 运行 `nextest -p nomifun-orchestrator` 相关用例,确认通过。
+- [ ] 运行 `nextest -p openhub-orchestrator` 相关用例,确认通过。
 - [ ] 提交 `feat(orchestrator): create_adhoc 路由把会话关联为 lead(Path B)`。
 
 ---

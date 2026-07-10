@@ -40,7 +40,7 @@ type Draft =
       uploadFile: string[];
     }
   | {
-      _type: 'nomi';
+      _type: 'openhub';
       content: string;
       atPath: Array<string | FileOrFolderItem>;
       uploadFile: string[];
@@ -68,7 +68,7 @@ const store: SendBoxDraftStore = {
   'openclaw-gateway': new Map(),
   nanobot: new Map(),
   remote: new Map(),
-  nomi: new Map(),
+  openhub: new Map(),
 };
 
 const setDraft = <K extends TChatConversation['type']>(
@@ -113,11 +113,11 @@ const setDraft = <K extends TChatConversation['type']>(
         store.remote.delete(conversation_id);
       }
       break;
-    case 'nomi':
+    case 'openhub':
       if (draft) {
-        store.nomi.set(conversation_id, draft as Extract<Draft, { _type: 'nomi' }>);
+        store.openhub.set(conversation_id, draft as Extract<Draft, { _type: 'openhub' }>);
       } else {
-        store.nomi.delete(conversation_id);
+        store.openhub.delete(conversation_id);
       }
       break;
     default:
@@ -141,8 +141,8 @@ const getDraft = <K extends TChatConversation['type']>(
       return store.nanobot.get(conversation_id) as Extract<Draft, { _type: K }>;
     case 'remote':
       return store.remote.get(conversation_id) as Extract<Draft, { _type: K }>;
-    case 'nomi':
-      return store.nomi.get(conversation_id) as Extract<Draft, { _type: K }>;
+    case 'openhub':
+      return store.openhub.get(conversation_id) as Extract<Draft, { _type: K }>;
     default:
       return undefined;
   }

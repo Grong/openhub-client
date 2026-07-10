@@ -40,11 +40,11 @@ cat > "$TMP_DIR/bin/bun" <<'STUB'
 #!/usr/bin/env bash
 set -euo pipefail
 
-printf "APPIMAGE_EXTRACT_AND_RUN=%s\n" "${APPIMAGE_EXTRACT_AND_RUN:-}" >> "$NOMIFUN_TEST_BUN_LOG"
+printf "APPIMAGE_EXTRACT_AND_RUN=%s\n" "${APPIMAGE_EXTRACT_AND_RUN:-}" >> "$OPENHUB_TEST_BUN_LOG"
 for arg in "$@"; do
-  printf "<%s>\n" "$arg" >> "$NOMIFUN_TEST_BUN_LOG"
+  printf "<%s>\n" "$arg" >> "$OPENHUB_TEST_BUN_LOG"
 done
-printf -- "---\n" >> "$NOMIFUN_TEST_BUN_LOG"
+printf -- "---\n" >> "$OPENHUB_TEST_BUN_LOG"
 STUB
 
 cat > "$TMP_DIR/bin/pkg-config" <<'STUB'
@@ -65,7 +65,7 @@ chmod +x "$TMP_DIR/bin/rustup" "$TMP_DIR/bin/bun" "$TMP_DIR/bin/pkg-config"
 
 run_build_linux() {
   PATH="$TMP_DIR/bin:$PATH" \
-    NOMIFUN_TEST_BUN_LOG="$LOG" \
+    OPENHUB_TEST_BUN_LOG="$LOG" \
     bash "$ROOT/scripts/desktop-build-linux.sh" "$@" >/dev/null
 }
 

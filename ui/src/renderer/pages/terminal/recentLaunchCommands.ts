@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -12,7 +12,7 @@
  * stored — no other session metadata.
  */
 
-export const RECENT_LAUNCH_COMMANDS_KEY = 'nomifun:recent-terminal-commands';
+export const RECENT_LAUNCH_COMMANDS_KEY = 'openhub:recent-terminal-commands';
 const MAX_RECENT_COMMANDS = 5;
 
 export const getRecentLaunchCommands = (): string[] => {

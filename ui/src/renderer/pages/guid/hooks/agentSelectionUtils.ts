@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -10,7 +10,7 @@ import type { AgentSource } from '@/renderer/utils/model/agentTypes';
 /** Save preferred mode to the agent's own config key */
 export async function savePreferredMode(agentKey: string, mode: string): Promise<void> {
   try {
-    if (agentKey === 'nomi') {
+    if (agentKey === 'openhub') {
       const config = configService.get('nomi.config');
       await configService.set('nomi.config', { ...config, preferredMode: mode });
     } else if (agentKey !== 'custom') {

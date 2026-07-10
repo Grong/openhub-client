@@ -11,7 +11,7 @@ If [AutoWork](autowork-requirements.md) is the engine that drives work
 to compose: AutoWork claims and executes requirements; IDMM makes sure every
 turn it starts actually finishes.
 
-> IDMM is an **optional** supervisor (the `nomifun-idmm` crate). You turn it on
+> IDMM is an **optional** supervisor (the `openhub-idmm` crate). You turn it on
 > per session, from the same place you toggle AutoWork — the session header.
 
 ## Why it exists
@@ -88,7 +88,7 @@ AutoWork: claim ─▶ inject ─▶ [ turn runs ] ─▶ finalize (done/failed)
                               IDMM guard ──▶ rule tier ──▶ (escalate) ──▶ sidecar model
 ```
 
-See `crates/backend/nomifun-idmm/` for the per-tier policy detail and the
+See `crates/backend/openhub-idmm/` for the per-tier policy detail and the
 intervention log API.
 
 ## Enabling it

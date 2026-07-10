@@ -26,8 +26,8 @@
 - **Create** `ui/src/renderer/pages/conversation/orchestration/NodePresetPill.tsx` — 「预置要求」pill + popover（textarea + 保存）。settled/pending 共用。
 - **Create** `ui/src/renderer/pages/conversation/orchestration/NodeModelPill.tsx` — 单选模型 pill（写 override）。仅 pending 用。
 - **Create** `ui/src/renderer/pages/conversation/orchestration/NodeConfigBar.tsx` — pending 窄配置条 = NodeModelPill + NodePresetPill + 提示。
-- **Modify** `ui/src/renderer/pages/conversation/platforms/nomi/NomiSendBox.tsx` — 新增可选 `extraRightTools?: React.ReactNode`，渲染进 `rightTools`。
-- **Modify** `ui/src/renderer/pages/conversation/platforms/nomi/NomiChat.tsx` — 新增可选 `extraRightTools` 透传给 `NomiSendBox`。
+- **Modify** `ui/src/renderer/pages/conversation/platforms/openhub/NomiSendBox.tsx` — 新增可选 `extraRightTools?: React.ReactNode`，渲染进 `rightTools`。
+- **Modify** `ui/src/renderer/pages/conversation/platforms/openhub/NomiChat.tsx` — 新增可选 `extraRightTools` 透传给 `NomiSendBox`。
 - **Modify** `ui/src/renderer/pages/orchestrator/RunDetail/ReadOnlyConversationView.tsx` — 新增可选 `nodeBinding` + `extraRightTools`；`NomiReadOnlyChat.onSelectModel` 写透 override。
 - **Modify** `ui/src/renderer/pages/conversation/orchestration/ProjectedWorkerView.tsx` — 删折叠面板；settled 传 `nodeBinding` + `<NodePresetPill>`；pending body 换 `<NodeConfigBar>`。
 - **Delete** `ui/src/renderer/pages/conversation/orchestration/NodePreconfigPanel.tsx`。
@@ -50,7 +50,7 @@
 ```tsx
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -190,7 +190,7 @@ Expected: 退出码 0（确认 `TRunTask` 有 `preset_prompt`/`override_*`、`ic
 ```tsx
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -331,7 +331,7 @@ export default NodeModelPill;
 ```tsx
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -399,13 +399,13 @@ export default NodeConfigBar;
 ### Task 4: `NomiSendBox` / `NomiChat` 透传 `extraRightTools`
 
 **Files:**
-- Modify: `ui/src/renderer/pages/conversation/platforms/nomi/NomiSendBox.tsx`
-- Modify: `ui/src/renderer/pages/conversation/platforms/nomi/NomiChat.tsx`
+- Modify: `ui/src/renderer/pages/conversation/platforms/openhub/NomiSendBox.tsx`
+- Modify: `ui/src/renderer/pages/conversation/platforms/openhub/NomiChat.tsx`
 
 **Interfaces:**
 - Produces: `NomiSendBox` + `NomiChat` 均新增可选 prop `extraRightTools?: React.ReactNode`；渲染在 `rightTools` 内、`collaboratorSelectorNode` 与 `AgentModeSelector` 之间（或末尾）。
 
-- [ ] **Step 1: NomiSendBox** — 在其 props 类型加 `extraRightTools?: React.ReactNode;`，解构它，并在 `rightTools` 的那个 `<div ...data-testid='nomi-sendbox-config-group'>` 里、`{collaboratorSelectorNode}` 之后加一行 `{extraRightTools}`：
+- [ ] **Step 1: NomiSendBox** — 在其 props 类型加 `extraRightTools?: React.ReactNode;`，解构它，并在 `rightTools` 的那个 `<div ...data-testid='openhub-sendbox-config-group'>` 里、`{collaboratorSelectorNode}` 之后加一行 `{extraRightTools}`：
 
 ```tsx
 // props 类型里（collaboratorSelectorNode 附近）新增：
@@ -517,8 +517,8 @@ type ReadOnlyConversationViewProps = {
   nodeBinding?: OrchestratorNodeBinding;
   extraRightTools?: React.ReactNode;
 };
-// 解构 nodeBinding/extraRightTools；仅 'nomi' case 传入：
-      case 'nomi':
+// 解构 nodeBinding/extraRightTools；仅 'openhub' case 传入：
+      case 'openhub':
         return (
           <NomiReadOnlyChat
             key={conversation.id}

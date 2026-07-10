@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -162,7 +162,7 @@ describe('httpRequest client deadline + network-failure diagnosis', () => {
 
       expect(isAuthExpiredHttpError(caught)).toBe(true);
       expect(isHandledAuthExpiredHttpError(caught)).toBe(false);
-      expect(capturedHeaders?.['x-nomi-local-trust']).toBe('local-secret');
+      expect(capturedHeaders?.['x-openhub-local-trust']).toBe('local-secret');
       expect(location.hash).toBe('');
     } finally {
       globalThis.fetch = realFetch;

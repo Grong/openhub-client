@@ -9,7 +9,7 @@
 IDMM 就是让每一轮持续**运转**的守卫。两者天生互补：AutoWork 负责认领并执行
 需求，IDMM 则确保它启动的每一轮都真的能跑完。
 
-> IDMM 是一个**可选**的监督器（`nomifun-idmm` crate）。在会话头部——与开启
+> IDMM 是一个**可选**的监督器（`openhub-idmm` crate）。在会话头部——与开启
 > AutoWork 相同的位置——按会话开启。
 
 ## 为什么需要它
@@ -75,7 +75,7 @@ AutoWork: 认领 ─▶ 注入 ─▶ [ 对话运行 ] ─▶ 完成（done/fail
                           IDMM 守卫 ──▶ 规则层 ──▶ （升级）──▶ 旁路模型
 ```
 
-每层策略的细节和介入日志 API 见 `crates/backend/nomifun-idmm/`。
+每层策略的细节和介入日志 API 见 `crates/backend/openhub-idmm/`。
 
 ## 开启方式
 

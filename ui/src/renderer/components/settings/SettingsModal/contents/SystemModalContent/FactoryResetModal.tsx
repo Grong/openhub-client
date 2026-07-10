@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -26,7 +26,7 @@ interface FactoryResetModalProps {
  * Flow on confirm: arm the reset on the backend (writes a marker; nothing is
  * deleted yet) -> clear front-end residual UI state -> relaunch. The actual
  * database + derived-data wipe happens early on the next boot, before the DB
- * pool opens or any background loop starts (see nomifun_common::factory_reset).
+ * pool opens or any background loop starts (see openhub_common::factory_reset).
  * On WebUI, relaunch is a no-op, so we tell the user to restart the service.
  */
 const FactoryResetModal: React.FC<FactoryResetModalProps> = ({ visible, onClose }) => {

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -14,7 +14,7 @@ import { useNomiModelSelection } from '@/renderer/pages/conversation/platforms/n
 import CompanionModelControl from '../CompanionModelControl';
 import type { useCompanion } from '../useNomi';
 
-type NomiConversation = Extract<TChatConversation, { type: 'nomi' }>;
+type NomiConversation = Extract<TChatConversation, { type: 'openhub' }>;
 
 interface Props {
   /** 该伙伴的唯一专属 nomi 会话（由 CompanionChatPanel 载入后传入）。 */

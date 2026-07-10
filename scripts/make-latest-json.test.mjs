@@ -16,13 +16,13 @@ rmSync(testDir, { recursive: true, force: true });
 mkdirSync(testDir, { recursive: true });
 
 const windowsFixtureDir = join(targetDir, 'x86_64-test-windows-msvc', 'release', 'bundle', 'nsis');
-const windowsArtifact = join(windowsFixtureDir, `NomiFun_${version}_x64-setup.exe`);
+const windowsArtifact = join(windowsFixtureDir, `OpenHub_${version}_x64-setup.exe`);
 writeArtifactWithSig(windowsArtifact, 'fake windows installer', 'fake windows signature');
 
 const linuxFixtureDir = join(targetDir, 'x86_64-unknown-linux-gnu', 'release', 'bundle');
-const appImageArtifact = join(linuxFixtureDir, 'appimage', `NomiFun_${version}_amd64.AppImage`);
-const debArtifact = join(linuxFixtureDir, 'deb', `NomiFun_${version}_amd64.deb`);
-const rpmArtifact = join(linuxFixtureDir, 'rpm', `NomiFun-${version}-1.x86_64.rpm`);
+const appImageArtifact = join(linuxFixtureDir, 'appimage', `OpenHub_${version}_amd64.AppImage`);
+const debArtifact = join(linuxFixtureDir, 'deb', `OpenHub_${version}_amd64.deb`);
+const rpmArtifact = join(linuxFixtureDir, 'rpm', `OpenHub-${version}-1.x86_64.rpm`);
 writeArtifactWithSig(rpmArtifact, 'fake rpm', 'fake rpm signature');
 writeArtifactWithSig(debArtifact, 'fake deb', 'fake deb signature');
 writeArtifactWithSig(appImageArtifact, 'fake appimage', 'fake appimage signature');
@@ -37,7 +37,7 @@ writeFileSync(
       platforms: {
         'darwin-x86_64': {
           signature: 'existing darwin signature',
-          url: `https://github.com/example/repo/releases/download/v${version}/NomiFun.app.tar.gz`,
+          url: `https://github.com/example/repo/releases/download/v${version}/OpenHub.app.tar.gz`,
         },
       },
     },
@@ -62,7 +62,7 @@ try {
   assert.ok(manifest.platforms['windows-x86_64']);
   assert.equal(
     manifest.platforms['linux-x86_64'].url,
-    `https://github.com/example/repo/releases/download/v${version}/NomiFun_${version}_amd64.AppImage`,
+    `https://github.com/example/repo/releases/download/v${version}/OpenHub_${version}_amd64.AppImage`,
   );
   assert.equal(manifest.platforms['linux-x86_64'].signature, 'fake appimage signature');
 } finally {

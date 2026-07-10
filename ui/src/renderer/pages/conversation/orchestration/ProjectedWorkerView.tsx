@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -27,10 +27,10 @@ type ProjectedWorkerViewProps = {
 };
 
 // These confirmation toasts float over the node banner. Keep them brief and
-// click-through (`nomifun-message-passthrough` flips the Arco message box back to
+// click-through (`openhub-message-passthrough` flips the Arco message box back to
 // `pointer-events:none`) so they never block the banner's 重跑 / 采用 / 返回 main
 // buttons while on screen. Errors linger a touch longer to stay readable.
-const TOAST_CLASS = 'nomifun-message-passthrough';
+const TOAST_CLASS = 'openhub-message-passthrough';
 const TOAST_OK_MS = 1500;
 const TOAST_ERR_MS = 2500;
 

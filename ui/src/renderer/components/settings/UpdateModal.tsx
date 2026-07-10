@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -19,8 +19,8 @@ type UpdateStatus = 'checking' | 'upToDate' | 'available' | 'downloading' | 'dow
 type UpdateInfo = UpdateReleaseInfo;
 
 const BAIDU_RELEASE_MIRROR_URL = 'https://pan.baidu.com/s/5GPonoJNrwJ7GciBSDgXLaA';
-const PRODUCT_WEBSITE_URL = 'https://www.nomifun.com';
-const GITHUB_RELEASES_PAGE = 'https://github.com/nomifun/nomifun-tauri/releases/latest';
+const PRODUCT_WEBSITE_URL = 'https://www.openhub.dev';
+const GITHUB_RELEASES_PAGE = 'https://github.com/Grong/openhub-client/releases/latest';
 
 const UpdateModal: React.FC = () => {
   const { t } = useTranslation();
@@ -209,11 +209,11 @@ const UpdateModal: React.FC = () => {
 
   useEffect(() => {
     const removeOpenListener = ipcBridge.update.open.on(handleOpenUpdateModal);
-    window.addEventListener('nomifun-open-update-modal', handleOpenUpdateModal);
+    window.addEventListener('openhub-open-update-modal', handleOpenUpdateModal);
 
     return () => {
       removeOpenListener();
-      window.removeEventListener('nomifun-open-update-modal', handleOpenUpdateModal);
+      window.removeEventListener('openhub-open-update-modal', handleOpenUpdateModal);
     };
   }, []);
 

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -253,7 +253,7 @@ const WebviewHost: React.FC<WebviewHostProps> = ({
       {showNavBar && (
         <style>
           {`
-            .nomi-url-viewer-toolbar {
+            .openhub-url-viewer-toolbar {
               --viewer-border: var(--color-border-2);
               --viewer-border-hover: var(--color-border-3);
               --viewer-bg: var(--color-bg-3);
@@ -261,7 +261,7 @@ const WebviewHost: React.FC<WebviewHostProps> = ({
               --viewer-text: var(--color-text-2);
               --viewer-text-muted: var(--color-text-3);
             }
-            .nomi-url-viewer-toolbar .toolbar-btn {
+            .openhub-url-viewer-toolbar .toolbar-btn {
               -webkit-appearance: none;
               appearance: none;
               display: inline-flex;
@@ -279,30 +279,30 @@ const WebviewHost: React.FC<WebviewHostProps> = ({
               transition: all 150ms ease;
               cursor: pointer;
             }
-            .nomi-url-viewer-toolbar .toolbar-btn.icon-btn {
+            .openhub-url-viewer-toolbar .toolbar-btn.icon-btn {
               width: 30px;
               min-width: 30px;
               padding: 0;
             }
-            .nomi-url-viewer-toolbar .toolbar-btn:hover:not(:disabled) {
+            .openhub-url-viewer-toolbar .toolbar-btn:hover:not(:disabled) {
               background: var(--viewer-bg-hover);
               border-color: var(--viewer-border-hover);
             }
-            .nomi-url-viewer-toolbar .toolbar-btn:active:not(:disabled) {
+            .openhub-url-viewer-toolbar .toolbar-btn:active:not(:disabled) {
               transform: translateY(0.5px);
             }
-            .nomi-url-viewer-toolbar .toolbar-btn:focus-visible {
+            .openhub-url-viewer-toolbar .toolbar-btn:focus-visible {
               outline: none;
               border-color: rgb(var(--primary-6));
               box-shadow: 0 0 0 2px rgba(var(--primary-6), 0.12);
             }
-            .nomi-url-viewer-toolbar .toolbar-btn:disabled {
+            .openhub-url-viewer-toolbar .toolbar-btn:disabled {
               opacity: 0.55;
               cursor: not-allowed;
               color: var(--viewer-text-muted);
               background: var(--color-bg-2);
             }
-            .nomi-url-viewer-toolbar .toolbar-chip {
+            .openhub-url-viewer-toolbar .toolbar-chip {
               display: inline-flex;
               align-items: center;
               justify-content: center;
@@ -316,7 +316,7 @@ const WebviewHost: React.FC<WebviewHostProps> = ({
               font-size: 11px;
               line-height: 1;
             }
-            .nomi-url-viewer-toolbar .toolbar-input {
+            .openhub-url-viewer-toolbar .toolbar-input {
               -webkit-appearance: none;
               appearance: none;
               width: 100%;
@@ -330,10 +330,10 @@ const WebviewHost: React.FC<WebviewHostProps> = ({
               line-height: 30px;
               transition: all 150ms ease;
             }
-            .nomi-url-viewer-toolbar .toolbar-input:hover {
+            .openhub-url-viewer-toolbar .toolbar-input:hover {
               border-color: var(--viewer-border-hover);
             }
-            .nomi-url-viewer-toolbar .toolbar-input:focus {
+            .openhub-url-viewer-toolbar .toolbar-input:focus {
               outline: none;
               border-color: rgb(var(--primary-6));
               box-shadow: 0 0 0 2px rgba(var(--primary-6), 0.12);
@@ -343,7 +343,7 @@ const WebviewHost: React.FC<WebviewHostProps> = ({
       )}
       {/* Navigation bar (optional) */}
       {showNavBar && (
-        <div className='nomi-url-viewer-toolbar flex items-center gap-6px h-40px px-10px bg-bg-2 border-b border-border-1 flex-shrink-0'>
+        <div className='openhub-url-viewer-toolbar flex items-center gap-6px h-40px px-10px bg-bg-2 border-b border-border-1 flex-shrink-0'>
           <button onClick={handleGoBack} disabled={!canGoBack} className='toolbar-btn icon-btn' title='Back'>
             <Left theme='outline' size={16} />
           </button>

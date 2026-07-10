@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -26,11 +26,11 @@ export interface NomiSelectProps extends NativeSelectProps {
 
 /**
  * 基础样式类名
- * 注意：主题相关样式（背景色、边框色）在 arco-override.css 的 .nomi-select 类中定义
- * Note: Theme-related styles (background, border colors) are defined in .nomi-select class in arco-override.css
+ * 注意：主题相关样式（背景色、边框色）在 arco-override.css 的 .openhub-select 类中定义
+ * Note: Theme-related styles (background, border colors) are defined in .openhub-select class in arco-override.css
  */
 const BASE_CLASS = classNames(
-  'nomi-select',
+  'openhub-select',
   '[&_.arco-select-view]:rounded-[4px]',
   '[&_.arco-select-view]:border',
   '[&_.arco-select-view]:border-solid',
@@ -97,7 +97,7 @@ const defaultGetPopupContainer = (): HTMLElement => {
  * </NomiSelect>
  * ```
  *
- * @see arco-override.css for theme-related styles (.nomi-select)
+ * @see arco-override.css for theme-related styles (.openhub-select)
  */
 const mapSizeToNative = (size?: NomiSelectSize): NativeSelectSize | undefined => {
   if (!size) return undefined;

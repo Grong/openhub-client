@@ -2,7 +2,7 @@
 
 ## 背景
 
-审查 nomifun-tauri UI 简化计划任务 1-8 的实现。17 个 commit，约 800 行变更。
+审查 openhub-client UI 简化计划任务 1-8 的实现。17 个 commit，约 800 行变更。
 
 ## 做得对的三件事
 

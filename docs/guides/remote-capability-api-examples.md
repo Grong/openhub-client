@@ -1,7 +1,7 @@
 # Remote Capability API Examples
 
 These examples use one companion access token bound to one companion. Replace
-`$HOST` with your NomiFun host and `$TOKEN` with the token shown when it was
+`$HOST` with your OpenHub host and `$TOKEN` with the token shown when it was
 created.
 
 ```bash
@@ -16,7 +16,7 @@ For Claude Code, Cursor, or any MCP client that supports Streamable HTTP:
 ```json
 {
   "mcpServers": {
-    "nomifun": {
+    "openhub": {
       "type": "streamable-http",
       "url": "http://$HOST/mcp-agent",
       "headers": {
@@ -39,10 +39,10 @@ curl -s "http://$HOST/v1/tools?profile=agent" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
-Delegate a task to an autonomous NomiFun agent:
+Delegate a task to an autonomous OpenHub agent:
 
 ```bash
-curl -s -X POST "http://$HOST/v1/tools/nomi_agent_run" \
+curl -s -X POST "http://$HOST/v1/tools/openhub_agent_run" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"goal":"Research competitor pricing and write notes.md","timeout_secs":600}'
@@ -51,7 +51,7 @@ curl -s -X POST "http://$HOST/v1/tools/nomi_agent_run" \
 Poll a long-running delegated task:
 
 ```bash
-curl -s -X POST "http://$HOST/v1/tools/nomi_agent_result" \
+curl -s -X POST "http://$HOST/v1/tools/openhub_agent_result" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"conversation_id":123}'
@@ -79,7 +79,7 @@ curl -s -X POST "http://$HOST/v1/tools/<tool_name>" \
 ## SSE Streaming
 
 ```bash
-curl -N -X POST "http://$HOST/v1/tools/nomi_agent_run/stream" \
+curl -N -X POST "http://$HOST/v1/tools/openhub_agent_run/stream" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"goal":"Summarize this repository"}'
@@ -103,7 +103,7 @@ headers = {
 }
 
 response = requests.post(
-    f"{base}/v1/tools/nomi_agent_run",
+    f"{base}/v1/tools/openhub_agent_run",
     headers=headers,
     json={"goal": "Research competitor pricing and write notes.md"},
 )
@@ -127,7 +127,7 @@ async def main():
             tools = await session.list_tools()
             print([tool.name for tool in tools.tools])
             result = await session.call_tool(
-                "nomi_agent_run",
+                "openhub_agent_run",
                 {"goal": "Research competitor pricing and write notes.md"},
             )
             print(result)
@@ -138,15 +138,15 @@ async def main():
 For a local headless server:
 
 ```bash
-export NOMIFUN_COMPANION_TOKEN="$(openssl rand -hex 32)"
-nomifun-web --host 127.0.0.1 --port 8787
+export OPENHUB_COMPANION_TOKEN="$(openssl rand -hex 32)"
+openhub-web --host 127.0.0.1 --port 8787
 ```
 
 For LAN or public access, finish admin setup first, bind intentionally, and
 place the server behind TLS:
 
 ```bash
-nomifun-web --host 0.0.0.0 --port 8787
+openhub-web --host 0.0.0.0 --port 8787
 ```
 
 ## OpenAPI
@@ -155,7 +155,7 @@ Generate a typed client from:
 
 ```bash
 curl -s "http://$HOST/v1/openapi.json?profile=agent" \
-  -H "Authorization: Bearer $TOKEN" > nomifun-openapi.json
+  -H "Authorization: Bearer $TOKEN" > openhub-openapi.json
 ```
 
 ## Notes

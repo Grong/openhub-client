@@ -13,12 +13,12 @@
 视觉语言(`useInputFocusRing`、`.send-button-custom`、`.sendbox-model-btn`、`chat-layout-header--glass`、800px 列)
 重塑 composer/玻璃头/列表/决策流,并新增 `useLeadThinking` 独立订阅渲染流式思考气泡。**无 IR / 无节点图。**
 
-**Tech Stack:** Rust(nomifun-orchestrator / nomifun-ai-agent / nomifun-realtime)+ React + Arco Design + UnoCSS。
+**Tech Stack:** Rust(openhub-orchestrator / openhub-ai-agent / openhub-realtime)+ React + Arco Design + UnoCSS。
 
 ## Global Constraints
 - **无 IR / compile / typed-graph / 节点图**(已撤回方向,禁复活);编排表达仍为 `orch_run_tasks.kind`。
 - **per-run 锁(`RunLocks`,tokio Mutex)绝不可跨 LLM await**;锁内只做纯 DB 变更。
-- 编排 WS 事件**手镜像**:新事件须同时加 `crates/.../nomifun-orchestrator/src/events.rs`、
+- 编排 WS 事件**手镜像**:新事件须同时加 `crates/.../openhub-orchestrator/src/events.rs`、
   `ui/src/common/types/orchestrator/orchestratorEvents.ts`、`ui/src/common/adapter/ipcBridge.ts` 的 `runEvents`。
 - 主题色**一律走 CSS 变量**(`--bg-base`/`--bg-2`/`--color-border-3`/`--color-border-2`/`rgb(var(--primary-6))` 等),
   禁硬编码(护现役 5 套主题)。
@@ -35,7 +35,7 @@
 ### Task B1: 后端 leadThinking 事件
 
 **Files:**
-- Modify: `crates/backend/nomifun-orchestrator/src/events.rs`(`OrchestratorRunEventEmitter` 加 `emit_lead_thinking`)
+- Modify: `crates/backend/openhub-orchestrator/src/events.rs`(`OrchestratorRunEventEmitter` 加 `emit_lead_thinking`)
 - Test: 同 crate 既有 events/emitter 测试位置(沿用现有测试文件)
 
 **Interfaces:**
@@ -59,10 +59,10 @@
 ### Task B2: 流式转发 lead 增量(text + reasoning,带合并)
 
 **Files:**
-- Modify: `crates/backend/nomifun-ai-agent/src/factory/provider_config.rs`(增加可转发 thinking 的流式入口)
-- Modify: `crates/backend/nomifun-orchestrator/src/plan.rs`(`PlanProducer` 接入 lead-thinking sink;LlmPlanProducer 用流式入口替换 one_shot 空回调)
-- Modify: `crates/backend/nomifun-orchestrator/src/run_service.rs`(把 sink 从引擎传入 produce/adjust/summarize 调用点)
-- Modify: `crates/backend/nomifun-orchestrator/src/engine.rs`(`RunEngineDeps` 已持 emitter;构造 sink 闭包 `|kind, delta| emitter.emit_lead_thinking(run_id, phase, kind, Some(delta), None, false)`,带合并节流)
+- Modify: `crates/backend/openhub-ai-agent/src/factory/provider_config.rs`(增加可转发 thinking 的流式入口)
+- Modify: `crates/backend/openhub-orchestrator/src/plan.rs`(`PlanProducer` 接入 lead-thinking sink;LlmPlanProducer 用流式入口替换 one_shot 空回调)
+- Modify: `crates/backend/openhub-orchestrator/src/run_service.rs`(把 sink 从引擎传入 produce/adjust/summarize 调用点)
+- Modify: `crates/backend/openhub-orchestrator/src/engine.rs`(`RunEngineDeps` 已持 emitter;构造 sink 闭包 `|kind, delta| emitter.emit_lead_thinking(run_id, phase, kind, Some(delta), None, false)`,带合并节流)
 - Test: plan.rs / provider_config.rs 既有测试位置
 
 **Interfaces:**
@@ -83,7 +83,7 @@
 - [ ] 运行确认失败。
 - [ ] 实现 `streaming_completion_kinded` + `DeltaKind`;`drain_*` 转发 thinking。
 - [ ] 实现 plan.rs sink 形参 + LlmPlanProducer 分支(有 sink 走 kinded,无 sink 走 one_shot);run_service 调用点透传 sink;engine 构造合并节流 sink 闭包(phase 由调用上下文给定)。
-- [ ] 运行 nomifun-ai-agent + nomifun-orchestrator 相关 nextest,确认通过。
+- [ ] 运行 openhub-ai-agent + openhub-orchestrator 相关 nextest,确认通过。
 - [ ] 提交 `feat(orchestrator): 流式转发 lead 规划增量(text+reasoning,合并防洪泛)`。
 
 ---
@@ -91,8 +91,8 @@
 ### Task B3: 乐观创建立即返回 + 阶段叙述
 
 **Files:**
-- Modify: `crates/backend/nomifun-orchestrator/src/routes.rs`(`create_adhoc_run`:create_adhoc 后**立即返回** run;`plan()`+`engine.start` 改为后台 `tokio::spawn`)
-- Modify: `crates/backend/nomifun-orchestrator/src/run_service.rs` 和/或 `engine.rs`(在 `plan()` 关键节点发 `kind:"phase"` 叙述事件:planning-started / decomposing / assigning / plan-ready;plan-ready 复用既有 `emit_run_plan_updated`)
+- Modify: `crates/backend/openhub-orchestrator/src/routes.rs`(`create_adhoc_run`:create_adhoc 后**立即返回** run;`plan()`+`engine.start` 改为后台 `tokio::spawn`)
+- Modify: `crates/backend/openhub-orchestrator/src/run_service.rs` 和/或 `engine.rs`(在 `plan()` 关键节点发 `kind:"phase"` 叙述事件:planning-started / decomposing / assigning / plan-ready;plan-ready 复用既有 `emit_run_plan_updated`)
 - Test: routes/run_service 既有测试位置;`caps_orchestrator.rs`(MCP 前门)同步保持一致或显式不变
 
 **Interfaces:**
@@ -114,8 +114,8 @@
 ### Task B4: adjust 路径锁外流式(守不变量)
 
 **Files:**
-- Modify: `crates/backend/nomifun-orchestrator/src/engine.rs`(`RunEngine::adjust`:把 `planner.adjust` 的 LLM await 移出 per-run 锁)
-- Modify: `crates/backend/nomifun-orchestrator/src/run_service.rs`(拆分 adjust:`compute_adjusted_plan`(锁外,含 LLM)+ `apply_adjusted_plan`(锁内 reconcile_run_plan + 重激活))
+- Modify: `crates/backend/openhub-orchestrator/src/engine.rs`(`RunEngine::adjust`:把 `planner.adjust` 的 LLM await 移出 per-run 锁)
+- Modify: `crates/backend/openhub-orchestrator/src/run_service.rs`(拆分 adjust:`compute_adjusted_plan`(锁外,含 LLM)+ `apply_adjusted_plan`(锁内 reconcile_run_plan + 重激活))
 - Test: 既有 adjust/reconcile 测试位置
 
 **Interfaces:**
@@ -125,7 +125,7 @@
 - [ ] 写失败测试:断言 adjust 期间 per-run 锁未跨 LLM await(用注入延迟的 mock planner + 并发 rerun/loop 终止判定,验证不被阻塞 / 无死锁);adjust 语义(保留/新增/移除 + deps 重建 + 完成产出保留)与重构前一致。
 - [ ] 运行确认失败。
 - [ ] 实现拆分:compute(锁外)/apply(锁内);adjust phase 流式接 B2 sink。
-- [ ] 运行 nomifun-orchestrator 相关 nextest(含既有 adjust/reconcile/锁用例),确认通过。
+- [ ] 运行 openhub-orchestrator 相关 nextest(含既有 adjust/reconcile/锁用例),确认通过。
 - [ ] 提交 `refactor(orchestrator): adjust 的 lead LLM 调用移出 per-run 锁 + adjust 阶段流式`。
 
 ---

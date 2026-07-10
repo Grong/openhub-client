@@ -56,8 +56,8 @@ metadata 使用 snake_case（`file_name`、`file_path`），因为 stream / IPC 
 
 `PreviewProvider` 只持久化小体积文本 tab：
 
-- 带 namespace 的 key：`nomifun_preview_tabs:<namespace>` 与
-  `nomifun_preview_active_tab_id:<namespace>`；
+- 带 namespace 的 key：`openhub_preview_tabs:<namespace>` 与
+  `openhub_preview_active_tab_id:<namespace>`；
 - 默认 namespace：`conversation`；
 - 可持久化类型：markdown、HTML、code、diff；
 - 有内容长度上限，避免 localStorage 卡顿。

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -13,8 +13,8 @@
  * - ConversationShell broadcasts STATE on mount and on every change.
  * - The Titlebar reflects STATE on its toggle icon and dispatches TOGGLE on click.
  */
-export const SESSION_SIDER_TOGGLE_EVENT = 'nomifun-session-sider-toggle';
-export const SESSION_SIDER_STATE_EVENT = 'nomifun-session-sider-state';
+export const SESSION_SIDER_TOGGLE_EVENT = 'openhub-session-sider-toggle';
+export const SESSION_SIDER_STATE_EVENT = 'openhub-session-sider-state';
 
 export interface SessionSiderStateDetail {
   collapsed: boolean;

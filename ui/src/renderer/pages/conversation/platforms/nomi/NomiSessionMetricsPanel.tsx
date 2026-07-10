@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -146,7 +146,7 @@ const NomiSessionMetricsPanel: React.FC<{ conversation: TChatConversation }> = (
   }
 
   return (
-    <div className='w-full p-12px pb-16px box-border text-t-primary' data-testid='nomi-session-metrics-panel'>
+    <div className='w-full p-12px pb-16px box-border text-t-primary' data-testid='openhub-session-metrics-panel'>
       <div className='mb-12px'>
         <div className='text-13px font-600 leading-20px'>{t('conversation.sessionMetrics.title')}</div>
         <div className='text-11px text-t-tertiary leading-16px'>{t('conversation.sessionMetrics.subtitle')}</div>

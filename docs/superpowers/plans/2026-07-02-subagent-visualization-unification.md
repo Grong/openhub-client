@@ -1,35 +1,35 @@
-# 子 Agent 可视化底座统一 (nomi_spawn 扁平编排) Implementation Plan
+# 子 Agent 可视化底座统一 (openhub_spawn 扁平编排) Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** 桌面会话（伙伴+普通）的并行子 agent 不再走静默的进程内 Spawn，而是走跳过 planner 的扁平编排 run（`nomi_spawn` 网关工具），复用编排 DAG 画布/worker 转录可视化；进程内 Spawn 仅留 CLI。
+**Goal:** 桌面会话（伙伴+普通）的并行子 agent 不再走静默的进程内 Spawn，而是走跳过 planner 的扁平编排 run（`openhub_spawn` 网关工具），复用编排 DAG 画布/worker 转录可视化；进程内 Spawn 仅留 CLI。
 
-**Architecture:** 三层：① `nomi-tools`/`nomi-config`/`nomi-agent` 引擎层加两个 config 门控（`in_process_spawn` 注册门 + `builtin_allowlist` 工具白名单）；② `nomifun-orchestrator` 把 `plan()` 拆出可复用落库半段，新增 `plan_flat`（无 planner LLM）；③ `nomifun-gateway` 新增 `nomi_spawn` 能力（supervised 自主度、deny Remote），`nomifun-ai-agent` 工厂计算门控值。前端零改动（可视化纯数据驱动）。
+**Architecture:** 三层：① `openhub-tools`/`openhub-config`/`openhub-agent` 引擎层加两个 config 门控（`in_process_spawn` 注册门 + `builtin_allowlist` 工具白名单）；② `openhub-orchestrator` 把 `plan()` 拆出可复用落库半段，新增 `plan_flat`（无 planner LLM）；③ `openhub-gateway` 新增 `openhub_spawn` 能力（supervised 自主度、deny Remote），`openhub-ai-agent` 工厂计算门控值。前端零改动（可视化纯数据驱动）。
 
 **Tech Stack:** Rust (tokio/axum/sqlx/serde), workspace crates 见下。
 
 ## Global Constraints
 
-- 提交作者：`git -c user.name=nomifun -c user.email=rika00@qq.com commit`（禁止 Claude 署名 / Co-Authored-By）。
+- 提交作者：`git -c user.nameopenhub-c user.email=rika00@qq.com commit`（禁止 Claude 署名 / Co-Authored-By）。
 - 禁 `cargo fmt`（全局）；提交信息中文。
 - 编排不变式**绝不破坏**：per-run 锁不跨 LLM await；`link_orchestrator_run` 只 merge extra + 广播；侧栏过滤键 `orchestrator_task_id`；新网关能力必须 `.deny_on(ORCHESTRATOR_DENY_SURFACES)`。
 - 所有新 config 字段默认值 = 现状行为（`in_process_spawn` 默认 `true`、`builtin_allowlist` 默认空 = 不限制）——CLI/既有会话零回归。
 - 每个 Task 结束跑该 crate 测试；全部完成后跑 `cargo check --workspace` + 相关 crate 全量测试。
-- 测试命令模式：`cargo test -p <crate> --lib <filter>`（在仓库根 `D:\code\nomifun\nomifun-tauri` 运行）。
+- 测试命令模式：`cargo test -p <crate> --lib <filter>`（在仓库根 `D:\codeopenhubopenhub-client` 运行）。
 
 ---
 
 ### Task 1: `ToolRegistry::retain_named`（工具白名单的执行机制）
 
 **Files:**
-- Modify: `crates/agent/nomi-tools/src/registry.rs`
+- Modify: `crates/agent/openhub-tools/src/registry.rs`
 
 **Interfaces:**
 - Produces: `pub fn retain_named(&mut self, allowed: &[String])` — 只保留名字在 `allowed` 里的已注册工具；`allowed` 为空时 no-op（不限制）。Task 3 的 bootstrap 调用它。
 
 - [ ] **Step 1: 读现有 registry 结构**
 
-Read `crates/agent/nomi-tools/src/registry.rs`（全文 ~67 行），确认内部存储（`HashMap`/`Vec`）与既有测试风格。
+Read `crates/agent/openhub-tools/src/registry.rs`（全文 ~67 行），确认内部存储（`HashMap`/`Vec`）与既有测试风格。
 
 - [ ] **Step 2: 写失败测试**（追加到该文件已有 `#[cfg(test)] mod tests`；若无则新建，参考同 crate lib.rs 的测试风格）
 
@@ -56,7 +56,7 @@ fn retain_named_keeps_only_allowed_and_empty_is_noop() {
 
 - [ ] **Step 3: 跑测试确认失败**
 
-Run: `cargo test -p nomi-tools --lib retain_named`
+Run: `cargo test -p openhub-tools --lib retain_named`
 Expected: FAIL（`retain_named` 未定义）
 
 - [ ] **Step 4: 最小实现**（按实际内部存储写；若是 `HashMap<String, Box<dyn Tool>>`：）
@@ -78,14 +78,14 @@ pub fn retain_named(&mut self, allowed: &[String]) {
 
 - [ ] **Step 5: 跑测试确认通过**
 
-Run: `cargo test -p nomi-tools --lib`
+Run: `cargo test -p openhub-tools --lib`
 Expected: 全部 PASS（含既有测试）
 
 - [ ] **Step 6: Commit**
 
 ```bash
-git add crates/agent/nomi-tools/src/registry.rs
-git -c user.name=nomifun -c user.email=rika00@qq.com commit -m "feat(nomi-tools): ToolRegistry::retain_named 工具白名单（空=不限制）"
+git add crates/agent/openhub-tools/src/registry.rs
+git -c user.nameopenhub-c user.email=rika00@qq.com commit -m "feat(openhub-tools): ToolRegistry::retain_named 工具白名单（空=不限制）"
 ```
 
 ---
@@ -93,7 +93,7 @@ git -c user.name=nomifun -c user.email=rika00@qq.com commit -m "feat(nomi-tools)
 ### Task 2: `ToolsConfig` 两个新字段
 
 **Files:**
-- Modify: `crates/agent/nomi-config/src/config.rs:181-259`（`ToolsConfig` struct + `Default` impl）
+- Modify: `crates/agent/openhub-config/src/config.rs:181-259`（`ToolsConfig` struct + `Default` impl）
 
 **Interfaces:**
 - Produces: `ToolsConfig.in_process_spawn: bool`（默认 `true`）、`ToolsConfig.builtin_allowlist: Vec<String>`（默认空）。Task 3 的 bootstrap、Task 4 的 manager 消费。
@@ -115,14 +115,14 @@ fn tools_config_new_fields_default_to_current_behavior() {
 
 - [ ] **Step 2: 跑测试确认失败**
 
-Run: `cargo test -p nomi-config --lib tools_config_new_fields`
+Run: `cargo test -p openhub-config --lib tools_config_new_fields`
 Expected: FAIL（字段不存在）
 
 - [ ] **Step 3: 实现**——在 `ToolsConfig` struct（`cooperative_cancel` 字段之后）加：
 
 ```rust
     /// 是否注册进程内 `Spawn` 子 agent 工具（默认 true = 现状）。桌面后端会话
-    /// 由工厂置 false —— 改走可视化的 `nomi_spawn` 编排扇出（子 agent 有 DAG
+    /// 由工厂置 false —— 改走可视化的 `openhub_spawn` 编排扇出（子 agent 有 DAG
     /// 画布/转录）；CLI/独立模式保持 true（进程内 Spawn 仍是其唯一扇出）。
     #[serde(default = "default_true")]
     pub in_process_spawn: bool,
@@ -145,14 +145,14 @@ fn default_true() -> bool {
 
 - [ ] **Step 4: 跑测试确认通过**
 
-Run: `cargo test -p nomi-config --lib`
+Run: `cargo test -p openhub-config --lib`
 Expected: 全部 PASS
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add crates/agent/nomi-config/src/config.rs
-git -c user.name=nomifun -c user.email=rika00@qq.com commit -m "feat(nomi-config): ToolsConfig 增 in_process_spawn 门控与 builtin_allowlist 白名单（默认=现状）"
+git add crates/agent/openhub-config/src/config.rs
+git -c user.nameopenhub-c user.email=rika00@qq.com commit -m "feat(openhub-config): ToolsConfig 增 in_process_spawn 门控与 builtin_allowlist 白名单（默认=现状）"
 ```
 
 ---
@@ -160,8 +160,8 @@ git -c user.name=nomifun -c user.email=rika00@qq.com commit -m "feat(nomi-config
 ### Task 3: bootstrap 应用两个门控
 
 **Files:**
-- Modify: `crates/agent/nomi-agent/src/bootstrap.rs`（SpawnTool 注册 ~:580-593；引擎构造前应用 retain）
-- Modify: `crates/agent/nomi-agent/src/bootstrap_test.rs`（现有 :74 断言 Spawn 恒注册——改造）
+- Modify: `crates/agent/openhub-agent/src/bootstrap.rs`（SpawnTool 注册 ~:580-593；引擎构造前应用 retain）
+- Modify: `crates/agent/openhub-agent/src/bootstrap_test.rs`（现有 :74 断言 Spawn 恒注册——改造）
 
 **Interfaces:**
 - Consumes: Task 1 `retain_named`、Task 2 两字段。
@@ -197,14 +197,14 @@ async fn builtin_allowlist_restricts_registered_tools() {
 
 - [ ] **Step 2: 跑测试确认失败**
 
-Run: `cargo test -p nomi-agent --lib bootstrap`
+Run: `cargo test -p openhub-agent --lib bootstrap`
 Expected: 新测试 FAIL
 
 - [ ] **Step 3: 实现门控**——`bootstrap.rs` :580-593 处，把 spawner 构造 + 注册整体包进条件：
 
 ```rust
         // 进程内 Spawn 门控（默认开）：桌面后端会话由工厂置 false —— 子 agent
-        // 改走可视化的 nomi_spawn 编排扇出；CLI/独立模式保持进程内 Spawn。
+        // 改走可视化的 openhub_spawn 编排扇出；CLI/独立模式保持进程内 Spawn。
         if self.config.tools.in_process_spawn {
             let spawner = Arc::new(
                 crate::spawner::AgentSpawner::new(
@@ -234,14 +234,14 @@ Expected: 新测试 FAIL
 
 - [ ] **Step 5: 跑测试确认通过 + 无回归**
 
-Run: `cargo test -p nomi-agent --lib`
+Run: `cargo test -p openhub-agent --lib`
 Expected: 全部 PASS（444+ 项；若某测试假设 Spawn 恒在，按 Step 1 改造其为"默认在"）
 
 - [ ] **Step 6: Commit**
 
 ```bash
-git add crates/agent/nomi-agent/src/bootstrap.rs crates/agent/nomi-agent/src/bootstrap_test.rs
-git -c user.name=nomifun -c user.email=rika00@qq.com commit -m "feat(nomi-agent): bootstrap 接入 in_process_spawn 门控与 builtin_allowlist 白名单"
+git add crates/agent/openhub-agent/src/bootstrap.rs crates/agent/openhub-agent/src/bootstrap_test.rs
+git -c user.nameopenhub-c user.email=rika00@qq.com commit -m "feat(openhub-agent): bootstrap 接入 in_process_spawn 门控与 builtin_allowlist 白名单"
 ```
 
 ---
@@ -249,10 +249,10 @@ git -c user.name=nomifun -c user.email=rika00@qq.com commit -m "feat(nomi-agent)
 ### Task 4: 后端工厂/manager 灌门控值
 
 **Files:**
-- Modify: `crates/backend/nomifun-api-types/src/agent_build_extra.rs`（`NomiBuildExtra` 加 `allowed_tools`）
-- Modify: `crates/backend/nomifun-ai-agent/src/types.rs:61-144`（`NomiResolvedConfig` 加两字段）
-- Modify: `crates/backend/nomifun-ai-agent/src/factory/nomi.rs`（计算 + 填充；~:377-433 `NomiResolvedConfig` 构造处）
-- Modify: `crates/backend/nomifun-ai-agent/src/manager/nomi/agent.rs:236-261`（灌入 config.tools，紧邻 browser/computer）
+- Modify: `crates/backend/openhub-api-types/src/agent_build_extra.rs`（`NomiBuildExtra` 加 `allowed_tools`）
+- Modify: `crates/backend/openhub-ai-agent/src/types.rs:61-144`（`NomiResolvedConfig` 加两字段）
+- Modify: `crates/backend/openhub-ai-agent/src/factory/nomi.rs`（计算 + 填充；~:377-433 `NomiResolvedConfig` 构造处）
+- Modify: `crates/backend/openhub-ai-agent/src/manager/openhub/agent.rs:236-261`（灌入 config.tools，紧邻 browser/computer）
 
 **Interfaces:**
 - Consumes: Task 2 的 `ToolsConfig` 字段。
@@ -263,9 +263,9 @@ git -c user.name=nomifun -c user.email=rika00@qq.com commit -m "feat(nomi-agent)
 ```rust
 #[test]
 fn engine_spawn_enabled_policy() {
-    // 本地桌面网关会话（普通/伙伴）→ 禁进程内 Spawn（改走 nomi_spawn 可视化扇出）。
+    // 本地桌面网关会话（普通/伙伴）→ 禁进程内 Spawn（改走 openhub_spawn 可视化扇出）。
     assert!(!engine_spawn_enabled(true, None));
-    // IM 渠道 master 会话：nomi_spawn 对 Remote 面拒绝，保留进程内 Spawn。
+    // IM 渠道 master 会话：openhub_spawn 对 Remote 面拒绝，保留进程内 Spawn。
     assert!(engine_spawn_enabled(true, Some("telegram")));
     // 无网关会话（不该出现在桌面，但语义上）→ 保留。
     assert!(engine_spawn_enabled(false, None));
@@ -274,7 +274,7 @@ fn engine_spawn_enabled_policy() {
 
 - [ ] **Step 2: 跑测试确认失败**
 
-Run: `cargo test -p nomifun-ai-agent --lib engine_spawn_enabled`
+Run: `cargo test -p openhub-ai-agent --lib engine_spawn_enabled`
 Expected: FAIL（函数未定义）
 
 - [ ] **Step 3: 实现**
@@ -301,8 +301,8 @@ Expected: FAIL（函数未定义）
 
 ```rust
 /// 进程内 Spawn 门控（纯函数，可单测）：本地桌面网关会话（desktop_gateway 且
-/// 非 IM 渠道）禁用进程内 Spawn —— 子 agent 改走 nomi_spawn 编排扇出（可视化）；
-/// IM 渠道 master（nomi_spawn 对 Remote 面拒绝）与其余会话保留进程内 Spawn。
+/// 非 IM 渠道）禁用进程内 Spawn —— 子 agent 改走 openhub_spawn 编排扇出（可视化）；
+/// IM 渠道 master（openhub_spawn 对 Remote 面拒绝）与其余会话保留进程内 Spawn。
 pub(crate) fn engine_spawn_enabled(desktop_gateway: bool, channel_platform: Option<&str>) -> bool {
     !(desktop_gateway && channel_platform.is_none())
 }
@@ -320,7 +320,7 @@ pub(crate) fn engine_spawn_enabled(desktop_gateway: bool, channel_platform: Opti
 
 （注意：`overrides` 若在此作用域不叫这个名，用该构造处实际读 `desktop_gateway`/`channel_platform` 的同一来源变量。）
 
-(d) `manager/nomi/agent.rs`（:243 `config.tools.browser.enabled` 后）加：
+(d) `manager/openhub/agent.rs`（:243 `config.tools.browser.enabled` 后）加：
 
 ```rust
         // 进程内 Spawn 门控 + per-session 工具白名单（工厂已算好；bootstrap 消费）。
@@ -328,18 +328,18 @@ pub(crate) fn engine_spawn_enabled(desktop_gateway: bool, channel_platform: Opti
         config.tools.builtin_allowlist = config_extra.allowed_tools.clone();
 ```
 
-(e) **编译修复**：`cargo check -p nomifun-ai-agent 2>&1 | grep error` 找出所有 `NomiResolvedConfig { ... }` 构造点（含测试 `make_test_config`），补 `in_process_spawn: true, allowed_tools: Vec::new(),`。
+(e) **编译修复**：`cargo check -p openhub-ai-agent 2>&1 | grep error` 找出所有 `NomiResolvedConfig { ... }` 构造点（含测试 `make_test_config`），补 `in_process_spawn: true, allowed_tools: Vec::new(),`。
 
 - [ ] **Step 4: 跑测试确认通过**
 
-Run: `cargo test -p nomifun-ai-agent --lib`
+Run: `cargo test -p openhub-ai-agent --lib`
 Expected: 全部 PASS（581+ 项）
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add crates/backend/nomifun-api-types/src/agent_build_extra.rs crates/backend/nomifun-ai-agent/src/types.rs crates/backend/nomifun-ai-agent/src/factory/nomi.rs crates/backend/nomifun-ai-agent/src/manager/nomi/agent.rs
-git -c user.name=nomifun -c user.email=rika00@qq.com commit -m "feat(ai-agent): 工厂计算进程内 Spawn 门控 + per-session 工具白名单灌入引擎 config"
+git add crates/backend/openhub-api-types/src/agent_build_extra.rs crates/backend/openhub-ai-agent/src/types.rs crates/backend/openhub-ai-agent/src/factory/nomi.rs crates/backend/openhub-ai-agent/src/manager/openhub/agent.rs
+git -c user.nameopenhub-c user.email=rika00@qq.com commit -m "feat(ai-agent): 工厂计算进程内 Spawn 门控 + per-session 工具白名单灌入引擎 config"
 ```
 
 ---
@@ -347,7 +347,7 @@ git -c user.name=nomifun -c user.email=rika00@qq.com commit -m "feat(ai-agent): 
 ### Task 5: `plan_flat`（跳过 planner 的扁平落库）
 
 **Files:**
-- Modify: `crates/backend/nomifun-orchestrator/src/run_service.rs`（`plan()` :262-448 拆分；新增 `plan_flat` + `spawn_plan_flat_and_start`）
+- Modify: `crates/backend/openhub-orchestrator/src/run_service.rs`（`plan()` :262-448 拆分；新增 `plan_flat` + `spawn_plan_flat_and_start`）
 
 **Interfaces:**
 - Consumes: 既有 `PlannedTask`/`PlannedDag`（api-types）、`persist` 逻辑、`assign_task`、`planned_dag_has_cycle`。
@@ -388,7 +388,7 @@ async fn plan_flat_rejects_empty_tasks() {
 
 #[tokio::test]
 async fn plan_flat_persists_synthesis_dep_edges() {
-    // 携带 depends_on 的 synthesis 任务（nomi_spawn synthesize=true 的形状）也能落边。
+    // 携带 depends_on 的 synthesis 任务（openhub_spawn synthesize=true 的形状）也能落边。
     let (svc, run_id) = setup_supervised_run().await;
     let mut synth = planned_task("综合", "汇总各子任务产出并标注冲突");
     synth.kind = "synthesis".to_string();
@@ -422,7 +422,7 @@ fn planned_task(title: &str, spec: &str) -> PlannedTask {
 
 - [ ] **Step 2: 跑测试确认失败**
 
-Run: `cargo test -p nomifun-orchestrator --lib plan_flat`
+Run: `cargo test -p openhub-orchestrator --lib plan_flat`
 Expected: FAIL（方法未定义）
 
 - [ ] **Step 3: 实现拆分**——`plan()` 保持公共签名与行为**逐字节等价**：
@@ -436,7 +436,7 @@ Expected: FAIL（方法未定义）
     async fn persist_dag_and_activate(
         &self,
         run_id: &str,
-        run: &nomifun_db::models::OrchRunRow, // ← 用 plan() 里 run 变量的实际类型
+        run: &openhub_db::models::OrchRunRow, // ← 用 plan() 里 run 变量的实际类型
         members: &[FleetMember],
         mut dag: PlannedDag,
     ) -> Result<(), AppError> {
@@ -450,7 +450,7 @@ Expected: FAIL（方法未定义）
 (c) 新增：
 
 ```rust
-    /// 扁平 fan-out 规划（nomi_spawn）：跳过 planner LLM，直接把调用方给的任务
+    /// 扁平 fan-out 规划（openhub_spawn）：跳过 planner LLM，直接把调用方给的任务
     /// 列表落库并激活。任务为空 → BadRequest（否则 run 会立即被判 stuck）。
     /// depends_on（如 synthesize 汇总节点）照常落边；autonomy 门与 plan() 一致。
     pub async fn plan_flat(&self, run_id: &str, tasks: Vec<PlannedTask>) -> Result<(), AppError> {
@@ -471,7 +471,7 @@ Expected: FAIL（方法未定义）
 (d) `spawn_plan_and_start`（:1791）旁新增：
 
 ```rust
-/// nomi_spawn 的后台编排：plan_flat（无 planner）→ engine.start。扁平 run 恒为
+/// openhub_spawn 的后台编排：plan_flat（无 planner）→ engine.start。扁平 run 恒为
 /// 非 interactive（supervised/autonomous），故 plan_flat 成功即直接启动引擎。
 /// 与 spawn_plan_and_start 同样 fail-soft：失败只 warn，run 留在 planning 可重试。
 pub fn spawn_plan_flat_and_start(
@@ -494,14 +494,14 @@ pub fn spawn_plan_flat_and_start(
 
 - [ ] **Step 4: 跑测试确认通过 + plan() 无回归**
 
-Run: `cargo test -p nomifun-orchestrator --lib`
+Run: `cargo test -p openhub-orchestrator --lib`
 Expected: 全部 PASS（既有 plan/adjust/engine 测试全绿）
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add crates/backend/nomifun-orchestrator/src/run_service.rs crates/backend/nomifun-orchestrator/src/lib.rs
-git -c user.name=nomifun -c user.email=rika00@qq.com commit -m "feat(orchestrator): plan_flat 扁平规划（跳过 planner LLM）+ spawn_plan_flat_and_start"
+git add crates/backend/openhub-orchestrator/src/run_service.rs crates/backend/openhub-orchestrator/src/lib.rs
+git -c user.nameopenhub-c user.email=rika00@qq.com commit -m "feat(orchestrator): plan_flat 扁平规划（跳过 planner LLM）+ spawn_plan_flat_and_start"
 ```
 
 ---
@@ -509,8 +509,8 @@ git -c user.name=nomifun -c user.email=rika00@qq.com commit -m "feat(orchestrato
 ### Task 6: worker 受限角色（per-node 工具白名单 + 网关收缩）
 
 **Files:**
-- Modify: `crates/backend/nomifun-orchestrator/src/worker.rs`（`role_allowed_tools` + `build_worker_extra` 加 role 参数 + `run_restricted` 默认方法）
-- Modify: `crates/backend/nomifun-orchestrator/src/engine.rs:1272-1283`（dispatch 调 `run_restricted` 传 `task.role`）
+- Modify: `crates/backend/openhub-orchestrator/src/worker.rs`（`role_allowed_tools` + `build_worker_extra` 加 role 参数 + `run_restricted` 默认方法）
+- Modify: `crates/backend/openhub-orchestrator/src/engine.rs:1272-1283`（dispatch 调 `run_restricted` 传 `task.role`）
 
 **Interfaces:**
 - Consumes: Task 4 的 `NomiBuildExtra.allowed_tools`（extra JSON 键 `allowed_tools`）。
@@ -547,7 +547,7 @@ fn build_worker_extra_restricted_role_shrinks_tools_and_gateway() {
 
 - [ ] **Step 2: 跑测试确认失败**
 
-Run: `cargo test -p nomifun-orchestrator --lib role_allowed_tools`
+Run: `cargo test -p openhub-orchestrator --lib role_allowed_tools`
 Expected: FAIL
 
 - [ ] **Step 3: 实现**
@@ -625,49 +625,49 @@ fn role_allowed_tools(role: Option<&str>) -> Option<Vec<&'static str>> {
 
 - [ ] **Step 4: 跑测试确认通过**
 
-Run: `cargo test -p nomifun-orchestrator --lib`
+Run: `cargo test -p openhub-orchestrator --lib`
 Expected: 全部 PASS（mock runner 走默认方法，零翻修）
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add crates/backend/nomifun-orchestrator/src/worker.rs crates/backend/nomifun-orchestrator/src/engine.rs
-git -c user.name=nomifun -c user.email=rika00@qq.com commit -m "feat(orchestrator): 受限角色 worker（per-node 工具白名单 + 网关收缩），run_restricted 默认方法零 mock 翻修"
+git add crates/backend/openhub-orchestrator/src/worker.rs crates/backend/openhub-orchestrator/src/engine.rs
+git -c user.nameopenhub-c user.email=rika00@qq.com commit -m "feat(orchestrator): 受限角色 worker（per-node 工具白名单 + 网关收缩），run_restricted 默认方法零 mock 翻修"
 ```
 
 ---
 
-### Task 7: `nomi_spawn` 网关能力
+### Task 7: `openhub_spawn` 网关能力
 
 **Files:**
-- Modify: `crates/backend/nomifun-gateway/src/caps_orchestrator.rs`（新 params/handler/注册）
+- Modify: `crates/backend/openhub-gateway/src/caps_orchestrator.rs`（新 params/handler/注册）
 
 **Interfaces:**
 - Consumes: Task 5 `plan_flat`/`spawn_plan_flat_and_start`；既有 `resolve_model_range`/`read_conversation_model_range`/`expand_auto_range`/`build_adhoc_request`/`parse_lead_conv_id`/`require_user`/`ok`。
-- Produces: MCP 工具 `nomi_spawn`（tasks[{name,prompt,role?}], synthesize?）。
+- Produces: MCP 工具 `openhub_spawn`（tasks[{name,prompt,role?}], synthesize?）。
 
 - [ ] **Step 1: 写注册测试**（加到 caps_orchestrator.rs 既有 `mod tests`；先 grep 该 mod 现有的注册断言写法——如按名字找 Capability 并断言 deny surface——完全沿用）
 
 ```rust
 #[test]
-fn nomi_spawn_registered_and_denied_on_remote() {
+fn openhub_spawn_registered_and_denied_on_remote() {
     let mut caps = Vec::new();
     register(&mut caps);
-    let spawn = caps.iter().find(|c| c.meta().name == "nomi_spawn").expect("nomi_spawn registered");
-    // 与 nomi_run_create 一致：Remote 面必须拒绝。（断言方式沿用本 mod 既有 deny 测试。）
+    let spawn = caps.iter().find(|c| c.meta().name == "openhub_spawn").expect("openhub_spawn registered");
+    // 与 openhub_run_create 一致：Remote 面必须拒绝。（断言方式沿用本 mod 既有 deny 测试。）
     assert!(spawn.meta().denied_on(Surface::Remote));
 }
 ```
 
 - [ ] **Step 2: 跑测试确认失败**
 
-Run: `cargo test -p nomifun-gateway --lib nomi_spawn`
+Run: `cargo test -p openhub-gateway --lib openhub_spawn`
 Expected: FAIL
 
 - [ ] **Step 3: 实现**——params（`RunResultParams` 之后）：
 
 ```rust
-/// One task in a `nomi_spawn` flat fan-out.
+/// One task in a `openhub_spawn` flat fan-out.
 #[derive(Deserialize, JsonSchema)]
 struct SpawnTaskParam {
     /// Short descriptive name (becomes the task/node title on the canvas).
@@ -704,7 +704,7 @@ async fn spawn(deps: Arc<GatewayDeps>, ctx: crate::deps::CallerCtx, p: SpawnPara
         Err(e) => return e,
     };
     if p.tasks.is_empty() {
-        return json!({ "error": "nomi_spawn requires at least one task" });
+        return json!({ "error": "openhub_spawn requires at least one task" });
     }
     if p.tasks.len() > MAX_SPAWN_TASKS {
         return json!({ "error": format!("too many tasks: {} (max {MAX_SPAWN_TASKS})", p.tasks.len()) });
@@ -780,7 +780,7 @@ async fn spawn(deps: Arc<GatewayDeps>, ctx: crate::deps::CallerCtx, p: SpawnPara
         });
     }
 
-    nomifun_orchestrator::spawn_plan_flat_and_start(
+    openhub_orchestrator::spawn_plan_flat_and_start(
         deps.orchestrator_run_service.clone(),
         deps.orchestrator_run_engine.as_ref().clone(),
         run.id.clone(),
@@ -790,22 +790,22 @@ async fn spawn(deps: Arc<GatewayDeps>, ctx: crate::deps::CallerCtx, p: SpawnPara
         "run_id": run.id,
         "status": "running",
         "task_count": n,
-        "message": "子任务已在编排画布并行执行（用户可实时看到每个子 agent 的状态与产出）。用 nomi_run_status 跟进、nomi_run_result 取汇总，然后向用户总结。",
+        "message": "子任务已在编排画布并行执行（用户可实时看到每个子 agent 的状态与产出）。用 openhub_run_status 跟进、openhub_run_result 取汇总，然后向用户总结。",
     }))
 }
 ```
 
 （`read_conversation_model_range` 的实际返回类型以文件为准——若是 `Option<ModelRange>` 按上；若模式不同，照 `create` :140-146 的用法适配。`ModelRef`/`PlannedTask` 的 import 按需补。）
 
-注册（`register()` 里 `nomi_run_create` 之后）：
+注册（`register()` 里 `openhub_run_create` 之后）：
 
 ```rust
     // 1b. Flat fan-out（write）。与 create 同域同 deny：Desktop-only。
     out.push(Capability::new::<SpawnParams, _, _>(
         CapabilityMeta::new(
-            "nomi_spawn",
+            "openhub_spawn",
             "orchestrator",
-            "Run several INDEPENDENT sub-agent tasks in parallel with live visualization (each task = a visible worker on the orchestration canvas; the user sees status and output per agent). No planner, no approval gate — starts immediately. Params: tasks (1-8 of {name, prompt, role?}; role searcher/reviewer = read-only, verifier = read-only+Bash, omit = full tools), synthesize (optional; true appends a read-only consolidation task). Use nomi_run_create instead for complex goals needing decomposition/dependencies. Returns run_id; follow up with nomi_run_status / nomi_run_result.",
+            "Run several INDEPENDENT sub-agent tasks in parallel with live visualization (each task = a visible worker on the orchestration canvas; the user sees status and output per agent). No planner, no approval gate — starts immediately. Params: tasks (1-8 of {name, prompt, role?}; role searcher/reviewer = read-only, verifier = read-only+Bash, omit = full tools), synthesize (optional; true appends a read-only consolidation task). Use openhub_run_create instead for complex goals needing decomposition/dependencies. Returns run_id; follow up with openhub_run_status / openhub_run_result.",
             DangerTier::Write,
         )
         .deny_on(ORCHESTRATOR_DENY_SURFACES),
@@ -815,14 +815,14 @@ async fn spawn(deps: Arc<GatewayDeps>, ctx: crate::deps::CallerCtx, p: SpawnPara
 
 - [ ] **Step 4: 跑测试确认通过**
 
-Run: `cargo test -p nomifun-gateway --lib`
+Run: `cargo test -p openhub-gateway --lib`
 Expected: 全部 PASS
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add crates/backend/nomifun-gateway/src/caps_orchestrator.rs
-git -c user.name=nomifun -c user.email=rika00@qq.com commit -m "feat(gateway): nomi_spawn 扁平并行扇出能力（画布可视化、supervised 即跑、deny Remote）"
+git add crates/backend/openhub-gateway/src/caps_orchestrator.rs
+git -c user.nameopenhub-c user.email=rika00@qq.com commit -m "feat(gateway): openhub_spawn 扁平并行扇出能力（画布可视化、supervised 即跑、deny Remote）"
 ```
 
 ---
@@ -830,37 +830,37 @@ git -c user.name=nomifun -c user.email=rika00@qq.com commit -m "feat(gateway): n
 ### Task 8: Prompt 引导（lead + 伙伴）
 
 **Files:**
-- Modify: `crates/backend/nomifun-ai-agent/src/factory/nomi.rs`（`LEAD_ORCHESTRATOR_PROMPT` ~:664）
-- Modify: `crates/backend/nomifun-companion/src/companion.rs`（智能编排 nudge，grep `调度子 agent`）
+- Modify: `crates/backend/openhub-ai-agent/src/factory/nomi.rs`（`LEAD_ORCHESTRATOR_PROMPT` ~:664）
+- Modify: `crates/backend/openhub-companion/src/companion.rs`（智能编排 nudge，grep `调度子 agent`）
 
-**Interfaces:** 纯文案；既有测试断言 `nomi_run_create` 在 prompt 里，新增断言 `nomi_spawn`。
+**Interfaces:** 纯文案；既有测试断言 `openhub_run_create` 在 prompt 里，新增断言 `openhub_spawn`。
 
-- [ ] **Step 1: 更新既有 prompt 测试**——factory 测试断言 lead prompt 含 `nomi_spawn`；companion 测试 `companion_system_prompt_smart_orchestration_nudge_local_only` 加断言 `on.contains("nomi_spawn")`。跑确认 FAIL。
+- [ ] **Step 1: 更新既有 prompt 测试**——factory 测试断言 lead prompt 含 `openhub_spawn`；companion 测试 `companion_system_prompt_smart_orchestration_nudge_local_only` 加断言 `on.contains("openhub_spawn")`。跑确认 FAIL。
 
 - [ ] **Step 2: 改文案**
 
 `LEAD_ORCHESTRATOR_PROMPT` 在「对复杂、可拆分…」句后补一句：
 
 ```
-对多个相互独立、无需拆解的并行小任务：改用 `nomi_spawn(tasks)` 直接并行扇出（无需规划、立即执行、每个子任务在画布上可见）。
+对多个相互独立、无需拆解的并行小任务：改用 `openhub_spawn(tasks)` 直接并行扇出（无需规划、立即执行、每个子任务在画布上可见）。
 ```
 
-Companion nudge（`调度子 agent（智能编排）` 段）在 `nomi_run_create` 句后补：
+Companion nudge（`调度子 agent（智能编排）` 段）在 `openhub_run_create` 句后补：
 
 ```
-如果只是几个相互独立的小任务要并行跑，用 nomi_spawn(tasks) 更快：不经规划直接开工，主人能在画布上看到每个子任务的进展。
+如果只是几个相互独立的小任务要并行跑，用 openhub_spawn(tasks) 更快：不经规划直接开工，主人能在画布上看到每个子任务的进展。
 ```
 
 - [ ] **Step 3: 跑测试确认通过**
 
-Run: `cargo test -p nomifun-ai-agent --lib lead && cargo test -p nomifun-companion --lib companion::`
+Run: `cargo test -p openhub-ai-agent --lib lead && cargo test -p openhub-companion --lib companion::`
 Expected: PASS
 
 - [ ] **Step 4: Commit**
 
 ```bash
-git add crates/backend/nomifun-ai-agent/src/factory/nomi.rs crates/backend/nomifun-companion/src/companion.rs
-git -c user.name=nomifun -c user.email=rika00@qq.com commit -m "feat(prompt): lead/伙伴提示引导独立并行小任务用 nomi_spawn"
+git add crates/backend/openhub-ai-agent/src/factory/nomi.rs crates/backend/openhub-companion/src/companion.rs
+git -c user.nameopenhub-c user.email=rika00@qq.com commit -m "feat(prompt): lead/伙伴提示引导独立并行小任务用 openhub_spawn"
 ```
 
 ---
@@ -873,19 +873,19 @@ git -c user.name=nomifun -c user.email=rika00@qq.com commit -m "feat(prompt): le
 - [ ] **Step 1: 全量回归**
 
 ```bash
-cargo test -p nomi-tools -p nomi-config -p nomi-agent --lib
-cargo test -p nomifun-orchestrator -p nomifun-gateway -p nomifun-ai-agent -p nomifun-companion -p nomifun-conversation --lib
+cargo test -p openhub-tools -p openhub-config -p openhub-agent --lib
+cargo test -p openhub-orchestrator -p openhub-gateway -p openhub-ai-agent -p openhub-companion -p openhub-conversation --lib
 cargo check --workspace --message-format=short
 bun run typecheck && bun run check:i18n
 ```
 
 Expected: 全部 exit 0。前端无改动，typecheck/i18n 应原样通过。
 
-- [ ] **Step 2: 设计文档追加「实施状态」**（列已交付各 Task、测试数、明确「运行时画布点亮」需真机验证——冒烟步骤：桌面会话让模型调 `nomi_spawn` 两个 hello-world 任务 → 右栏编排 tab 出现 2 节点 → 点节点看 worker 转录 → `nomi_run_result` 有汇总）。
+- [ ] **Step 2: 设计文档追加「实施状态」**（列已交付各 Task、测试数、明确「运行时画布点亮」需真机验证——冒烟步骤：桌面会话让模型调 `openhub_spawn` 两个 hello-world 任务 → 右栏编排 tab 出现 2 节点 → 点节点看 worker 转录 → `openhub_run_result` 有汇总）。
 
 - [ ] **Step 3: Commit**
 
 ```bash
 git add docs/superpowers/specs/2026-07-02-subagent-visualization-unification-design.md
-git -c user.name=nomifun -c user.email=rika00@qq.com commit -m "docs: 子 agent 可视化统一 v1 实施状态与真机冒烟清单"
+git -c user.nameopenhub-c user.email=rika00@qq.com commit -m "docs: 子 agent 可视化统一 v1 实施状态与真机冒烟清单"
 ```

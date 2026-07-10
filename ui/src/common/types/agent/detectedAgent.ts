@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -19,4 +19,4 @@ export type RemoteAgentProtocol = 'openclaw' | 'zeroclaw' | 'acp';
 export type RemoteAgentAuthType = 'bearer' | 'password' | 'none';
 
 /** Execution engine kinds — each uses a different protocol or runtime */
-export type DetectedAgentKind = 'acp' | 'remote' | 'nomi' | 'openclaw-gateway' | 'nanobot';
+export type DetectedAgentKind = 'acp' | 'remote' | 'openhub' | 'openclaw-gateway' | 'nanobot';

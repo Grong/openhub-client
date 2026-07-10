@@ -1,6 +1,6 @@
-export const WORKSPACE_TOGGLE_EVENT = 'nomifun-workspace-toggle';
-export const WORKSPACE_STATE_EVENT = 'nomifun-workspace-state';
-export const WORKSPACE_HAS_FILES_EVENT = 'nomifun-workspace-has-files';
+export const WORKSPACE_TOGGLE_EVENT = 'openhub-workspace-toggle';
+export const WORKSPACE_STATE_EVENT = 'openhub-workspace-state';
+export const WORKSPACE_HAS_FILES_EVENT = 'openhub-workspace-has-files';
 
 export interface WorkspaceStateDetail {
   collapsed: boolean;

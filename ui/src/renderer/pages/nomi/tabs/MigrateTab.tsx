@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -70,7 +70,7 @@ const MigrateTab: React.FC<Props> = ({ companions }) => {
 
   // ── 1. memory hub export ──
   const exportMemory = async () => {
-    const dest = await pickSavePath(`nomifun-memory-${today()}.zip`);
+    const dest = await pickSavePath(`openhub-memory-${today()}.zip`);
     if (!dest) return;
     setExportingMemory(true);
     try {
@@ -87,7 +87,7 @@ const MigrateTab: React.FC<Props> = ({ companions }) => {
   const exportCompanion = async () => {
     const companion = companions.find((p) => p.id === effectiveCompanionId);
     if (!companion) return;
-    const dest = await pickSavePath(`nomifun-companion-${safeName(companion.name)}-${today()}.zip`);
+    const dest = await pickSavePath(`openhub-companion-${safeName(companion.name)}-${today()}.zip`);
     if (!dest) return;
     setExportingCompanion(true);
     try {

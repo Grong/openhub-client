@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -22,7 +22,7 @@ describe('addImportantToAll', () => {
     const processed = addImportantToAll(css);
 
     expect(processed.includes('url("data:image/png;base64,AAAA")')).toBe(true);
-    expect(processed.includes('linear-gradient(var(--nomi-manual-bg-mask), var(--nomi-manual-bg-mask))')).toBe(true);
+    expect(processed.includes('linear-gradient(var(--openhub-manual-bg-mask), var(--openhub-manual-bg-mask))')).toBe(true);
     expect(processed.includes('data:image/png !important')).toBe(false);
   });
 });

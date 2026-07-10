@@ -368,7 +368,7 @@ const AddPlatformModal = ModalHOC<{
       setIsFullUrl(false);
       setDismissedFixUrl(null); // 重置 base_url 修复建议 / Reset base_url fix suggestion
 
-      // Pre-fill from deep link data (nomifun:// protocol)
+      // Pre-fill from deep link data (openhub:// protocol)
       if (deepLinkData?.base_url || deepLinkData?.api_key) {
         // Default to new-api platform for deep links (typical one-api/new-api usage)
         const dlPlatform = deepLinkData.platform || 'new-api';

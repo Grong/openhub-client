@@ -1,6 +1,6 @@
 # Introduction
 
-**NomiFun** is an open-source AI workstation and coding workspace. It unifies
+**OpenHub** is an open-source AI workstation and coding workspace. It unifies
 multiple AI runtimes, LLM providers, MCP servers, skills, terminals, knowledge
 bases, scheduled work, and companion/remote capability surfaces in one local-first
 application.
@@ -9,12 +9,12 @@ application.
 > [Quick Start](quick-start.md). For the full documentation map, see
 > [docs/README.md](../README.md).
 
-![NomiFun guide / landing page](../images/gs-01-introduction-hero.png)
+![OpenHub guide / landing page](../images/gs-01-introduction-hero.png)
 
-## What NomiFun Solves
+## What OpenHub Solves
 
 Modern AI workflows are scattered across separate CLIs, terminals, browser
-tabs, MCP servers, and local scripts. NomiFun pulls them into one workspace:
+tabs, MCP servers, and local scripts. OpenHub pulls them into one workspace:
 
 - **Many agents, one surface.** Use the built-in Nomi engine or external
   ACP-style CLIs such as Claude Code, Codex, Gemini CLI, Qwen, and OpenCode.
@@ -29,25 +29,25 @@ tabs, MCP servers, and local scripts. NomiFun pulls them into one workspace:
 - **Local-first deployment.** Run it as a Tauri desktop app or a self-hosted web
   server. You provide the model/API credentials and decide where the data lives.
 
-NomiFun is not a no-code SaaS chat product. It is infrastructure for users who
+OpenHub is not a no-code SaaS chat product. It is infrastructure for users who
 are comfortable configuring agents, providers, local tools, and self-hosted
 services.
 
 ## Two Hosts, One Backend
 
-Both hosts run the same Rust backend (`nomifun-app`) in-process and load the
+Both hosts run the same Rust backend (`openhub-app`) in-process and load the
 same React SPA (`ui/dist`).
 
 | Mode | Binary | Auth model | Typical use |
 | --- | --- | --- | --- |
-| Desktop app | `nomifun-desktop` | Per-boot local trust token injected into the desktop webview | Personal workstation |
-| Web server | `nomifun-web` | Login required by default; first-run setup or pre-seeded admin | Browser / LAN / server deployment |
+| Desktop app | `openhub-desktop` | Per-boot local trust token injected into the desktop webview | Personal workstation |
+| Web server | `openhub-web` | Login required by default; first-run setup or pre-seeded admin | Browser / LAN / server deployment |
 
 ```text
-nomifun-desktop
+openhub-desktop
   Tauri shell -> embedded backend on 127.0.0.1:<ephemeral> -> same SPA
 
-nomifun-web
+openhub-web
   axum server -> /api + /ws + static ui/dist on one port (default 8787)
 ```
 
@@ -73,11 +73,11 @@ The current frontend route source is
 
 ## Project Status
 
-NomiFun is in active development. [STATUS.md](../../STATUS.md) is the compact
+OpenHub is in active development. [STATUS.md](../../STATUS.md) is the compact
 current-state snapshot. Design and audit history is not kept in the repo; consult
 git history for past decisions.
 
 ## License
 
-NomiFun is released under the Apache-2.0 License. See
+OpenHub is released under the Apache-2.0 License. See
 [`NOTICE`](../../NOTICE) for third-party attributions.

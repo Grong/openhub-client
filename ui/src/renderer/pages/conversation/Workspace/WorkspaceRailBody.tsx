@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -169,7 +169,7 @@ const WorkspaceRailBody: React.FC<{ source: WorkspaceSource; messageApi?: Messag
 
   // Authoritative source: `conversation.extra.is_temporary_workspace` is
   // derived by the backend on every response (see
-  // nomifun-conversation::convert::row_to_response). We never inspect the
+  // openhub-conversation::convert::row_to_response). We never inspect the
   // directory path shape — the backend's temp-workspace layout is not a
   // public contract. Default to false when the source omits it.
   const isTemporaryWorkspace = source.isTemporary ?? false;

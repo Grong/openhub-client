@@ -1,22 +1,22 @@
 # Troubleshooting
 
-Symptoms you might hit running NomiFun, and the actual mechanism behind each one. If you find a problem that is not on this list, the source is the fastest reference — every behaviour described below is grounded in a specific file in `crates/backend/`.
+Symptoms you might hit running OpenHub, and the actual mechanism behind each one. If you find a problem that is not on this list, the source is the fastest reference — every behaviour described below is grounded in a specific file in `crates/backend/`.
 
 ## Backend port / connection problems
 
-### `nomifun-web: invalid --host '<value>'`
+### `openhub-web: invalid --host '<value>'`
 
-The host argument must parse as an IP address (`127.0.0.1`, `0.0.0.0`, an explicit interface IP). Hostnames like `localhost` are not parsed — `nomifun-web` fails fast with this message rather than producing a cryptic socket error later. Pass an IP literal.
+The host argument must parse as an IP address (`127.0.0.1`, `0.0.0.0`, an explicit interface IP). Hostnames like `localhost` are not parsed — `openhub-web` fails fast with this message rather than producing a cryptic socket error later. Pass an IP literal.
 
 ### `address already in use` on the configured port
 
-Another process is bound to the same port. The web host uses `8787` by default (`NOMIFUN_WEB_PORT`). The desktop shell does not have this problem because it asks the OS for a free localhost port at startup and then tells the renderer over IPC.
+Another process is bound to the same port. The web host uses `8787` by default (`OPENHUB_WEB_PORT`). The desktop shell does not have this problem because it asks the OS for a free localhost port at startup and then tells the renderer over IPC.
 
-To find the offender on Linux/macOS: `lsof -i :8787`. On Windows: `Get-NetTCPConnection -LocalPort 8787`. Either kill it, or change `--port` / `NOMIFUN_WEB_PORT`.
+To find the offender on Linux/macOS: `lsof -i :8787`. On Windows: `Get-NetTCPConnection -LocalPort 8787`. Either kill it, or change `--port` / `OPENHUB_WEB_PORT`.
 
 ### Browser cannot reach the server on a non-loopback address
 
-`nomifun-web` defaults to binding `127.0.0.1`. To accept LAN/VPN traffic, either pass `--host 0.0.0.0` or set `NOMIFUN_WEB_HOST=0.0.0.0`. Pre-seed the admin or complete first-run setup before doing this on a broadly reachable host. On Windows / macOS hosts also check the firewall — the OS may silently drop the connection.
+`openhub-web` defaults to binding `127.0.0.1`. To accept LAN/VPN traffic, either pass `--host 0.0.0.0` or set `OPENHUB_WEB_HOST=0.0.0.0`. Pre-seed the admin or complete first-run setup before doing this on a broadly reachable host. On Windows / macOS hosts also check the firewall — the OS may silently drop the connection.
 
 If the goal is remote access from a phone or another device on the LAN, [WebUI Remote Access](../guides/webui-remote-access.md) usually wants less configuration than full server deployment.
 
@@ -24,9 +24,9 @@ If the goal is remote access from a phone or another device on the LAN, [WebUI R
 
 ### `GET /api/auth/status` returns `needs_setup: true` after I started the server
 
-This is the expected state on a fresh install when `NOMIFUN_ADMIN_PASSWORD` is not set. The first browser visitor's username + password become the admin via `POST /api/auth/setup`. Open the URL, fill in the form, and you are logged in.
+This is the expected state on a fresh install when `OPENHUB_ADMIN_PASSWORD` is not set. The first browser visitor's username + password become the admin via `POST /api/auth/setup`. Open the URL, fill in the form, and you are logged in.
 
-If you want to close this window before the server is publicly reachable, set `NOMIFUN_ADMIN_PASSWORD` (and optionally `NOMIFUN_ADMIN_USERNAME`) before the first boot.
+If you want to close this window before the server is publicly reachable, set `OPENHUB_ADMIN_PASSWORD` (and optionally `OPENHUB_ADMIN_USERNAME`) before the first boot.
 
 ### `409 Conflict` on `/api/auth/setup`
 
@@ -34,7 +34,7 @@ An admin already exists. The setup endpoint is one-time only. Use `POST /login` 
 
 ### Login appears to succeed but the next request gets `401`
 
-Almost always a cookie problem behind a TLS proxy. The `Secure` flag is added to cookies only when `NOMIFUN_HTTPS=true`. On HTTPS responses without that flag, browsers reject the cookie outright and the next request has no session. Set `NOMIFUN_HTTPS=true` and reload.
+Almost always a cookie problem behind a TLS proxy. The `Secure` flag is added to cookies only when `OPENHUB_HTTPS=true`. On HTTPS responses without that flag, browsers reject the cookie outright and the next request has no session. Set `OPENHUB_HTTPS=true` and reload.
 
 A second cause: clock skew on the server. If the system clock is far off, the JWT may be considered expired by the same server that signed it. Make sure NTP is running.
 
@@ -50,9 +50,9 @@ The validators reject a small set of obvious patterns — passwords under 8 char
 
 ### `403 CSRF token validation failed` on a POST/PUT/PATCH/DELETE
 
-The `nomifun-csrf-token` cookie value must match the `x-csrf-token` request header. The middleware sets the cookie automatically on the first response that does not have one, so a freshly-loaded SPA acquires it on its first GET. This usually breaks for one of these reasons:
+The `openhub-csrf-token` cookie value must match the `x-csrf-token` request header. The middleware sets the cookie automatically on the first response that does not have one, so a freshly-loaded SPA acquires it on its first GET. This usually breaks for one of these reasons:
 
-- The client assumes no-auth local mode while the server is running in authenticated mode (or vice versa). `nomicore --local` and `nomifun-web --insecure-no-auth` skip CSRF; normal `nomifun-web` requires it. The desktop shell uses `TrustLocalToken`, so its own WebView should not see CSRF failures unless the injected trust header/cookie flow is broken.
+- The client assumes no-auth local mode while the server is running in authenticated mode (or vice versa). `openhub-core --local` and `openhub-web --insecure-no-auth` skip CSRF; normal `openhub-web` requires it. The desktop shell uses `TrustLocalToken`, so its own WebView should not see CSRF failures unless the injected trust header/cookie flow is broken.
 - A reverse proxy is stripping cookies or rewriting `Set-Cookie`. The standard Caddy/nginx configurations leave them alone; custom rewrite rules can break them.
 - The browser has third-party cookie blocking that affects the deployment domain.
 
@@ -77,21 +77,21 @@ The server pings every 30 s and considers a client dead at 60 s. If the network 
 
 ### Conversation fails immediately with "agent not available" / "command not found"
 
-The agent engine spawns ACP agent CLIs (`claude`, `codex`, `gemini`, `nomi`, `codebuddy`, …) and they must be on the **process** `PATH`. The process PATH is enhanced at startup (`nomifun_runtime::enhance_process_path`) but if the binary lives somewhere unusual it can still be missed.
+The agent engine spawns ACP agent CLIs (`claude`, `codex`, `gemini`, `nomi`, `codebuddy`, …) and they must be on the **process** `PATH`. The process PATH is enhanced at startup (`openhub_runtime::enhance_process_path`) but if the binary lives somewhere unusual it can still be missed.
 
 Run the doctor:
 
 ```bash
-nomicore doctor
+openhub-core doctor
 ```
 
 This hydrates the agent registry and probes every CLI on `$PATH`, printing a per-agent availability table. Run it from the same shell that launched the app to see exactly what the app sees. If an agent is missing, install its CLI or add its bin directory to `PATH` and restart.
 
 ### Under systemd: `bun: command not found`
 
-The agent engine requires **`bun ≥ 1.3.13`**. A `nologin` system account does not see `~/.bun/bin/`; install bun system-wide (`sudo install ~/.bun/bin/bun /usr/local/bin/bun`) or build with `NOMIFUN_EMBED_BUN=1` so bun is bundled into the binary and self-extracts into the data dir on first run. See [Web Server Deployment](../guides/web-server-deployment.md#bun-must-be-on-the-system-path) for the worked recipe.
+The agent engine requires **`bun ≥ 1.3.13`**. A `nologin` system account does not see `~/.bun/bin/`; install bun system-wide (`sudo install ~/.bun/bin/bun /usr/local/bin/bun`) or build with `OPENHUB_EMBED_BUN=1` so bun is bundled into the binary and self-extracts into the data dir on first run. See [Web Server Deployment](../guides/web-server-deployment.md#bun-must-be-on-the-system-path) for the worked recipe.
 
-Verify with `sudo -u nomifun -s -- which bun` after installing.
+Verify with `sudo -uopenhub-s -- which bun` after installing.
 
 ### "bun runtime extraction" log line followed by no agent activity
 
@@ -119,27 +119,27 @@ The Office preview routes spawn LibreOffice subprocesses and proxy them via `/ap
 
 The configured data directory must be writable by the process. Common cases:
 
-- Running under systemd with `User=nomifun` but a data dir owned by another user. Fix: `chown -R nomifun:nomifun /var/lib/nomifun`.
+- Running under systemd with `Useropenhub but a data dir owned by another user. Fix: `chown -R openhubopenhub/var/libopenhub.
 - A read-only mount (`RootDirectory=`, `ProtectHome=yes`, …) covering the data path. Drop the over-broad sandbox; keep the moderate hardening from the shipped unit (`NoNewPrivileges=yes`, `PrivateTmp=yes`).
 - On Docker, mounting a host directory whose UID does not match the container's. Use a named volume instead, or `chown` the host directory to the right UID.
 
-The desktop shell's default data dir is the **per-user application-data location** (`%LOCALAPPDATA%\NomiFun\Nomi` on Windows, `~/Library/Application Support/NomiFun/Nomi` on macOS, `$XDG_DATA_HOME/NomiFun/Nomi` on Linux), which is writable by the launching user by construction. Set `NOMIFUN_DATA_DIR=<absolute path>` and the dir becomes `$NOMIFUN_DATA_DIR/Nomi`. Legacy installs under `<system temp>/nomifun-data/Nomi` are relocated to the new default automatically on launch (the old dir is kept as a backup); if the relocation cannot complete, the app keeps starting from the legacy dir and retries next launch.
+The desktop shell's default data dir is the **per-user application-data location** (`%LOCALAPPDATA%\OpenHub\Nomi` on Windows, `~/Library/Application Support/OpenHub/Nomi` on macOS, `$XDG_DATA_HOME/OpenHub/Nomi` on Linux), which is writable by the launching user by construction. Set `OPENHUB_DATA_DIR=<absolute path>` and the dir becomes `$OPENHUB_DATA_DIR/Nomi`. Legacy installs under `<system temp>/openhub-data/Nomi` are relocated to the new default automatically on launch (the old dir is kept as a backup); if the relocation cannot complete, the app keeps starting from the legacy dir and retries next launch.
 
-### `data directory ... is already in use by another running NomiFun backend`
+### `data directory ... is already in use by another running OpenHub backend`
 
-Every host (desktop shell, `nomifun-web`, the `nomicore` binary) defaults to the **same** per-user data directory, and the backend takes an OS-level exclusive lock on `{data_dir}/server.lock` at startup — a second backend on the same directory fails fast with this message instead of silently corrupting shared state. The classic trigger: the desktop app is still running and you start `bun run serve:web` / `dev:web` (or vice versa). Two ways out: close the other instance (the message names the holder's pid and executable), or give the new one its own directory via `NOMIFUN_DATA_DIR` / `--data-dir`. The lock is released by the OS when the holder exits or crashes; a leftover `server.lock` file is harmless. `nomicore doctor` and the `mcp-*` stdio subcommands do not take the lock, so they are unaffected.
+Every host (desktop shell, `openhub-web`, the `openhub-core` binary) defaults to the **same** per-user data directory, and the backend takes an OS-level exclusive lock on `{data_dir}/server.lock` at startup — a second backend on the same directory fails fast with this message instead of silently corrupting shared state. The classic trigger: the desktop app is still running and you start `bun run serve:web` / `dev:web` (or vice versa). Two ways out: close the other instance (the message names the holder's pid and executable), or give the new one its own directory via `OPENHUB_DATA_DIR` / `--data-dir`. The lock is released by the OS when the holder exits or crashes; a leftover `server.lock` file is harmless. `openhub-core doctor` and the `mcp-*` stdio subcommands do not take the lock, so they are unaffected.
 
 ## Docker specifics
 
 ### `docker compose up` builds, starts, then exits immediately
 
-Read the logs (`docker compose logs nomifun`). The most common causes are:
+Read the logs (`docker compose logsopenhub). The most common causes are:
 
-- The data volume is empty *and* `NOMIFUN_ADMIN_PASSWORD` is missing — the server runs fine, but you have no way in until you complete first-run setup over HTTP. This is not actually a failure; it is a state.
-- The `--dist` directory inside the image points at the wrong path. The shipped Dockerfile copies `ui/dist` to `/opt/nomifun/web` and the `CMD` references that — only an issue if you have customised the Dockerfile.
+- The data volume is empty *and* `OPENHUB_ADMIN_PASSWORD` is missing — the server runs fine, but you have no way in until you complete first-run setup over HTTP. This is not actually a failure; it is a state.
+- The `--dist` directory inside the image points at the wrong path. The shipped Dockerfile copies `ui/dist` to `/opt/openhub/web` and the `CMD` references that — only an issue if you have customised the Dockerfile.
 - A bind-mounted data dir that the container user cannot write to.
 
-### Logs say `nomifun-web: embedded backend + SPA on one port` but the browser cannot connect
+### Logs say `openhub-web: embedded backend + SPA on one port` but the browser cannot connect
 
 Confirm the port mapping (`docker compose ps`). The default compose file publishes `8787:8787`; if you put Caddy in front, it should be `expose: ["8787"]` instead. Connecting to the wrong port is the usual culprit.
 
@@ -148,22 +148,22 @@ Confirm the port mapping (`docker compose ps`). The default compose file publish
 Pass a cargo registry mirror at build time:
 
 ```bash
-docker build --build-arg CARGO_REGISTRY_MIRROR=https://rsproxy.cn/index/ -t nomifun-web:local .
+docker build --build-arg CARGO_REGISTRY_MIRROR=https://rsproxy.cn/index/ -t openhub-web:local .
 ```
 
 (Or whichever mirror your environment uses.)
 
 ## Logging
 
-The backend writes to **both** stdout and a daily-rolling file at `<log-dir>/nomicore.log` (default `<data-dir>/logs`). When something is going wrong:
+The backend writes to **both** stdout and a daily-rolling file at `<log-dir>/openhub-core.log` (default `<data-dir>/logs`). When something is going wrong:
 
-- The `journalctl -u nomifun-web` / `docker compose logs nomifun` view shows the last few minutes.
+- The `journalctl -u openhub-web` / `docker compose logsopenhub view shows the last few minutes.
 - The rotating file under `<log-dir>` keeps history.
-- Crank up the level for the affected module: `--log-level info,nomifun_mcp=trace` for MCP issues, `info,nomifun_terminal=debug` for terminals, `info,nomifun_conversation=debug` for agent conversations.
+- Crank up the level for the affected module: `--log-level info,openhub_mcp=trace` for MCP issues, `info,openhub_terminal=debug` for terminals, `info,openhub_conversation=debug` for agent conversations.
 
 ## When all else fails
 
-Read the source. Every route handler is in the `routes.rs` (or `routes/`) file of its owning crate; the assembly is in `crates/backend/nomifun-app/src/router/routes.rs`. The error messages thrown by handlers are the literal strings that appear in HTTP responses, so a quick `grep` for the exact message usually lands you on the offending check in seconds.
+Read the source. Every route handler is in the `routes.rs` (or `routes/`) file of its owning crate; the assembly is in `crates/backend/openhub-app/src/router/routes.rs`. The error messages thrown by handlers are the literal strings that appear in HTTP responses, so a quick `grep` for the exact message usually lands you on the offending check in seconds.
 
 ## See also
 

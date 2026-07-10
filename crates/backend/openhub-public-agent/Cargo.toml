@@ -1,0 +1,19 @@
+[package]
+name = "openhub-public-agent"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+openhub-common.workspace = true
+openhub-api-types.workspace = true
+openhub-auth.workspace = true
+openhub-ai-agent.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+axum.workspace = true
+tracing.workspace = true
+async-trait.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true

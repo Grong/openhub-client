@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -19,7 +19,7 @@ const NanobotChat = React.lazy(() => import('@/renderer/pages/conversation/platf
 const RemoteChat = React.lazy(() => import('@/renderer/pages/conversation/platforms/remote/RemoteChat'));
 
 // Narrow to Nomi conversations so model field is always available
-type NomiConversation = Extract<TChatConversation, { type: 'nomi' }>;
+type NomiConversation = Extract<TChatConversation, { type: 'openhub' }>;
 
 /**
  * OrchestratorNodeBinding — supplied by {@link ProjectedWorkerView} for a DAG worker
@@ -140,7 +140,7 @@ const ReadOnlyConversationView: React.FC<ReadOnlyConversationViewProps> = ({
             hideSendBox={hideSendBox}
           />
         );
-      case 'nomi':
+      case 'openhub':
         return (
           <NomiReadOnlyChat
             key={conversation.id}

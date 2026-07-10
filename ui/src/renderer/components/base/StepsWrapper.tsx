@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -13,7 +13,7 @@ interface StepsWrapperProps extends StepsProps {
 }
 
 const StepsWrapper: React.FC<StepsWrapperProps> & { Step: typeof Steps.Step } = ({ className, ...props }) => {
-  return <Steps {...props} className={`nomifun-steps ${className || ''}`} />;
+  return <Steps {...props} className={`openhub-steps ${className || ''}`} />;
 };
 
 StepsWrapper.Step = Steps.Step;

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -249,7 +249,7 @@ export function useCronJobsMap() {
   const [unreadConversations, setUnreadConversations] = useState<Set<number>>(() => {
     // Restore from localStorage
     try {
-      const stored = localStorage.getItem('nomifun_cron_unread');
+      const stored = localStorage.getItem('openhub_cron_unread');
       if (stored) {
         return new Set(JSON.parse(stored));
       }
@@ -266,7 +266,7 @@ export function useCronJobsMap() {
   // Persist unread state to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem('nomifun_cron_unread', JSON.stringify([...unreadConversations]));
+      localStorage.setItem('openhub_cron_unread', JSON.stringify([...unreadConversations]));
     } catch {
       // ignore
     }

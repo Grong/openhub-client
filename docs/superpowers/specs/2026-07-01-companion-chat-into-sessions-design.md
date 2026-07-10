@@ -14,11 +14,11 @@
 
 ## 关键现状（探索结论）
 
-- **伙伴聊天本就是真实会话**：每个伙伴背后是一条真实的 `type:'nomi'` conversation，与普通会话同表、复用同一聊天引擎（`ChatLayout` + `NomiChat`）。它们只是被前端过滤器 `useConversationListSync.ts:123`（`isCompanionConversation`）**刻意隐藏**在会话列表之外。
+- **伙伴聊天本就是真实会话**：每个伙伴背后是一条真实的 `type:'openhub'` conversation，与普通会话同表、复用同一聊天引擎（`ChatLayout` + `NomiChat`）。它们只是被前端过滤器 `useConversationListSync.ts:123`（`isCompanionConversation`）**刻意隐藏**在会话列表之外。
 - **一个伙伴 = 恰好一条会话**：通过 `ensureCompanionSession`（幂等，缺失则创建）解析，称"单会话契约"。
 - **`/nomi` 已是侧边栏中标注「桌面伙伴」的入口**（i18n `nomi.siderTitle`），目前是配置中心 + 一个聊天 Tab。
 - **会话列表已有"工作空间(workpath) → 类型(交互/终端)"分组**（`SessionList/`），新增一个专属「桌面伙伴」分组顺理成章。
-- **会话视图的 nomi 分发点**在 `ChatConversation.tsx:357`：`type==='nomi'` → `NomiConversationPanel`（全功能面板）。
+- **会话视图的 nomi 分发点**在 `ChatConversation.tsx:357`：`type==='openhub'` → `NomiConversationPanel`（全功能面板）。
 - **浮窗桌宠**（`/companion` 窗口）与伙伴共享同一会话与 `extra` 标记；其"去聊天"深链 `pages/companion/index.tsx:1317` 现指向 `/nomi?...&tab=chat`，聊天 Tab 移除后会失效，需要改向会话。
 
 ## 用户已确认的决策
@@ -47,7 +47,7 @@
 - 在第 357 行处分支：`extra.companionSession === true` → 渲染新的轻量 `CompanionChatPanel`（由 `extra.companionId` 推导 companionId，取 `useCompanion(companionId)`，再渲染**现有** `CompanionConversation` 及其当前受限 props + 当前 `ChatTab` 的"模型未配置"引导门禁）。否则 → 现有 `NomiConversationPanel`。
 - 保留全部限制，仅把入口搬进会话。
 
-### 3. `/nomi` 变为纯管理中心（`pages/nomi/index.tsx`、`tabs/ChatTab.tsx`）
+### 3. `/nomi` 变为纯管理中心（`pages/openhub/index.tsx`、`tabs/ChatTab.tsx`）
 - 从伙伴 Tab 列表移除 `'chat'`；默认 Tab → `overview`。退役/删除 `ChatTab`（其 ensure-session + 门禁逻辑迁入 `CompanionChatPanel`）。
 - 提供"打开聊天"动作（overview 与创建后）：ensure 会话并导航至 `/conversation/:id`，使创建伙伴后仍能直接进入聊天。
 
@@ -69,8 +69,8 @@
 修改：
 - `ui/src/renderer/pages/conversation/SessionList/index.tsx`（渲染分组）
 - `ui/src/renderer/pages/conversation/components/ChatConversation.tsx`（357 行分支）
-- `ui/src/renderer/pages/nomi/index.tsx`（移除 chat tab、默认 overview、打开聊天动作、创建后导航）
-- `ui/src/renderer/pages/nomi/tabs/ChatTab.tsx`（退役/删除）
+- `ui/src/renderer/pages/openhub/index.tsx`（移除 chat tab、默认 overview、打开聊天动作、创建后导航）
+- `ui/src/renderer/pages/openhub/tabs/ChatTab.tsx`（退役/删除）
 - `ui/src/renderer/pages/companion/index.tsx`（1317 行深链）
 - `ui/src/renderer/services/i18n/locales/{zh-CN,en-US}/sessionList.json`
 

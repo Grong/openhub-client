@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -63,7 +63,7 @@ const dispatchCustomCssUpdated = (css: string) => {
  * Every mounted `useCssTheme` reloads so the footer popover and the settings
  * grid stay consistent without a remount.
  */
-const CSS_THEMES_CHANGED_EVENT = 'nomifun:css-themes-changed';
+const CSS_THEMES_CHANGED_EVENT = 'openhub:css-themes-changed';
 export const notifyCssThemesChanged = (): void => {
   window.dispatchEvent(new CustomEvent(CSS_THEMES_CHANGED_EVENT));
 };

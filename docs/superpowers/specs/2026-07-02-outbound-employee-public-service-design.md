@@ -8,7 +8,7 @@
 
 桌面伙伴很受欢迎，但要可靠地**对外服务陌生人**，现有权限模型不成立。区分两种"对外"：
 
-1. **对外自用**：owner 或其信任的 agent 远程驱动自己的伙伴，期望**全能力对标本地**。→ 已由 Remote 前门（`nomifun-public` `/mcp` `/v1`）+ per-companion 令牌覆盖，**本设计不动**。
+1. **对外自用**：owner 或其信任的 agent 远程驱动自己的伙伴，期望**全能力对标本地**。→ 已由 Remote 前门（`openhub-public` `/mcp` `/v1`）+ per-companion 令牌覆盖，**本设计不动**。
 2. **对外公共服务**：把伙伴发布到社交渠道当"客服/员工"服务**陌生人**，只能问答、知识库检索总结、记忆总结、安全网搜；**绝不能**控制 owner 电脑、跑任意代码、读写 owner 文件、外泄私有知识/记忆、脚本注入、越权。→ **本设计的全部内容**。
 
 **用户已定（2026-07-02）**：
@@ -20,10 +20,10 @@
 
 ## 1. 现状安全评估（为什么不能打补丁）
 
-> 今天唯一拦住灾难的是**配对审批门**：`PairingService::get_internal_user_id`（`nomifun-channel/src/action.rs:133`）要求陌生发送者由 owner 在设置里逐个手动批准，代码中**无自动放行模式**。本需求要打开这道门——门一开，下列缺陷全部变为现实。
+> 今天唯一拦住灾难的是**配对审批门**：`PairingService::get_internal_user_id`（`openhub-channel/src/action.rs:133`）要求陌生发送者由 owner 在设置里逐个手动批准，代码中**无自动放行模式**。本需求要打开这道门——门一开，下列缺陷全部变为现实。
 
 ### 1.1 陌生人经渠道的真实调用链（放行后）
-- 陌生人原文以 **owner 身份** `owner_user_id` 执行（`nomifun-channel/src/message_service.rs:236`），非匿名；
+- 陌生人原文以 **owner 身份** `owner_user_id` 执行（`openhub-channel/src/message_service.rs:236`），非匿名；
 - 汇入伙伴的**一个共享会话** `ensure_companion_session`（`message_service.rs:186`）——与桌面气泡/聊天 Tab 同一条 transcript 与记忆，所有陌生人共用；
 - `session_mode` 硬设 `yolo`（`message_service.rs:585`），全自动批准 file/shell/exec/mcp，无审批 UI；
 - 拿到**全套原生工具**：Bash/ExecCommand、Read/Write/Edit/ApplyPatch、`computer_use`（桌面版默认开）、`browser_use`（默认开）；
@@ -33,13 +33,13 @@
 
 | # | 缺陷 | 证据 | 后果 |
 |---|---|---|---|
-| C1 | Surface 矩阵**只管网关 `nomi_*`，完全不管原生工具** | `nomifun-gateway/src/registry/capability.rs:108-137`，仅在 `registry/mod.rs:164` 网关 dispatch 生效 | Bash/文件/computer/browser 对陌生人**无 surface 门** |
-| C2 | 原生工具唯一白名单 `retain_named` 对伙伴/渠道会话**恒空=不限制** | `nomi-agent/src/bootstrap.rs:767` + `api-types/src/agent_build_extra.rs:330`（"普通会话恒空"） | 白名单机制**存在但未被驱动** |
-| C3 | `KnowledgeSearch/RecallMemories/SaveMemory` 在 `bootstrap.build()` 之后直接注册到 `engine.registry_mut()` | `nomifun-ai-agent/src/manager/nomi/agent.rs:371` | 它们**连 `retain_named` 都绕过**——任何原生白名单方案的**必修前置 bug** |
-| C4 | 网关 `nomi_knowledge_list_bases/search` **全局**（列 owner 全部库），Read=所有 surface 放行 | `nomifun-gateway/src/caps_knowledge.rs:135,211` | 网关层**无数据隔离** |
-| C5 | Remote 面 `nomi_agent_run`（Write=放行）内部 `create()` 直建 `yolo + desktopGateway` 的 **Desktop-surface** 全原生工具 agent | `nomifun-gateway/src/caps_conversation.rs:426-503,680` | **一个放行 Write 击穿整个 Remote 矩阵** |
-| C6 | 所有 companion 令牌 → `SYSTEM_USER_ID`；`companion_id` 仅"归属标注非访问范围" | `nomifun-gateway/src/deps.rs:128` | **无 per-caller 数据分区** |
-| C7 | 网关档白名单仅在 stdio bridge（广告层）过滤，权威 in-process server 只按 surface×danger 复核 | `nomifun-app/src/commands/gateway_stdio.rs` vs `nomifun-gateway/src/registry/mod.rs:164` | 档位是"广告式防御"，非硬边界 |
+| C1 | Surface 矩阵**只管网关 `openhub_*`，完全不管原生工具** | `openhub-gateway/src/registry/capability.rs:108-137`，仅在 `registry/mod.rs:164` 网关 dispatch 生效 | Bash/文件/computer/browser 对陌生人**无 surface 门** |
+| C2 | 原生工具唯一白名单 `retain_named` 对伙伴/渠道会话**恒空=不限制** | `openhub-agent/src/bootstrap.rs:767` + `api-types/src/agent_build_extra.rs:330`（"普通会话恒空"） | 白名单机制**存在但未被驱动** |
+| C3 | `KnowledgeSearch/RecallMemories/SaveMemory` 在 `bootstrap.build()` 之后直接注册到 `engine.registry_mut()` | `openhub-ai-agent/src/manager/openhub/agent.rs:371` | 它们**连 `retain_named` 都绕过**——任何原生白名单方案的**必修前置 bug** |
+| C4 | 网关 `openhub_knowledge_list_bases/search` **全局**（列 owner 全部库），Read=所有 surface 放行 | `openhub-gateway/src/caps_knowledge.rs:135,211` | 网关层**无数据隔离** |
+| C5 | Remote 面 `openhub_agent_run`（Write=放行）内部 `create()` 直建 `yolo + desktopGateway` 的 **Desktop-surface** 全原生工具 agent | `openhub-gateway/src/caps_conversation.rs:426-503,680` | **一个放行 Write 击穿整个 Remote 矩阵** |
+| C6 | 所有 companion 令牌 → `SYSTEM_USER_ID`；`companion_id` 仅"归属标注非访问范围" | `openhub-gateway/src/deps.rs:128` | **无 per-caller 数据分区** |
+| C7 | 网关档白名单仅在 stdio bridge（广告层）过滤，权威 in-process server 只按 surface×danger 复核 | `openhub-app/src/commands/gateway_stdio.rs` vs `openhub-gateway/src/registry/mod.rs:164` | 档位是"广告式防御"，非硬边界 |
 
 **判断**：现状安全边界是"提示词复述确认 + yolo"，对陌生人**等于零**。必须换成**"工具与数据物理不可达"**——假设提示注入 100% 控制 agent 意图，它仍无害。这是新增一等抽象，不是加开关。
 
@@ -89,8 +89,8 @@ struct ExposurePolicy {
 - ✅ 允许：纯对话（无工具）、`KnowledgeSearch`/`KnowledgeRead`（限 `public_kb_ids`）、记忆总结（只读、限对外人格）、**新的安全网搜**（§4.3）。
 - ❌ 禁：Bash/ExecCommand/WriteStdin、Write/Edit/ApplyPatch、Read/Grep/Glob（无沙箱前一律禁）、Computer、Browser、Spawn、Skill、Plan、SaveMemory。
 
-### 4.2 网关 `nomi_*`（默认拒绝，仅显式放行）
-- ✅ 至多：收窄版 `nomi_knowledge_search`（限公开库）、极少数只读 conversation。
+### 4.2 网关 `openhub_*`（默认拒绝，仅显式放行）
+- ✅ 至多：收窄版 `openhub_knowledge_search`（限公开库）、极少数只读 conversation。
 - ❌ 禁：`system`/`channel`/`companion`/`cron`/`requirement`/`memory写`/`terminal`/`files`/`agent`/`orchestrator`/`mcp` 全域。
 - 注意：现渠道已强制 `LITE` 档（`team_mcp.rs:199`，含 conversation/provider/cron/requirement/autowork）——**LITE 仍不够安全**（含 provider/cron/requirement），`PublicService` 需比 LITE 更严的独立白名单。
 
@@ -113,7 +113,7 @@ struct ExposurePolicy {
 
 ## 7. 复用 / 必新建 / 必修
 
-- **直接复用**：`retain_named`/`allowed_tools`（`registry.rs:73`、`agent_build_extra.rs:330`）、`tool_specs_for`/域档（`registry/mod.rs:136`）、烘环境 scoped KB bridge（`NOMI_KB_MCP_KB_IDS`）、companion 令牌（`nomifun-auth/companion_token.rs`）、per-surface 写策略（`factory/nomi.rs:95-123`）、配对门、`desktopGateway` 剥离。
+- **直接复用**：`retain_named`/`allowed_tools`（`registry.rs:73`、`agent_build_extra.rs:330`）、`tool_specs_for`/域档（`registry/mod.rs:136`）、烘环境 scoped KB bridge（`NOMI_KB_MCP_KB_IDS`）、companion 令牌（`openhub-auth/companion_token.rs`）、per-surface 写策略（`factory/nomi.rs:95-123`）、配对门、`desktopGateway` 剥离。
 - **必新建**：`ExposurePolicy` 抽象与全链路穿线、网关默认拒绝白名单模式（权威层强制）、由对外伙伴驱动原生白名单、安全网搜工具、对外隔离伙伴 + 独立记忆/数据目录、"外呼员工" Tab + 审计。
 - **必修 bug**：C3（build-后工具绕过白名单）、C7（网关档权威/广告不一致）。
 - **旧分支**：`feat/per-companion-capabilities` / `feat/external-capability-exposure` 取其令牌/管线，**换掉"全有或全无"取舍**，不原样合并。

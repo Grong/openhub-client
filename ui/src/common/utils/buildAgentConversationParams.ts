@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -34,8 +34,8 @@ export type BuildAgentConversationInput = {
 
 export function getConversationTypeForBackend(backend: string): ICreateConversationParams['type'] {
   switch (backend) {
-    case 'nomi':
-      return 'nomi';
+    case 'openhub':
+      return 'openhub';
     case 'openclaw-gateway':
     case 'openclaw':
       return 'openclaw-gateway';

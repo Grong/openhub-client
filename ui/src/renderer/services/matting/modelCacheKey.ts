@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -14,7 +14,7 @@
  * the page-seeded entry is readable from the matting worker.
  */
 
-export const MODEL_CACHE_NAME = 'nomifun-matting-v1';
+export const MODEL_CACHE_NAME = 'openhub-matting-v1';
 
 /** Stable, origin-absolute Cache Storage key (same string in window + worker). */
 export function modelCacheKey(): string {

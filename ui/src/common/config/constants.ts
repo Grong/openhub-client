@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -11,8 +11,8 @@
 // ===== 文件处理相关常量 =====
 
 /** 用于匹配和清理时间戳后缀的正则表达式 */
-export const NOMIFUN_TIMESTAMP_REGEX = /_nomifun_\d{13}(\.\w+)?$/;
-export const NOMIFUN_FILES_MARKER = '[[NOMI_FILES]]';
+export const OPENHUB_TIMESTAMP_REGEX = /_openhub_\d{13}(\.\w+)?$/;
+export const OPENHUB_FILES_MARKER = '[[NOMI_FILES]]';
 
 // ===== 媒体类型相关常量 =====
 
@@ -51,7 +51,7 @@ export const DEFAULT_IMAGE_EXTENSION = '.png';
 /** WebUI default port: 25808 for production, 25809 for development, 25810 for multi-instance dev */
 export const WEBUI_DEFAULT_PORT = (() => {
   if (process.env.NODE_ENV === 'production') return 25808;
-  if (process.env.NOMIFUN_MULTI_INSTANCE === '1') return 25810;
+  if (process.env.OPENHUB_MULTI_INSTANCE === '1') return 25810;
   return 25809;
 })();
 

@@ -7,13 +7,13 @@
 
 ## 0. 所有 agent 的铁律
 
-1. **禁止读取 `D:\code\nomito\explorer\nomifun\download\infinite-canvas` 下任何文件**(AGPL 净室红线)。功能语义不清楚时,按 PRD 描述 + 本文契约实现;仍有歧义则在产出报告中列出"待澄清",不要自行去看参考源码。
+1. **禁止读取 `D:\code\nomito\exploreropenhubdownload\infinite-canvas` 下任何文件**(AGPL 净室红线)。功能语义不清楚时,按 PRD 描述 + 本文契约实现;仍有歧义则在产出报告中列出"待澄清",不要自行去看参考源码。
 2. **禁止执行任何 git 命令**(不 commit/不 checkout/不 stash);提交由主控统一做。
 3. 只创建/修改**自己模块所有权表(§9)名下的文件**。发现需要改别人的文件 → 报告,不要动手。
 4. 开发期只跑**自己触碰 crate** 的 `cargo check -p` / `cargo nextest run -p`;禁全量测试、禁启动应用。本机存在与本任务无关的存量环境性测试失败,只看自己 crate 的结果。
 5. 前端硬门槛:`bun run typecheck`(在 `ui/` 下)必须 exit 0 零新错;禁 `any`/`ts-ignore`;Arco 弹窗必经 `useArcoMessage`;真按钮用 `<div onClick>`;`@icon-park/react` 具名导入禁别名;改 locale 后跑根目录 `bun run gen:i18n` 并保证 `bun run check:i18n` 过。
 6. UI 必须漂亮(验收门槛):对齐既有视觉语言(参考 knowledge / publicCompanion / modelHub 页面),间距/圆角/色彩用主题变量与 UnoCSS 语义类。
-7. 不确定仓库惯例时,**照抄范例域**:后端范例 = `crates/backend/nomifun-public-agent`(crate 结构)与 `nomifun-knowledge`(routes/service),前端范例 = `ui/src/renderer/pages/knowledge`。
+7. 不确定仓库惯例时,**照抄范例域**:后端范例 = `crates/backend/openhub-public-agent`(crate 结构)与 `openhub-knowledge`(routes/service),前端范例 = `ui/src/renderer/pages/knowledge`。
 
 ## 1. 命名与 ID
 
@@ -24,7 +24,7 @@
 
 ## 2. 数据库迁移 `032_workshop.sql`
 
-实施者须先看 `018_orchestrator.sql`/`029_task_on_fail.sql` 的风格,并检查 `nomifun-db/src/database.rs` 与 db_lifecycle 的 pre_baseline 机制(历史规矩:每加迁移需同步 bump pre_baseline,如机制存在必须照做)。表结构(可按仓库惯例微调列序/索引名,语义不得变):
+实施者须先看 `018_orchestrator.sql`/`029_task_on_fail.sql` 的风格,并检查 `openhub-db/src/database.rs` 与 db_lifecycle 的 pre_baseline 机制(历史规矩:每加迁移需同步 bump pre_baseline,如机制存在必须照做)。表结构(可按仓库惯例微调列序/索引名,语义不得变):
 
 ```sql
 CREATE TABLE workshop_canvases (
@@ -78,7 +78,7 @@ CREATE INDEX idx_creation_tasks_status ON creation_tasks(status);
 CREATE INDEX idx_creation_tasks_canvas ON creation_tasks(canvas_id);
 ```
 
-模型/Repo 层跟随仓库现状:若既有表的 model+repository 都在 `nomifun-db`(如 provider),则同样放 `nomifun-db/src/models/` + `repository/`,trait 命名 `IWorkshopRepository`/`ICreationTaskRepository` 风格对齐。
+模型/Repo 层跟随仓库现状:若既有表的 model+repository 都在 `openhub-db`(如 provider),则同样放 `openhub-db/src/models/` + `repository/`,trait 命名 `IWorkshopRepository`/`ICreationTaskRepository` 风格对齐。
 
 ## 3. REST API 契约
 
@@ -148,18 +148,18 @@ M0 钉死的最小 data(后续模块只能**增**字段不能改语义):
 
 约定:**所有二进制内容一律先成为 workshop 资产**(上传/生成产物皆得 `wsa_` id),节点只存 `assetId`;画布内部上传默认 `in_library=0`。
 
-## 5. 后端 crate:`nomifun-workshop`
+## 5. 后端 crate:`openhub-workshop`
 
-`crates/backend/nomifun-workshop/`,完全对标 `nomifun-public-agent` 范式:
+`crates/backend/openhub-workshop/`,完全对标 `openhub-public-agent` 范式:
 - `lib.rs`:`pub const WORKSHOP_REL_DIR: &str = "workshop";` 目录规划:`{data_dir}/workshop/canvases/{id}/canvas.json`、`{data_dir}/workshop/assets/{id}.{ext}`、`.../thumbs/{id}.webp`。
 - `fsio.rs`:原子写(temp+rename)+ 损坏回退,照抄 public-agent。
-- `service.rs`:`WorkshopService::start(data_dir, repo…) -> Arc<Self>`;画布 CRUD、doc 读写、资产存/取/删、serve 路径解析(严防目录穿越,对标 `nomifun-requirement/src/attachments.rs`)。
+- `service.rs`:`WorkshopService::start(data_dir, repo…) -> Arc<Self>`;画布 CRUD、doc 读写、资产存/取/删、serve 路径解析(严防目录穿越,对标 `openhub-requirement/src/attachments.rs`)。
 - `state.rs` + `routes.rs`(§3.1/3.2 全部路由)。
-- 装配:`nomifun-app` 的 `services.rs`(start)、`router/state.rs`、`router/routes.rs`(merge),放 public-agent 旁。
+- 装配:`openhub-app` 的 `services.rs`(start)、`router/state.rs`、`router/routes.rs`(merge),放 public-agent 旁。
 
-## 6. 后端 crate:`nomifun-creation`
+## 6. 后端 crate:`openhub-creation`
 
-`crates/backend/nomifun-creation/`:
+`crates/backend/openhub-creation/`:
 - `types.rs`:`MediaCapability`(t2i/i2i/inpaint/t2v/i2v/v2v/tts/text)、`CreationParams`、`CreationInput{asset_id,role}`、`TaskStatus`、`CreationError{kind,message,http_status}`。
 - `provider.rs`:
   ```rust
@@ -171,10 +171,10 @@ M0 钉死的最小 data(后续模块只能**增**字段不能改语义):
       async fn poll(&self, remote_task_id: &str, req: &SubmitRequest) -> Result<PollResult, CreationError>; // Pending | Done | Failed
   }
   ```
-- `service.rs`:`CreationService`——任务入库、每 provider 并发闸(信号量)、轮询循环(间隔 2.5s,上限约 10 分钟)、取消传播、产物落盘(调 workshop 资产登记回调/trait,避免直接依赖 nomifun-workshop 造环:定义 `AssetSink` trait,由 app 装配时用 WorkshopService 实现)、**boot 对账**(启动时把 running 任务恢复轮询或收敛 failed)。
+- `service.rs`:`CreationService`——任务入库、每 provider 并发闸(信号量)、轮询循环(间隔 2.5s,上限约 10 分钟)、取消传播、产物落盘(调 workshop 资产登记回调/trait,避免直接依赖 openhub-workshop 造环:定义 `AssetSink` trait,由 app 装配时用 WorkshopService 实现)、**boot 对账**(启动时把 running 任务恢复轮询或收敛 failed)。
 - `adapters/`:M0 只建 `mod.rs` 空骨架;M2 实装。
 - `routes.rs` + `state.rs`(§3.3)。
-- 依赖:`reqwest`(经 `nomifun-net` 若其提供 client 惯例则复用)、`nomifun-common`(crypto/AppError)、provider 解密读取对标 `nomifun-system` 现有做法。
+- 依赖:`reqwest`(经 `openhub-net` 若其提供 client 惯例则复用)、`openhub-common`(crypto/AppError)、provider 解密读取对标 `openhub-system` 现有做法。
 
 ## 7. 前端布局
 
@@ -196,22 +196,22 @@ ui/src/renderer/pages/workshop/
 
 ## 8. 网关 `caps_workshop`
 
-按 gateway 3 步契约(lib.rs 顶部注释 + CI 守卫测试):`mod caps_workshop;` + registry 注册。M0 先提供一个只读能力 `nomi_workshop_list_canvases`(列画布 id/title/node_count)。M9 再扩(读状态/应用操作/触发生成)。
+按 gateway 3 步契约(lib.rs 顶部注释 + CI 守卫测试):`mod caps_workshop;` + registry 注册。M0 先提供一个只读能力 `openhub_workshop_list_canvases`(列画布 id/title/node_count)。M9 再扩(读状态/应用操作/触发生成)。
 
 ## 9. 模块所有权表
 
 | 模块 | 所有权(只能改这些) | 依赖 |
 |---|---|---|
-| M0a 后端骨架 | 迁移 030、`nomifun-db`(models/repository 新增文件+mod 注册)、`nomifun-workshop/**`、`nomifun-creation/**`、`nomifun-app`(services/state/routes 三点)、`nomifun-gateway`(caps_workshop+registry)、根 `Cargo.toml` workspace 登记 | — |
+| M0a 后端骨架 | 迁移 030、`openhub-db`(models/repository 新增文件+mod 注册)、`openhub-workshop/**`、`openhub-creation/**`、`openhub-app`(services/state/routes 三点)、`openhub-gateway`(caps_workshop+registry)、根 `Cargo.toml` workspace 登记 | — |
 | M0b 前端骨架 | `pages/workshop/{index.tsx,CanvasPage.tsx,api.ts,types.ts}`、`Router.tsx`、`Sider/**`(新 entry+挂载)、i18n 4 文件+2 index、`common.json` 仅加 siderSection key(如需) | 契约 §3/§4 |
 | M1 画布内核 FE | `pages/workshop/canvas/**`、`CanvasPage.tsx`、`workshopCanvas.json` | M0 |
-| M2 生成引擎 BE | `nomifun-creation/**` | M0 |
-| M3 工坊域 BE 完善 | `nomifun-workshop/**`(缩略图/导入导出/GC) | M0 |
+| M2 生成引擎 BE | `openhub-creation/**` | M0 |
+| M3 工坊域 BE 完善 | `openhub-workshop/**`(缩略图/导入导出/GC) | M0 |
 | M4 资产库 FE | `pages/workshop/assets/**`、`workshopAssets.json` | M0 |
 | M5 图片编辑器 FE | `pages/workshop/editor/**`、`workshopEditor.json` | M0 |
-| M6 模型管理扩展 | `nomifun-api-types`(能力枚举)、`nomifun-system`(分类建议)、`pages/modelHub/**`、`ui/src/common/types/provider/**` | M0 |
+| M6 模型管理扩展 | `openhub-api-types`(能力枚举)、`openhub-system`(分类建议)、`pages/modelHub/**`、`ui/src/common/types/provider/**` | M0 |
 | M7 生成卡片 FE | `pages/workshop/generation/**` + `canvas/`内注册点(与 M1 协调的钩子文件) | M1,M2,M6 |
 | M8 循环/对比/输出/分组 | `pages/workshop/canvas/nodes/**` 扩展 | M1,M7 |
-| M9 画布助手+caps | `nomifun-gateway/caps_workshop`、助手面板 FE | M1,M3 |
+| M9 画布助手+caps | `openhub-gateway/caps_workshop`、助手面板 FE | M1,M3 |
 
 跨模块公共文件(`api.ts`/`types.ts`)M0 后**冻结语义**:后续模块可追加(append-only),不得改既有字段。

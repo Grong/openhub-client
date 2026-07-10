@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -760,7 +760,7 @@ const CanvasInner: React.FC<CanvasEditorProps> = ({ canvasId, initialDoc, onSave
   const onDragOver = useCallback((e: React.DragEvent) => {
     const dt = e.dataTransfer;
     const hasPayload =
-      Array.from(dt.types).includes('Files') || Array.from(dt.types).includes('application/x-nomifun-workshop-asset');
+      Array.from(dt.types).includes('Files') || Array.from(dt.types).includes('application/x-openhub-workshop-asset');
     if (!hasPayload) return;
     e.preventDefault();
     dt.dropEffect = 'copy';
@@ -1116,8 +1116,8 @@ const CanvasInner: React.FC<CanvasEditorProps> = ({ canvasId, initialDoc, onSave
     const groupIds = new Set(nodes.filter((n) => n.type === 'group').map((n) => n.id));
     if (loopIds.size === 0 && groupIds.size === 0) return edges;
     return edges.map((e) => {
-      if (loopIds.has(e.source)) return { ...e, animated: true, className: 'nomi-ws-loop-edge' };
-      if (groupIds.has(e.source)) return { ...e, className: 'nomi-ws-group-edge' };
+      if (loopIds.has(e.source)) return { ...e, animated: true, className: 'openhub-ws-loop-edge' };
+      if (groupIds.has(e.source)) return { ...e, className: 'openhub-ws-group-edge' };
       return e;
     });
   }, [edges, nodes]);
@@ -1184,7 +1184,7 @@ const CanvasInner: React.FC<CanvasEditorProps> = ({ canvasId, initialDoc, onSave
   return (
     <div
       ref={wrapperRef}
-      className={['relative size-full min-h-0 overflow-hidden', dropActive ? 'nomi-ws-dropzone-active' : ''].join(' ')}
+      className={['relative size-full min-h-0 overflow-hidden', dropActive ? 'openhub-ws-dropzone-active' : ''].join(' ')}
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
       onDrop={(e) => void onDrop(e)}
@@ -1192,7 +1192,7 @@ const CanvasInner: React.FC<CanvasEditorProps> = ({ canvasId, initialDoc, onSave
       {messageHolder}
       <CanvasNodeContext.Provider value={nodeApi}>
         <ReactFlow<WorkshopFlowNode, WorkshopFlowEdge>
-          className='nomi-ws-flow'
+          className='openhub-ws-flow'
           nodes={nodes}
           edges={decoratedEdges}
           nodeTypes={WORKSHOP_NODE_TYPES}

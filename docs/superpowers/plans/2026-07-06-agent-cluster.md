@@ -17,7 +17,7 @@
 - 迁移 append-only 纯 ADD COLUMN；旧行读回 NULL 零回归。下一个迁移号：**030**。
 - 编排能力对 Remote 面硬拒（ORCHESTRATOR_DENY_SURFACES）；新工具同样 deny。
 - NomiChat 必须始终挂载（display:none 切换）；无 Provider 表面直通/渲染 null（伙伴零改动）。
-- commit author=`nomifun <rika00@qq.com>`，无 Co-Authored-By；分支 feature/agent-cluster。
+- commit author=openhub<rika00@qq.com>`，无 Co-Authored-By；分支 feature/agent-cluster。
 
 ---
 
@@ -26,8 +26,8 @@
 ### Task 1: 集群模式提示（agent_cluster_mode → CLUSTER_MODE_HINT）
 
 **Files:**
-- Modify: `crates/backend/nomifun-api-types/src/agent_build_extra.rs`（NomiBuildExtra，~line 342 后加字段）
-- Modify: `crates/backend/nomifun-ai-agent/src/factory/nomi.rs`（~line 190 注入点 + ~line 777 纯函数区 + tests mod）
+- Modify: `crates/backend/openhub-api-types/src/agent_build_extra.rs`（NomiBuildExtra，~line 342 后加字段）
+- Modify: `crates/backend/openhub-ai-agent/src/factory/nomi.rs`（~line 190 注入点 + ~line 777 纯函数区 + tests mod）
 
 **Interfaces:**
 - Produces: `NomiBuildExtra.agent_cluster_mode: bool`（serde default，alias `agentClusterMode`）；
@@ -46,20 +46,20 @@ pub agent_cluster_mode: bool,
 ```rust
 /// 「agent 集群」模式增强提示（需求1）。仅当会话 extra.agent_cluster_mode=true 且
 /// 常驻 subagent 提示已注入（同一网关前提）时，追加在其后。
-pub(crate) const CLUSTER_MODE_HINT: &str = "用户已为本会话显式开启「agent 集群」模式：对每一个任务（无论难度），你都必须先刻意评估是否应当用 nomi_spawn / nomi_run_create 开启多 agent 集群协作，并倾向于开启——多个独立 agent 各自拥有充足上下文，交付质量更高。只有当任务确实过于简单（单步可答、无可拆分子任务）时才可不开启，但此时必须在回复的开头先用一两句话向用户说明「本次使用简单模式」的原因，然后再直接作答。";
+pub(crate) const CLUSTER_MODE_HINT: &str = "用户已为本会话显式开启「agent 集群」模式：对每一个任务（无论难度），你都必须先刻意评估是否应当用 openhub_spawn / openhub_run_create 开启多 agent 集群协作，并倾向于开启——多个独立 agent 各自拥有充足上下文，交付质量更高。只有当任务确实过于简单（单步可答、无可拆分子任务）时才可不开启，但此时必须在回复的开头先用一两句话向用户说明「本次使用简单模式」的原因，然后再直接作答。";
 ```
 - [ ] Step 3: `compose_subagent_hint(base: Option<String>, inject: bool, cluster: bool)`：inject=false 原样返回；inject=true 拼 SUBAGENT_STANDARD_HINT；cluster=true 再拼 `\n\n{CLUSTER_MODE_HINT}`。调用点（~line 190）传 `overrides.agent_cluster_mode`。
 - [ ] Step 4: tests mod 更新既有 compose 测试签名 + 新增：cluster=true 含两段提示；cluster=true 但 inject=false 不含任何提示。
-- [ ] Step 5: `cargo test -p nomifun-ai-agent` 全绿 → commit `feat(cluster): 会话 extra 集群模式标记 + 提示注入`
+- [ ] Step 5: `cargo test -p openhub-ai-agent` 全绿 → commit `feat(cluster): 会话 extra 集群模式标记 + 提示注入`
 
 ### Task 2: 迁移 030 + approval_mode/pending_question 数据面
 
 **Files:**
-- Create: `crates/backend/nomifun-db/migrations/030_cluster_approval.sql`
-- Modify: `crates/backend/nomifun-db/src/...`（OrchRunRow/OrchRunTaskRow + sqlite repo：SELECT/INSERT 列表、`set_task_question` 新方法）
-- Modify: `crates/backend/nomifun-api-types/src/orchestrator.rs`（Run.approval_mode、RunTask.pending_question、CreateAdhocRunRequest.approval_mode）
-- Modify: `crates/backend/nomifun-orchestrator/src/run_service.rs`（create_adhoc 落列，默认 "auto"）
-- Modify: `crates/backend/nomifun-gateway/src/caps_orchestrator.rs`（create/spawn 读会话 extra `orchestrator_approval_mode` → request，仿 read_conversation_model_range）
+- Create: `crates/backend/openhub-db/migrations/030_cluster_approval.sql`
+- Modify: `crates/backend/openhub-db/src/...`（OrchRunRow/OrchRunTaskRow + sqlite repo：SELECT/INSERT 列表、`set_task_question` 新方法）
+- Modify: `crates/backend/openhub-api-types/src/orchestrator.rs`（Run.approval_mode、RunTask.pending_question、CreateAdhocRunRequest.approval_mode）
+- Modify: `crates/backend/openhub-orchestrator/src/run_service.rs`（create_adhoc 落列，默认 "auto"）
+- Modify: `crates/backend/openhub-gateway/src/caps_orchestrator.rs`（create/spawn 读会话 extra `orchestrator_approval_mode` → request，仿 read_conversation_model_range）
 
 **Interfaces:**
 - Produces: `Run.approval_mode: String`（serde default "auto"；合法值 "auto"|"manual"）；
@@ -71,7 +71,7 @@ pub(crate) const CLUSTER_MODE_HINT: &str = "用户已为本会话显式开启「
 ```sql
 -- 030 agent集群：节点级审批模式。append-only,基线不动。
 -- orch_runs.approval_mode: NULL/"auto"=全授权(节点遇抉择自行判断,现状零回归);
---   "manual"=审批模式(worker 可经 nomi_task_question 挂起提问,人来选)。
+--   "manual"=审批模式(worker 可经 openhub_task_question 挂起提问,人来选)。
 -- orch_run_tasks.pending_question: 节点挂起的决策问题原文(needs_review 态);
 --   解决(采用产出/重跑)后清空。
 ALTER TABLE orch_runs ADD COLUMN approval_mode TEXT;
@@ -80,13 +80,13 @@ ALTER TABLE orch_run_tasks ADD COLUMN pending_question TEXT;
 - [ ] Step 2: row 结构 + repo SELECT/INSERT/DTO 映射补两列（NULL→"auto"/None）；新增 `set_task_question`（单 UPDATE，顺带 touch updated_at）。
 - [ ] Step 3: CreateAdhocRunRequest 加 `approval_mode: Option<String>`，create_adhoc 落库（None→"auto"）；replan 保留原值。
 - [ ] Step 4: caps_orchestrator：`read_conversation_approval_mode`（读会话 extra 的 `orchestrator_approval_mode`，仅接受 "manual"，其余 None）；create(~line 292 附近) 与 spawn(~line 1129 附近) 都接上。
-- [ ] Step 5: 单测：request 透传（仿 build_adhoc_request 既有测试）+ repo 读写 roundtrip。`cargo test -p nomifun-db -p nomifun-orchestrator -p nomifun-gateway` → commit `feat(cluster): 迁移030 审批模式与节点提问数据面`
+- [ ] Step 5: 单测：request 透传（仿 build_adhoc_request 既有测试）+ repo 读写 roundtrip。`cargo test -p openhub-db -p openhub-orchestrator -p openhub-gateway` → commit `feat(cluster): 迁移030 审批模式与节点提问数据面`
 
 ### Task 3: RunOutcome::NodeQuestion + 回执文案
 
 **Files:**
-- Modify: `crates/backend/nomifun-orchestrator/src/engine.rs`（RunOutcome enum ~line 121-158）
-- Modify: `crates/backend/nomifun-app/src/router/state.rs`（compose_lead_receipt ~line 1079 + tests）
+- Modify: `crates/backend/openhub-orchestrator/src/engine.rs`（RunOutcome enum ~line 121-158）
+- Modify: `crates/backend/openhub-app/src/router/state.rs`（compose_lead_receipt ~line 1079 + tests）
 
 **Interfaces:**
 - Produces: `RunOutcome::NodeQuestion`（as_str `"node_question"`），非终态。
@@ -102,37 +102,37 @@ RunOutcome::NodeQuestion => format!(
 ),
 ```
 - [ ] Step 3: state.rs 纯函数单测（含 brief 注入、autonomous 不劫持该 arm——NodeQuestion 非 Completed/Failed 天然绕过 autonomous 分支）。
-- [ ] Step 4: `cargo test -p nomifun-app compose_lead_receipt` → commit `feat(cluster): NodeQuestion 回执`
+- [ ] Step 4: `cargo test -p openhub-app compose_lead_receipt` → commit `feat(cluster): NodeQuestion 回执`
 
-### Task 4: nomi_task_question 工具 + 引擎 park/豁免/恢复
+### Task 4: openhub_task_question 工具 + 引擎 park/豁免/恢复
 
 **Files:**
-- Modify: `crates/backend/nomifun-gateway/src/caps_orchestrator.rs`（新 handler + register）
-- Modify: `crates/backend/nomifun-orchestrator/src/engine.rs`（settle 守卫、终态判定、看门狗豁免、brief 决策策略段）
-- Modify: `crates/backend/nomifun-orchestrator/src/run_service.rs`（adopt/rerun 清 pending_question）
+- Modify: `crates/backend/openhub-gateway/src/caps_orchestrator.rs`（新 handler + register）
+- Modify: `crates/backend/openhub-orchestrator/src/engine.rs`（settle 守卫、终态判定、看门狗豁免、brief 决策策略段）
+- Modify: `crates/backend/openhub-orchestrator/src/run_service.rs`（adopt/rerun 清 pending_question）
 
 **Interfaces:**
-- Produces: 网关工具 `nomi_task_question { question: string }`——仅 worker 会话（extra 携 orchestrator run_id/task_id）可用；写 pending_question + status→needs_review + emit task.statusChanged + LeadReporter.report(NodeQuestion)。
+- Produces: 网关工具 `openhub_task_question { question: string }`——仅 worker 会话（extra 携 orchestrator run_id/task_id）可用；写 pending_question + status→needs_review + emit task.statusChanged + LeadReporter.report(NodeQuestion)。
 - 引擎不变量：settle 遇 task.status=="needs_review" → 仅落 output_summary/conversation_id/tokens，不改状态、不 emit done；终态判定把 needs_review 视为「未 settled 且不可判 failed」→ 循环退出但 run 保持 running；看门狗对含 needs_review 任务的 running run 豁免 stalled；adopt（已有）与 rerun 清 pending_question（needs_review→done / →pending）。
 
 - [ ] Step 1: 先读 engine.rs 终态判定分支与 reap_stalled_runs 全文、worker brief 组装点、run_service adopt/rerun 实现（grep 定位，超大文件勿整读）。
 - [ ] Step 2: settle_task_outcome `Ok(o) if o.ok` 分支入口加守卫：re-read task；若 status=="needs_review" → 只写 conversation_id/output_summary/tokens（不写 status、不 emit done）后 return。
 - [ ] Step 3: 终态判定：needs_review 不计入 done/failed/skipped 集合；存在 needs_review 且无 inflight/ready 时走「保持 running、退出循环」分支（复用 awaiting_plan_approval 的干净退出样式，engine.rs:1136-1147 同款注释说明由 adopt/rerun 重启）。
 - [ ] Step 4: reap_stalled_runs：跳过含 needs_review 任务的 run（列表页读 tasks，与既有查询合并，避免 N+1——若已有 per-run task 读取则顺路）。
-- [ ] Step 5: worker brief 组装点按 run.approval_mode 追加：manual→「遇到会显著影响方向/取舍的决策问题时，调用 nomi_task_question(question) 提交问题并立即结束本轮等待人工选择；不要自行猜测。」auto→「遇到抉择自行选择最合理方案并在产出中说明理由，不要停下来提问。」
+- [ ] Step 5: worker brief 组装点按 run.approval_mode 追加：manual→「遇到会显著影响方向/取舍的决策问题时，调用 openhub_task_question(question) 提交问题并立即结束本轮等待人工选择；不要自行猜测。」auto→「遇到抉择自行选择最合理方案并在产出中说明理由，不要停下来提问。」
 - [ ] Step 6: caps_orchestrator 新 handler `task_question`：从 CallerCtx.conversation_id 读会话 extra 拿 run_id/task_id（worker.rs 建会话时已埋）；校验 run.approval_mode=="manual"（否则报错文案引导自行决策）；`set_task_question` + `update_task(status=needs_review)` + `emit_task_status` + `report(NodeQuestion, brief=「节点『{title}』：{question}」)`；register() 注册（描述英文、注明仅审批模式 worker 可用）。
 - [ ] Step 7: adopt_task_result 与 rerun_task 里清 pending_question（set_task_question(None)），并确认 adopt 的状态守卫接受 needs_review 起点。
 - [ ] Step 8: 引擎单测（engine.rs tests mod，复用 reporter_stack/adhoc_lead_run 范式）：(a) worker 把 task 置 needs_review 后 settle 不覆盖为 done、run 保持 running 且循环退出；(b) 看门狗不 reap 含 needs_review 的 run；(c) adopt 后 run 重启至 completed。
-- [ ] Step 9: `cargo test -p nomifun-orchestrator -p nomifun-gateway` → commit `feat(cluster): 节点级审批模式（nomi_task_question + needs_review park）`
+- [ ] Step 9: `cargo test -p openhub-orchestrator -p openhub-gateway` → commit `feat(cluster): 节点级审批模式（openhub_task_question + needs_review park）`
 
 ### Task 5: 批量进展回执放宽（3→1）
 
 **Files:**
-- Modify: `crates/backend/nomifun-orchestrator/src/engine.rs`（BATCH_REPORT_MIN_NODES ~line 252 + doc + 测试 ~line 4709）
+- Modify: `crates/backend/openhub-orchestrator/src/engine.rs`（BATCH_REPORT_MIN_NODES ~line 252 + doc + 测试 ~line 4709）
 
 - [ ] Step 1: `const BATCH_REPORT_MIN_NODES: usize = 1;` 注释更新（间隔节流仍 20s；需求4：中途每批交付最迟 20s 内回执转述）。
 - [ ] Step 2: 更新 `batch_progress_reports_to_lead_midrun` 及相邻断言（原按 3 个节点设计的场景改为断言更早触发 + 间隔仍然节流）。
-- [ ] Step 3: `cargo test -p nomifun-orchestrator batch` → commit `feat(cluster): 中途批量回执降门槛到1节点(20s节流保留)`
+- [ ] Step 3: `cargo test -p openhub-orchestrator batch` → commit `feat(cluster): 中途批量回执降门槛到1节点(20s节流保留)`
 
 ## Phase 2 — 前端
 
@@ -177,12 +177,12 @@ RunOutcome::NodeQuestion => format!(
 - Modify: `ui/src/renderer/pages/conversation/orchestration/OrchestrationTopPanel.tsx`（leadThinking 传入画布占位）
 
 **要点（全部主题变量）：**
-- `.nomi-dag-card`：rest `box-shadow` 低、hover 抬升(translateY(-2px)+阴影加深+边框 primary 淡化)、active scale(0.985)、transition 180ms cubic-bezier(.2,.8,.2,1)。
+- `.openhub-dag-card`：rest `box-shadow` 低、hover 抬升(translateY(-2px)+阴影加深+边框 primary 淡化)、active scale(0.985)、transition 180ms cubic-bezier(.2,.8,.2,1)。
 - running：左侧状态条纹 + 卡片柔和 glow（`box-shadow: 0 0 0 1px color-mix(primary 30%), 0 0 18px color-mix(primary 18%)` 呼吸动画）+ 顶部 2px shimmer 进度条。
 - selected：animated ring（primary，脉冲一次后常亮）。
-- needs_review + pendingQuestion：警示徽标（Help/Caution 图标 + `nomi-dag-question-pulse` 缓脉冲）+ 琥珀 ring。
-- 入场：`.nomi-dag-enter { animation: nomi-dag-enter .32s both } @keyframes 从 opacity 0/translateY(6px)/scale(.97)`，`animation-delay: calc(var(--dag-i) * 40ms)`（node style 传 `--dag-i`，上限 12）。
-- 边：running 渐变流光（stroke-dasharray + dashoffset 动画类 `.nomi-dag-edge-live`）。
+- needs_review + pendingQuestion：警示徽标（Help/Caution 图标 + `openhub-dag-question-pulse` 缓脉冲）+ 琥珀 ring。
+- 入场：`.openhub-dag-enter { animation: openhub-dag-enter .32s both } @keyframes 从 opacity 0/translateY(6px)/scale(.97)`，`animation-delay: calc(var(--dag-i) * 40ms)`（node style 传 `--dag-i`，上限 12）。
+- 边：running 渐变流光（stroke-dasharray + dashoffset 动画类 `.openhub-dag-edge-live`）。
 - 规划占位：phaseKeys → i18n 文案列表逐条淡入 + reasoning 尾部 2 行滚动。
 - 签名函数补入 pendingQuestion/needs_review 相关字段。
 - [ ] `bun run build` → commit `feat(cluster): 画布节点/边/入场/规划叙事精美化 + 提问徽标`
@@ -197,7 +197,7 @@ RunOutcome::NodeQuestion => format!(
 **Interfaces:**
 - 消费 `useOrchestrationSafe()`：null/无 run → null。渲染：run 状态点 + 「agent 集群 · N/M 节点」+ 规划中 leadThinking 阶段 + 横向节点 chips（状态色点+标题+needs_review 提问图标）+ 提问横幅（存在 pending_question 节点时）。
 - chip/横幅点击 → 用 context.detail 组装 `OpenTaskPayload{task, assignment: detail.assignments.find, fleetMembers: detail.fleet_members, runId, refetch}` → `projectTask(payload)`。
-- 可折叠（记 localStorage `nomifun:cluster-strip-collapsed`）。
+- 可折叠（记 localStorage `openhub:cluster-strip-collapsed`）。
 - [ ] `bun run build` → commit `feat(cluster): 会话内集群实时进度条`
 
 ### Task 11: ProjectedWorkerView 提问横幅
@@ -238,7 +238,7 @@ RunOutcome::NodeQuestion => format!(
 ## Phase 3 — 验证与审查
 
 ### Task 15: 全量验证
-- [ ] `bun run build`；`cargo test -p nomifun-orchestrator -p nomifun-gateway -p nomifun-app -p nomifun-ai-agent -p nomifun-db`；`cargo clippy` 相关 crate 无新警告。
+- [ ] `bun run build`；`cargo test -p openhub-orchestrator -p openhub-gateway -p openhub-app -p openhub-ai-agent -p openhub-db`；`cargo clippy` 相关 crate 无新警告。
 
 ### Task 16: 多agent审查（需求7）
 - [ ] code-review workflow：正确性/资源泄露/内存/状态机 多镜头 + 对抗验证本次全部 diff；重点：useRunLive timer 清理、strip 订阅、needs_review×(重试/取消/暂停/看门狗/adopt) 状态机交互、迁移兼容。修复全部 CONFIRMED 项后重跑验证。

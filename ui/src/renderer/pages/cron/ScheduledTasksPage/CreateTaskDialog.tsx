@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -256,7 +256,7 @@ const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
     return agentId;
   }, [selectedAgent, presetAssistants]);
 
-  const isGeminiMode = resolvedBackend === 'gemini' || resolvedBackend === 'nomi';
+  const isGeminiMode = resolvedBackend === 'gemini' || resolvedBackend === 'openhub';
 
   const nomiProviders = useMemo(
     () => providers.filter((p) => !p.platform?.toLowerCase().includes('gemini-with-google-auth')),
@@ -265,13 +265,13 @@ const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
   const hasNomiProvider = nomiProviders.length > 0;
 
   const filteredProviders = useMemo(
-    () => (resolvedBackend === 'nomi' ? nomiProviders : providers),
+    () => (resolvedBackend === 'openhub' ? nomiProviders : providers),
     [resolvedBackend, providers, nomiProviders]
   );
 
   const geminiCurrentModel = useMemo<TProviderWithModel | undefined>(() => {
-    if (resolvedBackend !== 'nomi' || !model_id) return undefined;
-    const editedProviderId = resolvedBackend === 'nomi' ? editJob?.metadata.agent_config?.backend : undefined;
+    if (resolvedBackend !== 'openhub' || !model_id) return undefined;
+    const editedProviderId = resolvedBackend === 'openhub' ? editJob?.metadata.agent_config?.backend : undefined;
     if (editedProviderId) {
       const byId = filteredProviders.find((p) => p.id === editedProviderId);
       if (byId && getAvailableModels(byId).includes(model_id)) {
@@ -301,14 +301,14 @@ const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
   );
 
   const acpCachedModelInfo = useMemo<AcpModelInfo | null>(() => {
-    if (!resolvedBackend || resolvedBackend === 'gemini' || resolvedBackend === 'nomi') return null;
+    if (!resolvedBackend || resolvedBackend === 'gemini' || resolvedBackend === 'openhub') return null;
     const matched = detectedAgents?.find((a) => (a.backend ?? a.agent_type) === resolvedBackend);
     const info = matched?.handshake?.available_models as AcpModelInfo | undefined;
     return info?.available_models?.length ? info : null;
   }, [resolvedBackend, detectedAgents]);
 
   useEffect(() => {
-    if (resolvedBackend !== 'nomi' || model_id) return;
+    if (resolvedBackend !== 'openhub' || model_id) return;
     for (const provider of nomiProviders) {
       const models = getAvailableModels(provider);
       if (models.length > 0) {
@@ -414,15 +414,15 @@ const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
       const agent = cliAgents.find((a) => a.backend === agentId || a.agent_type === agentId);
       const backend = (agent?.backend || agent?.agent_type || agentId) as string;
 
-      if (backend === 'nomi') {
+      if (backend === 'openhub') {
         if (!geminiCurrentModel || !model_id) {
           throw new Error(t('cron.page.form.nomiModelRequired'));
         }
-        resolvedAgentType = 'nomi' as ICreateCronJobParams['agent_type'];
+        resolvedAgentType = 'openhub' as ICreateCronJobParams['agent_type'];
         agent_config = {
           backend: geminiCurrentModel.id as string,
           name: geminiCurrentModel.name,
-          mode: getFullAutoMode('nomi'),
+          mode: getFullAutoMode('openhub'),
           model_id,
           workspace,
           clear_context_each_run: clearContextEachRun,
@@ -479,7 +479,7 @@ const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
       // ─── 指定会话 — 复用已存在的会话 ─────────────────────────────────
       // 复用的会话已经带有自己的执行 Agent 和项目（workspace），这里不再重复配置，
       // 也绝不能传 agent_config：否则 agent_config.workspace 会覆盖会话自身的工作目录
-      // （见 nomifun-cron executor::resolve_execution_workspace_raw）。
+      // （见 openhub-cron executor::resolve_execution_workspace_raw）。
       // 指定会话仅在新建模式提供，因此直接构造创建参数并返回。
       if (execution_mode === 'specified') {
         if (!specifiedConversationId) {
@@ -624,7 +624,7 @@ const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
             {cliAgents.map((agent) => {
               const agentKey = agent.backend || agent.agent_type;
               const logo = resolveAgentLogo({ icon: agent.icon, backend: agentKey });
-              const disabled = agentKey === 'nomi' && !hasNomiProvider;
+              const disabled = agentKey === 'openhub' && !hasNomiProvider;
               return (
                 <Option key={`cli:${agentKey}`} value={`cli:${agentKey}`} disabled={disabled}>
                   <div

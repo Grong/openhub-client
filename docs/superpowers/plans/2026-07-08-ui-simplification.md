@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** 将 NomiFun 侧边栏从 13 个入口精简到 5 个（新建对话 + 知识库 + 插件 + 项目列表 + 设置），加入首次引导 Wizard，简化会话创建流程。
+**Goal:** 将 OpenHub 侧边栏从 13 个入口精简到 5 个（新建对话 + 知识库 + 插件 + 项目列表 + 设置），加入首次引导 Wizard，简化会话创建流程。
 
 **Architecture:** 纯前端 UI 重组。不涉及后端 API 变更、数据库迁移或 agent 引擎改动。所有改动限定在 `ui/src/renderer/` 下。
 
@@ -470,7 +470,7 @@ import WelcomeStep from './steps/WelcomeStep';
 import ApiKeyStep from './steps/ApiKeyStep';
 import CompanionStep from './steps/CompanionStep';
 
-const ONBOARDING_SKIPPED_KEY = 'nomifun_onboarding_skipped';
+const ONBOARDING_SKIPPED_KEY = 'openhub_onboarding_skipped';
 
 const OnboardingWizard: React.FC = () => {
   const [step, setStep] = useState(0);
@@ -550,7 +550,7 @@ const WelcomeStep: React.FC<WelcomeStepProps> = ({ onNext, onSkip }) => {
         <span className="text-48px">🤖</span>
       </div>
       <Typography.Title heading={4}>
-        {t('onboarding.welcome.title', { defaultValue: '欢迎来到 NomiFun' })}
+        {t('onboarding.welcome.title', { defaultValue: '欢迎来到 OpenHub' })}
       </Typography.Title>
       <Typography.Text type="secondary">
         {t('onboarding.welcome.subtitle', {
@@ -766,7 +766,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 // 在新建会话的逻辑中，替换配置向导为直接创建:
 const handleNewConversation = async () => {
   const defaultConfig = {
-    agentType: 'nomi',
+    agentType: 'openhub',
     assistantId: DEFAULT_ASSISTANT_ID,    // 通用助手
     knowledgeBaseIds: [DEFAULT_KB_ID],    // 我的知识库
   };

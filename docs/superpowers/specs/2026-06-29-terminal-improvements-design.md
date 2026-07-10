@@ -16,7 +16,7 @@
 - 终端会话**无 conversation/provider/model 关联**（DB 行、`CreateTerminalParams`、API DTO、IPC、UI 均无相关列）。
 - 全部输入经 `TerminalService::input(id, data_b64)`（service.rs:743）汇聚后写入 PTY；`pty.rs::write` 不留记录。`input()` 在无活 handle 时返回 `NotFound`。
 - 生命周期事件：`LifecycleKind{TurnEnd, ToolUse, Notification, SessionStart}`（lifecycle.rs）。claude 用 Stop→TurnEnd（payload 含 `last_assistant_message`），codex 同有 TurnEnd。`subscribe_lifecycle(id)` 已存在；spawn_pty 内已有一个示例消费者（service.rs:515-529）。
-- 既有「prompt→短文本」LLM 路径：`nomifun_ai_agent::one_shot_completion(cfg, system, messages, max_tokens)` + `resolve_provider_config(provider_repo, encryption_key, provider_id, model, workspace)` + `user_message(text)`。`LiveKnowledgeCompleter`（knowledge_completer.rs）是「持有 provider_repo + encryption_key + workspace、`resolve_default_model()` 取第一个有效 provider/model」的拷贝模板。`provider_repo`/`encryption_key` 在 `AppServices`（services.rs:173/176），`terminal_service` 在 services.rs:440-459 接线，但二者**未**传给 `TerminalService`。
+- 既有「prompt→短文本」LLM 路径：`openhub_ai_agent::one_shot_completion(cfg, system, messages, max_tokens)` + `resolve_provider_config(provider_repo, encryption_key, provider_id, model, workspace)` + `user_message(text)`。`LiveKnowledgeCompleter`（knowledge_completer.rs）是「持有 provider_repo + encryption_key + workspace、`resolve_default_model()` 取第一个有效 provider/model」的拷贝模板。`provider_repo`/`encryption_key` 在 `AppServices`（services.rs:173/176），`terminal_service` 在 services.rs:440-459 接线，但二者**未**传给 `TerminalService`。
 - 前端：`XtermView.tsx` 的 xterm 网格**从不**按 status 禁用（`onData` 始终转发输入）；仅 `TerminalSendBox` 在 `isExited`（`last_status!=='running'`）时 disable（TerminalSessionPage.tsx:408）。`term.clear()` 只清普通缓冲、**不能**退出 alt-screen；需 `term.reset()`。WebGL 上下文丢失（XtermView.tsx:89-95）是「失去激活态后乱码」的诱因之一。
 - **WS 重连间隙**：`httpBridge.ts` 的 WS 单例会重连（退避 1s~30s），监听器按事件名存于模块级 map 故重连后存活；但服务端只做无 replay 的 `broadcast_all`，重连 open 回调**不重新拉取 scrollback** → 断线期间的重绘帧永久丢失 = 持久乱码。
 - App 生命周期钩子仅在 `apps/desktop/src/main.rs`：`on_window_event`（CloseRequested 隐藏到托盘；Destroyed→exit(0)）、tray-quit（设 `QuitFlag` 后 `app.exit(0)`）、`handle_run_event`（仅 macOS Reopen）。无任何终端清理；`TerminalService`/`PtyHandle` 无 Drop。后端运行在独立 tokio runtime 线程，`DesktopServer` 暴露 runtime Handle（desktop.rs:106）但无阻塞 shutdown 方法。
@@ -43,12 +43,12 @@
 
 ### 后端接线
 - 新增 `LiveTerminalTitleCompleter { provider_repo, encryption_key, workspace }`（仿 `LiveKnowledgeCompleter`），late-wire 注入 `TerminalService`（新增 `with_title_completer`）。`None` 时只走兜底截断，绝不阻塞。
-- `crates/backend/nomifun-terminal/Cargo.toml` 加 `nomifun-ai-agent` 依赖。
+- `crates/backend/openhub-terminal/Cargo.toml` 加 `openhub-ai-agent` 依赖。
 - `services.rs:440-459` 旁注入，复用 `provider_repo.clone()` / `encryption_key` / `data_dir.clone()`。
 
 ### 主要文件
-- `crates/backend/nomifun-terminal/src/{service.rs, title.rs(新), Cargo.toml}`
-- `crates/backend/nomifun-app/src/services.rs`
+- `crates/backend/openhub-terminal/src/{service.rs, title.rs(新), Cargo.toml}`
+- `crates/backend/openhub-app/src/services.rs`
 
 ---
 
@@ -65,7 +65,7 @@
 5. **WS 重连重放（乱码主因修复）**：`httpBridge.ts` WS open 时若为重连，通知监听者（新增 `terminal.__reconnected` 内部事件或重连回调）；`XtermView` 收到后 `term.reset()` 然后重新 `ipcBridge.terminal.get(id)` 用同一 decoder 重放当前 scrollback。
 
 ### 主要文件
-- `crates/backend/nomifun-terminal/src/{service.rs, routes.rs}`
+- `crates/backend/openhub-terminal/src/{service.rs, routes.rs}`
 - `ui/src/renderer/pages/terminal/{XtermView.tsx, TerminalSessionPage.tsx, TerminalSendBox.tsx}`
 - `ui/src/common/adapter/{ipcBridge.ts, httpBridge.ts}`
 - i18n：`ui/.../locales/{zh-CN,en-US}/terminal.json`
@@ -83,9 +83,9 @@
    - **绝不在 close-to-tray（隐藏窗口）路径调用**。
 
 ### 主要文件
-- `crates/backend/nomifun-terminal/src/service.rs`
-- `crates/backend/nomifun-db/src/repository/{terminal.rs, sqlite_terminal.rs}`
-- `crates/backend/nomifun-app/src/desktop.rs`
+- `crates/backend/openhub-terminal/src/service.rs`
+- `crates/backend/openhub-db/src/repository/{terminal.rs, sqlite_terminal.rs}`
+- `crates/backend/openhub-app/src/desktop.rs`
 - `apps/desktop/src/main.rs`
 
 ---

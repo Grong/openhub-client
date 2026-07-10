@@ -1,7 +1,7 @@
-//! `nomifun-web` — the standalone Web host for the browser deployment.
+//! `openhub-web` — the standalone Web host for the browser deployment.
 //!
-//! In the unified architecture there is ONE Rust backend (`nomifun-app`, the
-//! former `nomicore`). It runs in two host modes:
+//! In the unified architecture there is ONE Rust backend (`openhub-app`, the
+//! former `openhub-core`). It runs in two host modes:
 //!   * embedded in the Tauri desktop shell (`apps/desktop`), started in-process
 //!     on a localhost port in `--local` (no-auth) mode — the shell IS the trust
 //!     boundary, so no login is required;
@@ -18,7 +18,7 @@
 //! This host boots the backend **in-process** (same binary), composes its `/api`
 //! router with a static `ServeDir` fallback for the SPA, and serves both on one
 //! port. Env mutation + runtime init happen before the tokio runtime starts,
-//! mirroring the `nomicore` bin's ordering.
+//! mirroring the `openhub-core` bin's ordering.
 
 use std::net::{IpAddr, SocketAddr};
 use std::path::PathBuf;
@@ -30,54 +30,54 @@ use tower_http::services::{ServeDir, ServeFile};
 use tower_http::trace::TraceLayer;
 
 /// Env var that, when truthy, opts into `--insecure-no-auth` without the flag.
-const ENV_INSECURE_NO_AUTH: &str = "NOMIFUN_WEB_INSECURE_NO_AUTH";
+const ENV_INSECURE_NO_AUTH: &str = "OPENHUB_WEB_INSECURE_NO_AUTH";
 
 #[derive(Parser, Debug)]
 #[command(
-    name = "nomifun-web",
-    about = "NomiFun unified Web host (SPA + backend API)"
+    name = "openhub-web",
+    about = "OpenHub unified Web host (SPA + backend API)"
 )]
 struct Args {
     /// Host/IP address to bind on. Defaults to loopback; use `0.0.0.0` to accept
     /// connections from other machines (do so behind a trusted gateway / private
     /// network — see `--insecure-no-auth`).
-    #[arg(long, env = "NOMIFUN_WEB_HOST", default_value = "127.0.0.1")]
+    #[arg(long, env = "OPENHUB_WEB_HOST", default_value = "127.0.0.1")]
     host: String,
     /// Port to listen on (serves both the API and the SPA).
-    #[arg(long, env = "NOMIFUN_WEB_PORT", default_value_t = 8787)]
+    #[arg(long, env = "OPENHUB_WEB_PORT", default_value_t = 8787)]
     port: u16,
     /// Data directory for the backend (db + storage). Defaults to the same
-    /// per-user dir as the desktop shell (`%LOCALAPPDATA%\NomiFun\Nomi` on
-    /// Windows, see `nomifun_app::cli::default_data_dir`) so every host and
+    /// per-user dir as the desktop shell (`%LOCALAPPDATA%\OpenHub\Nomi` on
+    /// Windows, see `openhub_app::cli::default_data_dir`) so every host and
     /// dev loop shares one state by default. The env value is taken literally
     /// (no `/Nomi` suffix) — production deployments (Docker `/data`, systemd
-    /// `/var/lib/nomifun`) rely on that.
+    /// `/var/libopenhub) rely on that.
     #[arg(
         long,
-        env = "NOMIFUN_DATA_DIR",
-        default_value_os_t = nomifun_app::cli::default_data_dir(),
-        value_parser = nomifun_app::cli::parse_non_empty_path
+        env = "OPENHUB_DATA_DIR",
+        default_value_os_t = openhub_app::cli::default_data_dir(),
+        value_parser = openhub_app::cli::parse_non_empty_path
     )]
     data_dir: PathBuf,
     /// Directory containing the built SPA (ui/dist).
-    #[arg(long, env = "NOMIFUN_WEB_DIST", default_value = "../../ui/dist")]
+    #[arg(long, env = "OPENHUB_WEB_DIST", default_value = "../../ui/dist")]
     dist: PathBuf,
     /// DANGER: run the backend in local mode — authentication is fully DISABLED
     /// and every client acts as a privileged user with shell/file/agent access.
     /// Only for a host reachable solely over loopback or a trusted private
     /// network. Without this flag the web host requires a login (safe default).
-    /// Can also be enabled via `NOMIFUN_WEB_INSECURE_NO_AUTH=true`.
+    /// Can also be enabled via `OPENHUB_WEB_INSECURE_NO_AUTH=true`.
     #[arg(long)]
     insecure_no_auth: bool,
     /// Initial admin username provisioned on first run (authenticated mode only).
     /// Ignored once an admin exists.
-    #[arg(long, env = "NOMIFUN_ADMIN_USERNAME", default_value = "admin")]
+    #[arg(long, env = "OPENHUB_ADMIN_USERNAME", default_value = "admin")]
     admin_user: String,
     /// Initial admin password provisioned on first run (authenticated mode only).
     /// If omitted, no admin is pre-seeded: the install is left uninitialised and
     /// the first WebUI visitor creates the admin interactively via first-run
     /// setup (`POST /api/auth/setup`). Ignored once an admin exists.
-    #[arg(long, env = "NOMIFUN_ADMIN_PASSWORD")]
+    #[arg(long, env = "OPENHUB_ADMIN_PASSWORD")]
     admin_password: Option<String>,
 }
 
@@ -100,7 +100,7 @@ fn main() -> Result<ExitCode> {
     // before any backend/server init. Every host binary must honor these or the
     // injected declaration tools (requirement_complete / team / guide) never
     // appear in the agent's session.
-    if let Some(code) = nomifun_app::commands::run_mcp_stdio_subcommand_if_present() {
+    if let Some(code) = openhub_app::commands::run_mcp_stdio_subcommand_if_present() {
         return Ok(code);
     }
 
@@ -113,17 +113,17 @@ fn main() -> Result<ExitCode> {
 
     // Build a fully-defaulted backend CLI without touching this process's argv,
     // then override the bits this host owns. `parse_from` gives a defaulted Cli.
-    let mut cli = nomifun_app::cli::Cli::parse_from(["nomifun-web"]);
+    let mut cli = openhub_app::cli::Cli::parse_from(["openhub-web"]);
     cli.host = args.host.clone();
     cli.port = args.port;
     cli.data_dir = args.data_dir.clone();
     cli.local = insecure_no_auth;
 
-    // Same ordering as the nomicore bin: runtime init + PATH enhancement BEFORE
+    // Same ordering as the openhub-core bin: runtime init + PATH enhancement BEFORE
     // any worker thread / tokio runtime exists.
-    nomifun_runtime::init(&cli.data_dir);
+    openhub_runtime::init(&cli.data_dir);
     // SAFETY: called before the tokio runtime (and its threads) is built.
-    let merged_path = unsafe { nomifun_runtime::enhance_process_path() };
+    let merged_path = unsafe { openhub_runtime::enhance_process_path() };
 
     let runtime = tokio::runtime::Builder::new_multi_thread()
         .enable_all()
@@ -131,7 +131,7 @@ fn main() -> Result<ExitCode> {
     runtime.block_on(serve(cli, merged_path, args))
 }
 
-async fn serve(cli: nomifun_app::cli::Cli, merged_path: String, args: Args) -> Result<ExitCode> {
+async fn serve(cli: openhub_app::cli::Cli, merged_path: String, args: Args) -> Result<ExitCode> {
     // Resolve the bind address up front so a bad --host fails fast with a clear
     // message instead of a cryptic socket error.
     let ip: IpAddr = args.host.parse().with_context(|| {
@@ -151,17 +151,17 @@ async fn serve(cli: nomifun_app::cli::Cli, merged_path: String, args: Args) -> R
 
     // Boot the backend in-process (env → data layer → services), then mount the
     // real API router with the SPA as the fallback for non-/api routes.
-    let env = nomifun_app::bootstrap::init_environment(&cli, &merged_path)?;
-    let database = nomifun_app::bootstrap::init_data_layer(&env.config).await?;
-    let services = nomifun_app::AppServices::from_config(database, &env.config).await?;
+    let env = openhub_app::bootstrap::init_environment(&cli, &merged_path)?;
+    let database = openhub_app::bootstrap::init_data_layer(&env.config).await?;
+    let services = openhub_app::AppServices::from_config(database, &env.config).await?;
 
     // First-run admin provisioning. No-op in local mode and once an admin
     // exists; otherwise a fresh authenticated install would have no way to set
     // the first password (the in-band setup routes are local-only). Returns
     // whether the install still awaits interactive first-run setup.
-    let needs_first_run_setup = nomifun_app::bootstrap::ensure_admin_credentials(
+    let needs_first_run_setup = openhub_app::bootstrap::ensure_admin_credentials(
         &services,
-        nomifun_app::bootstrap::AdminBootstrap {
+        openhub_app::bootstrap::AdminBootstrap {
             username: Some(args.admin_user.clone()),
             password: args.admin_password.clone(),
         },
@@ -172,11 +172,11 @@ async fn serve(cli: nomifun_app::cli::Cli, merged_path: String, args: Args) -> R
             %ip,
             "first-run setup is OPEN on a non-loopback address: the NEXT client to reach this \
              port will create the admin account. Complete setup over a trusted network/tunnel \
-             first, or pre-seed with NOMIFUN_ADMIN_PASSWORD."
+             first, or pre-seed with OPENHUB_ADMIN_PASSWORD."
         );
     }
 
-    let api = nomifun_app::create_router(&services).await;
+    let api = openhub_app::create_router(&services).await;
     let app = api
         .fallback_service(
             ServeDir::new(&args.dist)
@@ -190,13 +190,13 @@ async fn serve(cli: nomifun_app::cli::Cli, merged_path: String, args: Args) -> R
         requested = %addr,
         auth = if cli.local { "disabled (insecure-no-auth)" } else { "required" },
         dist = ?args.dist,
-        "nomifun-web: embedded backend + SPA on one port"
+        "openhub-web: embedded backend + SPA on one port"
     );
     // Port failover: if `args.port` is taken, bind a bounded-scan neighbour (or
     // an ephemeral port) instead of hard-failing, then announce the actually
     // bound port via `{data_dir}/port.json` + stdout so the operator/launcher
     // can re-point clients — a browser cannot self-discover a moved port.
-    let (actual_port, listener) = nomifun_app::bootstrap::bind_with_fallback(ip, args.port).await?;
+    let (actual_port, listener) = openhub_app::bootstrap::bind_with_fallback(ip, args.port).await?;
     if actual_port != args.port {
         tracing::warn!(
             requested = args.port,
@@ -204,7 +204,7 @@ async fn serve(cli: nomifun_app::cli::Cli, merged_path: String, args: Args) -> R
             "preferred port was busy; bound a fallback port"
         );
     }
-    nomifun_app::bootstrap::announce_bound_port(&cli.data_dir, &args.host, actual_port);
+    openhub_app::bootstrap::announce_bound_port(&cli.data_dir, &args.host, actual_port);
     axum::serve(listener, app).await?;
 
     services.database.close().await;

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -954,9 +954,9 @@ const CompanionPage: React.FC = () => {
     };
   }, []);
 
-  // 让原生窗口标题跟随伙伴的自定义名字。建窗时只给了占位标题 "NomiFun"（见 main.rs），
+  // 让原生窗口标题跟随伙伴的自定义名字。建窗时只给了占位标题 "OpenHub"（见 main.rs），
   // 窗口虽 skip_taskbar，但 alt-tab / 屏幕阅读器 / macOS 窗口菜单仍会读到它——给每个
-  // 伙伴专属称呼而非千篇一律的 "nomi"。初次加载与重命名（config-updated → setProfile）
+  // 伙伴专属称呼而非千篇一律的 "openhub"。初次加载与重命名（config-updated → setProfile）
   // 都会触发本 effect。
   useEffect(() => {
     if (!isTauriRuntime()) return;
@@ -1160,7 +1160,7 @@ const CompanionPage: React.FC = () => {
         const conversation_id = await ensureThread();
         turnActiveRef.current = true;
         setBubbleRunning(true);
-        // 把图片路径以 NOMIFUN_FILES_MARKER 形式嵌进 input（与 NomiSendBox 一致），
+        // 把图片路径以 OPENHUB_FILES_MARKER 形式嵌进 input（与 NomiSendBox 一致），
         // 这样 agent 才能看到附件；空 workspace 下绝对路径原样保留。
         const displayInput = files.length > 0 ? buildDisplayMessage(text, files, '') : text;
         await ipcBridge.conversation.sendMessage.invoke({
@@ -1388,7 +1388,7 @@ const CompanionPage: React.FC = () => {
       {(bubbleRunning || remoteRunning) && (
         <button
           type='button'
-          className='nomi-companion-reaction'
+          className='openhub-companion-reaction'
           title={t('nomi.companion.interrupt')}
           onClick={(e) => {
             e.stopPropagation();
@@ -1403,7 +1403,7 @@ const CompanionPage: React.FC = () => {
       {bubble && (
         <button
           type='button'
-          className='nomi-companion-reaction'
+          className='openhub-companion-reaction'
           title={t('nomi.companion.dismiss')}
           onClick={(e) => {
             e.stopPropagation();
@@ -1420,7 +1420,7 @@ const CompanionPage: React.FC = () => {
 
   if (!isTauriRuntime()) {
     return (
-      <div className='nomi-companion-web-hint'>
+      <div className='openhub-companion-web-hint'>
         <CompanionAvatar
           character={profile?.character}
           mood={mood}
@@ -1436,7 +1436,7 @@ const CompanionPage: React.FC = () => {
 
   return (
     <div
-      className='nomi-companion-window'
+      className='openhub-companion-window'
       // 气泡可用高度 = 100vh − 预留（立绘高 + 输入条/边距）。让正文吃满窗口剩余空间又不压到立绘。
       style={{ '--companion-reserve': `${desk.figureHeight + 84}px` } as React.CSSProperties}
       onContextMenu={(e) => {
@@ -1452,7 +1452,7 @@ const CompanionPage: React.FC = () => {
     >
       {bubble && (
         <div
-          className={`nomi-companion-bubble ${bubbleLoading ? 'nomi-companion-bubble--loading' : ''}`}
+          className={`openhub-companion-bubble ${bubbleLoading ? 'openhub-companion-bubble--loading' : ''}`}
           data-companion-hit
           onMouseEnter={() => {
             // 悬停即暂停消散——长回复不会没读完就消失（点 1）。
@@ -1471,17 +1471,17 @@ const CompanionPage: React.FC = () => {
           }}
         >
           {remoteHeader && (
-            <div className='nomi-companion-bubble__remote'>
+            <div className='openhub-companion-bubble__remote'>
               {CHANNEL_LOGOS[remoteHeader.platform] && (
                 <img src={CHANNEL_LOGOS[remoteHeader.platform]} alt={remoteHeader.platform} title={remoteHeader.platform} />
               )}
               <span>{remoteHeader.inbound || t('nomi.companion.remoteIncoming')}</span>
             </div>
           )}
-          <div className='nomi-companion-bubble__scroll' ref={bubbleScrollRef} onScroll={onBubbleScroll}>
-            <div className='nomi-companion-bubble__content' ref={bubbleContentRef}>
+          <div className='openhub-companion-bubble__scroll' ref={bubbleScrollRef} onScroll={onBubbleScroll}>
+            <div className='openhub-companion-bubble__content' ref={bubbleContentRef}>
               {bubble === '…' ? (
-                <span className='nomi-companion-bubble__typing' aria-label='…'>
+                <span className='openhub-companion-bubble__typing' aria-label='…'>
                   <i />
                   <i />
                   <i />
@@ -1493,10 +1493,10 @@ const CompanionPage: React.FC = () => {
           </div>
         </div>
       )}
-      <div className='nomi-companion-stage'>
+      <div className='openhub-companion-stage'>
         {unread > 0 && (
           <div
-            className='nomi-companion-badge'
+            className='openhub-companion-badge'
             data-companion-hit
             onClick={(e) => {
               e.stopPropagation();
@@ -1507,18 +1507,18 @@ const CompanionPage: React.FC = () => {
           </div>
         )}
         {showSuggestions && suggestions.length > 0 && (
-          <div className='nomi-companion-suggestions' data-companion-hit onClick={(e) => e.stopPropagation()}>
+          <div className='openhub-companion-suggestions' data-companion-hit onClick={(e) => e.stopPropagation()}>
             {suggestions.map((s) => (
-              <div key={s.id} className='nomi-companion-suggestions__item' onClick={() => void clickSuggestion(s)}>
-                <div className='nomi-companion-suggestions__title'>{s.title}</div>
-                <div className='nomi-companion-suggestions__body'>{s.body}</div>
+              <div key={s.id} className='openhub-companion-suggestions__item' onClick={() => void clickSuggestion(s)}>
+                <div className='openhub-companion-suggestions__title'>{s.title}</div>
+                <div className='openhub-companion-suggestions__body'>{s.body}</div>
               </div>
             ))}
           </div>
         )}
         <div
           ref={figureHitRef}
-          className='nomi-companion-figure-hit'
+          className='openhub-companion-figure-hit'
           data-companion-hit
           onMouseDown={(e) => void startDrag(e)}
         >
@@ -1535,17 +1535,17 @@ const CompanionPage: React.FC = () => {
       </div>
       {composerOpen ? (
         <div
-          className={`nomi-companion-composer ${dragOver ? 'is-dragover' : ''}`}
+          className={`openhub-companion-composer ${dragOver ? 'is-dragover' : ''}`}
           data-companion-hit
           onClick={(e) => e.stopPropagation()}
         >
           {attachedFiles.length > 0 && (
-            <div className='nomi-companion-composer__thumbs'>
+            <div className='openhub-companion-composer__thumbs'>
               {attachedFiles.map((path, i) => (
-                <div key={`${path}-${i}`} className='nomi-companion-composer__thumb'>
+                <div key={`${path}-${i}`} className='openhub-companion-composer__thumb'>
                   <LocalImageView src={path} alt='' />
                   <button
-                    className='nomi-companion-composer__thumb-x'
+                    className='openhub-companion-composer__thumb-x'
                     title={t('nomi.companion.collapse')}
                     onClick={() => setAttachedFiles((prev) => prev.filter((_, idx) => idx !== i))}
                   >
@@ -1556,7 +1556,7 @@ const CompanionPage: React.FC = () => {
             </div>
           )}
           <textarea
-            className='nomi-companion-composer__input'
+            className='openhub-companion-composer__input'
             value={composerText}
             placeholder={t('nomi.companion.chatPlaceholder', { name: profile?.name || 'Nomi' })}
             autoFocus
@@ -1570,16 +1570,16 @@ const CompanionPage: React.FC = () => {
               }
             }}
           />
-          <div className='nomi-companion-composer__bar'>
+          <div className='openhub-companion-composer__bar'>
             <button
               type='button'
-              className='nomi-companion-composer__attach'
+              className='openhub-companion-composer__attach'
               title={t('nomi.companion.attachImage')}
               disabled={sendboxUpload.isUploading}
               onClick={pickImages}
             >
               {sendboxUpload.isUploading ? (
-                <span className='nomi-companion-spinner' aria-hidden='true' />
+                <span className='openhub-companion-spinner' aria-hidden='true' />
               ) : (
                 <svg
                   width='16'
@@ -1596,11 +1596,11 @@ const CompanionPage: React.FC = () => {
               )}
             </button>
             <div className='spacer' />
-            <button className='nomi-companion-composer__ghost' onClick={collapseComposer}>
+            <button className='openhub-companion-composer__ghost' onClick={collapseComposer}>
               {t('nomi.companion.collapse')}
             </button>
             <button
-              className='nomi-companion-composer__send'
+              className='openhub-companion-composer__send'
               disabled={(!composerText.trim() && attachedFiles.length === 0) || sending || sendboxUpload.isUploading}
               onClick={() => void sendComposer()}
             >
@@ -1611,7 +1611,7 @@ const CompanionPage: React.FC = () => {
         </div>
       ) : (
         <div
-          className={`nomi-companion-chatbar ${input || sending || barRevealed ? 'is-active' : ''}`}
+          className={`openhub-companion-chatbar ${input || sending || barRevealed ? 'is-active' : ''}`}
           // 常驻命中候选；隐藏态 pointer-events:none 会被 companionHitTarget 跳过，
           // CSS hover 先显示但 React reveal 尚未赶上时也不会出现「看得到却穿透」。
           data-companion-hit
@@ -1625,7 +1625,7 @@ const CompanionPage: React.FC = () => {
               if (e.key === 'Enter') void sendChat();
             }}
           />
-          <div className='nomi-companion-iconbtn' title={t('nomi.companion.expand')} onClick={openComposer}>
+          <div className='openhub-companion-iconbtn' title={t('nomi.companion.expand')} onClick={openComposer}>
             <svg
               width='14'
               height='14'
@@ -1643,7 +1643,7 @@ const CompanionPage: React.FC = () => {
             </svg>
           </div>
           <button
-            className='nomi-companion-send'
+            className='openhub-companion-send'
             disabled={!input.trim() || sending}
             onClick={() => void sendChat()}
           >

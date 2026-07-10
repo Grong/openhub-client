@@ -2,14 +2,14 @@
 
 - 日期:2026-07-05
 - 状态:待评审(评审通过后进入分模块并行开发)
-- 领域代号:`workshop`(前端路由 `/workshop`,后端 crate `nomifun-workshop` + `nomifun-creation`,数据目录 `{data_dir}/workshop/`)
+- 领域代号:`workshop`(前端路由 `/workshop`,后端 crate `openhub-workshop` + `openhub-creation`,数据目录 `{data_dir}/workshop/`)
 - 中文名:创意工坊;英文名:Creative Workshop
 
 ---
 
 ## 0. 背景与目标
 
-用户希望在 NomiFun 中新增一个一等创作领域「创意工坊」:以**无限画布**为中心的 AI 视觉创作工作台,能力对标开源项目 infinite-canvas 及其演示口播稿(介绍v1/介绍v2)所展示的完整功能面,同时用 NomiFun 已有的平台能力**重做参考项目最薄弱的两块:资源(资产)管理与模型管理**。
+用户希望在 OpenHub 中新增一个一等创作领域「创意工坊」:以**无限画布**为中心的 AI 视觉创作工作台,能力对标开源项目 infinite-canvas 及其演示口播稿(介绍v1/介绍v2)所展示的完整功能面,同时用 OpenHub 已有的平台能力**重做参考项目最薄弱的两块:资源(资产)管理与模型管理**。
 
 一句话定位:**在一张无限大的画布上,用节点和连线组织素材与 AI 生成,图片/视频/文本混排创作,支持批量、循环、连续编辑,全部产物沉淀进统一资产库。**
 
@@ -79,7 +79,7 @@
 - 全局跨画布共享;资产可直接拖入画布成节点;导入导出(zip)。
 - 生成产物自动登记来源(prompt/模型/参数溯源)。
 
-### 2.5 模型与平台管理(参考实现簡陋→我们用 NomiFun 平台重做)
+### 2.5 模型与平台管理(参考实现簡陋→我们用 OpenHub 平台重做)
 - 多平台渠道管理:Base URL + Key(多 key)+ 协议;**验证地址/验证协议**(自动探测 OpenAI 直连 vs 异步任务协议 vs Gemini vs 火山);**拉取模型**一键导入;推荐平台一键填写。
 - **模型自动分类**(生图/视频/LLM/音频)+ 手动修正归组。
 - 协议面:OpenAI 兼容(同步 images)、**通用异步任务协议**(提交→轮询,断网/审核失败不扣费)、Gemini、火山方舟(Seedream/Seedance)。目标"兼容市面九成 API 平台"。
@@ -87,14 +87,14 @@
 
 ### 2.6 画布助手(AI 操作画布)
 - 侧栏助手:围绕选中节点与上游上下文对话、生图,结果自动插回画布(建节点/连线/触发生成),写操作可开确认闸,支持撤销。(参考:有,双宿主 Agent 架构)
-- 我们的实现直接复用 NomiFun 内建 agent 体系(Nomi + 网关能力域),**不需要**参考项目那种本机边车进程。
+- 我们的实现直接复用 OpenHub 内建 agent 体系(Nomi + 网关能力域),**不需要**参考项目那种本机边车进程。
 
 ### 2.7 明确不做/放弃(弃其糟粕)
 - ❌ 浏览器 IndexedDB 存储、WebDAV 手动同步(last-write-wins、删除复活):我们用后端 SQLite+文件系统,天然多端(桌面/WebUI LAN)。
 - ❌ 账号/算力点计费、管理后台(参考项目已自砍)。
-- ❌ 本机 canvas-agent 边车 + Codex 插件:NomiFun 内建 agent 直连,无需边车。
+- ❌ 本机 canvas-agent 边车 + Codex 插件:OpenHub 内建 agent 直连,无需边车。
 - ❌ 纹身图/细节增强/角度控制等独立网页小工具:本质是预置工作流,画布内即可完成,不单独做页面。
-- ❌ 一键更新/网盘启动等发行杂项:NomiFun 有自己的发行体系。
+- ❌ 一键更新/网盘启动等发行杂项:OpenHub 有自己的发行体系。
 - ❌ 多人实时协同编辑(参考项目实际也没有):v1 不做,预留单写者+观看者模式(P2)。
 
 ---
@@ -134,17 +134,17 @@
 
 ---
 
-## 4. 与 NomiFun 平台的关系(改进两大短板的方案)
+## 4. 与 OpenHub 平台的关系(改进两大短板的方案)
 
 ### 4.1 模型管理:不再另造轮子,长在 providers 平台上
-参考项目的渠道管理只有 `ModelChannel{baseUrl,key,models[]}` 级别。NomiFun 已有完整平台:`providers` 表(AES-256-GCM 密钥加密、多 key、模型目录/能力/协议/健康 per-model map)、模型拉取(`ModelFetchService`+URL 自动纠错)、协议探测(`detect-protocol`)、健康检查、故障转移队列。**创意工坊全部复用**,只补:
+参考项目的渠道管理只有 `ModelChannel{baseUrl,key,models[]}` 级别。OpenHub 已有完整平台:`providers` 表(AES-256-GCM 密钥加密、多 key、模型目录/能力/协议/健康 per-model map)、模型拉取(`ModelFetchService`+URL 自动纠错)、协议探测(`detect-protocol`)、健康检查、故障转移队列。**创意工坊全部复用**,只补:
 
 - `ModelType` 能力枚举已有 `ImageGeneration`(从未被消费),新增 `VideoGeneration`(P1)、`AudioGeneration`(P2);`infer_model_modalities` 的名字启发式扩展为四类分类建议,用户可改。
 - providers 增加(或经 `model_protocols` 扩展)**媒体调用协议**标注:`images-sync`(OpenAI /images)、`media-async`(通用提交-轮询)、`gemini-image`、`ark`(火山)、后续 `comfyui`/`runninghub`。协议探测端点扩展出媒体协议探测(打一次轻量请求判别)。
 - Model Hub 前端加「创作模型」视图:按能力(生图/视频/LLM)分组展示、勾选进创意工坊可用清单、每模型默认参数(尺寸/质量/时长等)。
 
 ### 4.2 执行链:新建生成引擎(现有引擎是 chat-only)
-勘察坐实:现有 `LlmProvider::stream` 全链无任何图像/视频产物路径、无异步任务队列、无产物资产层。新建独立 crate **`nomifun-creation`**:
+勘察坐实:现有 `LlmProvider::stream` 全链无任何图像/视频产物路径、无异步任务队列、无产物资产层。新建独立 crate **`openhub-creation`**:
 
 - `MediaProvider` trait:`submit(task) / poll(task_id) / fetch(result)`,能力声明(t2i/i2i/inpaint/t2v/i2v/v2v/tts)。适配器:OpenAI-images、通用异步任务、Gemini(P0);Ark 火山、ModelScope(P1);ComfyUI、RunningHub(P2)。
 - **任务队列**:`creation_tasks` 表(状态机 queued/running/succeeded/failed/canceled、参数快照、结果引用、错误详情、耗时);每 provider 并发闸+限流;取消传播 AbortController→HTTP;**boot 对账**(沿用 orchestrator "running⟺活体轮询器"不变量);事件推送前端(任务状态/节点状态联动)。
@@ -155,7 +155,7 @@
 
 ---
 
-## 5. 技术方案概要(净室,全部 NomiFun 惯例)
+## 5. 技术方案概要(净室,全部 OpenHub 惯例)
 
 ### 5.1 前端
 - 画布引擎:`@xyflow/react` v12(已在依赖)。直接继承 DagCanvas 的全部踩坑经验:主题镜像(`data-theme`→JS hex,MutationObserver)、`nodeTypes` 冻结常量、`initialWidth/Height` minimap 修复、节点对象 identity 缓存防 handleBounds 重置、`ResizeObserver` refit、`proOptions.hideAttribution`。新开启:`nodesConnectable`、自由拖拽写回坐标、`onlyRenderVisibleElements`。
@@ -164,10 +164,10 @@
 - 编辑器(裁剪/遮罩/切分/扩图)为纯前端 Canvas2D 组件族,独立于画布内核,可并行开发。
 
 ### 5.2 后端
-- **`nomifun-workshop`**(域 crate,完全对标 `nomifun-public-agent` 范式):`service.rs`(start(data_dir))、`fsio.rs`(原子写)、`routes.rs`(`/api/workshop/*`:画布 CRUD/资产 CRUD/媒体 serve/导入导出)、`state.rs`;画布正文 `canvas.json` 文件存储(原子写+损坏回退),`workshop_canvases` 轻索引表。
-- **`nomifun-creation`**(生成引擎 crate):§4.2。
+- **`openhub-workshop`**(域 crate,完全对标 `openhub-public-agent` 范式):`service.rs`(start(data_dir))、`fsio.rs`(原子写)、`routes.rs`(`/api/workshop/*`:画布 CRUD/资产 CRUD/媒体 serve/导入导出)、`state.rs`;画布正文 `canvas.json` 文件存储(原子写+损坏回退),`workshop_canvases` 轻索引表。
+- **`openhub-creation`**(生成引擎 crate):§4.2。
 - 迁移:`032_workshop.sql`(`workshop_canvases`、`workshop_assets`、`creation_tasks`;主键字符串 uuidv7、时间戳 ms;检查 pre_baseline 是否需 bump;提交前 `git pull --rebase` 防撞号)。
-- 装配:`nomifun-app` services/state/routes 三点接入;provider 删除清理登记 `provider_deletion.rs`。
+- 装配:`openhub-app` services/state/routes 三点接入;provider 删除清理登记 `provider_deletion.rs`。
 - 网关:新增 `caps_workshop` 域(3 步契约+CI 守卫):读画布状态/应用操作(建节点/连线/改参数/触发生成)/查任务/取产物,供画布助手与桌面伙伴调用。
 
 ### 5.3 数据模型(独立设计,示意)
@@ -183,15 +183,15 @@
 按「文件簇不相交则并行」原则(热点先串行钉死契约):
 
 **M0 骨架(串行先行,钉死全部契约,消灭并行冲突面)**
-一次性完成:迁移 030、两个新 crate 骨架、`nomifun-app` 装配、`api-types` DTO、前端路由/侧栏入口/页面壳、i18n 骨架、TS API 客户端契约、`caps_workshop` 空域注册。此后各模块只在自己目录内工作。
+一次性完成:迁移 030、两个新 crate 骨架、`openhub-app` 装配、`api-types` DTO、前端路由/侧栏入口/页面壳、i18n 骨架、TS API 客户端契约、`caps_workshop` 空域注册。此后各模块只在自己目录内工作。
 
 **并行簇(M0 后同时开跑,互不重叠)**
 - M1 画布内核 FE(`pages/workshop/canvas/**`):交互全套+节点渲染框架+撤销重做+小地图。
-- M2 生成引擎 BE(`nomifun-creation/**`):trait+三适配器+任务队列+对账。
-- M3 工坊域 BE(`nomifun-workshop/**`):画布/资产 CRUD、serve、导入导出、GC。
+- M2 生成引擎 BE(`openhub-creation/**`):trait+三适配器+任务队列+对账。
+- M3 工坊域 BE(`openhub-workshop/**`):画布/资产 CRUD、serve、导入导出、GC。
 - M4 资产库 FE(`pages/workshop/assets/**`):管理面板+@引用数据源。
 - M5 图片编辑器 FE(`pages/workshop/editor/**`):裁剪/遮罩/切分/扩图/放大组件族。
-- M6 模型管理扩展(`modelHub/**`+`nomifun-system` 小改+能力枚举):创作模型分组。
+- M6 模型管理扩展(`modelHub/**`+`openhub-system` 小改+能力枚举):创作模型分组。
 
 **集成簇(依赖前面,次轮并行)**
 - M7 生成卡片+参数面板 FE(M1+M2+M6)。

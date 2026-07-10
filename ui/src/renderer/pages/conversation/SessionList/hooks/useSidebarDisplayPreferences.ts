@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -14,8 +14,8 @@ import {
   type SidebarDisplayPreset,
 } from '../utils/sidebarDisplayPreferences';
 
-const STORAGE_KEY = 'nomifun:session-sidebar-display-preferences';
-const CHANGE_EVENT = 'nomifun:session-sidebar-display-preferences-change';
+const STORAGE_KEY = 'openhub:session-sidebar-display-preferences';
+const CHANGE_EVENT = 'openhub:session-sidebar-display-preferences-change';
 
 type PresetOption = Exclude<SidebarDisplayPreset, 'custom'>;
 type PreferencePatch = Partial<Omit<SidebarDisplayPreferences, 'preset'>>;

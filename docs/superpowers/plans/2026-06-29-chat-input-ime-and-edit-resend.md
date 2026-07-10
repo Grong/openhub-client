@@ -10,7 +10,7 @@
 
 ## Global Constraints
 
-- 注释/文案随上下文语言；交流用中文。提交以 `nomifun <rika00@qq.com>` 署名，**不**加 `Co-Authored-By` trailer：`git -c user.name=nomifun -c user.email=rika00@qq.com commit --author="nomifun <rika00@qq.com>" -m ...`。
+- 注释/文案随上下文语言；交流用中文。提交以 openhub<rika00@qq.com>` 署名，**不**加 `Co-Authored-By` trailer：`git -c user.nameopenhub-c user.email=rika00@qq.com commit --author=openhub<rika00@qq.com>" -m ...`。
 - 前端测试运行器是 `bun:test`：`cd ui && bun test <path>`；导入 `import { describe, expect, test } from 'bun:test'`。
 - Rust 测试：单测跑 `cargo test -p <crate> <filter>`。
 - sqlx 用**运行时**查询（`sqlx::query`/`query_as::<_, T>`），占位符是匿名 `?`，按顺序 `.bind(...)`。
@@ -40,7 +40,7 @@
 ```ts
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 import { describe, expect, test } from 'bun:test';
@@ -190,7 +190,7 @@ Expected: PASS（全部用例）
 
 ```bash
 git add ui/src/renderer/hooks/chat/useCompositionInput.ts ui/src/renderer/hooks/chat/useCompositionInput.test.ts
-git -c user.name=nomifun -c user.email=rika00@qq.com commit --author="nomifun <rika00@qq.com>" -m "fix(chat): 输入法上屏 Enter 防误发送，提取提交手势纯函数"
+git -c user.nameopenhub-c user.email=rika00@qq.com commit --author=openhub<rika00@qq.com>" -m "fix(chat): 输入法上屏 Enter 防误发送，提取提交手势纯函数"
 ```
 
 ## Task A2：新增 `chat.sendKey` 配置 + SendBox/引导页接入偏好
@@ -291,7 +291,7 @@ Expected: 无报错
 
 ```bash
 git add ui/src/common/config/configKeys.ts ui/src/renderer/components/chat/SendBox/index.tsx ui/src/renderer/pages/guid/components/GuidInputCard.tsx ui/src/renderer/pages/guid/GuidPage.tsx
-git -c user.name=nomifun -c user.email=rika00@qq.com commit --author="nomifun <rika00@qq.com>" -m "feat(chat): 新增发送键偏好(chat.sendKey)并在会话框/引导页生效"
+git -c user.nameopenhub-c user.email=rika00@qq.com commit --author=openhub<rika00@qq.com>" -m "feat(chat): 新增发送键偏好(chat.sendKey)并在会话框/引导页生效"
 ```
 
 ## Task A3：设置面板「发送键」一行 + i18n
@@ -363,7 +363,7 @@ Expected: 均通过
 
 ```bash
 git add ui/src/renderer/components/settings/SettingsModal/contents/SystemModalContent/index.tsx ui/src/renderer/services/i18n/locales/en-US/settings.json ui/src/renderer/services/i18n/locales/zh-CN/settings.json
-git -c user.name=nomifun -c user.email=rika00@qq.com commit --author="nomifun <rika00@qq.com>" -m "feat(settings): 系统设置新增「发送快捷键」偏好项"
+git -c user.nameopenhub-c user.email=rika00@qq.com commit --author=openhub<rika00@qq.com>" -m "feat(settings): 系统设置新增「发送快捷键」偏好项"
 ```
 
 ---
@@ -373,8 +373,8 @@ git -c user.name=nomifun -c user.email=rika00@qq.com commit --author="nomifun <r
 ## Task B1：repo 新增 `delete_messages_from`（keyset 截断删除）
 
 **Files:**
-- Modify: `crates/backend/nomifun-db/src/repository/conversation.rs`（trait，加默认体）
-- Modify: `crates/backend/nomifun-db/src/repository/sqlite_conversation.rs`（impl + 测试）
+- Modify: `crates/backend/openhub-db/src/repository/conversation.rs`（trait，加默认体）
+- Modify: `crates/backend/openhub-db/src/repository/sqlite_conversation.rs`（impl + 测试）
 
 **Interfaces:**
 - Produces: `async fn delete_messages_from(&self, conv_id: i64, from_created_at: i64, from_id: &str) -> Result<u64, DbError>`（删除 `(created_at,id) >= (from_created_at, from_id)` 的行，返回删除条数）。
@@ -431,7 +431,7 @@ git -c user.name=nomifun -c user.email=rika00@qq.com commit --author="nomifun <r
 
 - [ ] **Step 3: 跑测试确认失败**
 
-Run: `cargo test -p nomifun-db delete_messages_from_removes_cursor_and_newer`
+Run: `cargo test -p openhub-db delete_messages_from_removes_cursor_and_newer`
 Expected: FAIL（默认体返回 0，断言 `deleted == 2` 失败）
 
 - [ ] **Step 4: SQLite 实现** — `sqlite_conversation.rs`，紧邻 `delete_messages_by_conversation`（:459-466）后：
@@ -463,20 +463,20 @@ Expected: FAIL（默认体返回 0，断言 `deleted == 2` 失败）
 
 - [ ] **Step 5: 跑测试确认通过**
 
-Run: `cargo test -p nomifun-db delete_messages_from_removes_cursor_and_newer`
+Run: `cargo test -p openhub-db delete_messages_from_removes_cursor_and_newer`
 Expected: PASS
 
 - [ ] **Step 6: 提交**
 
 ```bash
-git add crates/backend/nomifun-db/src/repository/conversation.rs crates/backend/nomifun-db/src/repository/sqlite_conversation.rs
-git -c user.name=nomifun -c user.email=rika00@qq.com commit --author="nomifun <rika00@qq.com>" -m "feat(db): 新增 delete_messages_from 按 keyset 游标截断删除消息"
+git add crates/backend/openhub-db/src/repository/conversation.rs crates/backend/openhub-db/src/repository/sqlite_conversation.rs
+git -c user.nameopenhub-c user.email=rika00@qq.com commit --author=openhub<rika00@qq.com>" -m "feat(db): 新增 delete_messages_from 按 keyset 游标截断删除消息"
 ```
 
 ## Task B2：引擎 turn 起始锚点 + `rewind_last_turn`
 
 **Files:**
-- Modify: `crates/agent/nomi-agent/src/engine.rs`
+- Modify: `crates/agent/openhub-agent/src/engine.rs`
 
 **Interfaces:**
 - Produces: `pub fn rewind_last_turn(&mut self) -> bool`（把内存 transcript 截断到最后一个 turn 起始，成功 true）。锚点字段 `last_turn_start_len: Option<usize>`。
@@ -500,7 +500,7 @@ git -c user.name=nomifun -c user.email=rika00@qq.com commit --author="nomifun <r
 ```rust
     #[test]
     fn rewind_last_turn_truncates_to_marker() {
-        use nomi_types::message::{ContentBlock, Message, Role};
+        use openhub_types::message::{ContentBlock, Message, Role};
         let mut engine = make_engine("rewind");
         // 既有历史：U0, A0
         engine.messages.push(Message::now(Role::User, vec![ContentBlock::Text { text: "u0".into() }]));
@@ -529,7 +529,7 @@ git -c user.name=nomifun -c user.email=rika00@qq.com commit --author="nomifun <r
 
 - [ ] **Step 3: 跑测试确认失败**
 
-Run: `cargo test -p nomi-agent rewind_last_turn`
+Run: `cargo test -p openhub-agent rewind_last_turn`
 Expected: FAIL（`rewind_last_turn` 不存在，编译错误）
 
 - [ ] **Step 4: 实现 rewind + 设/清锚点**
@@ -576,21 +576,21 @@ Expected: FAIL（`rewind_last_turn` 不存在，编译错误）
 
 - [ ] **Step 5: 跑测试确认通过**
 
-Run: `cargo test -p nomi-agent rewind_last_turn`
+Run: `cargo test -p openhub-agent rewind_last_turn`
 Expected: PASS（两个用例）
 
 - [ ] **Step 6: 提交**
 
 ```bash
-git add crates/agent/nomi-agent/src/engine.rs
-git -c user.name=nomifun -c user.email=rika00@qq.com commit --author="nomifun <rika00@qq.com>" -m "feat(engine): 新增 turn 起始锚点与 rewind_last_turn 回退最后一个用户 turn"
+git add crates/agent/openhub-agent/src/engine.rs
+git -c user.nameopenhub-c user.email=rika00@qq.com commit --author=openhub<rika00@qq.com>" -m "feat(engine): 新增 turn 起始锚点与 rewind_last_turn 回退最后一个用户 turn"
 ```
 
 ## Task B3：manager + AgentInstance 暴露 `rewind_last_turn`（Nomi-only）
 
 **Files:**
-- Modify: `crates/backend/nomifun-ai-agent/src/manager/nomi/agent.rs`
-- Modify: `crates/backend/nomifun-ai-agent/src/agent_task.rs`
+- Modify: `crates/backend/openhub-ai-agent/src/manager/openhub/agent.rs`
+- Modify: `crates/backend/openhub-ai-agent/src/agent_task.rs`
 
 **Interfaces:**
 - Consumes: B2 的 `engine.rewind_last_turn()`。
@@ -598,7 +598,7 @@ git -c user.name=nomifun -c user.email=rika00@qq.com commit --author="nomifun <r
   - `NomiAgentManager::rewind_last_turn(&self) -> Result<(), AppError>`（inherent）
   - `AgentInstance::rewind_last_turn(&self) -> Result<(), AppError>`（Nomi-only match）
 
-- [ ] **Step 1: manager 方法** — `manager/nomi/agent.rs`，在 inherent impl 块内（与 `clear_context`/`steer` 同块，约 :906-921 旁）加：
+- [ ] **Step 1: manager 方法** — `manager/openhub/agent.rs`，在 inherent impl 块内（与 `clear_context`/`steer` 同块，约 :906-921 旁）加：
 
 ```rust
     /// 回退最后一个用户 turn（编辑最近一条用户消息重跑）：先停掉在飞 turn，
@@ -634,21 +634,21 @@ git -c user.name=nomifun -c user.email=rika00@qq.com commit --author="nomifun <r
 
 - [ ] **Step 3: 编译确认**
 
-Run: `cargo build -p nomifun-ai-agent`
+Run: `cargo build -p openhub-ai-agent`
 Expected: 成功（无类型/match 缺臂错误）
 
 - [ ] **Step 4: 提交**
 
 ```bash
-git add crates/backend/nomifun-ai-agent/src/manager/nomi/agent.rs crates/backend/nomifun-ai-agent/src/agent_task.rs
-git -c user.name=nomifun -c user.email=rika00@qq.com commit --author="nomifun <rika00@qq.com>" -m "feat(agent): manager/AgentInstance 暴露 rewind_last_turn(仅 Nomi)"
+git add crates/backend/openhub-ai-agent/src/manager/openhub/agent.rs crates/backend/openhub-ai-agent/src/agent_task.rs
+git -c user.nameopenhub-c user.email=rika00@qq.com commit --author=openhub<rika00@qq.com>" -m "feat(agent): manager/AgentInstance 暴露 rewind_last_turn(仅 Nomi)"
 ```
 
 ## Task B4：service `edit_and_resubmit` + 路由
 
 **Files:**
-- Modify: `crates/backend/nomifun-conversation/src/service.rs`
-- Modify: `crates/backend/nomifun-conversation/src/routes.rs`
+- Modify: `crates/backend/openhub-conversation/src/service.rs`
+- Modify: `crates/backend/openhub-conversation/src/routes.rs`
 
 **Interfaces:**
 - Consumes: `conversation_repo.{get, get_messages_keyset, delete_messages_from}`、`task_manager.get_task`、`AgentInstance::rewind_last_turn`、`self.send_message`。
@@ -683,7 +683,7 @@ git -c user.name=nomifun -c user.email=rika00@qq.com commit --author="nomifun <r
             .ok_or_else(|| AppError::NotFound(format!("Conversation {conversation_id} not found")))?;
 
         // 2. 仅 Nomi
-        if row.r#type != "nomi" {
+        if row.r#type != "openhub" {
             return Err(AppError::BadRequest("Edit & resubmit is only supported for Nomi conversations".into()));
         }
 
@@ -753,18 +753,18 @@ async fn edit_resubmit(
 
 - [ ] **Step 4: 写测试**（service 层，复用既有 mock；验证"非最近一条 → BadRequest"与"非 Nomi → BadRequest"）
 
-在 `crates/backend/nomifun-conversation/src/service_test.rs` 末尾，仿既有 service 测试新增两条：一条插入一个非 Nomi 会话调用 `edit_and_resubmit` 断言 `Err(BadRequest)`；一条 Nomi 会话但传入非最新 message_id 断言 `Err(BadRequest)`。（沿用该文件既有 mock 构造 service 的 helper —— 实现时参照文件内最近的 `send_message`/`steer_message` 测试样板复制其 service 搭建部分。）
+在 `crates/backend/openhub-conversation/src/service_test.rs` 末尾，仿既有 service 测试新增两条：一条插入一个非 Nomi 会话调用 `edit_and_resubmit` 断言 `Err(BadRequest)`；一条 Nomi 会话但传入非最新 message_id 断言 `Err(BadRequest)`。（沿用该文件既有 mock 构造 service 的 helper —— 实现时参照文件内最近的 `send_message`/`steer_message` 测试样板复制其 service 搭建部分。）
 
 - [ ] **Step 5: 跑测试 + 编译**
 
-Run: `cargo test -p nomifun-conversation edit_and_resubmit`
-Expected: PASS（两条新测试），且 `cargo build -p nomifun-conversation` 成功
+Run: `cargo test -p openhub-conversation edit_and_resubmit`
+Expected: PASS（两条新测试），且 `cargo build -p openhub-conversation` 成功
 
 - [ ] **Step 6: 提交**
 
 ```bash
-git add crates/backend/nomifun-conversation/src/service.rs crates/backend/nomifun-conversation/src/routes.rs crates/backend/nomifun-conversation/src/service_test.rs
-git -c user.name=nomifun -c user.email=rika00@qq.com commit --author="nomifun <rika00@qq.com>" -m "feat(conversation): 新增 edit_and_resubmit 服务与 /edit-resubmit 路由(仅 Nomi、仅最近一条)"
+git add crates/backend/openhub-conversation/src/service.rs crates/backend/openhub-conversation/src/routes.rs crates/backend/openhub-conversation/src/service_test.rs
+git -c user.nameopenhub-c user.email=rika00@qq.com commit --author=openhub<rika00@qq.com>" -m "feat(conversation): 新增 edit_and_resubmit 服务与 /edit-resubmit 路由(仅 Nomi、仅最近一条)"
 ```
 
 ## Task B5：前端 ipcBridge + emitter 事件
@@ -803,7 +803,7 @@ Expected: 通过
 
 ```bash
 git add ui/src/common/adapter/ipcBridge.ts ui/src/renderer/utils/emitter.ts
-git -c user.name=nomifun -c user.email=rika00@qq.com commit --author="nomifun <rika00@qq.com>" -m "feat(chat): ipcBridge.editResubmit 与 sendbox.edit 事件"
+git -c user.nameopenhub-c user.email=rika00@qq.com commit --author=openhub<rika00@qq.com>" -m "feat(chat): ipcBridge.editResubmit 与 sendbox.edit 事件"
 ```
 
 ## Task B6：hooks 新增 `useRemoveMessagesFrom`
@@ -836,7 +836,7 @@ Expected: 通过
 
 ```bash
 git add ui/src/renderer/pages/conversation/Messages/hooks.ts
-git -c user.name=nomifun -c user.email=rika00@qq.com commit --author="nomifun <rika00@qq.com>" -m "feat(chat): 新增 useRemoveMessagesFrom 本地按时间截断消息"
+git -c user.nameopenhub-c user.email=rika00@qq.com commit --author=openhub<rika00@qq.com>" -m "feat(chat): 新增 useRemoveMessagesFrom 本地按时间截断消息"
 ```
 
 ## Task B7：SendBox「编辑模式」
@@ -932,13 +932,13 @@ Expected: 通过
 
 ```bash
 git add ui/src/renderer/components/chat/SendBox/index.tsx
-git -c user.name=nomifun -c user.email=rika00@qq.com commit --author="nomifun <rika00@qq.com>" -m "feat(chat): SendBox 支持编辑模式(回填+提示条+提交分流)"
+git -c user.nameopenhub-c user.email=rika00@qq.com commit --author=openhub<rika00@qq.com>" -m "feat(chat): SendBox 支持编辑模式(回填+提示条+提交分流)"
 ```
 
 ## Task B8：NomiSendBox 接 `onEditResubmit` + 还原附件
 
 **Files:**
-- Modify: `ui/src/renderer/pages/conversation/platforms/nomi/NomiSendBox.tsx`
+- Modify: `ui/src/renderer/pages/conversation/platforms/openhub/NomiSendBox.tsx`
 
 **Interfaces:**
 - Consumes: `ipcBridge.conversation.editResubmit`、`useRemoveMessagesFrom`、`emitter('sendbox.edit')` 由 MessageText 触发。
@@ -992,8 +992,8 @@ Run: `cd ui && bun run typecheck`
 Expected: 通过
 
 ```bash
-git add ui/src/renderer/pages/conversation/platforms/nomi/NomiSendBox.tsx
-git -c user.name=nomifun -c user.email=rika00@qq.com commit --author="nomifun <rika00@qq.com>" -m "feat(nomi): NomiSendBox 接入 editResubmit 提交编辑重跑"
+git add ui/src/renderer/pages/conversation/platforms/openhub/NomiSendBox.tsx
+git -c user.nameopenhub-c user.email=rika00@qq.com commit --author=openhub<rika00@qq.com>" -m "feat(nomi): NomiSendBox 接入 editResubmit 提交编辑重跑"
 ```
 
 ## Task B9：MessageText 用户气泡「编辑」按钮（Nomi + 最近一条 + idle）
@@ -1032,7 +1032,7 @@ git -c user.name=nomifun -c user.email=rika00@qq.com commit --author="nomifun <r
     return lastRight?.msg_id != null && lastRight.msg_id === message.msg_id;
   }, [isUserMessage, messageList, message.msg_id]);
 
-  const canEdit = conversationCtx?.type === 'nomi' && isUserMessage && message.type === 'text' && isLatestUserMessage;
+  const canEdit = conversationCtx?.type === 'openhub' && isUserMessage && message.type === 'text' && isLatestUserMessage;
 
   const handleEdit = () => {
     if (!message.msg_id || !message.created_at) return;
@@ -1068,7 +1068,7 @@ Expected: 均通过
 
 ```bash
 git add ui/src/renderer/pages/conversation/Messages/components/MessageText.tsx ui/src/renderer/services/i18n/locales/en-US/conversation.json ui/src/renderer/services/i18n/locales/zh-CN/conversation.json
-git -c user.name=nomifun -c user.email=rika00@qq.com commit --author="nomifun <rika00@qq.com>" -m "feat(chat): 用户消息悬浮工具行新增「编辑」按钮(仅 Nomi+最近一条)"
+git -c user.nameopenhub-c user.email=rika00@qq.com commit --author=openhub<rika00@qq.com>" -m "feat(chat): 用户消息悬浮工具行新增「编辑」按钮(仅 Nomi+最近一条)"
 ```
 
 ## Task B10：端到端联调与回归校验
@@ -1082,7 +1082,7 @@ Expected: 通过
 
 - [ ] **Step 2: Rust 相关 crate 测试**
 
-Run: `cargo test -p nomifun-db -p nomi-agent -p nomifun-conversation`
+Run: `cargo test -p openhub-db -p openhub-agent -p openhub-conversation`
 Expected: 全绿（含 B1/B2/B4 新测试）
 
 - [ ] **Step 3: 手动联调（dev）** — `bun run dev` 后在 Nomi 会话：
@@ -1093,7 +1093,7 @@ Expected: 全绿（含 B1/B2/B4 新测试）
 - [ ] **Step 4: 收尾提交（如有联调微调）**
 
 ```bash
-git add -A && git -c user.name=nomifun -c user.email=rika00@qq.com commit --author="nomifun <rika00@qq.com>" -m "chore(chat): 编辑重发与发送键偏好联调收尾"
+git add -A && git -c user.nameopenhub-c user.email=rika00@qq.com commit --author=openhub<rika00@qq.com>" -m "chore(chat): 编辑重发与发送键偏好联调收尾"
 ```
 
 ---

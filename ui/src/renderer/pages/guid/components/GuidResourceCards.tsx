@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -10,10 +10,10 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from '../index.module.css';
 
-const DOCS_URL = 'https://www.nomifun.com/docs';
+const DOCS_URL = 'https://www.openhub.dev/docs';
 const VIDEO_URL_CN = 'https://www.bilibili.com/video/BV1kwKZ6UE5X/';
 const VIDEO_URL_GLOBAL = 'https://youtu.be/AsEToBDFR9s';
-const FEEDBACK_URL = 'https://www.nomifun.com/contact';
+const FEEDBACK_URL = 'https://www.openhub.dev/contact';
 
 const ResourceLinkCard: React.FC<{
   icon: React.ReactNode;

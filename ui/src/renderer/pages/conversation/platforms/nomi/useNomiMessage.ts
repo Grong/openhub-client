@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -399,7 +399,7 @@ export const useNomiMessage = (
       // raise-only, so it ORs the backend status onto whatever is already set.
       dispatchTurn({ type: 'hydrate', isRunning });
       // Load persisted token usage stats
-      if (res.type === 'nomi' && res.extra?.last_token_usage) {
+      if (res.type === 'openhub' && res.extra?.last_token_usage) {
         const { last_token_usage } = res.extra;
         if (last_token_usage.total_tokens > 0) {
           setTokenUsage(last_token_usage);

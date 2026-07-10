@@ -1,4 +1,4 @@
-# NomiFun 发版手册
+# OpenHub 发版手册
 
 本文面向实际发版操作。需要英文维护说明时看 `RELEASING.md`；日常发桌面版优先按本文执行。
 
@@ -46,7 +46,7 @@ tag 统一使用 `vX.Y.Z`，例如 `v0.1.11`。
 
 一次性配置好后即可反复一键：
 
-1. 从密钥库拷入 updater 私钥 `apps/desktop/signing/nomifun-updater.key`（keyID
+1. 从密钥库拷入 updater 私钥 `apps/desktop/signing/openhub-updater.key`（keyID
    `F3AA272E60AA7952`，已被 gitignore，必须与 `tauri.conf.json` 内嵌 `pubkey` 匹配）。
 2. 配置 `apps/desktop/signing/.env.signing`，填好 Developer ID 签名与 Apple notarization 信息。
 3. 运行 `gh auth login`，或复制 `apps/desktop/signing/.env.release.example` 为 `.env.release`
@@ -71,7 +71,7 @@ bun run release:mac -SkipPull   # 真实执行时跳过 git pull
 ```
 
 **版本号**：单一真源是根 `Cargo.toml [workspace.package].version`。追加模式用当前版本；首发
-时若带 `-Version X.Y.Z` 且与当前不同，脚本先跑 `bun run bump` 打版本号，再以 `nomifun`
+时若带 `-Version X.Y.Z` 且与当前不同，脚本先跑 `bun run bump` 打版本号，再以 openhub
 署名提交、打 tag、建 Release（不带 `-Version` 则按当前版本走）。
 
 **Release note（对 LLM 友好）**：走命令行、不与 CHANGELOG 耦合，且 **GitHub Release 正文与
@@ -82,19 +82,19 @@ bun run release:mac -SkipPull   # 真实执行时跳过 git pull
 脚本自动完成：读 `.env.release` 的 `GH_TOKEN`（若存在）或沿用 `gh auth login`、加载 updater
 私钥、判定模式、执行 `build:mac --signed --config apps/desktop/tauri.updater.conf.json`、校验
 staple / codesign / Gatekeeper、`make:latest` 合并 darwin 条目、上传（追加 `--clobber` / 首发
-`gh release create`）、以 `nomifun` 提交 `latest.json`（首发含 bump）回 `main`、拉取 updater
+`gh release create`）、以 openhub 提交 `latest.json`（首发含 bump）回 `main`、拉取 updater
 端点校验。任何一步失败都会明确报错并中断。
 
 ### 手动分步（等价于一键脚本内部流程）
 
 下面命令会同时产出：
 
-- 手动安装包：`dist/desktop/NomiFun_<version>_universal.dmg`
-- 自动更新包：`target/universal-apple-darwin/release/bundle/macos/NomiFun.app.tar.gz`
-- 自动更新签名：`target/universal-apple-darwin/release/bundle/macos/NomiFun.app.tar.gz.sig`
+- 手动安装包：`dist/desktop/OpenHub_<version>_universal.dmg`
+- 自动更新包：`target/universal-apple-darwin/release/bundle/macos/OpenHub.app.tar.gz`
+- 自动更新签名：`target/universal-apple-darwin/release/bundle/macos/OpenHub.app.tar.gz.sig`
 
 ```bash
-export TAURI_SIGNING_PRIVATE_KEY="$(cat apps/desktop/signing/nomifun-updater.key)"
+export TAURI_SIGNING_PRIVATE_KEY="$(cat apps/desktop/signing/openhub-updater.key)"
 export TAURI_SIGNING_PRIVATE_KEY_PASSWORD=""
 
 bun run build:mac --config apps/desktop/tauri.updater.conf.json
@@ -104,7 +104,7 @@ bun run make:latest
 如果是公开分发，建议配置 `apps/desktop/signing/.env.signing` 后使用 Developer ID 签名和公证：
 
 ```bash
-export TAURI_SIGNING_PRIVATE_KEY="$(cat apps/desktop/signing/nomifun-updater.key)"
+export TAURI_SIGNING_PRIVATE_KEY="$(cat apps/desktop/signing/openhub-updater.key)"
 export TAURI_SIGNING_PRIVATE_KEY_PASSWORD=""
 
 bun run build:mac --signed --config apps/desktop/tauri.updater.conf.json
@@ -126,7 +126,7 @@ bun run make:latest
 
 一次性配置好后即可反复一键：
 
-1. 从密钥库拷入 updater 私钥 `apps/desktop/signing/nomifun-updater.key`（keyID
+1. 从密钥库拷入 updater 私钥 `apps/desktop/signing/openhub-updater.key`（keyID
    `F3AA272E60AA7952`，已被 gitignore，必须与 `tauri.conf.json` 内嵌 `pubkey` 匹配）。
 2. 复制 `apps/desktop/signing/.env.release.example` 为 `.env.release`（已被 gitignore），
    填入 `GH_TOKEN=...`（`repo` 权限的经典 PAT，或对本仓库 Contents:read/write 的细粒度 PAT）。
@@ -150,7 +150,7 @@ bun run release:win -SkipPull   # 跳过 git pull
 ```
 
 **版本号**：单一真源是根 `Cargo.toml [workspace.package].version`。追加模式用当前版本；首发
-时若带 `-Version X.Y.Z` 且与当前不同，脚本先跑 `bun run bump` 打版本号，再以 `nomifun`
+时若带 `-Version X.Y.Z` 且与当前不同，脚本先跑 `bun run bump` 打版本号，再以 openhub
 署名提交、打 tag、建 Release（不带 `-Version` 则按当前版本走）。
 
 **Release note（对 LLM 友好）**：走命令行、不与 CHANGELOG 耦合，且 **GitHub Release 正文与
@@ -161,7 +161,7 @@ bun run release:win -SkipPull   # 跳过 git pull
 
 脚本自动完成：读 `.env.release` 的 `GH_TOKEN` 注入 `gh`、加载签名私钥、判定模式、清理旧版本
 残留 NSIS 产物、构建更新产物、`make:latest` 合并 windows 条目、上传（追加 `--clobber` / 首发
-`gh release create`）、以 `nomifun` 提交 `latest.json`（首发含 bump）回 `main`、拉取 updater
+`gh release create`）、以 openhub 提交 `latest.json`（首发含 bump）回 `main`、拉取 updater
 端点校验。任何一步失败都会明确报错并中断。
 
 > 未启用 Authenticode 时，手动安装包仍可能触发 SmartScreen / 未知发布者提示；自动更新验签
@@ -178,7 +178,7 @@ git checkout main
 
 如果是在已经发布 macOS 后补 Windows，确认 `Cargo.toml` 版本号与现有 GitHub Release 一致。
 
-> updater 私钥 `apps/desktop/signing/nomifun-updater.key` 已被 gitignore、只存在于密钥库。
+> updater 私钥 `apps/desktop/signing/openhub-updater.key` 已被 gitignore、只存在于密钥库。
 > 这台 Windows 构建前需先从密钥库把它拷过来，且必须与 `tauri.conf.json` 内嵌的 `pubkey`
 > 匹配（keyID `F3AA272E60AA7952`），否则已安装的客户端会拒绝更新。叠加 `createUpdaterArtifacts`
 > 用的是仓库内的 `apps/desktop/tauri.updater.conf.json`，以 `--config <文件路径>` 传入——
@@ -187,7 +187,7 @@ git checkout main
 ### 当前无 Authenticode 签名的做法
 
 ```powershell
-$env:TAURI_SIGNING_PRIVATE_KEY = Get-Content apps/desktop/signing/nomifun-updater.key -Raw
+$env:TAURI_SIGNING_PRIVATE_KEY = Get-Content apps/desktop/signing/openhub-updater.key -Raw
 $env:TAURI_SIGNING_PRIVATE_KEY_PASSWORD = ""
 
 bun run build:win --config apps/desktop/tauri.updater.conf.json
@@ -206,7 +206,7 @@ bun run make:latest
 注入指纹仍走内联 JSON，需在 pwsh 7+ 下运行）：
 
 ```powershell
-$env:TAURI_SIGNING_PRIVATE_KEY = Get-Content apps/desktop/signing/nomifun-updater.key -Raw
+$env:TAURI_SIGNING_PRIVATE_KEY = Get-Content apps/desktop/signing/openhub-updater.key -Raw
 $env:TAURI_SIGNING_PRIVATE_KEY_PASSWORD = ""
 $env:WINDOWS_CERTIFICATE_THUMBPRINT = "A1B2C3..."
 
@@ -229,7 +229,7 @@ sudo apt-get install -y pkg-config libgbm-dev libayatana-appindicator3-dev librs
 `linuxdeploy` AppImage。
 
 ```bash
-export TAURI_SIGNING_PRIVATE_KEY="$(cat apps/desktop/signing/nomifun-updater.key)"
+export TAURI_SIGNING_PRIVATE_KEY="$(cat apps/desktop/signing/openhub-updater.key)"
 export TAURI_SIGNING_PRIVATE_KEY_PASSWORD=""
 
 bun run build:linux --config apps/desktop/tauri.updater.conf.json
@@ -268,9 +268,9 @@ git tag "v$VERSION"
 git push origin main "v$VERSION"
 
 gh release create "v$VERSION" \
-  target/universal-apple-darwin/release/bundle/macos/NomiFun.app.tar.gz \
-  target/universal-apple-darwin/release/bundle/macos/NomiFun.app.tar.gz.sig \
-  dist/desktop/NomiFun_${VERSION}_universal.dmg \
+  target/universal-apple-darwin/release/bundle/macos/OpenHub.app.tar.gz \
+  target/universal-apple-darwin/release/bundle/macos/OpenHub.app.tar.gz.sig \
+  dist/desktop/OpenHub_${VERSION}_universal.dmg \
   apps/desktop/updater/latest.json \
   --title "v$VERSION" \
   --notes "发布说明"
@@ -290,9 +290,9 @@ gh release upload "v$VERSION" apps/desktop/updater/latest.json --clobber
 macOS 至少上传：
 
 ```text
-dist/desktop/NomiFun_<version>_universal.dmg
-target/universal-apple-darwin/release/bundle/macos/NomiFun.app.tar.gz
-target/universal-apple-darwin/release/bundle/macos/NomiFun.app.tar.gz.sig
+dist/desktop/OpenHub_<version>_universal.dmg
+target/universal-apple-darwin/release/bundle/macos/OpenHub.app.tar.gz
+target/universal-apple-darwin/release/bundle/macos/OpenHub.app.tar.gz.sig
 apps/desktop/updater/latest.json
 ```
 
@@ -304,7 +304,7 @@ Linux 上传对应安装包、`.sig`、`latest.json`。
 
 ```bash
 gh release view "v$VERSION" --json tagName,assets,url
-curl -fsSL https://github.com/nomifun/nomifun-tauri/releases/latest/download/latest.json
+curl -fsSL https://github.com/Grong/openhub-client/releases/latest/download/latest.json
 ```
 
 确认：
@@ -318,8 +318,8 @@ curl -fsSL https://github.com/nomifun/nomifun-tauri/releases/latest/download/lat
 
 `v0.1.11` 已完成 macOS：
 
-- 已上传 `NomiFun_0.1.11_universal.dmg`。
-- 已上传 `NomiFun.app.tar.gz` 和 `NomiFun.app.tar.gz.sig`。
+- 已上传 `OpenHub_0.1.11_universal.dmg`。
+- 已上传 `OpenHub.app.tar.gz` 和 `OpenHub.app.tar.gz.sig`。
 - `latest.json` 目前只有 `darwin-x86_64` 和 `darwin-aarch64`。
 
 Windows 还需要在 Windows 机器上继续构建、上传 Windows 资产，并用 `--clobber` 替换 Release 上的 `latest.json`。

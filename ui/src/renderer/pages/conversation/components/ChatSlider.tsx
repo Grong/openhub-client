@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -42,7 +42,7 @@ const ChatSlider: React.FC<{
         messageApi={messageApi}
       ></ChatWorkspace>
     );
-  } else if (conversation?.type === 'nomi' && conversation.extra?.workspace) {
+  } else if (conversation?.type === 'openhub' && conversation.extra?.workspace) {
     workspaceNode = (
       <ChatWorkspace
         conversation_id={conversation.id}
@@ -54,7 +54,7 @@ const ChatSlider: React.FC<{
         messageApi={messageApi}
         extraTabs={[
           {
-            key: 'nomi-session-metrics',
+            key: 'openhub-session-metrics',
             title: t('conversation.sessionMetrics.tab'),
             content: <NomiSessionMetricsPanel conversation={conversation} />,
           },

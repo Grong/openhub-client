@@ -1,12 +1,12 @@
 # Installation
 
-NomiFun has two host modes that share one Rust backend (see
+OpenHub has two host modes that share one Rust backend (see
 [Introduction](introduction.md)). This page covers all three ways to install
 it today:
 
-- [Desktop app from source](#desktop-app-from-source) — `nomifun-desktop`
+- [Desktop app from source](#desktop-app-from-source) — `openhub-desktop`
   (Tauri shell), desktop local-trust, single-user.
-- [Web server from source](#web-server-from-source) — `nomifun-web`,
+- [Web server from source](#web-server-from-source) — `openhub-web`,
   authenticated, self-hosted.
 - [Docker / Docker Compose](#docker--docker-compose) — the same web server,
   containerised.
@@ -40,8 +40,8 @@ Optional but recommended on the host that runs Nomi (not for building):
 ### Clone the repo
 
 ```bash
-git clone <your-fork-or-mirror>/nomifun-tauri.git
-cd nomifun-tauri
+git clone <your-fork-or-mirror>/openhub-client.git
+cd openhub-client
 ```
 
 The rest of this page assumes the repository root is your working directory.
@@ -58,7 +58,7 @@ time `package.json` or `ui/package.json` changes.
 ## Desktop app from source
 
 The desktop app is a Tauri 2 shell (`apps/desktop`, binary
-`nomifun-desktop`) that links the backend in-process and starts it on a free
+`openhub-desktop`) that links the backend in-process and starts it on a free
 localhost port under the desktop `TrustLocalToken` policy. Its own WebView
 receives a per-boot local trust secret, so there is no login screen in the
 desktop window.
@@ -73,7 +73,7 @@ What this does, end-to-end:
 
 1. Tauri's `beforeDevCommand` runs `bun run --filter=./ui dev` to start the
    Vite dev server on `http://localhost:5173`.
-2. `cargo` compiles `nomifun-desktop` (and the workspace it depends on).
+2. `cargo` compiles `openhub-desktop` (and the workspace it depends on).
 3. The shell starts, picks a free port, spawns the embedded backend, and
    loads the Vite dev URL. Hot-reload works on the renderer side; the backend
    restarts only when its Rust code changes.
@@ -83,7 +83,7 @@ console — that is the embedded backend. The renderer reads
 `window.__backendPort` (injected by the Tauri shell as an init script) so the
 SPA always knows where to call `/api`.
 
-![nomifun-desktop running in dev with the embedded backend](../images/gs-02-desktop-dev.png)
+![openhub-desktop running in dev with the embedded backend](../images/gs-02-desktop-dev.png)
 
 ### Build a release binary
 
@@ -95,7 +95,7 @@ bun run build    # tauri build → installers + standalone binary
 `tauri build` produces:
 
 - A standalone executable under
-  `target/release/nomifun-desktop` (`.exe` on Windows).
+  `target/release/openhub-desktop` (`.exe` on Windows).
 - Platform installers under `target/release/bundle/` — `.exe` (NSIS,
   Windows), `.dmg`/`.app` (macOS), `.deb`/`.AppImage` (Linux).
 
@@ -113,30 +113,30 @@ application-data directory, joined with `Nomi`:
 
 | OS | Default path |
 | --- | --- |
-| Windows | `%LOCALAPPDATA%\NomiFun\Nomi` (e.g. `C:\Users\<you>\AppData\Local\NomiFun\Nomi`) |
-| macOS | `~/Library/Application Support/NomiFun/Nomi` |
-| Linux | `$XDG_DATA_HOME/NomiFun/Nomi` (usually `~/.local/share/NomiFun/Nomi`) |
+| Windows | `%LOCALAPPDATA%\OpenHub\Nomi` (e.g. `C:\Users\<you>\AppData\Local\OpenHub\Nomi`) |
+| macOS | `~/Library/Application Support/OpenHub/Nomi` |
+| Linux | `$XDG_DATA_HOME/OpenHub/Nomi` (usually `~/.local/share/OpenHub/Nomi`) |
 
-Override with `NOMIFUN_DATA_DIR=<absolute path>` before launching — the
-shell appends `/Nomi`, so the dir becomes `$NOMIFUN_DATA_DIR/Nomi`.
+Override with `OPENHUB_DATA_DIR=<absolute path>` before launching — the
+shell appends `/Nomi`, so the dir becomes `$OPENHUB_DATA_DIR/Nomi`.
 
-> Older builds defaulted to `<system temp>/nomifun-data/Nomi`, where OS temp
+> Older builds defaulted to `<system temp>/openhub-data/Nomi`, where OS temp
 > cleanup could destroy user data. On first launch the app now relocates such
 > a legacy install to the per-user location automatically (one-shot): data is
 > copied, absolute paths inside the database are rewritten, and the old
 > directory is kept as a backup. If the relocation cannot complete, the app
 > starts from the legacy directory and retries on the next launch.
 
-> Note: the app's user-facing name is `NomiFun` everywhere — the bundle
+> Note: the app's user-facing name is `OpenHub` everywhere — the bundle
 > product name (`apps/desktop/tauri.conf.json`), the runtime window title,
 > and release artifacts. The data folder keeps its existing `/Nomi`
-> suffix for compatibility with current installs. Internal identifiers keep the legacy `nomifun`
-> name by design (crates, `NOMIFUN_*` env vars, the `com.nomifun.*`
+> suffix for compatibility with current installs. Internal identifiers keep the legacy openhub
+> name by design (crates, `OPENHUB_*` env vars, the `com.openhub.*`
 > bundle identifier).
 
 ## Web server from source
 
-`nomifun-web` is an axum server that mounts the same backend in-process
+`openhub-web` is an axum server that mounts the same backend in-process
 **and** serves the built SPA on the same port (default `8787`). It is the
 right path for self-hosting on a LAN, VPN, or VPS.
 
@@ -145,7 +145,7 @@ right path for self-hosting on a LAN, VPN, or VPS.
 ```bash
 bun install
 bun run build:ui       # ui/dist — required before serving in non-dev mode
-bun run serve:web            # = cargo run -p nomifun-web
+bun run serve:web            # = cargo run -p openhub-web
 ```
 
 By default the server binds `127.0.0.1:8787` and uses the same per-user
@@ -153,11 +153,11 @@ data directory as the desktop app (see
 [Where data lives (desktop)](#where-data-lives-desktop)):
 
 ```text
-nomifun-web: embedded backend + SPA on one port
+openhub-web: embedded backend + SPA on one port
 listening on 127.0.0.1:8787  auth=required  dist=../../ui/dist
 ```
 
-On a machine that also has the desktop app installed, a bare `nomifun-web`
+On a machine that also has the desktop app installed, a bare `openhub-web`
 run opens the desktop app's data directly — an exclusive `server.lock`
 guarantees the two backends never run on that directory at the same time.
 
@@ -169,27 +169,27 @@ initial admin account**. After that, login is required for everyone.
 
 ### Common flags
 
-`nomifun-web` (defined in `apps/web/src/main.rs`) accepts both CLI flags and
+`openhub-web` (defined in `apps/web/src/main.rs`) accepts both CLI flags and
 environment variables:
 
 | Flag | Env var | Default | Meaning |
 | --- | --- | --- | --- |
-| `--host` | `NOMIFUN_WEB_HOST` | `127.0.0.1` | Bind address. Use `0.0.0.0` only when you intend LAN/VPN/public access; pre-seed or complete admin setup first. |
-| `--port` | `NOMIFUN_WEB_PORT` | `8787` | Port for both `/api` and the SPA. |
-| `--data-dir` | `NOMIFUN_DATA_DIR` | _per-user app-data dir, same as the [desktop default](#where-data-lives-desktop)_ | Backend data dir (db / logs / bun cache / agent state). The env value is taken literally (no `/Nomi` suffix). Use an absolute path in production. |
-| `--dist` | `NOMIFUN_WEB_DIST` | `../../ui/dist` | SPA static directory. **Set this explicitly when running outside the repo root.** |
-| `--admin-user` | `NOMIFUN_ADMIN_USERNAME` | `admin` | Username for pre-seeded admin (only honoured before the admin exists). |
-| `--admin-password` | `NOMIFUN_ADMIN_PASSWORD` | _(none — interactive first-run setup)_ | Pre-seed the admin password and skip interactive first-run. |
-| `--insecure-no-auth` | `NOMIFUN_WEB_INSECURE_NO_AUTH` | `false` | **Danger.** Disable authentication entirely (desktop-style local mode). Loopback / trusted private network only. |
-| _(env only)_ | `NOMIFUN_HTTPS` | `false` | Set to `true` when fronted by TLS so cookies get the `Secure` flag. |
+| `--host` | `OPENHUB_WEB_HOST` | `127.0.0.1` | Bind address. Use `0.0.0.0` only when you intend LAN/VPN/public access; pre-seed or complete admin setup first. |
+| `--port` | `OPENHUB_WEB_PORT` | `8787` | Port for both `/api` and the SPA. |
+| `--data-dir` | `OPENHUB_DATA_DIR` | _per-user app-data dir, same as the [desktop default](#where-data-lives-desktop)_ | Backend data dir (db / logs / bun cache / agent state). The env value is taken literally (no `/Nomi` suffix). Use an absolute path in production. |
+| `--dist` | `OPENHUB_WEB_DIST` | `../../ui/dist` | SPA static directory. **Set this explicitly when running outside the repo root.** |
+| `--admin-user` | `OPENHUB_ADMIN_USERNAME` | `admin` | Username for pre-seeded admin (only honoured before the admin exists). |
+| `--admin-password` | `OPENHUB_ADMIN_PASSWORD` | _(none — interactive first-run setup)_ | Pre-seed the admin password and skip interactive first-run. |
+| `--insecure-no-auth` | `OPENHUB_WEB_INSECURE_NO_AUTH` | `false` | **Danger.** Disable authentication entirely (desktop-style local mode). Loopback / trusted private network only. |
+| _(env only)_ | `OPENHUB_HTTPS` | `false` | Set to `true` when fronted by TLS so cookies get the `Secure` flag. |
 
 Example, opening it up to the LAN with a pre-seeded admin:
 
 ```bash
-nomifun-web \
+openhub-web \
   --host 0.0.0.0 --port 8787 \
-  --data-dir /var/lib/nomifun \
-  --dist /opt/nomifun/web \
+  --data-dir /var/libopenhub\
+  --dist /opt/openhub/web \
   --admin-user admin \
   --admin-password "change-me-to-something-strong"
 ```
@@ -201,7 +201,7 @@ notes — see
 ## Docker / Docker Compose
 
 The repository ships a multi-stage `Dockerfile` and a `docker-compose.yml`
-that produce a **headless** (no GUI) image: SPA + `nomifun-web` + `bun` on
+that produce a **headless** (no GUI) image: SPA + `openhub-web` + `bun` on
 `debian:bookworm-slim`.
 
 ### Quick start with Compose
@@ -215,16 +215,16 @@ docker compose up -d --build
 
 The service is configured with `restart: unless-stopped` so installing it
 **is** enabling it on boot. Persistent state (SQLite database, logs, bun
-cache, agent state) lives in the named volume `nomifun-data` mounted at
+cache, agent state) lives in the named volume `openhub-data` mounted at
 `/data` inside the container.
 
 The image's defaults are tuned for container life:
 
 ```text
-NOMIFUN_WEB_HOST=0.0.0.0
-NOMIFUN_WEB_PORT=8787
-NOMIFUN_DATA_DIR=/data
-NOMIFUN_WEB_DIST=/opt/nomifun/web
+OPENHUB_WEB_HOST=0.0.0.0
+OPENHUB_WEB_PORT=8787
+OPENHUB_DATA_DIR=/data
+OPENHUB_WEB_DIST=/opt/openhub/web
 SHELL=/bin/bash
 ```
 
@@ -234,7 +234,7 @@ network before publishing port `8787` broadly. For anything reachable from the
 internet, put TLS in front of it — the bundled `Caddyfile` and the
 commented-out `caddy` service in `docker-compose.yml` are the recommended path.
 Set
-`NOMIFUN_HTTPS=true` on the `nomifun` service when you do, so the session
+`OPENHUB_HTTPS=true` on the openhub service when you do, so the session
 cookie gains the `Secure` flag.
 
 ### Pre-seed the admin (recommended for non-interactive setup)
@@ -243,11 +243,11 @@ The first browser visit otherwise wins the admin account; pre-seeding closes
 that race window:
 
 ```yaml
-# docker-compose.yml — under services.nomifun
+# docker-compose.yml — under services.openhub
 environment:
-  NOMIFUN_ADMIN_USERNAME: admin
-  NOMIFUN_ADMIN_PASSWORD: "change-me-to-something-strong"
-  NOMIFUN_HTTPS: "true"   # only when behind a TLS proxy
+  OPENHUB_ADMIN_USERNAME: admin
+  OPENHUB_ADMIN_PASSWORD: "change-me-to-something-strong"
+  OPENHUB_HTTPS: "true"   # only when behind a TLS proxy
 ```
 
 ### Speeding up Rust builds
@@ -274,7 +274,7 @@ cargo check --workspace
 
 # All three binaries build
 cargo build --workspace --bins
-# → target/(debug|release)/{nomicore, nomifun-web, nomifun-desktop}
+# → target/(debug|release)/{openhub-core, openhub-web, openhub-desktop}
 
 # Web host responds with the SPA + auth status
 curl -sS http://127.0.0.1:8787/                | head -c 200
@@ -282,7 +282,7 @@ curl -sS http://127.0.0.1:8787/api/auth/status
 # → 200 {"success":true,"needs_setup":..., "user_count":...}
 ```
 
-If you see `nomifun-web: embedded backend + SPA on one port` in the logs and
+If you see `openhub-web: embedded backend + SPA on one port` in the logs and
 `/api/auth/status` returns JSON, the backend is up and the SPA is being
 served from the same port.
 

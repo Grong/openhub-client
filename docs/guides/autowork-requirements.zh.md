@@ -1,6 +1,6 @@
 # AutoWork 与 Requirements
 
-AutoWork 是 NomiFun 的旗舰自动化能力：一块 **需求看板**（requirements board）加上一个 **编排器**（orchestrator），由它驱动 AI 智能体（或运行在终端中的 agent CLI）逐条处理这些需求，无需你全程盯着。
+AutoWork 是 OpenHub 的旗舰自动化能力：一块 **需求看板**（requirements board）加上一个 **编排器**（orchestrator），由它驱动 AI 智能体（或运行在终端中的 agent CLI）逐条处理这些需求，无需你全程盯着。
 
 你登记需求，按 tag 分组，把 tag 绑定到一个会话（对话或终端），编排器就会按顺序认领、执行并完结它们。当某条需求进入终态时，可以触发 **完成通知**（Lark/飞书 webhook），让你的团队第一时间知道结果。
 
@@ -150,14 +150,14 @@ Gemini 终端可以手动运行，但后端目前不会接受它作为终端 Aut
 
 ## IDMM——让卡顿中的本轮继续存活
 
-IDMM 是一个独立、可选的监督器（`nomifun-idmm`）。它监视会话，并在检测到卡顿时介入：
+IDMM 是一个独立、可选的监督器（`openhub-idmm`）。它监视会话，并在检测到卡顿时介入：
 
 - **规则层（无 LLM）**：provider 报错、反复重试、模型在工具调用上转圈等等——以确定性策略处理。
 - **Sidecar 层**：调用一个轻量备用模型来下达下一步决策，避免会话挂死。
 
 当 AutoWork 启动一轮时，它会请求 IDMM（如果已对接）在本轮持续期间 **保证监督** 该目标。两个特性可以组合：AutoWork 推动前进，IDMM 让每一轮不至于卡死，从而真正进入终态而不是超时。IDMM 与 AutoWork 在同一处切换（会话头部）。
 
-每层策略的细节和介入日志 API 见 `crates/backend/nomifun-idmm/`。
+每层策略的细节和介入日志 API 见 `crates/backend/openhub-idmm/`。
 
 > 想看完整全貌 —— 规则层、旁路模型、会话保活，以及何时开启 —— 参见专门的
 > [智能决策（IDMM）](intelligent-decision.zh.md)指南。

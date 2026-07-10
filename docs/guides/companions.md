@@ -105,7 +105,7 @@ is `('companion', companionId)`). Scope of effect:
   conversations without a companionId keep their conversation-level bindings;
   the two are **not merged**.
 - **What the agent sees**: bases are mounted at
-  `{workspace}/.nomi/knowledge/`, and the injected context carries, per
+  `{workspace}/.openhub/knowledge/`, and the injected context carries, per
   base, the description + an AI digest + "when to consult" hints + a
   budgeted table of contents (20 entries per base / 60 global,
   directories aggregated beyond that), plus an explicit retrieval
@@ -127,14 +127,14 @@ is `('companion', companionId)`). Scope of effect:
   AI-compressed) and auto-generates the digest — refreshable from the
   detail page; *live* mode lets the agent fetch at runtime (engines
   without a web tool can call the gateway tool
-  `nomi_knowledge_fetch_url`). Only public `http/https` URLs are
+  `openhub_knowledge_fetch_url`). Only public `http/https` URLs are
   accepted (SSRF guard).
 - The companion can also **grow its own libraries**: the Desktop Gateway
   ships seven knowledge tools (list / bindings / create / write /
   autogen / fetch-url), and knowledge-deposit tips are built into the
   companion's system prompt — a companion or channel chat can create a base
   and distill notes into it unprompted. When
-  `nomi_knowledge_create_base` is called with `urls`, the fetching runs
+  `openhub_knowledge_create_base` is called with `urls`, the fetching runs
   as a background job — the tool returns immediately, so the agent must
   not create the base again just because the snapshots haven't appeared
   yet; once the base's description shows up, the fetch + digest
@@ -199,7 +199,7 @@ Migration steps:
 ## Automatic migration of legacy data
 
 After upgrading from the single-companion version, the first boot detects the
-legacy layout `{data_dir}/companion/nomi/`: if it exists and `companion/shared/`
+legacy layout `{data_dir}/companion/openhub/`: if it exists and `companion/shared/`
 does not, it is automatically migrated into the shared memory hub plus
 a first companion (default name **"Nomi"**, inheriting the existing XP /
 persona / character / model / desktop-companion position / companion

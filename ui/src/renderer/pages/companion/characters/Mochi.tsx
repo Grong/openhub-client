@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -17,83 +17,83 @@ const Mochi: React.FC<CharacterProps> = ({ mood, activity, size = 150 }) => {
   const isThinking = activity === 'thinking';
 
   return (
-    <div className={`nomi-ch nomi-mochi nomi-mochi--${mood} nomi-mochi--${activity}`} style={{ width: size, height: size }}>
+    <div className={`openhub-ch openhub-mochi openhub-mochi--${mood} openhub-mochi--${activity}`} style={{ width: size, height: size }}>
       <style>{`
-.nomi-mochi { position: relative; display: inline-block; }
-.nomi-mochi svg { display: block; overflow: visible; }
-.nomi-mochi * { transform-box: view-box; }
+.openhub-mochi { position: relative; display: inline-block; }
+.openhub-mochi svg { display: block; overflow: visible; }
+.openhub-mochi * { transform-box: view-box; }
 
 /* ground shadow — counter-scales against body lift */
-.nomi-mochi__shadow { transform-origin: 80px 147px; animation: nomi-mochi-shadow 3.4s ease-in-out infinite; }
-@keyframes nomi-mochi-shadow { 0%,100%{ transform: scale(1); opacity:.13 } 50%{ transform: scale(.9); opacity:.09 } }
+.openhub-mochi__shadow { transform-origin: 80px 147px; animation: openhub-mochi-shadow 3.4s ease-in-out infinite; }
+@keyframes openhub-mochi-shadow { 0%,100%{ transform: scale(1); opacity:.13 } 50%{ transform: scale(.9); opacity:.09 } }
 
 /* whole-body mochi squash & breathe */
-.nomi-mochi__body-g { transform-origin: 80px 138px; animation: nomi-mochi-breathe 3.4s ease-in-out infinite; }
-@keyframes nomi-mochi-breathe {
+.openhub-mochi__body-g { transform-origin: 80px 138px; animation: openhub-mochi-breathe 3.4s ease-in-out infinite; }
+@keyframes openhub-mochi-breathe {
   0%,100%{ transform: translateY(0) scaleY(1) scaleX(1) }
   50%{ transform: translateY(-2px) scaleY(1.035) scaleX(.975) }
 }
 
 /* ears — soft alternate sway */
-.nomi-mochi__ear-l { transform-origin: 64px 44px; animation: nomi-mochi-earL 3.6s ease-in-out infinite; }
-.nomi-mochi__ear-r { transform-origin: 96px 44px; animation: nomi-mochi-earR 3.6s ease-in-out infinite; }
-@keyframes nomi-mochi-earL { 0%,100%{ transform: rotate(2deg) } 50%{ transform: rotate(-5deg) } }
-@keyframes nomi-mochi-earR { 0%,100%{ transform: rotate(-2deg) } 50%{ transform: rotate(5deg) } }
+.openhub-mochi__ear-l { transform-origin: 64px 44px; animation: openhub-mochi-earL 3.6s ease-in-out infinite; }
+.openhub-mochi__ear-r { transform-origin: 96px 44px; animation: openhub-mochi-earR 3.6s ease-in-out infinite; }
+@keyframes openhub-mochi-earL { 0%,100%{ transform: rotate(2deg) } 50%{ transform: rotate(-5deg) } }
+@keyframes openhub-mochi-earR { 0%,100%{ transform: rotate(-2deg) } 50%{ transform: rotate(5deg) } }
 
 /* blink — periodic squash */
-.nomi-mochi__eyes { transform-origin: 80px 92px; animation: nomi-mochi-blink 5s ease-in-out infinite; }
-@keyframes nomi-mochi-blink { 0%,92%,100%{ transform: scaleY(1) } 95%{ transform: scaleY(.08) } }
-.nomi-mochi--sleepy .nomi-mochi__eyes { animation: none; }
+.openhub-mochi__eyes { transform-origin: 80px 92px; animation: openhub-mochi-blink 5s ease-in-out infinite; }
+@keyframes openhub-mochi-blink { 0%,92%,100%{ transform: scaleY(1) } 95%{ transform: scaleY(.08) } }
+.openhub-mochi--sleepy .openhub-mochi__eyes { animation: none; }
 
 /* mouth chew while thinking */
-.nomi-mochi__mouth { transform-origin: 80px 104px; }
-.nomi-mochi--thinking .nomi-mochi__mouth { animation: nomi-mochi-chew .55s ease-in-out infinite; }
-@keyframes nomi-mochi-chew { 0%,100%{ transform: scaleY(1) translateY(0) } 50%{ transform: scaleY(.6) translateY(1px) } }
+.openhub-mochi__mouth { transform-origin: 80px 104px; }
+.openhub-mochi--thinking .openhub-mochi__mouth { animation: openhub-mochi-chew .55s ease-in-out infinite; }
+@keyframes openhub-mochi-chew { 0%,100%{ transform: scaleY(1) translateY(0) } 50%{ transform: scaleY(.6) translateY(1px) } }
 
 /* happy / excited bounce overrides */
-.nomi-mochi--happy .nomi-mochi__body-g { animation: nomi-mochi-hop 1.5s ease-in-out infinite; }
-@keyframes nomi-mochi-hop {
+.openhub-mochi--happy .openhub-mochi__body-g { animation: openhub-mochi-hop 1.5s ease-in-out infinite; }
+@keyframes openhub-mochi-hop {
   0%,100%{ transform: translateY(0) scaleY(1) } 30%{ transform: translateY(-6px) scaleY(1.04) }
   55%{ transform: translateY(0) scaleY(.94) } 70%{ transform: translateY(-1px) scaleY(1.01) }
 }
-.nomi-mochi--excited .nomi-mochi__body-g { animation: nomi-mochi-jump 1s ease-in-out infinite; }
-@keyframes nomi-mochi-jump {
+.openhub-mochi--excited .openhub-mochi__body-g { animation: openhub-mochi-jump 1s ease-in-out infinite; }
+@keyframes openhub-mochi-jump {
   0%,100%{ transform: translateY(0) scaleY(.95) scaleX(1.04) } 40%{ transform: translateY(-12px) scaleY(1.08) scaleX(.94) }
   60%{ transform: translateY(-10px) scaleY(1.05) } 80%{ transform: translateY(2px) scaleY(.9) scaleX(1.06) }
 }
-.nomi-mochi--sleepy .nomi-mochi__body-g { animation: nomi-mochi-doze 4s ease-in-out infinite; }
-@keyframes nomi-mochi-doze { 0%,100%{ transform: translateY(2px) scaleY(.985) } 50%{ transform: translateY(4px) scaleY(.965) } }
+.openhub-mochi--sleepy .openhub-mochi__body-g { animation: openhub-mochi-doze 4s ease-in-out infinite; }
+@keyframes openhub-mochi-doze { 0%,100%{ transform: translateY(2px) scaleY(.985) } 50%{ transform: translateY(4px) scaleY(.965) } }
 
 /* sleepy Z's */
-.nomi-mochi__z { opacity: 0; }
-.nomi-mochi--sleepy .nomi-mochi__z1 { animation: nomi-mochi-z 3s ease-in-out infinite; }
-.nomi-mochi--sleepy .nomi-mochi__z2 { animation: nomi-mochi-z 3s ease-in-out infinite 1.5s; }
-@keyframes nomi-mochi-z {
+.openhub-mochi__z { opacity: 0; }
+.openhub-mochi--sleepy .openhub-mochi__z1 { animation: openhub-mochi-z 3s ease-in-out infinite; }
+.openhub-mochi--sleepy .openhub-mochi__z2 { animation: openhub-mochi-z 3s ease-in-out infinite 1.5s; }
+@keyframes openhub-mochi-z {
   0%{ opacity:0; transform: translate(0,0) scale(.6) } 25%{ opacity:.9 }
   70%{ opacity:.7 } 100%{ opacity:0; transform: translate(7px,-22px) scale(1.1) }
 }
 
 /* worried sweat drop */
-.nomi-mochi__sweat { opacity: 0; }
-.nomi-mochi--worried .nomi-mochi__sweat { animation: nomi-mochi-sweat 2.8s ease-in-out infinite; }
-@keyframes nomi-mochi-sweat {
+.openhub-mochi__sweat { opacity: 0; }
+.openhub-mochi--worried .openhub-mochi__sweat { animation: openhub-mochi-sweat 2.8s ease-in-out infinite; }
+@keyframes openhub-mochi-sweat {
   0%,12%{ opacity:0; transform: translateY(0) }
   22%{ opacity:.85 } 70%{ opacity:.85 } 100%{ opacity:0; transform: translateY(16px) }
 }
 
 /* excited sparkle particles */
-.nomi-mochi__spark { opacity: 0; transform-origin: center; }
-.nomi-mochi--excited .nomi-mochi__spark1 { animation: nomi-mochi-spark 1.1s ease-in-out infinite; }
-.nomi-mochi--excited .nomi-mochi__spark2 { animation: nomi-mochi-spark 1.1s ease-in-out infinite .4s; }
-.nomi-mochi--excited .nomi-mochi__spark3 { animation: nomi-mochi-spark 1.1s ease-in-out infinite .75s; }
-@keyframes nomi-mochi-spark { 0%,100%{ opacity:0; transform: scale(.4) } 45%{ opacity:1; transform: scale(1.1) } }
+.openhub-mochi__spark { opacity: 0; transform-origin: center; }
+.openhub-mochi--excited .openhub-mochi__spark1 { animation: openhub-mochi-spark 1.1s ease-in-out infinite; }
+.openhub-mochi--excited .openhub-mochi__spark2 { animation: openhub-mochi-spark 1.1s ease-in-out infinite .4s; }
+.openhub-mochi--excited .openhub-mochi__spark3 { animation: openhub-mochi-spark 1.1s ease-in-out infinite .75s; }
+@keyframes openhub-mochi-spark { 0%,100%{ opacity:0; transform: scale(.4) } 45%{ opacity:1; transform: scale(1.1) } }
 
 /* thinking bubbles — small to large, serial float */
-.nomi-mochi__tb { opacity: 0; }
-.nomi-mochi--thinking .nomi-mochi__tb1 { animation: nomi-mochi-tb 2.4s ease-in-out infinite; }
-.nomi-mochi--thinking .nomi-mochi__tb2 { animation: nomi-mochi-tb 2.4s ease-in-out infinite .35s; }
-.nomi-mochi--thinking .nomi-mochi__tb3 { animation: nomi-mochi-tb 2.4s ease-in-out infinite .7s; }
-@keyframes nomi-mochi-tb {
+.openhub-mochi__tb { opacity: 0; }
+.openhub-mochi--thinking .openhub-mochi__tb1 { animation: openhub-mochi-tb 2.4s ease-in-out infinite; }
+.openhub-mochi--thinking .openhub-mochi__tb2 { animation: openhub-mochi-tb 2.4s ease-in-out infinite .35s; }
+.openhub-mochi--thinking .openhub-mochi__tb3 { animation: openhub-mochi-tb 2.4s ease-in-out infinite .7s; }
+@keyframes openhub-mochi-tb {
   0%{ opacity:0; transform: translateY(4px) scale(.5) } 30%{ opacity:.95 }
   75%{ opacity:.8 } 100%{ opacity:0; transform: translateY(-9px) scale(1) }
 }
@@ -120,15 +120,15 @@ const Mochi: React.FC<CharacterProps> = ({ mood, activity, size = 150 }) => {
         </defs>
 
         {/* ground shadow */}
-        <ellipse className='nomi-mochi__shadow' cx='80' cy='147' rx='38' ry='8' fill='#000000' opacity='0.12' />
+        <ellipse className='openhub-mochi__shadow' cx='80' cy='147' rx='38' ry='8' fill='#000000' opacity='0.12' />
 
-        <g className='nomi-mochi__body-g'>
+        <g className='openhub-mochi__body-g'>
           {/* ===== EARS (behind body) ===== */}
-          <g className='nomi-mochi__ear-l'>
+          <g className='openhub-mochi__ear-l'>
             <path d='M62 60 C50 50 48 26 54 14 C58 6 68 8 70 20 C72 34 71 50 68 60 Z' fill='url(#mochiBody)' stroke='#dba6aa' strokeWidth='2.3' strokeLinejoin='round' />
             <path d='M62 54 C55 46 54 28 58 18 C61 12 66 15 66 24 C66 36 65 48 63 55 Z' fill='url(#mochiEarIn)' />
           </g>
-          <g className='nomi-mochi__ear-r'>
+          <g className='openhub-mochi__ear-r'>
             <path d='M98 60 C110 50 112 26 106 14 C102 6 92 8 90 20 C88 34 89 50 92 60 Z' fill='url(#mochiBody)' stroke='#dba6aa' strokeWidth='2.3' strokeLinejoin='round' />
             <path d='M98 54 C105 46 106 28 102 18 C99 12 94 15 94 24 C94 36 95 48 97 55 Z' fill='url(#mochiEarIn)' />
           </g>
@@ -152,7 +152,7 @@ const Mochi: React.FC<CharacterProps> = ({ mood, activity, size = 150 }) => {
           <ellipse cx='108' cy='102' rx='11' ry='7' fill='url(#mochiBlush)' />
 
           {/* ===== EYES ===== */}
-          <g className='nomi-mochi__eyes'>
+          <g className='openhub-mochi__eyes'>
             {isSleepy ? (
               <>
                 <path d='M56 92 Q63 99 70 92' fill='none' stroke='#7a5a52' strokeWidth='3' strokeLinecap='round' />
@@ -194,7 +194,7 @@ const Mochi: React.FC<CharacterProps> = ({ mood, activity, size = 150 }) => {
 
           {/* ===== nose + mouth ===== */}
           <ellipse cx='80' cy='100' rx='3' ry='2.2' fill='#e89aa8' />
-          <g className='nomi-mochi__mouth'>
+          <g className='openhub-mochi__mouth'>
             {isSleepy ? (
               <path d='M74 106 Q80 109 86 106' fill='none' stroke='#a86a64' strokeWidth='2.2' strokeLinecap='round' />
             ) : isWorried ? (
@@ -207,7 +207,7 @@ const Mochi: React.FC<CharacterProps> = ({ mood, activity, size = 150 }) => {
           </g>
 
           {/* worried sweat */}
-          <g className='nomi-mochi__sweat'>
+          <g className='openhub-mochi__sweat'>
             <path d='M114 80 C114 80 109 87 109 91 a5 5 0 0 0 10 0 C119 87 114 80 114 80 Z' fill='#9fd9ef' stroke='#7cc4e0' strokeWidth='1' />
             <ellipse cx='112' cy='88' rx='1.5' ry='2' fill='#fff' opacity='0.7' />
           </g>
@@ -216,26 +216,26 @@ const Mochi: React.FC<CharacterProps> = ({ mood, activity, size = 150 }) => {
         {/* ===== sleepy Z's (head-top) ===== */}
         {isSleepy && (
           <g fill='#b79be0' fontFamily='sans-serif' fontWeight='700'>
-            <text className='nomi-mochi__z nomi-mochi__z1' x='104' y='48' fontSize='13'>z</text>
-            <text className='nomi-mochi__z nomi-mochi__z2' x='112' y='38' fontSize='17'>Z</text>
+            <text className='openhub-mochi__z openhub-mochi__z1' x='104' y='48' fontSize='13'>z</text>
+            <text className='openhub-mochi__z openhub-mochi__z2' x='112' y='38' fontSize='17'>Z</text>
           </g>
         )}
 
         {/* ===== excited sparkles ===== */}
         {isExcited && (
           <g fill='#ffd84d'>
-            <path className='nomi-mochi__spark nomi-mochi__spark1' d='M118 60 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 Z' />
-            <path className='nomi-mochi__spark nomi-mochi__spark2' d='M40 56 l1.6 4 4 1.6 -4 1.6 -1.6 4 -1.6 -4 -4 -1.6 4 -1.6 Z' />
-            <path className='nomi-mochi__spark nomi-mochi__spark3' d='M128 88 l1.4 3.5 3.5 1.4 -3.5 1.4 -1.4 3.5 -1.4 -3.5 -3.5 -1.4 3.5 -1.4 Z' />
+            <path className='openhub-mochi__spark openhub-mochi__spark1' d='M118 60 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 Z' />
+            <path className='openhub-mochi__spark openhub-mochi__spark2' d='M40 56 l1.6 4 4 1.6 -4 1.6 -1.6 4 -1.6 -4 -4 -1.6 4 -1.6 Z' />
+            <path className='openhub-mochi__spark openhub-mochi__spark3' d='M128 88 l1.4 3.5 3.5 1.4 -3.5 1.4 -1.4 3.5 -1.4 -3.5 -3.5 -1.4 3.5 -1.4 Z' />
           </g>
         )}
 
         {/* ===== thinking bubbles ===== */}
         {isThinking && (
           <g>
-            <circle className='nomi-mochi__tb nomi-mochi__tb1' cx='112' cy='52' r='3' fill='url(#mochiBubble)' stroke='#f3b9cb' strokeWidth='0.8' />
-            <circle className='nomi-mochi__tb nomi-mochi__tb2' cx='120' cy='42' r='4.5' fill='url(#mochiBubble)' stroke='#f3b9cb' strokeWidth='0.8' />
-            <circle className='nomi-mochi__tb nomi-mochi__tb3' cx='130' cy='30' r='6.5' fill='url(#mochiBubble)' stroke='#f3b9cb' strokeWidth='0.9' />
+            <circle className='openhub-mochi__tb openhub-mochi__tb1' cx='112' cy='52' r='3' fill='url(#mochiBubble)' stroke='#f3b9cb' strokeWidth='0.8' />
+            <circle className='openhub-mochi__tb openhub-mochi__tb2' cx='120' cy='42' r='4.5' fill='url(#mochiBubble)' stroke='#f3b9cb' strokeWidth='0.8' />
+            <circle className='openhub-mochi__tb openhub-mochi__tb3' cx='130' cy='30' r='6.5' fill='url(#mochiBubble)' stroke='#f3b9cb' strokeWidth='0.9' />
           </g>
         )}
       </svg>

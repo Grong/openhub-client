@@ -1,7 +1,7 @@
 # Screenshot Manifest
 
 This file tracks every screenshot referenced by the documentation. All images
-are captured from the **real running NomiFun app** (not mockups) and saved into
+are captured from the **real running OpenHub app** (not mockups) and saved into
 this `docs/images/` directory.
 
 ## Naming scheme
@@ -16,7 +16,7 @@ this `docs/images/` directory.
 
 ## How to capture (current process)
 
-The desktop app and the `nomifun-web` host render the **same** production SPA
+The desktop app and the `openhub-web` host render the **same** production SPA
 (`ui/dist`), so in-app screens are pixel-identical between them. Capture in-app
 screens from the web host (scriptable, no native window needed); capture native
 window chrome from the installed app.
@@ -26,8 +26,8 @@ window chrome from the installed app.
    touches your real data or collides with the desktop app's database):
 
    ```bash
-   target/debug/nomifun-web --insecure-no-auth --port 8799 \
-     --dist ui/dist --data-dir /tmp/nomifun-shots
+   target/debug/openhub-web --insecure-no-auth --port 8799 \
+     --dist ui/dist --data-dir /tmp/openhub-shots
    ```
 
 3. **Seed synthetic demo data** through the local API (no real credentials),
@@ -39,7 +39,7 @@ window chrome from the installed app.
    ```python
    ctx = browser.new_context(viewport={"width":1440,"height":900},
                              color_scheme="dark", device_scale_factor=2)
-   ctx.add_init_script("localStorage.setItem('__nomifun_theme','dark')")
+   ctx.add_init_script("localStorage.setItem('__openhub_theme','dark')")
    page.goto("http://127.0.0.1:8799/#/<route>")
    ```
 
@@ -47,7 +47,7 @@ window chrome from the installed app.
    `--insecure-no-auth`. No admin yet → first-run setup; pass
    `--admin-user/--admin-password` → login screen.
 6. **Native window** (titlebar / tray): capture from the installed
-   `/Applications/NomiFun.app` with macOS window capture. Requires Screen
+   `/Applications/OpenHub.app` with macOS window capture. Requires Screen
    Recording permission for the capturing process.
 
 ## Module prefixes
@@ -127,7 +127,7 @@ copy-pasteable commands or an ASCII diagram, and several are platform-specific
 `gs-02` and `desktop-01` are marked `live\*`: they currently show the **real
 current app content** captured from the web host, but **without the native
 window chrome** (titlebar / traffic-lights / tray). Replace them with a true
-native capture from the installed `/Applications/NomiFun.app` (needs Screen
+native capture from the installed `/Applications/OpenHub.app` (needs Screen
 Recording permission, or a manual `Cmd+Shift+4` window capture) when convenient.
 
 A few data-heavy views are intentionally **not** screenshotted — a live

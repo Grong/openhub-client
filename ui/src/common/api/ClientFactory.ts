@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -76,8 +76,8 @@ export class ClientFactory {
           baseURL: base_url,
           timeout: options.timeout,
           defaultHeaders: {
-            'HTTP-Referer': 'https://nomifun.com',
-            'X-Title': 'NomiFun',
+            'HTTP-Referer': 'https://openhub.dev',
+            'X-Title': 'OpenHub',
           },
           ...(options.baseConfig as OpenAIClientConfig),
         };
@@ -127,8 +127,8 @@ export class ClientFactory {
           baseURL: base_url,
           timeout: options.timeout,
           defaultHeaders: {
-            'HTTP-Referer': 'https://nomifun.com',
-            'X-Title': 'NomiFun',
+            'HTTP-Referer': 'https://openhub.dev',
+            'X-Title': 'OpenHub',
           },
           ...(options.baseConfig as OpenAIClientConfig),
         };

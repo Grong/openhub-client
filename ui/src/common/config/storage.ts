@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -122,7 +122,7 @@ export interface IConfigStorageRefer {
     custom_agent_id?: string;
     name?: string;
   };
-  // Skills Market: whether the nomifun-skills builtin skill is enabled
+  // Skills Market: whether the openhub-skills builtin skill is enabled
   'skillsMarket.enabled'?: boolean;
   /**
    * One-shot completion flag for the legacy `model.config` → backend providers
@@ -144,7 +144,7 @@ export interface IConfigStorageRefer {
 }
 
 export interface IEnvStorageRefer {
-  'nomifun.dir': {
+  'openhub.dir': {
     workDir: string;
     cacheDir: string;
   };
@@ -154,7 +154,7 @@ export interface IEnvStorageRefer {
  * Conversation source type - identifies where the conversation was created
  * 会话来源类型 - 标识会话创建的来源
  */
-export type ConversationSource = 'nomifun' | 'telegram' | 'lark' | 'dingtalk' | 'weixin' | 'wecom' | (string & {});
+export type ConversationSource = 'openhub' | 'telegram' | 'lark' | 'dingtalk' | 'weixin' | 'wecom' | (string & {});
 
 export type TChatConversationStatus = 'pending' | 'running' | 'finished';
 export type TConversationRuntimeStateKind = 'idle' | 'starting' | 'running' | 'waiting_confirmation';
@@ -185,7 +185,7 @@ interface IChatConversation<T, Extra> {
   model: TProviderWithModel;
   status?: TChatConversationStatus | undefined;
   runtime?: TConversationRuntimeSummary;
-  /** 会话来源，默认为 nomifun / Conversation source, defaults to nomifun */
+  /** 会话来源，默认为openhub/ Conversation source, defaults toopenhub*/
   source?: ConversationSource;
   /** Channel chat isolation ID (e.g. user:xxx, group:xxx) */
   channel_chat_id?: string;
@@ -350,7 +350,7 @@ export type TChatConversation =
   // open historical rows with type='gemini' (message history is served
   // by the shared messages table). The backend factory rejects any
   // attempt to resume this conversation — see
-  // Nomicore/crates/nomifun-common/src/enums.rs and factory.rs.
+  // Nomicore/crates/openhub-common/src/enums.rs and factory.rs.
   // Every field is optional because legacy rows shape-varies across
   // several older Gemini-runtime versions.
   | Omit<
@@ -423,7 +423,7 @@ export type TChatConversation =
       'model'
     >
   | IChatConversation<
-      'nomi',
+      'openhub',
       {
         workspace: string;
         custom_workspace?: boolean;
@@ -479,7 +479,7 @@ export type TChatConversation =
          * spawns (homepage「主模型 + 协作模型」picker). `models[0]` is the 主模型
          * (also the lead/planner); the rest are 协作模型 the planner may assign
          * per node by difficulty. Written by the homepage entry into `extra`; the
-         * `nomi_run_create` gateway handler reads it back to build the run's fleet
+         * `openhub_run_create` gateway handler reads it back to build the run's fleet
          * (deterministic — not relayed through the LLM). Absent ⇒ Auto (all enabled). */
         orchestrator_model_range?:
           | { mode: 'single'; model: { provider_id: string; model: string } }
@@ -520,13 +520,13 @@ export type ModelCapability = {
   type: ModelType;
   /**
    * 是否为用户手动选择，如果为true，则表示用户手动选择了该类型，否则表示用户手动禁止了该模型；如果为undefined，则表示使用默认值。
-   * 后端按 snake_case 序列化为 `is_user_selected`（见 crates/backend/nomifun-api-types/src/provider.rs 的 ModelCapability，无 rename），此处须与线名一致。
+   * 后端按 snake_case 序列化为 `is_user_selected`（见 crates/backend/openhub-api-types/src/provider.rs 的 ModelCapability，无 rename），此处须与线名一致。
    */
   is_user_selected?: boolean;
 };
 
 /**
- * 统一多模态能力词表 —— 镜像 crates/backend/nomifun-api-types/src/model_task.rs。
+ * 统一多模态能力词表 —— 镜像 crates/backend/openhub-api-types/src/model_task.rs。
  * ModelTask 决定端点/请求体；ModelTrait 是同一任务内的细化（主要修饰 chat）。
  * 无 ts-rs：改动须同步 Rust 与此处。
  */
@@ -701,8 +701,8 @@ export interface IConversationMcpStatus {
 
 /** Stable ID for the built-in image generation MCP server */
 export const BUILTIN_IMAGE_GEN_ID = 'builtin-image-gen';
-export const BUILTIN_IMAGE_GEN_NAME = 'nomifun-image-generation';
-export const BUILTIN_IMAGE_GEN_LEGACY_NAMES = ['Nomifun Image Generation', BUILTIN_IMAGE_GEN_ID] as const;
+export const BUILTIN_IMAGE_GEN_NAME = 'openhub-image-generation';
+export const BUILTIN_IMAGE_GEN_LEGACY_NAMES = ['Openhub Image Generation', BUILTIN_IMAGE_GEN_ID] as const;
 
 export interface IMcpTool {
   name: string;

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -382,13 +382,13 @@ const NomiModal: React.FC<NomiModalProps> = ({
       closable={false}
       footer={null}
       onCancel={onCancel}
-      className={`nomifun-modal ${className}`}
+      className={`openhub-modal ${className}`}
       style={finalStyle}
       getPopupContainer={() => document.body}
     >
-      <div className='nomifun-modal-wrapper' style={{ borderRadius: borderRadiusVal }}>
+      <div className='openhub-modal-wrapper' style={{ borderRadius: borderRadiusVal }}>
         {renderHeader()}
-        <div className='nomifun-modal-body-content' style={bodyInlineStyle}>
+        <div className='openhub-modal-body-content' style={bodyInlineStyle}>
           {children}
         </div>
         {renderFooter()}

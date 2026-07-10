@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -23,7 +23,7 @@ const WelcomeStep: React.FC<WelcomeStepProps> = ({ onNext, onSkip }) => {
         <span className='text-48px'>🤖</span>
       </div>
       <Typography.Title heading={4}>
-        {t('onboarding.welcome.title', { defaultValue: '欢迎来到 NomiFun' })}
+        {t('onboarding.welcome.title', { defaultValue: '欢迎来到 OpenHub' })}
       </Typography.Title>
       <Typography.Text type='secondary'>
         {t('onboarding.welcome.subtitle', {

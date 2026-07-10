@@ -17,7 +17,7 @@
 
 ## 已确认的三大 fork
 
-1. **发起方式 = 两者都要**:主 agent 自主 fan-out(ultracode,经 `caps_orchestrator.nomi_run_create`)**和**用户在会话内显式发起,均可。
+1. **发起方式 = 两者都要**:主 agent 自主 fan-out(ultracode,经 `caps_orchestrator.openhub_run_create`)**和**用户在会话内显式发起,均可。
 2. **画布形态 = 右栏常驻实时预览 + 点击展开悬浮**:右栏新增一个「编排」tab 显示小号实时画布预览;点「展开」浮出大号悬浮画布,可收起回小预览。
 3. **独立「智能编排」Tab = 移除**:删 `/orchestrator` 路由 + 侧栏 `SiderOrchestratorEntry` + Titlebar 特例;编排完全活在会话里。
 
@@ -36,12 +36,12 @@
 
 ### A. 后端接线(小;无迁移、无引擎改动)
 
-1. **`ConversationService::link_orchestrator_run(conversation_id, run_id)`**(新方法,`nomifun-conversation/src/service.rs`):`update_extra` 合并 `{ "orchestrator_run_id": run_id }`(merge 语义,`service.rs:1024`)**并**广播 `conversation.listChanged(conversation_id, "updated", source)`(复用 `broadcast_list_changed`,`service.rs:2650`)。空 `conversation_id` 直接 no-op。**这是唯一的链接写入点(DRY),两条发起路径都调它。**
+1. **`ConversationService::link_orchestrator_run(conversation_id, run_id)`**(新方法,`openhub-conversation/src/service.rs`):`update_extra` 合并 `{ "orchestrator_run_id": run_id }`(merge 语义,`service.rs:1024`)**并**广播 `conversation.listChanged(conversation_id, "updated", source)`(复用 `broadcast_list_changed`,`service.rs:2650`)。空 `conversation_id` 直接 no-op。**这是唯一的链接写入点(DRY),两条发起路径都调它。**
 2. **Path A — `caps_orchestrator.create`**(`caps_orchestrator.rs:113`):
    - 读 `ctx.conversation_id`(`deps.rs:125`,`String`,空串守卫);非空时 `build_adhoc_request` 传 `lead_conv_id: Some(parsed)`(取代恒 `None` 的 `:269`)。
    - `create_adhoc` 返回 `run` 后,调 `deps.conversation_service.link_orchestrator_run(&ctx.conversation_id, &run.id)`(`deps.conversation_service`,`deps.rs:31`)。
    - autonomy 默认仍 `supervised`(agent 自主发起、无 Tab 审批位);Remote 仍 deny(`ORCHESTRATOR_DENY_SURFACES`)。
-3. **Path B — `create_adhoc_run` 路由**(`nomifun-orchestrator/src/routes.rs:244`):请求体 `CreateAdhocRunRequest.lead_conv_id`(`api-types/orchestrator.rs:481`,已存在)由前端填当前会话 id;返回 run 后调编排 crate 自持的 `ConversationService::link_orchestrator_run`。autonomy 默认仍 `interactive`(用户在场审批)。
+3. **Path B — `create_adhoc_run` 路由**(`openhub-orchestrator/src/routes.rs:244`):请求体 `CreateAdhocRunRequest.lead_conv_id`(`api-types/orchestrator.rs:481`,已存在)由前端填当前会话 id;返回 run 后调编排 crate 自持的 `ConversationService::link_orchestrator_run`。autonomy 默认仍 `interactive`(用户在场审批)。
 4. **不变量守护**:`link_orchestrator_run` 只 merge extra + 广播,**不**碰 model/name/pinned、**不**杀 agent task(故用 `update_extra` 而非重量级 `update`)。per-run 锁、规划、调度全不动。
 
 ### B. 前端 — 会话原生编排呈现层
@@ -71,7 +71,7 @@
 ## 范围与边界(v1)
 
 - **纳入**:两条发起、右栏预览 tab、悬浮画布(展开/收起)、main 节点、内容区投射(默认 main)、run 级控制(取消/暂停/恢复/批准/重规划/重命名)+ adjust 意图 + per-node 重跑/转向、移除独立 Tab、对齐会话视觉(玻璃头/rd-24 composer/CSS 变量主题)。
-- **暂不**(记录,非阻塞):reassign/updateTaskSpec 富 inspector(节点改派/微调表单);worker 文件右栏;Path B 结果回灌主会话(Path A 由 agent `nomi_run_result` 自然回灌;Path B 结果暂留画布);移动端发起(编排=桌面)。
+- **暂不**(记录,非阻塞):reassign/updateTaskSpec 富 inspector(节点改派/微调表单);worker 文件右栏;Path B 结果回灌主会话(Path A 由 agent `openhub_run_result` 自然回灌;Path B 结果暂留画布);移动端发起(编排=桌面)。
 
 ## 风险与对策
 
@@ -85,4 +85,4 @@
 
 ## 约束(贯穿;来自标准规则与记忆)
 
-无 IR/compile/节点图;禁 cargo fmt;禁合并 main;提交前 `git pull --rebase`(注意迁移号——本次**无新迁移**);push 仅在用户要求;中文 only;UI 必须漂亮;品牌 NomiFun;公开路由禁 extract `Extension<CurrentUser>`;icon-park 具名禁别名;交互元素 `<div role=button>` 非裸 `<button>`;Arco 弹窗经 `useArcoMessage`;无 `any`/`@ts-ignore`;用 `npm run typecheck`;per-run 锁绝不跨 LLM await;编排 WS 事件手镜像两端同步。
+无 IR/compile/节点图;禁 cargo fmt;禁合并 main;提交前 `git pull --rebase`(注意迁移号——本次**无新迁移**);push 仅在用户要求;中文 only;UI 必须漂亮;品牌 OpenHub;公开路由禁 extract `Extension<CurrentUser>`;icon-park 具名禁别名;交互元素 `<div role=button>` 非裸 `<button>`;Arco 弹窗经 `useArcoMessage`;无 `any`/`@ts-ignore`;用 `npm run typecheck`;per-run 锁绝不跨 LLM await;编排 WS 事件手镜像两端同步。

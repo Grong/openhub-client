@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -27,20 +27,20 @@ describe('Nomi sendbox control layout', () => {
     expect(collaboratorIndex).toBeGreaterThan(modelIndex);
     expect(source.includes('topRightTools={')).toBe(false);
     expect(source.includes('ContextUsagePill')).toBe(false);
-    expect(source.includes("data-testid='nomi-context-usage-slot'")).toBe(false);
-    expect(source.includes("data-testid='nomi-turn-metrics'")).toBe(false);
+    expect(source.includes("data-testid='openhub-context-usage-slot'")).toBe(false);
+    expect(source.includes("data-testid='openhub-turn-metrics'")).toBe(false);
     expect(source.includes('formatTurnDuration')).toBe(false);
     expect(source.includes('formatTokenCount(tokenUsage.total_tokens)')).toBe(false);
     expect(sendBoxSource.includes("data-testid='sendbox-internal-status-row'")).toBe(true);
     expect(sendBoxSource.includes("data-testid='sendbox-top-right-tools'")).toBe(false);
-    expect(contextRingSource.includes("data-testid='nomi-context-usage-ring'")).toBe(true);
-    expect(contextRingSource.includes("data-testid='nomi-context-usage-popover'")).toBe(true);
+    expect(contextRingSource.includes("data-testid='openhub-context-usage-ring'")).toBe(true);
+    expect(contextRingSource.includes("data-testid='openhub-context-usage-popover'")).toBe(true);
     expect(contextRingSource.includes("trigger='click'")).toBe(true);
     expect(contextRingSource.includes('conic-gradient')).toBe(true);
     expect(contextRingSource.includes('h-22px w-22px')).toBe(true);
     expect(contextRingSource.includes('formatTokenCount(used)')).toBe(true);
     expect(contextRingSource.includes('formatTokenCount(max)')).toBe(true);
-    expect(contextRingSource.includes("data-testid='nomi-context-usage'")).toBe(false);
+    expect(contextRingSource.includes("data-testid='openhub-context-usage'")).toBe(false);
     expect(contextRingSource.includes('rd-999px b b-solid px-10px')).toBe(false);
   });
 

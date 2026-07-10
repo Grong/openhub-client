@@ -10,7 +10,7 @@ if [[ "$(uname -s)" != "Darwin" ]]; then
 fi
 
 TMP_DIR="$(mktemp -d)"
-FAKE_DMG="$TMP_DIR/NomiFun-test.dmg"
+FAKE_DMG="$TMP_DIR/OpenHub-test.dmg"
 LOG="$TMP_DIR/bun-args.log"
 
 cleanup() {
@@ -44,9 +44,9 @@ cat > "$TMP_DIR/bin/bun" <<'STUB'
 set -euo pipefail
 
 for arg in "$@"; do
-  printf "<%s>\n" "$arg" >> "$NOMIFUN_TEST_BUN_LOG"
+  printf "<%s>\n" "$arg" >> "$OPENHUB_TEST_BUN_LOG"
 done
-printf -- "---\n" >> "$NOMIFUN_TEST_BUN_LOG"
+printf -- "---\n" >> "$OPENHUB_TEST_BUN_LOG"
 STUB
 
 cat > "$TMP_DIR/bin/find" <<'STUB'
@@ -55,7 +55,7 @@ set -euo pipefail
 
 for arg in "$@"; do
   if [[ "$arg" == "*.dmg" ]]; then
-    printf "%s\0" "$NOMIFUN_TEST_DMG"
+    printf "%s\0" "$OPENHUB_TEST_DMG"
     exit 0
   fi
 done
@@ -67,8 +67,8 @@ chmod +x "$TMP_DIR/bin/rustup" "$TMP_DIR/bin/bun" "$TMP_DIR/bin/find"
 
 run_build_mac() {
   PATH="$TMP_DIR/bin:$PATH" \
-    NOMIFUN_TEST_DMG="$FAKE_DMG" \
-    NOMIFUN_TEST_BUN_LOG="$LOG" \
+    OPENHUB_TEST_DMG="$FAKE_DMG" \
+    OPENHUB_TEST_BUN_LOG="$LOG" \
     bash "$ROOT/scripts/desktop-build-mac.sh" "$@" >/dev/null
 }
 

@@ -24,8 +24,8 @@ function readCsrfCookie(): string | null {
   if (typeof document === 'undefined') return null;
   for (const part of document.cookie.split(';')) {
     const trimmed = part.trim();
-    if (trimmed.startsWith('nomifun-csrf-token=')) {
-      return decodeURIComponent(trimmed.slice('nomifun-csrf-token='.length));
+    if (trimmed.startsWith('openhub-csrf-token=')) {
+      return decodeURIComponent(trimmed.slice('openhub-csrf-token='.length));
     }
   }
   return null;
@@ -43,7 +43,7 @@ async function fetchJson<T>(method: string, path: string, body?: unknown): Promi
   // Must match `httpBridge.ts` since configService bypasses that chokepoint.
   const trustSecret = typeof window !== 'undefined' ? (window as Window).__nomiLocalTrust : undefined;
   if (trustSecret) {
-    headers['x-nomi-local-trust'] = trustSecret;
+    headers['x-openhub-local-trust'] = trustSecret;
   } else if (
     typeof document !== 'undefined' &&
     ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method.toUpperCase())

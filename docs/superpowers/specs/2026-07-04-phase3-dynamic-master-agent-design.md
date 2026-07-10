@@ -5,16 +5,16 @@
 
 ## 0. 目标（回顾）
 
-把「lead 会话 = 主 agent」做实，覆盖 Claude Code 式交互：主控随时派发 subagent、拿回结果继续推理、按需再派发；并支持**自主长循环**（带目标+退出条件自跑、无需用户逐轮）与**受控嵌套**（subagent 再委派）。骨架式（Phase 0/1 已有的 `nomi_run_create` 静态 DAG + 画布）与动态式共用一套引擎——区别只是「节点是提前铺满还是增量涌现」。
+把「lead 会话 = 主 agent」做实，覆盖 Claude Code 式交互：主控随时派发 subagent、拿回结果继续推理、按需再派发；并支持**自主长循环**（带目标+退出条件自跑、无需用户逐轮）与**受控嵌套**（subagent 再委派）。骨架式（Phase 0/1 已有的 `openhub_run_create` 静态 DAG + 画布）与动态式共用一套引擎——区别只是「节点是提前铺满还是增量涌现」。
 
 ## 1. 现状与可复用的缝（勘察已坐实）
 
 - **运行时长 DAG 结构上已可工作**：`run_loop` 每轮重查 `list_ready_tasks`，`RunLocks` 保证「追加节点」与「终态判定」原子互斥、loop 在锁内注销 handle。唯一阻塞 = `adjust`/append 现要求「无节点在跑」（`compute_/apply_adjusted_plan` 的 `no task running` 拒绝）。
 - **中途观测已开头**：Phase 1a 已加 `RunOutcome::NodeFailed` 中途回执（节点永久失败时唤起 lead）。成功侧的中途观测尚无。
 - **`autonomous` 自主模式是空槽**：现仅为 `supervised` 同义词（无分支区分），正好可赋真语义。
-- **AutoWork 持久循环是现成外壳**：`nomifun-requirement/src/orchestrator.rs` 的 `run_loop`（`claim→inject→wait→finalize→idle-on-wake→repeat` + boot-resume + sweeper + 退避），引擎注释自承「RunEngine 是 AutoWork 的忠实缩减版」。
-- **子委派现不安全**：worker `extra.orchestrator_run_id`/`_task_id` 仅关联标记无人消费；worker 调 `nomi_run_create` 建**孤儿子 run**（挂一次性 worker 会话，终态回执落已结束会话）；**无深度守卫**；只读受限角色 `desktopGateway=false` 本就无网关工具。
-- **每会话可能多 run**：现 `nomi_spawn`/`nomi_run_create` 每次调用 `create_adhoc + link`，一个会话多次派发会建多个 run 并重写 `extra.orchestrator_run_id`。
+- **AutoWork 持久循环是现成外壳**：`openhub-requirement/src/orchestrator.rs` 的 `run_loop`（`claim→inject→wait→finalize→idle-on-wake→repeat` + boot-resume + sweeper + 退避），引擎注释自承「RunEngine 是 AutoWork 的忠实缩减版」。
+- **子委派现不安全**：worker `extra.orchestrator_run_id`/`_task_id` 仅关联标记无人消费；worker 调 `openhub_run_create` 建**孤儿子 run**（挂一次性 worker 会话，终态回执落已结束会话）；**无深度守卫**；只读受限角色 `desktopGateway=false` 本就无网关工具。
+- **每会话可能多 run**：现 `openhub_spawn`/`openhub_run_create` 每次调用 `create_adhoc + link`，一个会话多次派发会建多个 run 并重写 `extra.orchestrator_run_id`。
 
 ## 2. 五个设计分叉（★需用户确认；下列为推荐默认）
 
@@ -48,7 +48,7 @@
 ### W7a — 单会话单持久 run + 运行时追加（F3 + 运行时 DAG 增长）
 - 新增控制面原语 `add_tasks(run_id, tasks)`：复用 `plan_flat`/`reconcile_run_plan` 的插入逻辑把 caller 指定节点追加到**现有 run**，走同一 `assign_task` 路由；存活 loop 下轮 `list_ready_tasks` 自取，或 re-activate 终态 run。
 - **放宽 `adjust`/append 的「无节点在跑」限制**（`run_service.rs` `compute_/apply_adjusted_plan`）：`RunLocks` 已保证追加与终态判定原子，故允许边跑边追加。这是「边跑边派发」唯一阻塞点。
-- 网关给 lead 暴露「向本 run 追加子任务」工具（区别于新建 run 的 `nomi_spawn`）；会话已有 run 时 `nomi_spawn`/`nomi_run_create` 改为追加语义。
+- 网关给 lead 暴露「向本 run 追加子任务」工具（区别于新建 run 的 `openhub_spawn`）；会话已有 run 时 `openhub_spawn`/`openhub_run_create` 改为追加语义。
 
 ### W7b — 动态 master 中途观测（F4）
 - 在 `settle_task_outcome` 后 / 每 fill 批次末，节流地经 `deps.lead_reporter` 发**批次完成观测回执**（复用 Phase 1a 的 `LeadReporter` 缝，新增 `RunOutcome::BatchProgress` 或复用带摘要的通道），使 master 能「观测→再追加」形成 Claude Code 式循环。绝不在 `RunLocks` 锁内 await。
@@ -71,7 +71,7 @@
 | `RunOutcome` 加 `BatchProgress`（中途成功观测）| W7b |
 | `add_tasks` 无需新表（复用 orch_run_tasks + deps）| W7a |
 
-> 每加迁移 bump `db_lifecycle`（自动发现，无硬编码计数）；跨 crate 加字段必 `cargo check -p nomifun-app` 等全构造点（Phase 1 教训）。
+> 每加迁移 bump `db_lifecycle`（自动发现，无硬编码计数）；跨 crate 加字段必 `cargo check -p openhub-app` 等全构造点（Phase 1 教训）。
 
 ## 5. 分期实施（分叉确认后各自 plan）
 

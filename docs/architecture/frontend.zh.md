@@ -1,6 +1,6 @@
 # 前端
 
-前端是位于 [`ui/`](../../ui/) 的一个 React 19 SPA。两个宿主 —— Tauri 桌面外壳与 `nomifun-web` —— 都加载同一份 Vite 构建产物（`ui/dist`）。渲染进程从不使用 Electron IPC；在两个宿主中它都通过普通的 HTTP 与 WebSocket 与后端通信。
+前端是位于 [`ui/`](../../ui/) 的一个 React 19 SPA。两个宿主 —— Tauri 桌面外壳与 `openhub-web` —— 都加载同一份 Vite 构建产物（`ui/dist`）。渲染进程从不使用 Electron IPC；在两个宿主中它都通过普通的 HTTP 与 WebSocket 与后端通信。
 
 ## 技术栈
 
@@ -31,7 +31,7 @@ ui/src/
 │   ├── chat/      chat library helpers (rendering hooks, types)
 │   ├── config/    constants, configService (settings cache)
 │   ├── platform/  platform-detection helpers
-│   ├── types/     TypeScript mirrors of nomifun-api-types DTOs
+│   ├── types/     TypeScript mirrors of openhub-api-types DTOs
 │   ├── update/    self-update flow helpers
 │   ├── utils/     shared utilities (date, hash, ...)
 │   └── index.ts
@@ -95,7 +95,7 @@ export function getBaseUrl(): string {
 
 ### CSRF 双提交
 
-当宿主以认证模式运行（即未带 `--insecure-no-auth` 的 Web 宿主），后端会签发非 HttpOnly 的 cookie `nomifun-csrf-token`。在状态变更请求（POST / PUT / PATCH / DELETE）上，桥读取该 cookie 并把它回显到 `x-csrf-token` 头里。桌面外壳使用 `TrustLocalToken`：WebView 会在请求中带上 `window.__nomiLocalTrust` 注入的本地信任 secret，而不是关闭所有鉴权。
+当宿主以认证模式运行（即未带 `--insecure-no-auth` 的 Web 宿主），后端会签发非 HttpOnly 的 cookie `openhub-csrf-token`。在状态变更请求（POST / PUT / PATCH / DELETE）上，桥读取该 cookie 并把它回显到 `x-csrf-token` 头里。桌面外壳使用 `TrustLocalToken`：WebView 会在请求中带上 `window.__nomiLocalTrust` 注入的本地信任 secret，而不是关闭所有鉴权。
 
 ## 路由 —— `HashRouter`
 

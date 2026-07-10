@@ -17,20 +17,20 @@
   - 智能决策 IDMM：`client_preferences: idmm_backup_provider_id` + `conversations.extra.idmm` / `terminal_sessions.idmm` 内各 watch 的 `bypass_model.provider_id`
   - 智能编排：`fleet_members.provider_id`（真实列）
   - 软引用（会自愈）：`nomi.defaultModel`（前端配置）、`knowledge.autogenModel`、`agent.model_failover`、`assistant.{platform}.defaultModel`（渠道默认模型，后端 client_preferences）
-- **删除无任何 in-use 检查**：`ProviderService::delete`（`nomifun-system/src/provider.rs:110`）直接 `DELETE FROM providers WHERE id=?`（`sqlite_provider.rs:143`）。唯一守卫是 id 不存在返回 404。
-- **报错来源**：字符串 `Provider '{id}' not found` 由 `factory/provider_config.rs:61`（`resolve_provider_fields`）产生 → `AppError::BadRequest`，Display 自动加 `Bad request:` 前缀（`nomifun-common/src/error.rs:14`）。另一处 `services/provider_health.rs:68` 只在设置页手动健康检查触达，非首页来源。
+- **删除无任何 in-use 检查**：`ProviderService::delete`（`openhub-system/src/provider.rs:110`）直接 `DELETE FROM providers WHERE id=?`（`sqlite_provider.rs:143`）。唯一守卫是 id 不存在返回 404。
+- **报错来源**：字符串 `Provider '{id}' not found` 由 `factory/provider_config.rs:61`（`resolve_provider_fields`）产生 → `AppError::BadRequest`，Display 自动加 `Bad request:` 前缀（`openhub-common/src/error.rs:14`）。另一处 `services/provider_health.rs:68` 只在设置页手动健康检查触达，非首页来源。
 - **两条 toast**：`NomiSendBox` 打开会话时并发触发 (1) mount warmup（`.catch` 弹 toast）+ (2) 自动发送首条消息（`catch` 弹 toast），各 build 一次 Nomi agent → 同一错误 → 弹两次。前端 `getConversationRuntimeWorkspaceErrorMessage`（`conversationCreateError.ts`）把 `backendMessage` 原样返回，无 i18n 映射。
 - **无回退**：`resolve_provider_fields` 找不到 provider 直接硬报错，没有 fallback。
 - **可复用先例**：
   - `AppError` 已有 `Conflict`（409）+ 每变体 `error_details() -> Option<Value>`（`WorkspacePathEdgeWhitespace` 携带结构化 `details`）；前端 `BackendHttpError` 已解析 `code`/`backendMessage`/`details`。
   - 删除拦截先例：`CompanionService::delete_figure`（`companion/src/service.rs:718`）在 `figure_user_count>0` 时返回 `Conflict`。
-  - **`resolve_default_model(&provider_repo)`**（`nomifun-ai-agent` `knowledge_completer.rs:118`，`lib.rs:59` 导出）：取首个已启用 provider+model，无则 `None` / 清晰错误。
+  - **`resolve_default_model(&provider_repo)`**（`openhub-ai-agent` `knowledge_completer.rs:118`，`lib.rs:59` 导出）：取首个已启用 provider+model，无则 `None` / 清晰错误。
 
 ### 分层关键约束
 
-- `nomifun-system`（`ProviderService`、provider 路由）是**低层 crate**，仅依赖 auth/common/db/net/api-types，看不到伙伴/IDMM/编排。
-- 只有顶层 `nomifun-app` 依赖全部子系统，在 `router/state.rs:299` 构造 `ProviderService`。
-- Provider 删除路由定义在 `nomifun-system/src/routes.rs:70`（`delete_provider`）。
+- `openhub-system`（`ProviderService`、provider 路由）是**低层 crate**，仅依赖 auth/common/db/net/api-types，看不到伙伴/IDMM/编排。
+- 只有顶层 `openhub-app` 依赖全部子系统，在 `router/state.rs:299` 构造 `ProviderService`。
+- Provider 删除路由定义在 `openhub-system/src/routes.rs:70`（`delete_provider`）。
 
 ## 2. 目标 / 非目标
 
@@ -49,7 +49,7 @@
 
 ## 3. 组件 A — 删除保护（in-use 拦截 + 软引用清理）
 
-### A.1 数据形状（`nomifun-api-types`）
+### A.1 数据形状（`openhub-api-types`）
 
 ```rust
 pub struct ProviderUsage {
@@ -67,14 +67,14 @@ pub enum ProviderUsageFeature { DesktopCompanion, PublicCompanion, SmartDecision
 
 每个子系统在自己 crate 内暴露 `async fn providers_in_use(provider_id: &str) -> Result<Vec<ProviderUsage>, AppError>`：
 
-- `nomifun-companion`：遍历 `companions/*/config.json`，命中 `model.provider_id`（含 shared learn/evolve）→ `DesktopCompanion`，label=伙伴名，target_id=伙伴 id。
-- `nomifun-public-agent`：遍历 `public-agents/*/config.json`，命中 `model.provider_id` → `PublicCompanion`，label=对外伙伴名，target_id=agent id。
-- `nomifun-idmm`：扫 `client_preferences: idmm_backup_provider_id`（命中→label="智能决策·备份模型"，target_id=None）；扫 `conversations.extra.idmm` / `terminal_sessions.idmm` 内各 watch 的 `bypass_model.provider_id`（命中→label=会话/终端标题，target_id=会话 id）。
-- `nomifun-orchestrator`：`SELECT DISTINCT fleet_id, fleet_name FROM fleet_members WHERE provider_id=?` → `Orchestrator`，label=fleet 名，target_id=fleet id。
+- `openhub-companion`：遍历 `companions/*/config.json`，命中 `model.provider_id`（含 shared learn/evolve）→ `DesktopCompanion`，label=伙伴名，target_id=伙伴 id。
+- `openhub-public-agent`：遍历 `public-agents/*/config.json`，命中 `model.provider_id` → `PublicCompanion`，label=对外伙伴名，target_id=agent id。
+- `openhub-idmm`：扫 `client_preferences: idmm_backup_provider_id`（命中→label="智能决策·备份模型"，target_id=None）；扫 `conversations.extra.idmm` / `terminal_sessions.idmm` 内各 watch 的 `bypass_model.provider_id`（命中→label=会话/终端标题，target_id=会话 id）。
+- `openhub-orchestrator`：`SELECT DISTINCT fleet_id, fleet_name FROM fleet_members WHERE provider_id=?` → `Orchestrator`，label=fleet 名，target_id=fleet id。
 
 ### A.3 app 层聚合 + 注入
 
-- 在低层（`nomifun-system` 或 `nomifun-api-types`）定义 trait：
+- 在低层（`openhub-system` 或 `openhub-api-types`）定义 trait：
   ```rust
   #[async_trait]
   pub trait ProviderDeletionCoordinator: Send + Sync {
@@ -82,13 +82,13 @@ pub enum ProviderUsageFeature { DesktopCompanion, PublicCompanion, SmartDecision
       async fn cleanup_soft_refs(&self, provider_id: &str) -> Result<(), AppError>;
   }
   ```
-- 具体实现放 `nomifun-app`（唯一能看到全部子系统），聚合四路 `providers_in_use`，并实现软清理（清 `knowledge.autogenModel`、`agent.model_failover` 里的死 id；`nomi.defaultModel` 是前端配置由前端清）。
+- 具体实现放 `openhub-app`（唯一能看到全部子系统），聚合四路 `providers_in_use`，并实现软清理（清 `knowledge.autogenModel`、`agent.model_failover` 里的死 id；`nomi.defaultModel` 是前端配置由前端清）。
 - 在 `state.rs:299` 把 `Arc<dyn ProviderDeletionCoordinator>` 注入 `ProviderService`（构造签名新增该依赖）。
 - `ProviderService::delete` 改为：先 `coordinator.usages(id)`；非空 → 返回 `AppError::ProviderInUse { usages }`；空 → `repo.delete(id)`，成功后 `coordinator.cleanup_soft_refs(id)`（清理失败仅告警不回滚删除）。
 
 > 备选：若注入 trait 改动面偏大，可改为把 DELETE handler 上移到 app 层。默认采用 trait 注入（保持路由不动、尊重分层）。最终以实现计划为准。
 
-### A.4 错误传输（`nomifun-common/src/error.rs`）
+### A.4 错误传输（`openhub-common/src/error.rs`）
 
 仿 `WorkspacePathEdgeWhitespace` 新增变体：
 
@@ -101,7 +101,7 @@ AppError::ProviderInUse(ProviderInUseDetails)   // { usages: Vec<ProviderUsage> 
 - `error_details` → `Some(json!({ "usages": [...] }))`
 - `Display` → 简短英文（前端按 code i18n，不直接展示）。
 
-`ProviderInUseDetails` / `ProviderUsage` 需在 `nomifun-common` 可见（放 `nomifun-common` 或让 `nomifun-common` 依赖 `nomifun-api-types`；以实现计划确认最省依赖的位置）。
+`ProviderInUseDetails` / `ProviderUsage` 需在 `openhub-common` 可见（放 `openhub-common` 或让 `openhub-common` 依赖 `openhub-api-types`；以实现计划确认最省依赖的位置）。
 
 ### A.5 前端（`ModelModalContent.tsx` + i18n）
 
@@ -166,7 +166,7 @@ AppError::ProviderInUse(ProviderInUseDetails)   // { usages: Vec<ProviderUsage> 
 
 ## 7. 实现计划待钉点（转 writing-plans 时确认）
 
-- `ProviderDeletionCoordinator` trait 与 `ProviderUsage`/`ProviderInUseDetails` 的最省依赖落位（`nomifun-common` vs `nomifun-api-types`）。
+- `ProviderDeletionCoordinator` trait 与 `ProviderUsage`/`ProviderInUseDetails` 的最省依赖落位（`openhub-common` vs `openhub-api-types`）。
 - 是否采用 trait 注入 vs DELETE handler 上移 app 层（默认 trait 注入）。
 - 前端各 feature 解绑页精确路由（对外伙伴 / IDMM / 编排）。
 - `substituted_model` 从工厂 build 结果到 send 响应的传递是否需要（前端自愈已足够时可省后端透传）。

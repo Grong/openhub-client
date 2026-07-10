@@ -27,7 +27,7 @@
 ### 编排页现状(待改)
 - master-detail:300px `RunListRail` + detail(三态:`NewRunIntentBox` 空态 / `NewRunComposer` 表单 / `RunView`)。
 - `NewRunIntentBox` / `RunIntentBox` 是**手搓扁平 rd-14px 卡 + 32px 方形 div 发送钮**(非 SendBox),列宽 560/720。
-- `RunView` 仅一条细边切换条(对话⟷编排画布,localStorage `nomifun:orchestrator-runview-mode` 默认 conversation);
+- `RunView` 仅一条细边切换条(对话⟷编排画布,localStorage `openhub:orchestrator-runview-mode` 默认 conversation);
   **无玻璃头**;运行控制(取消/批准/暂停/恢复)埋在 `DagCanvas`/`RunDetailHeader` 内。
 - 对话视图 = `RunDecisionFeed`:**纯前端**由 `TRunDetail` 重建的 chat 风气泡线(已最接近会话,但无实时 LLM 文本)。
 
@@ -73,7 +73,7 @@
 1. **后端事件**:`OrchestratorRunEventEmitter` 新增 `emit_lead_thinking`,广播 WS
    `orchestrator.run.leadThinking`,payload:
    `{ run_id, phase: "plan"|"adjust"|"summarize", kind: "reasoning"|"text"|"phase", delta?: string, content?: string, done?: bool }`。
-2. **流式源**:在 `nomifun-ai-agent` provider_config 增加可同时转发 `TextDelta` 与 `ThinkingDelta`(带 kind 区分)的
+2. **流式源**:在 `openhub-ai-agent` provider_config 增加可同时转发 `TextDelta` 与 `ThinkingDelta`(带 kind 区分)的
    流式入口(现 `drain_text_response_with` 只转发 TextDelta);`PlanProducer`/`RunService` 接入一个 lead-thinking sink,
    把 produce/adjust/summarize 的空回调换成真转发。后端按 N ms / M 字符**合并**增量,防 WS 洪泛。
    - `kind:"reasoning"` = `ThinkingDelta`(可读推理,provider 支持时);`kind:"text"` = 计划 JSON 草稿

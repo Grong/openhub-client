@@ -1,0 +1,28 @@
+[package]
+name = "openhub-requirement"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+openhub-common.workspace = true
+openhub-db.workspace = true
+openhub-api-types.workspace = true
+openhub-file.workspace = true
+openhub-realtime.workspace = true
+openhub-conversation.workspace = true
+openhub-ai-agent.workspace = true
+openhub-terminal.workspace = true
+openhub-auth.workspace = true
+axum.workspace = true
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tracing.workspace = true
+dashmap.workspace = true
+async-trait.workspace = true
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["test-util"] }
+sqlx = { workspace = true }
+reqwest = { workspace = true }
+tempfile.workspace = true

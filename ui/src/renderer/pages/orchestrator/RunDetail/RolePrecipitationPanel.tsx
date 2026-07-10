@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -220,7 +220,7 @@ const RolePrecipitationPanel: React.FC<{ detail: TRunDetail }> = ({ detail }) =>
           models: candidate.models,
           enabled_skills: candidate.enabledSkills,
           disabled_builtin_skills: candidate.disabledBuiltinSkills,
-          preset_agent_type: 'nomi',
+          preset_agent_type: 'openhub',
         };
         await ipcBridge.assistants.create.invoke(payload);
         setSavedNames((prev) => {

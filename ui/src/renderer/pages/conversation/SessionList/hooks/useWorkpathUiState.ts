@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -13,17 +13,17 @@ import type { SessionKind } from '../utils/workpathTree';
  *
  * Storage model (localStorage + CustomEvent broadcast, so multiple mounted
  * instances — e.g. desktop sider + mobile drawer — stay in sync):
- * - `nomifun:workpath-pinned`              string[]; array order is the manual pin order
- * - `nomifun:workpath-expansion`           Record<workpathKey, boolean>; drawers default to COLLAPSED
- * - `nomifun:workpath-subgroup-expansion`  Record<`${workpathKey}:${kind}`, boolean>; subgroups default to EXPANDED
- * - `nomifun:companion-group-expanded`     boolean; the 桌面伙伴 group defaults to EXPANDED
+ * - `openhub:workpath-pinned`              string[]; array order is the manual pin order
+ * - `openhub:workpath-expansion`           Record<workpathKey, boolean>; drawers default to COLLAPSED
+ * - `openhub:workpath-subgroup-expansion`  Record<`${workpathKey}:${kind}`, boolean>; subgroups default to EXPANDED
+ * - `openhub:companion-group-expanded`     boolean; the 桌面伙伴 group defaults to EXPANDED
  */
-export const WORKPATH_PINNED_STORAGE_KEY = 'nomifun:workpath-pinned';
-export const WORKPATH_EXPANSION_STORAGE_KEY = 'nomifun:workpath-expansion';
-export const WORKPATH_SUBGROUP_STORAGE_KEY = 'nomifun:workpath-subgroup-expansion';
-export const COMPANION_GROUP_STORAGE_KEY = 'nomifun:companion-group-expanded';
+export const WORKPATH_PINNED_STORAGE_KEY = 'openhub:workpath-pinned';
+export const WORKPATH_EXPANSION_STORAGE_KEY = 'openhub:workpath-expansion';
+export const WORKPATH_SUBGROUP_STORAGE_KEY = 'openhub:workpath-subgroup-expansion';
+export const COMPANION_GROUP_STORAGE_KEY = 'openhub:companion-group-expanded';
 
-const WORKPATH_UI_EVENT = 'nomifun:workpath-ui-changed';
+const WORKPATH_UI_EVENT = 'openhub:workpath-ui-changed';
 
 type WorkpathUiChangeDetail = {
   storageKey: string;

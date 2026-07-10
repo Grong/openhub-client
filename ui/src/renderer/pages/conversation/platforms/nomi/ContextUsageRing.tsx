@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -30,7 +30,7 @@ export function ContextUsageRing({ used, max }: ContextUsageRingProps) {
   });
 
   const content = (
-    <div data-testid='nomi-context-usage-popover' className='min-w-156px px-2px py-1px'>
+    <div data-testid='openhub-context-usage-popover' className='min-w-156px px-2px py-1px'>
       <div className='mb-6px text-12px font-600 leading-18px color-#86909C'>
         {t('conversation.contextUsage.title', { defaultValue: 'Context window' })}
       </div>
@@ -56,7 +56,7 @@ export function ContextUsageRing({ used, max }: ContextUsageRingProps) {
       <button
         type='button'
         aria-label={ariaLabel}
-        data-testid='nomi-context-usage-ring'
+        data-testid='openhub-context-usage-ring'
         className='relative h-22px w-22px shrink-0 rd-999px b-none bg-transparent p-0 cursor-pointer outline-none transition-transform hover:scale-105 active:scale-95 focus-visible:ring-2 focus-visible:ring-[rgb(var(--primary-6))] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-2)]'
         style={{ color: tone }}
       >

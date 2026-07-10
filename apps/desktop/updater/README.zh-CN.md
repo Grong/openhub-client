@@ -1,4 +1,4 @@
-# NomiFun 桌面端自动更新说明
+# OpenHub 桌面端自动更新说明
 
 本文只说明自动更新链路。完整发版操作看根目录 `RELEASING.zh-CN.md`。
 
@@ -19,7 +19,7 @@
 当前 endpoint：
 
 ```text
-https://github.com/nomifun/nomifun-tauri/releases/latest/download/latest.json
+https://github.com/Grong/openhub-client/releases/latest/download/latest.json
 ```
 
 ## 密钥区别
@@ -27,13 +27,13 @@ https://github.com/nomifun/nomifun-tauri/releases/latest/download/latest.json
 自动更新使用一把 Tauri updater 私钥：
 
 ```text
-apps/desktop/signing/nomifun-updater.key
+apps/desktop/signing/openhub-updater.key
 ```
 
 发版时把私钥内容写入环境变量：
 
 ```bash
-export TAURI_SIGNING_PRIVATE_KEY="$(cat apps/desktop/signing/nomifun-updater.key)"
+export TAURI_SIGNING_PRIVATE_KEY="$(cat apps/desktop/signing/openhub-updater.key)"
 export TAURI_SIGNING_PRIVATE_KEY_PASSWORD=""
 ```
 
@@ -51,13 +51,13 @@ export TAURI_SIGNING_PRIVATE_KEY_PASSWORD=""
 里的双引号、变成非法 JSON；文件路径没有引号，各平台都稳。
 
 > 新构建机（如这台 Windows）构建前，需先把已被 gitignore 的私钥
-> `apps/desktop/signing/nomifun-updater.key` 从密钥库拷过来，且它必须与 `tauri.conf.json`
+> `apps/desktop/signing/openhub-updater.key` 从密钥库拷过来，且它必须与 `tauri.conf.json`
 > 内嵌的 `pubkey` 匹配（keyID `F3AA272E60AA7952`），否则已安装的客户端会拒绝更新。
 
 macOS：
 
 ```bash
-export TAURI_SIGNING_PRIVATE_KEY="$(cat apps/desktop/signing/nomifun-updater.key)"
+export TAURI_SIGNING_PRIVATE_KEY="$(cat apps/desktop/signing/openhub-updater.key)"
 export TAURI_SIGNING_PRIVATE_KEY_PASSWORD=""
 
 bun run build:mac --config apps/desktop/tauri.updater.conf.json
@@ -67,7 +67,7 @@ bun run make:latest
 Windows 无 Authenticode 签名：
 
 ```powershell
-$env:TAURI_SIGNING_PRIVATE_KEY = Get-Content apps/desktop/signing/nomifun-updater.key -Raw
+$env:TAURI_SIGNING_PRIVATE_KEY = Get-Content apps/desktop/signing/openhub-updater.key -Raw
 $env:TAURI_SIGNING_PRIVATE_KEY_PASSWORD = ""
 
 bun run build:win --config apps/desktop/tauri.updater.conf.json
@@ -77,7 +77,7 @@ bun run make:latest
 Windows 有 Authenticode 签名（`--signed` 注入证书指纹仍走内联 JSON，需在 pwsh 7+ 下运行）：
 
 ```powershell
-$env:TAURI_SIGNING_PRIVATE_KEY = Get-Content apps/desktop/signing/nomifun-updater.key -Raw
+$env:TAURI_SIGNING_PRIVATE_KEY = Get-Content apps/desktop/signing/openhub-updater.key -Raw
 $env:TAURI_SIGNING_PRIVATE_KEY_PASSWORD = ""
 $env:WINDOWS_CERTIFICATE_THUMBPRINT = "A1B2C3..."
 
@@ -88,7 +88,7 @@ bun run make:latest
 Linux：
 
 ```bash
-export TAURI_SIGNING_PRIVATE_KEY="$(cat apps/desktop/signing/nomifun-updater.key)"
+export TAURI_SIGNING_PRIVATE_KEY="$(cat apps/desktop/signing/openhub-updater.key)"
 export TAURI_SIGNING_PRIVATE_KEY_PASSWORD=""
 
 bun run build:linux --config apps/desktop/tauri.updater.conf.json
@@ -113,9 +113,9 @@ apps/desktop/updater/latest.json
 macOS 需要同时上传：
 
 ```text
-dist/desktop/NomiFun_<version>_universal.dmg
-target/universal-apple-darwin/release/bundle/macos/NomiFun.app.tar.gz
-target/universal-apple-darwin/release/bundle/macos/NomiFun.app.tar.gz.sig
+dist/desktop/OpenHub_<version>_universal.dmg
+target/universal-apple-darwin/release/bundle/macos/OpenHub.app.tar.gz
+target/universal-apple-darwin/release/bundle/macos/OpenHub.app.tar.gz.sig
 apps/desktop/updater/latest.json
 ```
 
@@ -132,7 +132,7 @@ gh release upload "v<version>" apps/desktop/updater/latest.json --clobber
 
 ```bash
 gh release view "v<version>" --json tagName,assets,url
-curl -fsSL https://github.com/nomifun/nomifun-tauri/releases/latest/download/latest.json
+curl -fsSL https://github.com/Grong/openhub-client/releases/latest/download/latest.json
 ```
 
 确认 `latest.json` 的版本、平台 key、URL 和 Release 资产一致。

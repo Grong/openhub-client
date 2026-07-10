@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -45,7 +45,7 @@ const KnowledgeEmptyState: React.FC<KnowledgeEmptyStateProps> = ({ onCreate, onI
       num: 3,
       icon: <FolderOpen theme='outline' size='18' />,
       title: t('knowledge.onboarding.step3Title', { defaultValue: '挂载' }),
-      desc: t('knowledge.onboarding.step3Desc', { defaultValue: '挂载到会话，模型会在 .nomi/knowledge/ 下随时查阅。' }),
+      desc: t('knowledge.onboarding.step3Desc', { defaultValue: '挂载到会话，模型会在 .openhub/knowledge/ 下随时查阅。' }),
     },
   ];
 

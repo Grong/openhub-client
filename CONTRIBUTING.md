@@ -1,8 +1,8 @@
-# Contributing to NomiFun
+# Contributing to OpenHub
 
 Simplified Chinese: [CONTRIBUTING.zh-CN.md](CONTRIBUTING.zh-CN.md)
 
-NomiFun is a Rust + Tauri + React monorepo. It is also a local-first automation
+OpenHub is a Rust + Tauri + React monorepo. It is also a local-first automation
 surface that can drive shells, files, browsers, desktop apps, agents, MCP
 servers, and remote capability APIs. Contributions are welcome, but they need to
 be easy to review and safe for users.
@@ -22,7 +22,7 @@ If you only remember one page of rules, remember these:
    refactors.
 3. Follow the existing ownership boundaries: renderer code through `ui/`,
    backend feature code through `crates/backend/`, agent-engine code through
-   `crates/agent/`, and backend-to-agent usage through `nomifun-ai-agent` unless
+   `crates/agent/`, and backend-to-agent usage through `openhub-ai-agent` unless
    a documented exception already exists.
 4. Run the narrowest checks that prove your change works. If you cannot run a
    check, say so in the PR and explain why.
@@ -68,7 +68,7 @@ Follow [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md). Be direct, factual, and kind.
 Technical disagreement is normal; personal attacks are not.
 
 Report vulnerabilities through [SECURITY.md](SECURITY.md), not a public issue.
-NomiFun can operate local tools and high-privilege automation surfaces, so
+OpenHub can operate local tools and high-privilege automation surfaces, so
 security reports need private handling.
 
 AI-assisted contributions are allowed. You are still responsible for every line:
@@ -91,8 +91,8 @@ Prerequisites:
 Install and smoke-check:
 
 ```bash
-git clone <repo-url> nomifun-tauri
-cd nomifun-tauri
+git clone <repo-url> openhub-client
+cd openhub-client
 bun install
 cargo check --workspace
 ```
@@ -115,10 +115,10 @@ cleanup and consistency checks. The script registry is in [package.json](package
 
 | Path | Ownership |
 | --- | --- |
-| `apps/web` | Standalone `nomifun-web` server that serves API + SPA. |
+| `apps/web` | Standalone `openhub-web` server that serves API + SPA. |
 | `apps/desktop` | Tauri desktop shell with embedded backend and desktop plugins. |
-| `crates/agent` | `nomi-*` crates: the independent agent engine. |
-| `crates/backend` | `nomifun-*` crates: HTTP/WS backend, data layer, auth, features, public APIs. |
+| `crates/agent` | `openhub-*` crates: the independent agent engine. |
+| `crates/backend` | `openhub-*` crates: HTTP/WS backend, data layer, auth, features, public APIs. |
 | `crates/shared` | Rare cross-layer utilities used by both backend and agent code. |
 | `ui` | React 19 + TypeScript + Vite SPA. |
 | `docs` | Current user, operator, architecture, and contributor documentation. |
@@ -147,16 +147,16 @@ legacy redirected routes as current navigation.
 - Run `cargo fmt` before submitting Rust changes.
 - Use workspace dependencies from the root [Cargo.toml](Cargo.toml) when adding
   shared Rust dependencies.
-- Route backend feature code through its owning `nomifun-*` crate. Do not put
-  feature logic in `nomifun-app` unless it is composition/boot/router glue.
+- Route backend feature code through its owning `openhub-*` crate. Do not put
+  feature logic in `openhub-app` unless it is composition/boot/router glue.
 - Backend crates should normally use agent types through
-  `nomifun-ai-agent::{nomi_config, nomi_types, RequirementSink}`. New direct
-  `nomi-*` dependencies from backend crates need a documented reason and should
+  `openhub-ai-agent::{openhub_config, openhub_types, RequirementSink}`. New direct
+  `openhub-*` dependencies from backend crates need a documented reason and should
   usually be feature-gated.
-- HTTP request/response DTOs belong in `nomifun-api-types` when they are part of
+- HTTP request/response DTOs belong in `openhub-api-types` when they are part of
   the API contract.
 - Database schema changes are append-only SQL files under
-  `crates/backend/nomifun-db/migrations/`. Update models, repositories, and
+  `crates/backend/openhub-db/migrations/`. Update models, repositories, and
   focused migration tests together.
 - Use `AppError` for user-facing backend failures and preserve useful context in
   logs with `tracing`.
@@ -197,7 +197,7 @@ legacy redirected routes as current navigation.
 
 ### Dependencies, Assets, And Licenses
 
-NomiFun is Apache-2.0. Contributions are accepted under the same license.
+OpenHub is Apache-2.0. Contributions are accepted under the same license.
 
 Before adding a dependency, asset, bundled skill, model preset, or generated
 file, verify:
@@ -260,7 +260,7 @@ PR.
 | Frontend feature | `bun run check`; add screenshots for visible surfaces. |
 | Rust compile path | `cargo check --workspace` or a narrower `cargo check -p <crate>`. |
 | Rust behavior | `cargo test -p <crate>` or the focused test target that covers the change. |
-| Database migration | Migration test or focused repository test plus `cargo test -p nomifun-db` when practical. |
+| Database migration | Migration test or focused repository test plus `cargo test -p openhub-db` when practical. |
 | Packaging/release | The relevant build script plus the release docs you changed. |
 | Security-sensitive path | Focused tests, threat-model notes in the PR, and no public vulnerability details if disclosure is private. |
 
@@ -330,7 +330,7 @@ Maintainers may rewrite changelog entries during release preparation.
 
 ## References We Borrow From
 
-This guide is tailored to NomiFun, but it borrows proven practices from:
+This guide is tailored to OpenHub, but it borrows proven practices from:
 
 - [GitHub contributor guideline docs](https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/setting-guidelines-for-repository-contributors)
 - [Open Source Guides: How to Contribute](https://opensource.guide/how-to-contribute/)

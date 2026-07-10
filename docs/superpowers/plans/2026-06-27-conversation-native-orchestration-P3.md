@@ -16,18 +16,18 @@
 
 ## File Structure（已勘察 file:line）
 - 迁移 `migrations/021_model_descriptions.sql`
-- DB：`models/provider.rs`（+字段）、`repository/provider.rs`（CreateProviderParams/UpdateProviderParams +字段）、`repository/sqlite_provider.rs`（INSERT :46-68 / UPDATE :106-128 / create 返回 :78-95 / merge_update :155-186）、测试 fixture `nomifun-gateway/src/tools_provider.rs:317-333`
-- 映射：`nomifun-system/src/provider.rs`（create :33-64 / update :67-100 / row_to_response :118-149，用 serialize_opt/deserialize_opt）
-- api-types：`nomifun-api-types/src/provider.rs`（ProviderResponse :123-148 / Create :151-181 / Update :190-205）
+- DB：`models/provider.rs`（+字段）、`repository/provider.rs`（CreateProviderParams/UpdateProviderParams +字段）、`repository/sqlite_provider.rs`（INSERT :46-68 / UPDATE :106-128 / create 返回 :78-95 / merge_update :155-186）、测试 fixture `openhub-gateway/src/tools_provider.rs:317-333`
+- 映射：`openhub-system/src/provider.rs`（create :33-64 / update :67-100 / row_to_response :118-149，用 serialize_opt/deserialize_opt）
+- api-types：`openhub-api-types/src/provider.rs`（ProviderResponse :123-148 / Create :151-181 / Update :190-205）
 - 前端类型：`ui/src/common/config/storage.ts:492-552`（IProvider）+ `ui/src/common/types/provider/providerApi.ts`（Create :18-39 / Update :45-59）
 - 模型中心 UI：`ui/src/renderer/components/settings/SettingsModal/contents/ModelModalContent.tsx`（每模型行 :492-614 + 删除清理 :580-600）
-- 规划：`nomifun-orchestrator/src/plan.rs`（produce :96-121 / build_plan_user_prompt :138-159）、`run_service.rs`（plan 采纳 :319-345）、常量 `PLANNER_HONOR_TOP_K`（:53）
+- 规划：`openhub-orchestrator/src/plan.rs`（produce :96-121 / build_plan_user_prompt :138-159）、`run_service.rs`（plan 采纳 :319-345）、常量 `PLANNER_HONOR_TOP_K`（:53）
 
 ---
 
 ## Task 1: model_descriptions 端到端持久化（DB + 映射 + api-types + 前端类型）
 
-**Files:** Create `migrations/021_model_descriptions.sql`；Modify `models/provider.rs`、`repository/provider.rs`、`repository/sqlite_provider.rs`、`nomifun-system/src/provider.rs`、`nomifun-api-types/src/provider.rs`、`ui/.../storage.ts`、`ui/.../providerApi.ts`、测试 fixture `tools_provider.rs:317-333`。
+**Files:** Create `migrations/021_model_descriptions.sql`；Modify `models/provider.rs`、`repository/provider.rs`、`repository/sqlite_provider.rs`、`openhub-system/src/provider.rs`、`openhub-api-types/src/provider.rs`、`ui/.../storage.ts`、`ui/.../providerApi.ts`、测试 fixture `tools_provider.rs:317-333`。
 
 **迁移：** `ALTER TABLE providers ADD COLUMN model_descriptions TEXT NOT NULL DEFAULT '{}';`（仿 models/capabilities 的非空 JSON-TEXT）。
 
@@ -41,9 +41,9 @@
 - fixture `tools_provider.rs:317-333` 的 `Provider{...}` 字面量补字段。
 
 - [ ] **Step 1: 测试（失败优先）** — provider 仓库/服务往返测试：create 带 `model_descriptions={"m1":"擅长前端"}` → row_to_response 解回相同 map；update 改描述 → 持久化。
-- [ ] **Step 2: RED** `cargo nextest run -p nomifun-db -p nomifun-system -p nomifun-api-types`。
+- [ ] **Step 2: RED** `cargo nextest run -p openhub-db -p openhub-system -p openhub-api-types`。
 - [ ] **Step 3: 实现** 全链路。
-- [ ] **Step 4: GREEN** 上述 nextest + `cargo build -p nomifun-app`；前端 `cd ui && npm run typecheck`(0)。
+- [ ] **Step 4: GREEN** 上述 nextest + `cargo build -p openhub-app`；前端 `cd ui && npm run typecheck`(0)。
 - [ ] **Step 5: 提交** `git commit -m "feat(orchestrator): 迁移021 providers.model_descriptions 端到端持久化"`
 
 ---
@@ -84,17 +84,17 @@ updatePlatform({ ...platform, model_descriptions: { ...platform.model_descriptio
    **理由注释**：裸模型成员 capability_profile=None→Router 中性无区分；描述驱动的 LLM 选择应被采纳,Router 只硬过滤+回退。
 
 - [ ] **Step 1: 测试（失败优先）** — (a) `build_plan_user_prompt` 含 `desc=`(给成员带描述); (b) plan 采纳:6 个 None-profile 成员,planner 选 member_index=4 → 断言 assignment 选中 index 4 的成员(旧 top-2 规则会误选 ranked[0];新规则采纳 4); (c) planner 选了被硬过滤(如 needs_vision 但成员无 vision)的 index → 回退 ranked[0]; (d) planner 无 member_index → ranked[0]。produce 读描述用 mock provider_repo。
-- [ ] **Step 2: RED** `cargo nextest run -p nomifun-orchestrator`。
+- [ ] **Step 2: RED** `cargo nextest run -p openhub-orchestrator`。
 - [ ] **Step 3: 实现** produce 读描述 + 提示 + 采纳放宽。
-- [ ] **Step 4: GREEN** `cargo nextest run -p nomifun-orchestrator` + `cargo build -p nomifun-orchestrator -p nomifun-app` + `cargo nextest run -p nomifun-app -E 'binary(orchestrator_run_e2e)'`(4/4 不破)。
+- [ ] **Step 4: GREEN** `cargo nextest run -p openhub-orchestrator` + `cargo build -p openhub-orchestrator -p openhub-app` + `cargo nextest run -p openhub-app -E 'binary(orchestrator_run_e2e)'`(4/4 不破)。
 - [ ] **Step 5: 提交** `git commit -m "feat(orchestrator): 规划喂模型描述 + 采纳描述驱动选择(LLM-primary+Router-veto)"`
 
 ---
 
 ## Task 4: 集成 + 真机冒烟
 
-- [ ] **Step 1:** `cargo build --workspace` 绿 + `cargo nextest run -p nomifun-orchestrator -p nomifun-db -p nomifun-system -p nomifun-api-types -p nomifun-gateway -p nomifun-app` 全绿（orchestrator_run_e2e 4/4）；前端 typecheck0+build。
-- [ ] **Step 2: 真机冒烟（controller）** — `nomifun-web --dist --insecure-no-auth`（temp NOMIFUN_DATA_DIR target/_p3_smoke）。打开模型中心 → 给某模型填描述 → 保存 → 重开确认描述持久化 → 零 console error → UI 漂亮。截图 target/_p3_smoke。真·描述驱动选模型需 provider 真跑,留用户（mock 单测已证 seam）。
+- [ ] **Step 1:** `cargo build --workspace` 绿 + `cargo nextest run -p openhub-orchestrator -p openhub-db -p openhub-system -p openhub-api-types -p openhub-gateway -p openhub-app` 全绿（orchestrator_run_e2e 4/4）；前端 typecheck0+build。
+- [ ] **Step 2: 真机冒烟（controller）** — `openhub-web --dist --insecure-no-auth`（temp OPENHUB_DATA_DIR target/_p3_smoke）。打开模型中心 → 给某模型填描述 → 保存 → 重开确认描述持久化 → 零 console error → UI 漂亮。截图 target/_p3_smoke。真·描述驱动选模型需 provider 真跑,留用户（mock 单测已证 seam）。
 - [ ] **Step 3: 记账 + 提交**（若有微调）；账本追加 P3 完成行。
 
 ## Self-Review（spec §6）

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -538,7 +538,7 @@ const normalizePersistedWorkspaceRuntimeError = (
   return {
     message,
     code: 'WORKSPACE_PATH_EDGE_WHITESPACE_RUNTIME_UNSUPPORTED',
-    ownership: 'nomifun',
+    ownership: 'openhub',
     detail,
     workspacePath,
     retryable: false,
@@ -569,16 +569,16 @@ const classifyPersistedSendFailure = (
   if (persistedCode === 'INTERNAL_ERROR') {
     return {
       message,
-      code: 'NOMIFUN_INTERNAL_ERROR',
-      ownership: 'nomifun',
+      code: 'OPENHUB_INTERNAL_ERROR',
+      ownership: 'openhub',
       detail: message,
       retryable: true,
       feedback_recommended: true,
     };
   }
 
-  if (persistedCode?.startsWith('NOMIFUN_')) {
-    return { message, code: persistedCode, ownership: 'nomifun', detail: message, retryable: true };
+  if (persistedCode?.startsWith('OPENHUB_')) {
+    return { message, code: persistedCode, ownership: 'openhub', detail: message, retryable: true };
   }
   if (persistedCode?.startsWith('USER_AGENT_')) {
     return { message, code: persistedCode, ownership: 'user_agent', detail: message, retryable: true };
@@ -607,8 +607,8 @@ const classifyPersistedSendFailure = (
   if (parsed.source === 'send_failed') {
     return {
       message,
-      code: 'NOMIFUN_INTERNAL_ERROR',
-      ownership: 'nomifun',
+      code: 'OPENHUB_INTERNAL_ERROR',
+      ownership: 'openhub',
       detail: message,
       retryable: true,
       feedback_recommended: true,

@@ -4,14 +4,14 @@
 
 **Goal:** Let a channel (Telegram first, WeChat later) deliver AI-generated images/files to the remote IM user, instead of only forwarding the assistant's text.
 
-**Architecture:** The image an agent produces is a *workshop asset* (`wsa_…` id), surfaced today only to the desktop (Markdown link → localhost fetch). This plan taps the same turn's signals — the completed `nomi_workshop_*` tool-call `output` JSON (`result_asset_ids`) plus any `/api/workshop/files/{id}` URL in the assistant text — accumulates the asset ids in the stream relay, resolves them to raw bytes via a new injectable `AssetResolver` trait (implemented in `nomifun-app` over `WorkshopService::read_asset_bytes`), and hands each to a new `ChannelPlugin::send_media` method that uploads the bytes to the platform. `send_media` has a graceful no-op default so the other 11 plugins compile and text-only channels degrade cleanly; Telegram overrides it with a multipart `sendPhoto`/`sendDocument`. No change to `UnifiedOutgoingMessage` (avoids serde/literal churn) and no new AgentStreamEvent variant.
+**Architecture:** The image an agent produces is a *workshop asset* (`wsa_…` id), surfaced today only to the desktop (Markdown link → localhost fetch). This plan taps the same turn's signals — the completed `openhub_workshop_*` tool-call `output` JSON (`result_asset_ids`) plus any `/api/workshop/files/{id}` URL in the assistant text — accumulates the asset ids in the stream relay, resolves them to raw bytes via a new injectable `AssetResolver` trait (implemented in `openhub-app` over `WorkshopService::read_asset_bytes`), and hands each to a new `ChannelPlugin::send_media` method that uploads the bytes to the platform. `send_media` has a graceful no-op default so the other 11 plugins compile and text-only channels degrade cleanly; Telegram overrides it with a multipart `sendPhoto`/`sendDocument`. No change to `UnifiedOutgoingMessage` (avoids serde/literal churn) and no new AgentStreamEvent variant.
 
-**Tech Stack:** Rust, `async-trait`, `tokio`, `reqwest` (already has the `multipart` feature at root `Cargo.toml:111`), `serde_json`, `regex` (already a `nomifun-channel` dependency). Tests via `cargo nextest`.
+**Tech Stack:** Rust, `async-trait`, `tokio`, `reqwest` (already has the `multipart` feature at root `Cargo.toml:111`), `serde_json`, `regex` (already a `openhub-channel` dependency). Tests via `cargo nextest`.
 
 ## Global Constraints
 
-- **Touched crates only for tests:** run `cargo nextest run -p nomifun-channel` (and `-p nomifun-app` for wiring); do NOT run the full workspace test suite until final review. (Ref: memory `test-workflow-rules`.)
-- **`nomifun-channel` MUST NOT depend on `nomifun-workshop`** — that is why asset resolution is an injected trait (`AssetResolver`) implemented in `nomifun-app`, mirroring the existing `MasterAgentProfile` pattern (`message_service.rs:29`).
+- **Touched crates only for tests:** run `cargo nextest run -p openhub-channel` (and `-p openhub-app` for wiring); do NOT run the full workspace test suite until final review. (Ref: memory `test-workflow-rules`.)
+- **`openhub-channel` MUST NOT depend on `openhub-workshop`** — that is why asset resolution is an injected trait (`AssetResolver`) implemented in `openhub-app`, mirroring the existing `MasterAgentProfile` pattern (`message_service.rs:29`).
 - **Struct-literal gotcha:** `UnifiedOutgoingMessage` is constructed as a full literal in ~10 places; this plan deliberately does NOT add a field to it. Do not add one. Carry bytes in the new `OutgoingMedia` type passed through the new `send_media` path instead. (Ref: memory `dag-node-preconfig-delivered` — "全枚举字面量 struct 加字段优先专用方法".)
 - **`cargo check` does not compile tests:** always verify test code with `cargo nextest run`, never rely on `cargo check` alone. (Ref: memory `knowledge-bugfix-sweep`.)
 - **Do not `cargo fmt`** the whole repo; format only touched files if needed. (Ref: memory `external-capability-exposure-p0-delivered`.)
@@ -22,25 +22,25 @@
 
 ## File Structure
 
-**Phase A — shared pipeline (crate `nomifun-channel`):**
-- Modify `crates/backend/nomifun-channel/src/types.rs` — add `OutgoingMedia` + `MediaKind`.
-- Create `crates/backend/nomifun-channel/src/media_refs.rs` — pure asset-id extraction helpers.
-- Modify `crates/backend/nomifun-channel/src/lib.rs` — register `pub mod media_refs;` and re-export `AssetResolver`.
-- Modify `crates/backend/nomifun-channel/src/message_service.rs` — `StreamAction::MediaProduced`, `AssetResolver` trait, `process_stream_event` change, `with_asset_resolver`/`asset_resolver()`.
-- Modify `crates/backend/nomifun-channel/src/plugin.rs` — `ChannelPlugin::send_media` default method.
-- Modify `crates/backend/nomifun-channel/src/stream_relay.rs` — `ChannelSender::send_media`, relay media accumulation + flush, `MessageRecorder` impl update, constructor signature.
-- Modify `crates/backend/nomifun-channel/src/manager.rs` — `ChannelManager::send_media` inherent + trait impl.
-- Modify `crates/backend/nomifun-channel/src/orchestrator.rs` — pass resolver into `ChannelStreamRelay::new`.
+**Phase A — shared pipeline (crate `openhub-channel`):**
+- Modify `crates/backend/openhub-channel/src/types.rs` — add `OutgoingMedia` + `MediaKind`.
+- Create `crates/backend/openhub-channel/src/media_refs.rs` — pure asset-id extraction helpers.
+- Modify `crates/backend/openhub-channel/src/lib.rs` — register `pub mod media_refs;` and re-export `AssetResolver`.
+- Modify `crates/backend/openhub-channel/src/message_service.rs` — `StreamAction::MediaProduced`, `AssetResolver` trait, `process_stream_event` change, `with_asset_resolver`/`asset_resolver()`.
+- Modify `crates/backend/openhub-channel/src/plugin.rs` — `ChannelPlugin::send_media` default method.
+- Modify `crates/backend/openhub-channel/src/stream_relay.rs` — `ChannelSender::send_media`, relay media accumulation + flush, `MessageRecorder` impl update, constructor signature.
+- Modify `crates/backend/openhub-channel/src/manager.rs` — `ChannelManager::send_media` inherent + trait impl.
+- Modify `crates/backend/openhub-channel/src/orchestrator.rs` — pass resolver into `ChannelStreamRelay::new`.
 
 **Phase B — Telegram pilot:**
-- Modify `crates/backend/nomifun-channel/src/plugins/telegram/api.rs` — `send_photo`/`send_document` multipart.
-- Modify `crates/backend/nomifun-channel/src/plugins/telegram/plugin.rs` — `send_media` override.
-- Create `crates/backend/nomifun-app/src/channel_asset_resolver.rs` — `AssetResolver` impl over `WorkshopService`.
-- Modify `crates/backend/nomifun-app/src/lib.rs` (or module root) — register the new module.
-- Modify `crates/backend/nomifun-app/src/router/state.rs:749-761` — `.with_asset_resolver(...)`.
+- Modify `crates/backend/openhub-channel/src/plugins/telegram/api.rs` — `send_photo`/`send_document` multipart.
+- Modify `crates/backend/openhub-channel/src/plugins/telegram/plugin.rs` — `send_media` override.
+- Create `crates/backend/openhub-app/src/channel_asset_resolver.rs` — `AssetResolver` impl over `WorkshopService`.
+- Modify `crates/backend/openhub-app/src/lib.rs` (or module root) — register the new module.
+- Modify `crates/backend/openhub-app/src/router/state.rs:749-761` — `.with_asset_resolver(...)`.
 
 **Phase C — WeChat (discovery-gated):**
-- Modify `crates/backend/nomifun-channel/src/plugins/weixin/{api.rs,types.rs,plugin.rs}` — media upload + `send_media` (contract filled from the C1 spike).
+- Modify `crates/backend/openhub-channel/src/plugins/weixin/{api.rs,types.rs,plugin.rs}` — media upload + `send_media` (contract filled from the C1 spike).
 
 ---
 
@@ -86,9 +86,9 @@ ChannelStreamRelay::new(config, sender, pending, asset_resolver: Option<Arc<dyn 
 ### Task A1: `OutgoingMedia` type + asset-id extraction helpers
 
 **Files:**
-- Modify: `crates/backend/nomifun-channel/src/types.rs` (add types near `ChannelMediaAction`, ~line 486)
-- Create: `crates/backend/nomifun-channel/src/media_refs.rs`
-- Modify: `crates/backend/nomifun-channel/src/lib.rs` (add `pub mod media_refs;`)
+- Modify: `crates/backend/openhub-channel/src/types.rs` (add types near `ChannelMediaAction`, ~line 486)
+- Create: `crates/backend/openhub-channel/src/media_refs.rs`
+- Modify: `crates/backend/openhub-channel/src/lib.rs` (add `pub mod media_refs;`)
 
 **Interfaces:**
 - Produces: `OutgoingMedia`, `MediaKind`, `media_refs::asset_ids_from_tool_output(&str) -> Vec<String>`, `media_refs::asset_ids_from_text(&str) -> Vec<String>`.
@@ -122,12 +122,12 @@ pub enum MediaKind {
 
 - [ ] **Step 2: Write the failing test for `media_refs`**
 
-Create `crates/backend/nomifun-channel/src/media_refs.rs`:
+Create `crates/backend/openhub-channel/src/media_refs.rs`:
 
 ```rust
 //! Pure helpers that extract workshop asset ids (`wsa_…`) from the two
 //! machine-readable signals a channel turn carries: a completed
-//! `nomi_workshop_*` tool call's `output` JSON (`result_asset_ids`), and any
+//! `openhub_workshop_*` tool call's `output` JSON (`result_asset_ids`), and any
 //! `/api/workshop/files/{id}` URL the assistant wrote into its visible text
 //! (the same link the desktop renders). Both are deduped by the caller.
 
@@ -223,7 +223,7 @@ mod tests {
 
 - [ ] **Step 3: Register the module in `lib.rs`**
 
-Add alongside the other `pub mod` declarations in `crates/backend/nomifun-channel/src/lib.rs`:
+Add alongside the other `pub mod` declarations in `crates/backend/openhub-channel/src/lib.rs`:
 
 ```rust
 pub mod media_refs;
@@ -231,13 +231,13 @@ pub mod media_refs;
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `cargo nextest run -p nomifun-channel media_refs`
+Run: `cargo nextest run -p openhub-channel media_refs`
 Expected: PASS (5 tests). `OutgoingMedia`/`MediaKind` compile (unused-warning is fine — they are consumed in A3).
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add crates/backend/nomifun-channel/src/types.rs crates/backend/nomifun-channel/src/media_refs.rs crates/backend/nomifun-channel/src/lib.rs
+git add crates/backend/openhub-channel/src/types.rs crates/backend/openhub-channel/src/media_refs.rs crates/backend/openhub-channel/src/lib.rs
 git commit -m "feat(channel): add OutgoingMedia type + workshop asset-id extraction helpers"
 ```
 
@@ -246,8 +246,8 @@ git commit -m "feat(channel): add OutgoingMedia type + workshop asset-id extract
 ### Task A2: `AssetResolver` trait + `StreamAction::MediaProduced` + tool-output surfacing
 
 **Files:**
-- Modify: `crates/backend/nomifun-channel/src/message_service.rs`
-- Modify: `crates/backend/nomifun-channel/src/lib.rs` (re-export `AssetResolver` if convenient)
+- Modify: `crates/backend/openhub-channel/src/message_service.rs`
+- Modify: `crates/backend/openhub-channel/src/lib.rs` (re-export `AssetResolver` if convenient)
 
 **Interfaces:**
 - Consumes: `media_refs::asset_ids_from_tool_output` (A1), `OutgoingMedia` (A1).
@@ -259,7 +259,7 @@ In `message_service.rs`, add to the `StreamAction` enum (after `Decision {…}`,
 
 ```rust
     /// One or more workshop asset ids produced by a *completed* tool call
-    /// (e.g. `nomi_workshop_get_task` `result_asset_ids`). The relay resolves
+    /// (e.g. `openhub_workshop_get_task` `result_asset_ids`). The relay resolves
     /// each to bytes and sends it as media after the final text.
     MediaProduced(Vec<String>),
 ```
@@ -271,7 +271,7 @@ Add this test in the `tests` module (near `tool_call_event_produces_tool_call`, 
     fn completed_workshop_tool_call_produces_media() {
         let event = AgentStreamEvent::ToolCall(ToolCallEventData {
             call_id: "c1".into(),
-            name: "nomi_workshop_get_task".into(),
+            name: "openhub_workshop_get_task".into(),
             args: serde_json::Value::Null,
             status: ToolCallStatus::Completed,
             description: None,
@@ -288,7 +288,7 @@ Add this test in the `tests` module (near `tool_call_event_produces_tool_call`, 
     fn running_tool_call_still_produces_tool_call_status() {
         let event = AgentStreamEvent::ToolCall(ToolCallEventData {
             call_id: "c1".into(),
-            name: "nomi_workshop_generate".into(),
+            name: "openhub_workshop_generate".into(),
             args: serde_json::Value::Null,
             status: ToolCallStatus::Running,
             description: None,
@@ -304,7 +304,7 @@ Add this test in the `tests` module (near `tool_call_event_produces_tool_call`, 
 
 - [ ] **Step 2: Run the test to verify it fails**
 
-Run: `cargo nextest run -p nomifun-channel completed_workshop_tool_call_produces_media`
+Run: `cargo nextest run -p openhub-channel completed_workshop_tool_call_produces_media`
 Expected: FAIL (variant not yet produced — currently maps to `ToolCall`).
 
 - [ ] **Step 3: Change `process_stream_event` to surface completed tool-output asset ids**
@@ -314,12 +314,12 @@ Replace the `AgentStreamEvent::ToolCall(data)` arm (message_service.rs:608-611) 
 ```rust
             AgentStreamEvent::ToolCall(data) => {
                 // A completed tool call may carry produced workshop asset ids in
-                // its output JSON (nomi_workshop_get_task/generate `result_asset_ids`).
+                // its output JSON (openhub_workshop_get_task/generate `result_asset_ids`).
                 // Surface those as MediaProduced so the relay can send the picture;
                 // otherwise keep the cosmetic {name,status} progress update.
                 if matches!(
                     data.status,
-                    nomifun_ai_agent::protocol::events::ToolCallStatus::Completed
+                    openhub_ai_agent::protocol::events::ToolCallStatus::Completed
                 ) && let Some(output) = data.output.as_deref()
                 {
                     let ids = crate::media_refs::asset_ids_from_tool_output(output);
@@ -341,8 +341,8 @@ Near the `MasterAgentProfile` trait (top of `message_service.rs`, after the impo
 ```rust
 /// Resolves a workshop asset id (`wsa_…`) to raw bytes for outbound media.
 ///
-/// Defined here (not in `nomifun-workshop`) so `nomifun-channel` stays free of
-/// a workshop dependency; the concrete impl lives in `nomifun-app`
+/// Defined here (not in `openhub-workshop`) so `openhub-channel` stays free of
+/// a workshop dependency; the concrete impl lives in `openhub-app`
 /// (`channel_asset_resolver.rs`), mirroring [`MasterAgentProfile`].
 #[async_trait::async_trait]
 pub trait AssetResolver: Send + Sync {
@@ -379,13 +379,13 @@ Initialize it to `None` in `ChannelMessageService::new` (add `asset_resolver: No
 
 - [ ] **Step 5: Run tests to verify they pass**
 
-Run: `cargo nextest run -p nomifun-channel process_stream_event completed_workshop running_tool_call`
-Expected: PASS. Then `cargo check -p nomifun-channel` — clean.
+Run: `cargo nextest run -p openhub-channel process_stream_event completed_workshop running_tool_call`
+Expected: PASS. Then `cargo check -p openhub-channel` — clean.
 
 - [ ] **Step 6: Commit**
 
 ```bash
-git add crates/backend/nomifun-channel/src/message_service.rs crates/backend/nomifun-channel/src/lib.rs
+git add crates/backend/openhub-channel/src/message_service.rs crates/backend/openhub-channel/src/lib.rs
 git commit -m "feat(channel): surface workshop asset ids as StreamAction::MediaProduced + AssetResolver trait"
 ```
 
@@ -394,9 +394,9 @@ git commit -m "feat(channel): surface workshop asset ids as StreamAction::MediaP
 ### Task A3: `send_media` on `ChannelPlugin` + `ChannelSender` + manager routing
 
 **Files:**
-- Modify: `crates/backend/nomifun-channel/src/plugin.rs` (trait default method)
-- Modify: `crates/backend/nomifun-channel/src/stream_relay.rs` (`ChannelSender` trait + `MessageRecorder` impl)
-- Modify: `crates/backend/nomifun-channel/src/manager.rs` (inherent + trait impl)
+- Modify: `crates/backend/openhub-channel/src/plugin.rs` (trait default method)
+- Modify: `crates/backend/openhub-channel/src/stream_relay.rs` (`ChannelSender` trait + `MessageRecorder` impl)
+- Modify: `crates/backend/openhub-channel/src/manager.rs` (inherent + trait impl)
 
 **Interfaces:**
 - Consumes: `OutgoingMedia` (A1).
@@ -510,16 +510,16 @@ Add the trait method to `impl crate::stream_relay::ChannelSender for ChannelMana
 
 - [ ] **Step 4: Verify it compiles and existing tests pass**
 
-Run: `cargo check -p nomifun-channel`
+Run: `cargo check -p openhub-channel`
 Expected: clean (all plugins get the default `send_media`; only `MessageRecorder` and `ChannelManager` implement the `ChannelSender` method).
 
-Run: `cargo nextest run -p nomifun-channel`
+Run: `cargo nextest run -p openhub-channel`
 Expected: PASS (no regressions).
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add crates/backend/nomifun-channel/src/plugin.rs crates/backend/nomifun-channel/src/stream_relay.rs crates/backend/nomifun-channel/src/manager.rs
+git add crates/backend/openhub-channel/src/plugin.rs crates/backend/openhub-channel/src/stream_relay.rs crates/backend/openhub-channel/src/manager.rs
 git commit -m "feat(channel): add send_media path (ChannelPlugin default no-op + ChannelSender + manager routing)"
 ```
 
@@ -528,8 +528,8 @@ git commit -m "feat(channel): add send_media path (ChannelPlugin default no-op +
 ### Task A4: Relay accumulates + flushes media
 
 **Files:**
-- Modify: `crates/backend/nomifun-channel/src/stream_relay.rs`
-- Modify: `crates/backend/nomifun-channel/src/orchestrator.rs` (constructor call site, ~line 334)
+- Modify: `crates/backend/openhub-channel/src/stream_relay.rs`
+- Modify: `crates/backend/openhub-channel/src/orchestrator.rs` (constructor call site, ~line 334)
 
 **Interfaces:**
 - Consumes: `StreamAction::MediaProduced` (A2), `AssetResolver` (A2), `ChannelSender::send_media` (A3), `media_refs::asset_ids_from_text` (A1).
@@ -574,7 +574,7 @@ mod media_tests {
     // resolved image is sent exactly once via send_media (deduped).
     #[tokio::test]
     async fn relay_flushes_media_on_finish() {
-        use nomifun_ai_agent::protocol::events::{FinishEventData, TextEventData, ToolCallEventData, ToolCallStatus};
+        use openhub_ai_agent::protocol::events::{FinishEventData, TextEventData, ToolCallEventData, ToolCallStatus};
 
         let recorder = Arc::new(MessageRecorder::new());
         let pending = crate::pending_decision::PendingDecisionStore::new();
@@ -591,7 +591,7 @@ mod media_tests {
         for _ in 0..2 {
             tx.send(AgentStreamEvent::ToolCall(ToolCallEventData {
                 call_id: "t".into(),
-                name: "nomi_workshop_get_task".into(),
+                name: "openhub_workshop_get_task".into(),
                 args: serde_json::Value::Null,
                 status: ToolCallStatus::Completed,
                 description: None,
@@ -615,7 +615,7 @@ mod media_tests {
 
 - [ ] **Step 2: Run to verify it fails**
 
-Run: `cargo nextest run -p nomifun-channel relay_flushes_media_on_finish`
+Run: `cargo nextest run -p openhub-channel relay_flushes_media_on_finish`
 Expected: FAIL to COMPILE (`ChannelStreamRelay::new` still takes 3 args; no media handling).
 
 - [ ] **Step 3: Add the resolver field + 4-arg constructor**
@@ -730,17 +730,17 @@ In `orchestrator.rs`, change the relay construction (~line 334) to pass the reso
 
 - [ ] **Step 7: Run tests to verify they pass**
 
-Run: `cargo nextest run -p nomifun-channel relay_flushes_media_on_finish`
-Expected: PASS. Then `cargo nextest run -p nomifun-channel` — no regressions. Then `cargo check -p nomifun-channel`.
+Run: `cargo nextest run -p openhub-channel relay_flushes_media_on_finish`
+Expected: PASS. Then `cargo nextest run -p openhub-channel` — no regressions. Then `cargo check -p openhub-channel`.
 
 - [ ] **Step 8: Fix the `orchestrator_test.rs` constructor call if present**
 
-Run: `cargo nextest run -p nomifun-channel` — if `tests/orchestrator_test.rs` fails to compile because it calls `ChannelStreamRelay::new`, grep it (`grep -n "ChannelStreamRelay::new" crates/backend/nomifun-channel/tests/orchestrator_test.rs`) and add a trailing `None,` argument. (The relay is usually spawned via the orchestrator, so this may not appear — only fix if the compiler flags it.)
+Run: `cargo nextest run -p openhub-channel` — if `tests/orchestrator_test.rs` fails to compile because it calls `ChannelStreamRelay::new`, grep it (`grep -n "ChannelStreamRelay::new" crates/backend/openhub-channel/tests/orchestrator_test.rs`) and add a trailing `None,` argument. (The relay is usually spawned via the orchestrator, so this may not appear — only fix if the compiler flags it.)
 
 - [ ] **Step 9: Commit**
 
 ```bash
-git add crates/backend/nomifun-channel/src/stream_relay.rs crates/backend/nomifun-channel/src/orchestrator.rs
+git add crates/backend/openhub-channel/src/stream_relay.rs crates/backend/openhub-channel/src/orchestrator.rs
 git commit -m "feat(channel): relay accumulates workshop asset ids and flushes them as media after the final text"
 ```
 
@@ -751,7 +751,7 @@ git commit -m "feat(channel): relay accumulates workshop asset ids and flushes t
 ### Task B1: `TelegramApi::send_photo` / `send_document` (multipart)
 
 **Files:**
-- Modify: `crates/backend/nomifun-channel/src/plugins/telegram/api.rs`
+- Modify: `crates/backend/openhub-channel/src/plugins/telegram/api.rs`
 
 **Interfaces:**
 - Produces: `TelegramApi::send_photo(chat_id: i64, bytes: Vec<u8>, filename: &str, mime: &str, caption: Option<&str>) -> Result<TgMessage, ChannelError>` and `send_document(...)` with the same signature.
@@ -841,13 +841,13 @@ In `telegram/api.rs`, add to `impl TelegramApi` (after `send_message`, ~line 108
 
 - [ ] **Step 3: Verify it compiles**
 
-Run: `cargo check -p nomifun-channel --features telegram`
+Run: `cargo check -p openhub-channel --features telegram`
 Expected: clean. (No unit test here — the method performs real HTTP; it is exercised by the manual end-to-end check in Task B4.)
 
 - [ ] **Step 4: Commit**
 
 ```bash
-git add crates/backend/nomifun-channel/src/plugins/telegram/api.rs
+git add crates/backend/openhub-channel/src/plugins/telegram/api.rs
 git commit -m "feat(channel/telegram): add sendPhoto/sendDocument multipart upload"
 ```
 
@@ -856,7 +856,7 @@ git commit -m "feat(channel/telegram): add sendPhoto/sendDocument multipart uplo
 ### Task B2: Telegram plugin `send_media` override
 
 **Files:**
-- Modify: `crates/backend/nomifun-channel/src/plugins/telegram/plugin.rs`
+- Modify: `crates/backend/openhub-channel/src/plugins/telegram/plugin.rs`
 
 **Interfaces:**
 - Consumes: `TelegramApi::send_photo`/`send_document` (B1), `OutgoingMedia`/`MediaKind` (A1), `parse_chat_id` (existing, used by `send_message` at plugin.rs:192).
@@ -898,46 +898,46 @@ Ensure `crate::types::OutgoingMedia`/`MediaKind` are importable (they are `pub` 
 
 - [ ] **Step 2: Verify it compiles**
 
-Run: `cargo check -p nomifun-channel --features telegram`
+Run: `cargo check -p openhub-channel --features telegram`
 Expected: clean.
 
-Run: `cargo nextest run -p nomifun-channel`
+Run: `cargo nextest run -p openhub-channel`
 Expected: PASS (no regressions).
 
 - [ ] **Step 3: Commit**
 
 ```bash
-git add crates/backend/nomifun-channel/src/plugins/telegram/plugin.rs
+git add crates/backend/openhub-channel/src/plugins/telegram/plugin.rs
 git commit -m "feat(channel/telegram): implement send_media (photo/document upload)"
 ```
 
 ---
 
-### Task B3: `AssetResolver` implementation in `nomifun-app`
+### Task B3: `AssetResolver` implementation in `openhub-app`
 
 **Files:**
-- Create: `crates/backend/nomifun-app/src/channel_asset_resolver.rs`
-- Modify: `crates/backend/nomifun-app/src/lib.rs` (register module — match the existing `mod`/`pub mod` style; `workshop_bridge` is declared there, add next to it)
+- Create: `crates/backend/openhub-app/src/channel_asset_resolver.rs`
+- Modify: `crates/backend/openhub-app/src/lib.rs` (register module — match the existing `mod`/`pub mod` style; `workshop_bridge` is declared there, add next to it)
 
 **Interfaces:**
-- Consumes: `nomifun_workshop::WorkshopService::read_asset_bytes(&str) -> Result<(Vec<u8>, String), AppError>` (service.rs:556), `nomifun_channel::message_service::AssetResolver` (A2), `nomifun_channel::types::{OutgoingMedia, MediaKind}` (A1).
+- Consumes: `openhub_workshop::WorkshopService::read_asset_bytes(&str) -> Result<(Vec<u8>, String), AppError>` (service.rs:556), `openhub_channel::message_service::AssetResolver` (A2), `openhub_channel::types::{OutgoingMedia, MediaKind}` (A1).
 - Produces: `ChannelAssetResolver` (constructed from `Arc<WorkshopService>`).
 
 - [ ] **Step 1: Write the resolver + a filename-extension unit test**
 
-Create `crates/backend/nomifun-app/src/channel_asset_resolver.rs`:
+Create `crates/backend/openhub-app/src/channel_asset_resolver.rs`:
 
 ```rust
-//! Bridges `nomifun-channel`'s [`AssetResolver`] to the workshop asset store,
-//! so channel replies can upload AI-generated images. Kept in `nomifun-app`
-//! (not `nomifun-channel`) so the channel crate has no workshop dependency —
+//! Bridges `openhub-channel`'s [`AssetResolver`] to the workshop asset store,
+//! so channel replies can upload AI-generated images. Kept in `openhub-app`
+//! (not `openhub-channel`) so the channel crate has no workshop dependency —
 //! same layering as `CompanionMasterAgentProfile`.
 
 use std::sync::Arc;
 
-use nomifun_channel::message_service::AssetResolver;
-use nomifun_channel::types::{MediaKind, OutgoingMedia};
-use nomifun_workshop::WorkshopService;
+use openhub_channel::message_service::AssetResolver;
+use openhub_channel::types::{MediaKind, OutgoingMedia};
+use openhub_workshop::WorkshopService;
 
 pub struct ChannelAssetResolver {
     pub workshop: Arc<WorkshopService>,
@@ -997,7 +997,7 @@ mod tests {
 
 - [ ] **Step 2: Register the module**
 
-Run: `grep -n "mod workshop_bridge" crates/backend/nomifun-app/src/lib.rs`
+Run: `grep -n "mod workshop_bridge" crates/backend/openhub-app/src/lib.rs`
 Add a sibling declaration matching its visibility, e.g.:
 
 ```rust
@@ -1006,13 +1006,13 @@ pub mod channel_asset_resolver;
 
 - [ ] **Step 3: Verify it compiles and the unit test passes**
 
-Run: `cargo nextest run -p nomifun-app ext_mapping`
+Run: `cargo nextest run -p openhub-app ext_mapping`
 Expected: PASS.
 
 - [ ] **Step 4: Commit**
 
 ```bash
-git add crates/backend/nomifun-app/src/channel_asset_resolver.rs crates/backend/nomifun-app/src/lib.rs
+git add crates/backend/openhub-app/src/channel_asset_resolver.rs crates/backend/openhub-app/src/lib.rs
 git commit -m "feat(app): ChannelAssetResolver bridging workshop assets to channel media send"
 ```
 
@@ -1021,7 +1021,7 @@ git commit -m "feat(app): ChannelAssetResolver bridging workshop assets to chann
 ### Task B4: Wire the resolver into the channel message service + end-to-end verification
 
 **Files:**
-- Modify: `crates/backend/nomifun-app/src/router/state.rs:749-761`
+- Modify: `crates/backend/openhub-app/src/router/state.rs:749-761`
 
 **Interfaces:**
 - Consumes: `ChannelAssetResolver` (B3), `ChannelMessageService::with_asset_resolver` (A2), `services.workshop_service` (services.rs:115).
@@ -1032,7 +1032,7 @@ In `state.rs`, extend the `ChannelMessageService` construction (currently ending
 
 ```rust
     let message_service = Arc::new(
-        nomifun_channel::message_service::ChannelMessageService::new(
+        openhub_channel::message_service::ChannelMessageService::new(
             conversation_svc,
             services.worker_task_manager.clone(),
             Arc::clone(&channel_settings),
@@ -1050,14 +1050,14 @@ In `state.rs`, extend the `ChannelMessageService` construction (currently ending
 
 - [ ] **Step 2: Verify the whole app compiles**
 
-Run: `cargo check -p nomifun-app`
+Run: `cargo check -p openhub-app`
 Expected: clean.
 
 - [ ] **Step 3: End-to-end manual verification (Telegram)**
 
 This exercises the real path (no automated test — it needs a live bot + model). Steps:
 
-1. Build & run the desktop dev app (Ref: memory `dev-data-dir-is-nomi-dev`): `bun run desktop:dev`.
+1. Build & run the desktop dev app (Ref: memory `dev-data-dir-is-openhub-dev`): `bun run desktop:dev`.
 2. Settings → Channel → add a Telegram bot (token), bind it to a companion with a working image-generation-capable model, start it.
 3. From Telegram, DM the bot: `画一张猫猫满天飞的图`.
 4. **Expected:** the bot replies with the assistant text (e.g. "图来咯～") AND then sends the generated image as a photo. Confirm the photo renders inline in Telegram.
@@ -1070,7 +1070,7 @@ Invoke the `verify` skill (drive the affected flow, observe behavior) against th
 - [ ] **Step 5: Commit**
 
 ```bash
-git add crates/backend/nomifun-app/src/router/state.rs
+git add crates/backend/openhub-app/src/router/state.rs
 git commit -m "feat(app): wire ChannelAssetResolver so channels send AI-generated images (Telegram end-to-end)"
 ```
 
@@ -1106,9 +1106,9 @@ git commit -m "docs(channel/weixin): iLink outbound media-upload contract findin
 > Fill the request/response types and the upload call from C1's findings. The parts below that are already known are concrete; the `upload_media` body is the only C1-dependent piece.
 
 **Files:**
-- Modify: `crates/backend/nomifun-channel/src/plugins/weixin/types.rs` — add outbound `SendImageItem`/`SendFileItem` and extend `SendMessageItem` with optional `image_item`/`file_item`.
-- Modify: `crates/backend/nomifun-channel/src/plugins/weixin/api.rs` — add `upload_media(bytes, mime) -> MediaHandle` (from C1) and `send_image(to_user_id, handle, context_token)`.
-- Modify: `crates/backend/nomifun-channel/src/plugins/weixin/plugin.rs` — override `send_media` (fetch bytes → `upload_media` → `send_image`).
+- Modify: `crates/backend/openhub-channel/src/plugins/weixin/types.rs` — add outbound `SendImageItem`/`SendFileItem` and extend `SendMessageItem` with optional `image_item`/`file_item`.
+- Modify: `crates/backend/openhub-channel/src/plugins/weixin/api.rs` — add `upload_media(bytes, mime) -> MediaHandle` (from C1) and `send_image(to_user_id, handle, context_token)`.
+- Modify: `crates/backend/openhub-channel/src/plugins/weixin/plugin.rs` — override `send_media` (fetch bytes → `upload_media` → `send_image`).
 
 - [ ] **Step 1: Extend outbound item structs (known)**
 
@@ -1157,12 +1157,12 @@ In `weixin/api.rs`, add `upload_media` (endpoint/schema from C1) and `send_image
 
 - [ ] **Step 3: Verify + live-test**
 
-Run: `cargo check -p nomifun-channel --features weixin` (clean), then live-test the WeChat image reply exactly as in Task B4 step 3 (via WeChat instead of Telegram).
+Run: `cargo check -p openhub-channel --features weixin` (clean), then live-test the WeChat image reply exactly as in Task B4 step 3 (via WeChat instead of Telegram).
 
 - [ ] **Step 4: Commit**
 
 ```bash
-git add crates/backend/nomifun-channel/src/plugins/weixin/
+git add crates/backend/openhub-channel/src/plugins/weixin/
 git commit -m "feat(channel/weixin): send AI-generated images via iLink media upload"
 ```
 

@@ -6,14 +6,14 @@
 
 ## 背景与问题
 
-用户反馈:**临时会话中 Agent 无法修改其它路径上的文件**。现场截图:临时会话(workspace=`nomi-temp-5`),Agent 报"当前环境的沙箱限制只能访问工作区目录,无法直接访问 `C:\code…`"。
+用户反馈:**临时会话中 Agent 无法修改其它路径上的文件**。现场截图:临时会话(workspace=`openhub-temp-5`),Agent 报"当前环境的沙箱限制只能访问工作区目录,无法直接访问 `C:\code…`"。
 
 根因排查(见 memory `temp-session-path-write-investigation`)结论:文件访问权限被**劈成两套互不一致、且都不看会话信任等级**的机制:
 
-1. **原生 nomi-tools**(Read/Write/Edit/ApplyPatch/Bash):`write_root` 默认 `None` → 完全不受限;后端从不设置。绝对路径全放行。**不区分 Desktop/Channel/Remote。**
-2. **gateway file-service**(`nomi_fs_*` + UI 文件面板):被全局固定的 `allowed_roots = [temp_dir, home_dir, work_dir, data_dir]` 钳制(`nomifun-file` 单例,构造期定死),**不含会话工作区、也不含用户随口指定的 `C:\code`**;`extra_root` 只能"加宽",无法"收窄"或"放开到 OS 全权"。**同样不区分 surface。**
+1. **原生 openhub-tools**(Read/Write/Edit/ApplyPatch/Bash):`write_root` 默认 `None` → 完全不受限;后端从不设置。绝对路径全放行。**不区分 Desktop/Channel/Remote。**
+2. **gateway file-service**(`openhub_fs_*` + UI 文件面板):被全局固定的 `allowed_roots = [temp_dir, home_dir, work_dir, data_dir]` 钳制(`openhub-file` 单例,构造期定死),**不含会话工作区、也不含用户随口指定的 `C:\code`**;`extra_root` 只能"加宽",无法"收窄"或"放开到 OS 全权"。**同样不区分 surface。**
 
-Agent 在桌面会话里用了 `nomi_fs_*`(第二通道),撞上 `allowed_roots` 的 `Forbidden`,然后过度概括成"只能访问工作区",且未回退到不受限的原生工具。
+Agent 在桌面会话里用了 `openhub_fs_*`(第二通道),撞上 `allowed_roots` 的 `Forbidden`,然后过度概括成"只能访问工作区",且未回退到不受限的原生工具。
 
 **核心矛盾**:`Desktop` 需要"更宽(OS 全权)",`Channel/Remote` 需要"更窄(仅工作区)"。现有的 `base_roots ∪ extra_root` 模型两个方向都表达不了。
 
@@ -32,7 +32,7 @@ Agent 在桌面会话里用了 `nomi_fs_*`(第二通道),撞上 `allowed_roots` 
 
 ## 设计
 
-### 核心抽象:`PathAuthority`(新增于 `nomifun-file::path_safety`)
+### 核心抽象:`PathAuthority`(新增于 `openhub-file::path_safety`)
 
 ```rust
 pub enum PathAuthority {
@@ -45,35 +45,35 @@ pub enum PathAuthority {
 
 - 新增 `validate_path_for_write_with_authority(path, &PathAuthority)` / 读版,内部:先做 `has_traversal`/NUL 预拒(两档都做),再按 authority 分支:`Unrestricted` → 仅规范化返回;`Confined(roots)` → 现有 `starts_with(canonical_root)` 校验。
 
-### 单元 1:`nomifun-file` — file-service 接受 authority
+### 单元 1:`openhub-file` — file-service 接受 authority
 
 **接口取舍**:把路径作用域族方法的 `extra_root: Option<&Path>` / 依赖 `allowed_roots` 的校验改为显式接收 `authority: &PathAuthority`。涉及 `read_file` / `read_file_buffer` / `get_file_metadata` / `get_image_base64`(读族)与 `write_file` / `remove_entry` / `get_files_by_dir` / `list_workspace_files` / `rename_entry`(写/浏览族)。
 
 - `FileService` 仍持有基础 `allowed_roots` 作为 `Confined` 默认集。
 - 现有 UI/内部调用者传 `Confined(allowed_roots ∪ 请求 workspace)` = **今日行为等价**(零回归)。
-- 依赖:`nomifun-common`(AppError)。测试:Unrestricted 放行任意盘符;Confined 拒 root 外;traversal 两档都拒。
+- 依赖:`openhub-common`(AppError)。测试:Unrestricted 放行任意盘符;Confined 拒 root 外;traversal 两档都拒。
 
-### 单元 2:`nomifun-gateway` — 按 surface 解析 authority
+### 单元 2:`openhub-gateway` — 按 surface 解析 authority
 
 `caps_files.rs` 各 handler 用 `ctx.surface()`:
 - `Desktop` → `PathAuthority::Unrestricted`。
 - `Channel`/`Remote` → `PathAuthority::Confined([workspace])`(取请求里的 workspace/root;为空则回退基础 allowed_roots)。
 
-调用改为传 authority。`nomi_fs_read_file` 现在硬传 `None` → 改为 authority。写/删的 `workspace` 参数保留用于事件 scoping。DangerTier 矩阵/`deny_on` 不动(destructive/sensitive 在 Channel 仍 Deny)。
+调用改为传 authority。`openhub_fs_read_file` 现在硬传 `None` → 改为 authority。写/删的 `workspace` 参数保留用于事件 scoping。DangerTier 矩阵/`deny_on` 不动(destructive/sensitive 在 Channel 仍 Deny)。
 
-- 依赖:`nomifun-file::PathAuthority`。测试:Desktop caller 放行 `C:\code`;Channel caller 拒工作区外。
+- 依赖:`openhub-file::PathAuthority`。测试:Desktop caller 放行 `C:\code`;Channel caller 拒工作区外。
 
-### 单元 3:`nomifun-ai-agent` — 原生工具 write_root 按 surface
+### 单元 3:`openhub-ai-agent` — 原生工具 write_root 按 surface
 
 - `NomiResolvedConfig` 新增 `write_root: Option<String>`。
 - `factory/nomi.rs`:据 `overrides.exposure`/`channel_platform`/`remote`(与 gateway surface 同源的纯函数 `resolve_file_authority_surface`)解析:Desktop → `None`;Channel/Remote → `Some(workspace)`。Public 已 clamp。
-- `manager/nomi/agent.rs`:把它写进 `config.tools.write_root`(在现有 override 段)。
+- `manager/openhub/agent.rs`:把它写进 `config.tools.write_root`(在现有 override 段)。
 - 净效果:Desktop 原生工具维持不限(今日行为);Channel/Remote 原生写收窄到工作区(**顺带修掉原生工具对对外面过度开放的隐患**)。
 - 依赖:纯 surface 判定函数(可单测)。
 
 ### 单元 4:方案 3 UX — 会话内绑定/切换真实工作目录
 
-**后端**(`nomifun-conversation`):
+**后端**(`openhub-conversation`):
 - 确认 PATCH `/api/conversations/{id}` 合并 `extra.workspace` 可用(已存在)。
 - **补缺口**:`update()` 现在只在 model 变更时 kill agent(`service.rs:965`);增加"workspace 变更也 kill/重建 agent",使新 cwd 立即生效(不变量:mid-turn 运行中不 kill,延后到下条消息,与 knowledge 绑定变更同策略)。
 - 校验复用 `normalize_workspace_path`;对绑定目录无 data_dir 归属限制(允许指向任意真实目录)。
@@ -88,7 +88,7 @@ pub enum PathAuthority {
 
 用户在临时会话让 Agent 改 `C:\code\x`:
 - 若走原生 Write:`write_root=None`(Desktop)→ 放行(今日即可)。
-- 若走 `nomi_fs_write_file`:`ctx.surface()=Desktop` → `PathAuthority::Unrestricted` → file-service 放行。**不再 Forbidden。**
+- 若走 `openhub_fs_write_file`:`ctx.surface()=Desktop` → `PathAuthority::Unrestricted` → file-service 放行。**不再 Forbidden。**
 - Channel 陌生人让改 `C:\code\x`:`Confined([workspace])` → 拒(安全保持)。
 
 ## 错误处理
@@ -96,15 +96,15 @@ pub enum PathAuthority {
 - workspace 绑定非法路径:`normalize_workspace_path` 现有校验(空/首尾空白段)返回 `BadRequest`。
 
 ## 测试策略
-- `nomifun-file`:path_safety authority 单测(Unrestricted/Confined/traversal)。
-- `nomifun-gateway`:caps_files surface→authority 映射单测。
-- `nomifun-ai-agent`:`resolve_file_authority_surface` 纯函数单测 + write_root 装配。
-- `nomifun-conversation`:workspace 变更触发 agent 重建的服务测试。
+- `openhub-file`:path_safety authority 单测(Unrestricted/Confined/traversal)。
+- `openhub-gateway`:caps_files surface→authority 映射单测。
+- `openhub-ai-agent`:`resolve_file_authority_surface` 纯函数单测 + write_root 装配。
+- `openhub-conversation`:workspace 变更触发 agent 重建的服务测试。
 - 前端:typecheck 0;无可跑 vitest(见 memory `frontend-test-harness-reality`)。
 - 收尾:触碰 crate `cargo nextest`;`cargo clippy` 零告警。
 
 ## 非目标(YAGNI)
-- 不做方案 2 的"删除冗余 nomi_fs_* 通道"(authority 一致后双通道已安全共存;确认无依赖再另议)。
+- 不做方案 2 的"删除冗余 openhub_fs_* 通道"(authority 一致后双通道已安全共存;确认无依赖再另议)。
 - 不动 UI 文件面板对普通会话的现有 allowed_roots 行为(非本 bug)。
 - 不做"已授权目录集合持久记忆"(方案 3 的更重变体)。
 

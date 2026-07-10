@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -31,11 +31,11 @@ const isModelKeyAvailable = (key: string | null, providers?: IProvider[]) => {
 };
 
 /** Provider-based agent keys that share the model list UI */
-type ProviderAgentKey = 'nomi';
+type ProviderAgentKey = 'openhub';
 
 /** Map agent key → storage key for persisting default model */
 const MODEL_STORAGE_KEY: Record<ProviderAgentKey, 'nomi.defaultModel'> = {
-  nomi: 'nomi.defaultModel',
+  openhub: 'nomi.defaultModel',
 };
 
 export type GuidModelSelectionResult = {
@@ -48,9 +48,9 @@ export type GuidModelSelectionResult = {
 
 /**
  * Hook that manages the model list and selection state for the Guid page.
- * @param agentKey - current provider-based agent (currently only 'nomi')
+ * @param agentKey - current provider-based agent (currently only 'openhub')
  */
-export const useGuidModelSelection = (agentKey: ProviderAgentKey = 'nomi'): GuidModelSelectionResult => {
+export const useGuidModelSelection = (agentKey: ProviderAgentKey = 'openhub'): GuidModelSelectionResult => {
   const { isGoogleAuth } = useGoogleAuthModels();
   const { data: modelConfig } = useProvidersQuery();
 

@@ -15,7 +15,7 @@ Assistants are merged from three sources:
 
 | Source | Where it comes from | Editable? |
 | --- | --- | --- |
-| Builtin | Embedded manifest under `crates/backend/nomifun-app/assets/builtin-assistants/`, loaded by `BuiltinAssistantRegistry`. | Content is read-only; enable/sort/last-used state and builtin `preset_agent_type` override are stored separately. |
+| Builtin | Embedded manifest under `crates/backend/openhub-app/assets/builtin-assistants/`, loaded by `BuiltinAssistantRegistry`. | Content is read-only; enable/sort/last-used state and builtin `preset_agent_type` override are stored separately. |
 | Custom | User-created rows in the `assistants` table plus files in the data dir. | Fully editable and deletable. |
 | Extension | Installed extensions via `resolvers::assistant`. | Read-only from this page; manage the extension lifecycle instead. |
 

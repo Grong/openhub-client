@@ -13,7 +13,7 @@ interface AgentHubModalProps {
   onCancel: () => void;
 }
 
-const NOMI_HUB_REPO_URL = 'https://github.com/nomifun/NomiHub';
+const NOMI_HUB_REPO_URL = 'https://github.com/openhub/NomiHub';
 
 export const AgentHubModal: React.FC<AgentHubModalProps> = ({ visible, onCancel }) => {
   const { t } = useTranslation();

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -15,7 +15,7 @@ import { useResizableSplit } from '@/renderer/hooks/ui/useResizableSplit';
 import { useContainerWidth } from '@/renderer/hooks/ui/useContainerWidth';
 import { type RequirementsSection, useRequirementsSections } from './sections';
 
-const REQUIREMENTS_SIDER_STORAGE_KEY = 'nomifun:requirements-sider-width';
+const REQUIREMENTS_SIDER_STORAGE_KEY = 'openhub:requirements-sider-width';
 
 /**
  * Derive the active section from a pathname. `/requirements` (the workspace

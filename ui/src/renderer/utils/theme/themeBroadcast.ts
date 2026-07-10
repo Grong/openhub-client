@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -19,7 +19,7 @@ import { isTauriRuntime } from '@/common/adapter/tauriRuntime';
  *
  * No-op outside the desktop shell (web/WebUI runs a single document, nothing to sync).
  */
-export const THEME_SYNC_EVENT = 'nomifun://theme-sync';
+export const THEME_SYNC_EVENT = 'openhub://theme-sync';
 
 export interface ThemeSyncPayload {
   /** Light/dark scheme — present on a theme toggle, absent on a customCss-only sync. */

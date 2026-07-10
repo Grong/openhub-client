@@ -14,7 +14,7 @@
 **复用**：`WorkspaceRailBody`(源无关、路径根)；`useFileChanges`/`ipcBridge.fileSnapshot.*`(已纯路径键 `{workspace}`)→ Changes 对 `run.work_dir` **零后端**可用；`TerminalWorkspaceRail` 是路径根绑定的现成范式。
 **新增**：
 - 新建 `pages/orchestrator/RunDetail/RunWorkspaceRail.tsx`：仿 TerminalWorkspaceRail，构造 `WorkspaceSource{ workspace: run.work_dir, tree:{key:run.id, listRoot/listChildren 经新 run 路径浏览路由}, lazyChanges:true }`，渲染 `WorkspaceRailBody`。无 upload/selectFiles/refresh 订阅(只读查看)。
-- 后端路径浏览路由：`GET /api/orchestrator/runs/{id}/workspace?path=<rel>` → 受保护层，解析 run 的目录(优先 `run.work_dir`，否则 `orch_workspaces.workspace_dir`)→ 复用 `nomifun_file::list_workspace_level(root, path, search)`(已存在)。ipcBridge `orchestrator.runs.browseWorkspace`。
+- 后端路径浏览路由：`GET /api/orchestrator/runs/{id}/workspace?path=<rel>` → 受保护层，解析 run 的目录(优先 `run.work_dir`，否则 `orch_workspaces.workspace_dir`)→ 复用 `openhub_file::list_workspace_level(root, path, search)`(已存在)。ipcBridge `orchestrator.runs.browseWorkspace`。
 - `TRun` TS 类型加 `work_dir?: string`(后端 Run DTO 已序列化，仅 TS 缺)。
 - run 视图(`index.tsx`)：DagCanvas 所在 detail pane 右侧加**可折叠右栏**(Files/Changes)，绑当前选中 run 的 work_dir;run 无 work_dir(legacy workspace-backed)则栏不显或显空态。
 

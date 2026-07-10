@@ -243,7 +243,7 @@ clearing the binding to mute notifications for that tag.
 
 ## IDMM — keeping turns alive through stalls
 
-IDMM is a separate, optional supervisor (`nomifun-idmm`). It watches a
+IDMM is a separate, optional supervisor (`openhub-idmm`). It watches a
 session and intervenes when a stall is detected:
 
 - **Rule tier (no LLM)** — provider error, repeated retries, model spinning
@@ -258,7 +258,7 @@ from getting stuck so it actually reaches a terminal state instead of
 timing out. Toggle IDMM from the same place as AutoWork (the session
 header).
 
-See `crates/backend/nomifun-idmm/` for the per-tier policy detail and the
+See `crates/backend/openhub-idmm/` for the per-tier policy detail and the
 intervention log API.
 
 > For the full picture — the rule tier, the sidecar model, session keep-alive

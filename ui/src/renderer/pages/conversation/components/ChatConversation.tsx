@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -147,7 +147,7 @@ const _AddNewConversation: React.FC<{ conversation: TChatConversation }> = ({ co
   );
 };
 
-type NomiConversation = Extract<TChatConversation, { type: 'nomi' }>;
+type NomiConversation = Extract<TChatConversation, { type: 'openhub' }>;
 
 const NomiConversationPanel: React.FC<{ conversation: NomiConversation; sliderTitle: React.ReactNode }> = ({
   conversation,
@@ -239,7 +239,7 @@ const NomiConversationPanel: React.FC<{ conversation: NomiConversation; sliderTi
       value={collaborators}
       onChange={onCollaboratorsChange}
       mainModel={mainModelRef}
-      className='nomi-sendbox-model-btn'
+      className='openhub-sendbox-model-btn'
     />
   );
 
@@ -290,7 +290,7 @@ const NomiConversationPanel: React.FC<{ conversation: NomiConversation; sliderTi
     workspacePath: conversation.extra?.workspace,
     isTemporaryWorkspace: (conversation.extra as { is_temporary_workspace?: boolean } | undefined)
       ?.is_temporary_workspace,
-    backend: 'nomi' as const,
+    backend: 'openhub' as const,
     presetAssistant: presetAssistantInfo ? { ...presetAssistantInfo, id: nomiAssistantId } : undefined,
   };
 
@@ -344,7 +344,7 @@ const ChatConversation: React.FC<{
   const { t } = useTranslation();
   const workspaceEnabled = Boolean(conversation?.extra?.workspace);
 
-  const isNomiConversation = conversation?.type === 'nomi';
+  const isNomiConversation = conversation?.type === 'openhub';
 
   // 使用统一的 Hook 获取预设助手信息（ACP/Codex 会话）
   // Use unified hook for preset assistant info (ACP/Codex conversations)
@@ -385,7 +385,7 @@ const ChatConversation: React.FC<{
         // removed. The message history is still served by the shared messages
         // table, so AcpChat renders it fine. The composer is left enabled —
         // any send attempt will get a BadRequest from the factory branch in
-        // nomifun-common/src/enums.rs → factory.rs, surfacing a clear error
+        // openhub-common/src/enums.rs → factory.rs, surfacing a clear error
         // to the user.
         return (
           <AcpChat
@@ -464,7 +464,7 @@ const ChatConversation: React.FC<{
     );
   }, [t]);
 
-  if (conversation && conversation.type === 'nomi') {
+  if (conversation && conversation.type === 'openhub') {
     // 桌面伙伴的专属会话（单会话契约）走受限面板：保留锁定模型/隐藏高级控制/强制 yolo/
     // 固定工作区（详见 CompanionChatPanel → CompanionConversation），而非全功能编排面板。
     if (conversation.extra?.companionSession) {

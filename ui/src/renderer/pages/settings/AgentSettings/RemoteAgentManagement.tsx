@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -33,7 +33,7 @@ const FormItem = Form.Item;
 
 const PAIRING_POLL_INTERVAL = 5_000;
 const PAIRING_TIMEOUT = 5 * 60 * 1000;
-const REMOTE_AGENT_GUIDE_URL = 'https://github.com/nomifun/nomifun-app/wiki/Remote-Agent-Guide-Chinese';
+const REMOTE_AGENT_GUIDE_URL = 'https://github.com/openhub/openhub-app/wiki/Remote-Agent-Guide-Chinese';
 
 type PairingState = 'idle' | 'handshaking' | 'pending' | 'timeout';
 
@@ -61,7 +61,7 @@ const openRemoteAgentGuide = (): void => {
   void openExternalUrl(REMOTE_AGENT_GUIDE_URL).catch(console.error);
 };
 
-/** Remote protocols NomiFun can connect to — surfaced so users can discover them. */
+/** Remote protocols OpenHub can connect to — surfaced so users can discover them. */
 const REMOTE_PROTOCOLS: { key: string; label: string }[] = [
   { key: 'openclaw', label: 'OpenClaw' },
   { key: 'zeroclaw', label: 'ZeroClaw' },

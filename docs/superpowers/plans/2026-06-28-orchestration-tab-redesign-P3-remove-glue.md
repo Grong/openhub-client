@@ -35,7 +35,7 @@
 2. grep 全 ui/src 每个被删符号(`OrchestrationStatusStrip|DagRailTab|useOrchestrationStatus|GuidOrchestrationMode|WORKSPACE_SELECT_TAB`)+ 三态符号(`selectionMode|selectedRange|toggleRangeModel|orchestration-dag|orchestrator_role|model_range`(在 guid/会话侧))→ 逐个清除引用。
 3. GuidModelSelector/useGuidModelSelection 回退单选:对照 git 历史(三态是后加的)——去掉 selectionMode 三态分支,droplist 只留单选 Menu(provider 分组),触发钮显模型名(去主管模型 label)。useGuidModelSelection 去 selectionMode/selectedRange state + 返回。GuidPage 去 orchestrationModeNode/hideModelSelector,modelSelectorNode 恒渲染。
 4. useGuidSend nomi 分支:extra 去 orchestrator_role/model_range;session_mode 回 selectedMode。
-5. ChatSlider 去 orchestration-dag extraTab(只留 nomi-session-metrics 等原有)。ChatConversation 去状态条。
+5. ChatSlider 去 orchestration-dag extraTab(只留 openhub-session-metrics 等原有)。ChatConversation 去状态条。
 6. workspaceEvents/WorkspaceRailBody 去 SELECT_TAB(grep 确认仅 DagRailTab/OrchestrationStatusStrip 用过)。
 7. 清死 i18n + gen:i18n + check:i18n。
 8. `cd ui && npm run typecheck` 反复直到 0(清每个悬挂);`bun run build` 绿。

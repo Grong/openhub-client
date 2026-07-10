@@ -29,13 +29,13 @@ version = "9.9.9"
 TOML
 
 printf "{}\n" > "$WORK/apps/desktop/tauri.updater.conf.json"
-printf "fake updater key\n" > "$WORK/apps/desktop/signing/nomifun-updater.key"
+printf "fake updater key\n" > "$WORK/apps/desktop/signing/openhub-updater.key"
 
 cat > "$TMP_DIR/bin/gh" <<'STUB'
 #!/usr/bin/env bash
 set -euo pipefail
 
-printf "gh %s\n" "$*" >> "$NOMIFUN_TEST_LOG"
+printf "gh %s\n" "$*" >> "$OPENHUB_TEST_LOG"
 if [[ "${1:-}" == "api" && "${2:-}" == "user" ]]; then
   printf "tester\n"
   exit 0
@@ -82,7 +82,7 @@ cat > "$TMP_DIR/bin/bun" <<'STUB'
 #!/usr/bin/env bash
 set -euo pipefail
 
-printf "bun %s\n" "$*" >> "$NOMIFUN_TEST_LOG"
+printf "bun %s\n" "$*" >> "$OPENHUB_TEST_LOG"
 
 if [[ "${1:-}" == "run" && "${2:-}" == "build:linux" ]]; then
   echo "release-linux should call scripts/desktop-build-linux.sh directly" >&2
@@ -102,9 +102,9 @@ if [[ "${1:-}" == "x" && "${2:-}" == "tauri" && "${3:-}" == "build" ]]; then
   mkdir -p "target/$target/release/bundle/deb" \
     "target/$target/release/bundle/appimage" \
     "target/$target/release/bundle/rpm"
-  printf "deb\n" > "target/$target/release/bundle/deb/nomifun_9.9.9_amd64.deb"
-  printf "appimage\n" > "target/$target/release/bundle/appimage/nomifun_9.9.9_amd64.AppImage"
-  printf "rpm\n" > "target/$target/release/bundle/rpm/nomifun-9.9.9-1.x86_64.rpm"
+  printf "deb\n" > "target/$target/release/bundle/deb/openhub_9.9.9_amd64.deb"
+  printf "appimage\n" > "target/$target/release/bundle/appimage/openhub_9.9.9_amd64.AppImage"
+  printf "rpm\n" > "target/$target/release/bundle/rpm/openhub-9.9.9-1.x86_64.rpm"
   exit 0
 fi
 
@@ -114,7 +114,7 @@ fi
 
 if [[ "${1:-}" == "scripts/make-latest-json.mjs" ]]; then
   mkdir -p apps/desktop/updater dist/desktop
-  printf "sig\n" > dist/desktop/nomifun_9.9.9_amd64.AppImage.sig
+  printf "sig\n" > dist/desktop/openhub_9.9.9_amd64.AppImage.sig
   cat > apps/desktop/updater/latest.json <<'JSON'
 {
   "version": "9.9.9",
@@ -122,7 +122,7 @@ if [[ "${1:-}" == "scripts/make-latest-json.mjs" ]]; then
   "platforms": {
     "linux-x86_64": {
       "signature": "fake",
-      "url": "https://github.com/nomifun/nomifun-tauri/releases/download/v9.9.9/nomifun_9.9.9_amd64.AppImage"
+      "url": "https://github.com/Grong/openhub-client/releases/download/v9.9.9/openhub_9.9.9_amd64.AppImage"
     }
   }
 }
@@ -140,8 +140,8 @@ chmod +x "$TMP_DIR/bin/gh" "$TMP_DIR/bin/rustup" "$TMP_DIR/bin/pkg-config" "$TMP
   cd "$WORK"
   PATH="$TMP_DIR/bin:$PATH" \
     GH_TOKEN=fake-token \
-    NOMIFUN_TEST_LOG="$LOG" \
-    NOMIFUN_RELEASE_KEY_FILE="apps/desktop/signing/nomifun-updater.key" \
+    OPENHUB_TEST_LOG="$LOG" \
+    OPENHUB_RELEASE_KEY_FILE="apps/desktop/signing/openhub-updater.key" \
     bash scripts/release-linux.sh -SkipPull -NoPush -Notes "test release" > "$TMP_DIR/release.out"
 )
 

@@ -14,7 +14,7 @@ system prompt 和技能选择。
 
 | 来源 | 来自哪里 | 是否可编辑 |
 | --- | --- | --- |
-| Builtin | 嵌入在 `crates/backend/nomifun-app/assets/builtin-assistants/` 的 manifest，由 `BuiltinAssistantRegistry` 加载。 | 内容只读；启用、排序、最近使用和 builtin `preset_agent_type` 覆盖单独存储。 |
+| Builtin | 嵌入在 `crates/backend/openhub-app/assets/builtin-assistants/` 的 manifest，由 `BuiltinAssistantRegistry` 加载。 | 内容只读；启用、排序、最近使用和 builtin `preset_agent_type` 覆盖单独存储。 |
 | Custom | 用户创建的 `assistants` 表记录和数据目录中的文件。 | 可完整编辑和删除。 |
 | Extension | 已安装扩展通过 `resolvers::assistant` 提供。 | 此页只读；生命周期由扩展管理。 |
 

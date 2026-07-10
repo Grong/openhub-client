@@ -1,6 +1,6 @@
 # Channels
 
-A **channel** lets you operate a NomiFun agent from an external chat app —
+A **channel** lets you operate a OpenHub agent from an external chat app —
 Telegram, Lark / 飞书, DingTalk, WeChat — instead of sitting in front of
 the desktop window. You enable a plugin, paste in its credentials,
 authorize a chat user with a one-time code, and from then on messages
@@ -14,8 +14,8 @@ Channels are useful when:
 - you want long-running tasks ([AutoWork](./autowork-requirements.md))
   to be kickable from outside the desktop without spinning up the WebUI.
 
-> Each platform plugin is a Cargo feature on `nomifun-channel`
-> (`telegram`, `lark`, `dingtalk`, `weixin`). The default NomiFun build
+> Each platform plugin is a Cargo feature on `openhub-channel`
+> (`telegram`, `lark`, `dingtalk`, `weixin`). The default OpenHub build
 > ships with all of them on; if you build the backend yourself with a
 > non-default feature set, the corresponding tab simply disappears.
 
@@ -145,43 +145,43 @@ the **Desktop Gateway** tools, so from your phone you're not talking
 to an isolated chat bot — you're talking to the agent that runs your
 desktop.
 
-What the gateway tools (all prefixed `nomi_*`, 32 of them today) let the
+What the gateway tools (all prefixed `openhub_*`, 32 of them today) let the
 remote agent do on your behalf:
 
 - **Conversations** — list every conversation with its runtime state,
   inspect one (status plus the latest messages, including an in-flight
   streaming reply), send a message or task prompt into any
   conversation, create new ones, update or delete old ones
-  (`nomi_list_conversations`, `nomi_conversation_status`,
-  `nomi_send_to_conversation`, `nomi_create_conversation`,
-  `nomi_update_conversation`, `nomi_delete_conversation`).
+  (`openhub_list_conversations`, `openhub_conversation_status`,
+  `openhub_send_to_conversation`, `openhub_create_conversation`,
+  `openhub_update_conversation`, `openhub_delete_conversation`).
 - **Scheduled tasks** — list / create / update / delete cron jobs
-  (`nomi_cron_list`, `nomi_cron_create`, `nomi_cron_update`,
-  `nomi_cron_delete`).
+  (`openhub_cron_list`, `openhub_cron_create`, `openhub_cron_update`,
+  `openhub_cron_delete`).
 - **Long-term memory** — read and write the companion's global memory bank
-  (`nomi_memory_list`, `nomi_memory_save`, `nomi_memory_update`,
-  `nomi_memory_delete`).
+  (`openhub_memory_list`, `openhub_memory_save`, `openhub_memory_update`,
+  `openhub_memory_delete`).
 - **Requirements** — browse and manage the requirements platform
-  (`nomi_requirement_list`, `nomi_requirement_create`,
-  `nomi_requirement_update`, `nomi_requirement_delete`).
+  (`openhub_requirement_list`, `openhub_requirement_create`,
+  `openhub_requirement_update`, `openhub_requirement_delete`).
 - **Terminals & supervision** — list terminal sessions, create new ones
   (optionally binding knowledge bases via `knowledge_base_ids`), and
   read / toggle a terminal's AutoWork binding and IDMM supervision
-  (`nomi_list_terminals`, `nomi_create_terminal`, `nomi_get_autowork`,
-  `nomi_set_autowork`, `nomi_get_idmm`, `nomi_set_idmm`).
+  (`openhub_list_terminals`, `openhub_create_terminal`, `openhub_get_autowork`,
+  `openhub_set_autowork`, `openhub_get_idmm`, `openhub_set_idmm`).
 - **Knowledge bases** — browse bases and bindings, rebind a
   conversation / terminal / companion, create a new base, write markdown
   files into one, trigger the AI digest, or fetch a URL as markdown —
   so the companion can deposit knowledge on its own
-  (`nomi_knowledge_list_bases`, `nomi_knowledge_get_binding`,
-  `nomi_knowledge_set_binding`, `nomi_knowledge_create_base`,
-  `nomi_knowledge_write_file`, `nomi_knowledge_autogen`,
-  `nomi_knowledge_fetch_url`). `nomi_knowledge_create_base` with
+  (`openhub_knowledge_list_bases`, `openhub_knowledge_get_binding`,
+  `openhub_knowledge_set_binding`, `openhub_knowledge_create_base`,
+  `openhub_knowledge_write_file`, `openhub_knowledge_autogen`,
+  `openhub_knowledge_fetch_url`). `openhub_knowledge_create_base` with
   `urls` fetches in the background — the call returns immediately, so
   don't create the base a second time while waiting; the base's
   description appearing means the fetch + digest pipeline is done.
 - **Providers** — list the configured LLM providers
-  (`nomi_list_providers`).
+  (`openhub_list_providers`).
 
 So *"move my daily-report cron to 9 am and tell me what's running
 right now"* is a single Lark message.

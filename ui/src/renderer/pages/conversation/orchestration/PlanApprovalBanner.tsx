@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -14,7 +14,7 @@ import styles from './planApprovalBanner.module.css';
 
 // Match ProjectedWorkerView's toast conventions (brief, click-through so they
 // never block the banner action).
-const TOAST_CLASS = 'nomifun-message-passthrough';
+const TOAST_CLASS = 'openhub-message-passthrough';
 const TOAST_OK_MS = 1500;
 const TOAST_ERR_MS = 2500;
 

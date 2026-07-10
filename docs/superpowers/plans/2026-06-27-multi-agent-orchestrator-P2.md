@@ -4,7 +4,7 @@
 
 **Goal:** 让 RunEngine 从「串行一次一个就绪任务」升级为「**真并行**，受并发上限约束，依赖仍严格」；worker 会话 id 在创建即上报（前端节点立即可看实时转录）；停止/取消 Run 时**传播取消到在飞 worker 会话**（以 Finish(Cancelled) 收尾）；worker 获得 Run 工作目录。实时流式画布 + 节点转录面板已在 P1b 交付（WS 驱动 useRunLive 刷新），P2 不重做。
 
-**Architecture:** 改造 `nomifun-orchestrator` 的 `RunEngine::run_loop`（engine.rs）+ `ConversationWorkerRunner`（worker.rs）+ `RunEngineDeps` + app `build_orchestrator_state`。并发上限来自 `run.max_parallel ?? fleet_snapshot.max_parallel ?? 全局默认`。在飞 worker 用 `DashMap<task_id, conv_id>` 跟踪；取消经注入的 cancel 钩子（`ConversationService::cancel` by conv_id）。WorkerRunner 新增 `on_started(conv_id)` 回调（创建会话后立即触发）→ 引擎记录在飞 + 立即 `update_task(conversation_id)`（前端实时转录）。
+**Architecture:** 改造 `openhub-orchestrator` 的 `RunEngine::run_loop`（engine.rs）+ `ConversationWorkerRunner`（worker.rs）+ `RunEngineDeps` + app `build_orchestrator_state`。并发上限来自 `run.max_parallel ?? fleet_snapshot.max_parallel ?? 全局默认`。在飞 worker 用 `DashMap<task_id, conv_id>` 跟踪；取消经注入的 cancel 钩子（`ConversationService::cancel` by conv_id）。WorkerRunner 新增 `on_started(conv_id)` 回调（创建会话后立即触发）→ 引擎记录在飞 + 立即 `update_task(conversation_id)`（前端实时转录）。
 
 **Spec：** `docs/superpowers/specs/2026-06-26-multi-agent-orchestrator-design.md` §4.5（并发模型）、§7（取消令 worker 以 Finish(Cancelled) 收尾）。承接 P1a carry-forward（取消传播、workspace_dir）。
 
@@ -14,15 +14,15 @@
 - **取消令在飞 worker 以 Finish(Cancelled) 收尾**（经 ConversationService::cancel，非 Error）；worker await_turn 见 is_processing 清零即返 ok=false。
 - **worker conversation_id 创建即落 task 行**（on_started 回调 → update_task），前端节点立即可开转录；i64。
 - 引擎复刻/沿用 AutoWork Orchestrator 形态；mock trait（MockPlanProducer/MockWorkerRunner）单测；端到端 mock。
-- 测试只跑触碰 crate（`cargo nextest run -p nomifun-orchestrator`/`-p nomifun-app`）；**禁 cargo fmt**；app 必编过。
+- 测试只跑触碰 crate（`cargo nextest run -p openhub-orchestrator`/`-p openhub-app`）；**禁 cargo fmt**；app 必编过。
 - 提交：feature 分支 `feat/multi-agent-orchestrator`；每任务末提交；**禁合并 main**。
 
 ## File Structure（P2）
-- 修改 `crates/backend/nomifun-orchestrator/src/worker.rs`（WorkerRunner trait + ConversationWorkerRunner：on_started 回调）。
-- 修改 `crates/backend/nomifun-orchestrator/src/engine.rs`（RunEngineDeps + 并行 run_loop + 在飞 map + 取消传播）。
-- 修改 `crates/backend/nomifun-orchestrator/src/run_service.rs`（若 cancel 需联动）。
-- 修改 `crates/backend/nomifun-app/src/router/state.rs`（build_orchestrator_state：注入 cancel 钩子 + 并发配置 + workspace 解析）。
-- 修改/扩展 `crates/backend/nomifun-app/tests/orchestrator_run_e2e.rs`（并行 + 取消）。
+- 修改 `crates/backend/openhub-orchestrator/src/worker.rs`（WorkerRunner trait + ConversationWorkerRunner：on_started 回调）。
+- 修改 `crates/backend/openhub-orchestrator/src/engine.rs`（RunEngineDeps + 并行 run_loop + 在飞 map + 取消传播）。
+- 修改 `crates/backend/openhub-orchestrator/src/run_service.rs`（若 cancel 需联动）。
+- 修改 `crates/backend/openhub-app/src/router/state.rs`（build_orchestrator_state：注入 cancel 钩子 + 并发配置 + workspace 解析）。
+- 修改/扩展 `crates/backend/openhub-app/tests/orchestrator_run_e2e.rs`（并行 + 取消）。
 
 ---
 
@@ -46,12 +46,12 @@ pub trait WorkerRunner: Send + Sync {
 - `ConversationWorkerRunner::run`：`create()` 得到 conv 后**立即 `on_started(conv.id)`**，再 send_message + await_turn + read_final_text（其余配方不变）。
 - `MockWorkerRunner`：也调用 `on_started(fixed_conv_id)` 后返回固定 outcome（供 Task 2 引擎测试在飞跟踪 + 可选延迟）。给 MockWorkerRunner 加一个可选 `delay: Duration`（默认 0；Task 2 并发测试用它制造重叠窗口）。
 
-参照模板：当前 `worker.rs`（P1a，nomi_agent_run 配方）。
+参照模板：当前 `worker.rs`（P1a，openhub_agent_run 配方）。
 
 - [ ] **Step 1: 改 trait + 两个 impl 测试（失败优先）** — ConversationWorkerRunner（对 Mock AgentInstance 或仅断言 on_started 在 create 后、await 前被调用一次 + 传对 conv_id）；MockWorkerRunner（on_started 调用 + delay 生效）。
-- [ ] **Step 2: 跑确认失败** — `cargo nextest run -p nomifun-orchestrator worker`。
+- [ ] **Step 2: 跑确认失败** — `cargo nextest run -p openhub-orchestrator worker`。
 - [ ] **Step 3: 实现** on_started（ConversationWorkerRunner 在 create 后调用；MockWorkerRunner 调用 + delay）。
-- [ ] **Step 4: 跑确认通过** + `cargo build -p nomifun-orchestrator`（注意：引擎现有调用点会因签名变更编译失败——本任务**仅改 worker.rs + 其测试**，引擎调用点的修复在 Task 2；若 `cargo build -p nomifun-orchestrator` 因 engine.rs 调用点报错，这是预期的，Task 2 修；本任务用 `cargo build -p nomifun-orchestrator --lib` 是否能过取决于 engine 是否同 crate——engine 同 crate,故本任务需同时把 engine.rs 的调用点临时适配[传一个空 on_started Box::new(|_|{})]以保持 crate 编译,Task 2 再做真并行)。**决策**：本任务把 engine 调用点改为传 `Box::new(|_| {})` 占位(保持串行+编译绿),Task 2 替换为真并行+在飞记录。
+- [ ] **Step 4: 跑确认通过** + `cargo build -p openhub-orchestrator`（注意：引擎现有调用点会因签名变更编译失败——本任务**仅改 worker.rs + 其测试**，引擎调用点的修复在 Task 2；若 `cargo build -p openhub-orchestrator` 因 engine.rs 调用点报错，这是预期的，Task 2 修；本任务用 `cargo build -p openhub-orchestrator --lib` 是否能过取决于 engine 是否同 crate——engine 同 crate,故本任务需同时把 engine.rs 的调用点临时适配[传一个空 on_started Box::new(|_|{})]以保持 crate 编译,Task 2 再做真并行)。**决策**：本任务把 engine 调用点改为传 `Box::new(|_| {})` 占位(保持串行+编译绿),Task 2 替换为真并行+在飞记录。
 - [ ] **Step 5: 提交** `git commit -m "feat(orchestrator): WorkerRunner on_started 早报 conv_id"`
 
 ---
@@ -102,9 +102,9 @@ loop {
 参照模板：当前 `engine.rs`（P1a 串行 run_loop）；AutoWork Orchestrator；`futures::FuturesUnordered`/`tokio::JoinSet` 语义。
 
 - [ ] **Step 1: 写并发集成测试（失败优先，全 mock）** — DAG: A(无依赖), B(无依赖), C(依赖 A+B)。MockWorkerRunner delay=100ms。cap=2。断言：A、B **并发**执行（用计数器/时间戳证重叠：总耗时 ≈100ms 而非串行 200ms+；或记录 max 并发=2），C 在 A、B 都 done 后才跑；run→completed，全 done，output_summary 落库。再测 cap=1 退化为串行（A→B→C 序）。再测 workspace_dir 透传（MockWorkerRunner 记录收到的 workspace_dir == run 的 workspace_dir）。
-- [ ] **Step 2: 跑确认失败** — `cargo nextest run -p nomifun-orchestrator engine`（现串行,并发断言失败）。
+- [ ] **Step 2: 跑确认失败** — `cargo nextest run -p openhub-orchestrator engine`（现串行,并发断言失败）。
 - [ ] **Step 3: 实现并行 run_loop + RunEngineDeps 扩展 + workspace 解析 + on_started 在飞记录/落库**。
-- [ ] **Step 4: 跑确认通过** + `cargo build -p nomifun-orchestrator`。**关键**：复核无 busy-spin（无就绪+有在飞→await；无就绪+无在飞→break）、依赖严格（C 不早跑）、cap 生效。
+- [ ] **Step 4: 跑确认通过** + `cargo build -p openhub-orchestrator`。**关键**：复核无 busy-spin（无就绪+有在飞→await；无就绪+无在飞→break）、依赖严格（C 不早跑）、cap 生效。
 - [ ] **Step 5: 提交** `git commit -m "feat(orchestrator): RunEngine 真并行调度(并发上限)+workspace_dir 注入"`
 
 ---
@@ -117,15 +117,15 @@ loop {
 - `RunEngineDeps` 加 `cancel_conversation: Arc<dyn Fn(i64) + Send + Sync>`（或一个小 trait `ConversationCanceller { async fn cancel(&self, conv_id: i64); }`）。app 注入一个调用 `ConversationService::cancel(SYSTEM_USER_ID, conv_id.to_string(), ..., &task_manager)` 的实现（读 service.rs 确认 cancel 签名：user_cancel 戳 + agent.cancel,幂等;无活 agent 时 no-op）。
 - `RunEngine::stop(run_id)`：设 cancelled 标志 + abort loop（现有）**并** 取消该 run 所有在飞 conv（遍历在飞 map 的 conv_id 调 cancel_conversation）。worker 的 await_turn 见 is_processing 清零 → 返 ok=false → 任务标 failed/cancelled（P2：取消的 run，任务收尾不必标 failed,可标 cancelled 或留 running 由 run=cancelled 覆盖——取简单:run=cancelled 即可,在飞任务被取消后自然 await 返回,引擎因 cancelled 不再处理 outcome)。
 - **app 接线**（build_orchestrator_state）：RunEngineDeps 加 `default_max_parallel`(如 4)、`ws_repo`、`cancel_conversation`(包 ConversationService::cancel)。其余沿用。
-- **集成测试**（mock，nomifun-app 或 orchestrator crate）：(a) 并行 run 经真 wiring 跑到 completed（mock planner+worker）；(b) cancel 中途 → run=cancelled，在飞 worker 被调用 cancel（mock canceller 记录被调用的 conv_id 非空）。**app 必编过**。
+- **集成测试**（mock，openhub-app 或 orchestrator crate）：(a) 并行 run 经真 wiring 跑到 completed（mock planner+worker）；(b) cancel 中途 → run=cancelled，在飞 worker 被调用 cancel（mock canceller 记录被调用的 conv_id 非空）。**app 必编过**。
 
 参照模板：`ConversationService::cancel`（service.rs）；AutoWork Orchestrator stop 的 task_manager.get_task().cancel()（orchestrator.rs:246-255）；P1a build_orchestrator_state。
 
 - [ ] **Step 1: 写取消传播测试（失败优先）** — engine: 用 MockWorkerRunner（长 delay + on_started 报 conv_id）+ mock canceller（记录被取消的 conv_id）。start run → 等任务进 running（conv 已报）→ stop → 断言 mock canceller 收到在飞 conv_id，run=cancelled。
-- [ ] **Step 2: 跑确认失败** — `cargo nextest run -p nomifun-orchestrator engine`（cancel propagation）。
+- [ ] **Step 2: 跑确认失败** — `cargo nextest run -p openhub-orchestrator engine`（cancel propagation）。
 - [ ] **Step 3: 实现 cancel 钩子 + stop 取消在飞 + RunEngineDeps 扩展**。
 - [ ] **Step 4: app 接线** build_orchestrator_state 注入 cancel_conversation(ConversationService::cancel) + default_max_parallel + ws_repo。
-- [ ] **Step 5: `cargo build -p nomifun-app`（关键闸）+ 集成测试** — 并行 run 跑通 + cancel 传播；扩展 orchestrator_run_e2e。
+- [ ] **Step 5: `cargo build -p openhub-app`（关键闸）+ 集成测试** — 并行 run 跑通 + cancel 传播；扩展 orchestrator_run_e2e。
 - [ ] **Step 6: 提交** `git commit -m "feat(orchestrator): 取消传播到在飞 worker + 并行引擎 app 接线"`
 
 ---

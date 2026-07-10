@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -128,9 +128,9 @@ export const useGuidAgentSelection = ({
 }: UseGuidAgentSelectionOptions): GuidAgentSelectionResult => {
   const [selectedAgentKey, _setSelectedAgentKey] = useState<string>(() => {
     try {
-      return configService.get('guid.lastSelectedAgent') || 'nomi';
+      return configService.get('guid.lastSelectedAgent') || 'openhub';
     } catch {
-      return 'nomi';
+      return 'openhub';
     }
   });
   const [availableAgents, setAvailableAgents] = useState<AvailableAgent[]>();
@@ -337,7 +337,7 @@ export const useGuidAgentSelection = ({
       const currentIsPreset = selectedAgentKey.startsWith('custom:');
       if (currentIsPreset) {
         const firstCliAgent = availableAgents.find((a) => !a.is_preset);
-        const fallbackKey = firstCliAgent ? getAgentKey(firstCliAgent) : 'nomi';
+        const fallbackKey = firstCliAgent ? getAgentKey(firstCliAgent) : 'openhub';
         _setSelectedAgentKey(fallbackKey);
         configService.set('guid.lastSelectedAgent', fallbackKey).catch((error) => {
           console.error('Failed to save reset agent key:', error);
@@ -471,7 +471,7 @@ export const useGuidAgentSelection = ({
         let preferred: string | undefined;
         let yoloMode = false;
 
-        if (configKey === 'nomi') {
+        if (configKey === 'openhub') {
           const config = configService.get('nomi.config');
           preferred = config?.preferredMode;
         } else {
@@ -551,7 +551,7 @@ export const useGuidAgentSelection = ({
   // Key of the first non-preset CLI agent (used as fallback when leaving preset mode)
   const defaultAgentKey = useMemo(() => {
     const firstCliAgent = availableAgents?.find((a) => !a.is_preset);
-    return firstCliAgent ? getAgentKey(firstCliAgent) : 'nomi';
+    return firstCliAgent ? getAgentKey(firstCliAgent) : 'openhub';
   }, [availableAgents]);
 
   return {

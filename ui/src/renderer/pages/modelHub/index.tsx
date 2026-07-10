@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -25,7 +25,7 @@ type Section = 'agents' | 'models' | 'creation' | 'global';
 const isSection = (value: string | null): value is Section =>
   value === 'agents' || value === 'models' || value === 'creation' || value === 'global';
 
-const MODELHUB_SIDER_STORAGE_KEY = 'nomifun:modelhub-sider-width';
+const MODELHUB_SIDER_STORAGE_KEY = 'openhub:modelhub-sider-width';
 
 interface SectionDef {
   key: Section;

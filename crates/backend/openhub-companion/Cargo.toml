@@ -1,0 +1,29 @@
+[package]
+name = "openhub-companion"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+openhub-common.workspace = true
+openhub-redact.workspace = true
+openhub-memory.workspace = true
+openhub-db.workspace = true
+openhub-api-types.workspace = true
+openhub-realtime.workspace = true
+openhub-ai-agent.workspace = true
+openhub-extension.workspace = true
+openhub-auth.workspace = true
+openhub-conversation.workspace = true
+axum.workspace = true
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sqlx.workspace = true
+chrono.workspace = true
+tracing.workspace = true
+async-trait.workspace = true
+zip.workspace = true
+reqwest.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true

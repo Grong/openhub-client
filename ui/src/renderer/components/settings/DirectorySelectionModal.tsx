@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -129,7 +129,7 @@ const DirectorySelectionModal: React.FC<DirectorySelectionModalProps> = ({
       onCancel={onCancel}
       onOk={handleConfirm}
       okButtonProps={{ disabled: !selectedPath }}
-      className='nomifun-file-picker-modal w-[90vw] md:w-[600px]'
+      className='openhub-file-picker-modal w-[90vw] md:w-[600px]'
       style={{ width: 'min(600px, 90vw)' }}
       wrapStyle={{ zIndex: 3000 }}
       maskStyle={{ zIndex: 2990 }}
@@ -147,7 +147,7 @@ const DirectorySelectionModal: React.FC<DirectorySelectionModalProps> = ({
             <Button onClick={onCancel}>{t('common.cancel')}</Button>
             <Button
               type='primary'
-              className='nomifun-file-picker-confirm'
+              className='openhub-file-picker-confirm'
               onClick={handleConfirm}
               disabled={!selectedPath}
             >

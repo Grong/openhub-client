@@ -114,7 +114,7 @@ if (message.type === 'plan') continue;
 `<PinnedPlan />`：
 
 - `platforms/acp/AcpChat.tsx`
-- `platforms/nomi/NomiChat.tsx`
+- `platforms/openhub/NomiChat.tsx`
 - `platforms/nanobot/NanobotChat.tsx`
 - `platforms/openclaw/OpenClawChat.tsx`
 - `platforms/remote/RemoteChat.tsx`

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -16,10 +16,10 @@ describe('public contact links', () => {
     const combined = `${aboutSource}\n${contactSource}`;
 
     for (const target of [
-      'https://www.nomifun.com',
-      'https://www.nomifun.com/contact',
-      'https://github.com/nomifun/nomifun-tauri/issues',
-      'https://github.com/nomifun/nomifun-tauri/releases',
+      'https://www.openhub.dev',
+      'https://www.openhub.dev/contact',
+      'https://github.com/Grong/openhub-client/issues',
+      'https://github.com/Grong/openhub-client/releases',
       '535526063@qq.com',
     ]) {
       expect(combined.includes(target)).toBe(true);
@@ -34,7 +34,7 @@ describe('public contact links', () => {
     const updateModalSource = readSource(new URL('../../UpdateModal.tsx', import.meta.url));
 
     expect(contactSource.includes("baiduPan: 'https://pan.baidu.com/s/5GPonoJNrwJ7GciBSDgXLaA'")).toBe(true);
-    expect(aboutSource.includes('NOMIFUN_PUBLIC_LINKS.baiduPan')).toBe(true);
+    expect(aboutSource.includes('OPENHUB_PUBLIC_LINKS.baiduPan')).toBe(true);
     expect(aboutSource.includes('settings.baiduManualDownload')).toBe(true);
     expect(updateModalSource.includes('settings.baiduManualDownload')).toBe(true);
   });

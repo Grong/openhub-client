@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -890,7 +890,7 @@ const SendBox: React.FC<{
   useAddEventListener(
     'nomi.selected.file.append',
     (items: FileSelectionItem[]) => {
-      if (conversationContext?.type === 'nomi') {
+      if (conversationContext?.type === 'openhub') {
         handleExternalSelectionAppend(items);
       }
     },
@@ -945,7 +945,7 @@ const SendBox: React.FC<{
   const emitSelectedFileAppend = useCallback(
     (item: FileOrFolderItem) => {
       switch (conversationContext?.type) {
-        case 'nomi':
+        case 'openhub':
           emitter.emit('nomi.selected.file.append', [item]);
           break;
         case 'acp':

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  * Based on AionUi (https://github.com/iOfficeAI/AionUi)
  */
@@ -311,7 +311,7 @@ export const useGuidSend = (deps: GuidSendDeps): GuidSendResult => {
     }
 
     // Nomi path (direct selection or preset assistant with nomi as main agent)
-    if (selectedAgent === 'nomi' || (is_preset && finalEffectiveAgentType === 'nomi')) {
+    if (selectedAgent === 'openhub' || (is_preset && finalEffectiveAgentType === 'openhub')) {
       if (!current_model) {
         Message.warning(t('conversation.noModelConfigured'));
         return;
@@ -319,7 +319,7 @@ export const useGuidSend = (deps: GuidSendDeps): GuidSendResult => {
 
       try {
         const conversation = await ipcBridge.conversation.create.invoke({
-          type: 'nomi',
+          type: 'openhub',
           name: entryPlan.conversationName,
           model: current_model,
           extra: {
@@ -361,7 +361,7 @@ export const useGuidSend = (deps: GuidSendDeps): GuidSendResult => {
           files: files.length > 0 ? files : undefined,
         };
         if (entryPlan.sendInitialMessage) {
-          sessionStorage.setItem(`nomi_initial_message_${conversation.id}`, JSON.stringify(initialMessage));
+          sessionStorage.setItem(`openhub_initial_message_${conversation.id}`, JSON.stringify(initialMessage));
         }
 
         seedConversationCache(conversation);

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -148,7 +148,7 @@ const GuidPage: React.FC = () => {
   // --- Hooks ---
   // Only nomi uses this provider-based model picker now (Gemini runs as a
   // regular ACP backend with its own model selector).
-  const modelSelection = useGuidModelSelection('nomi');
+  const modelSelection = useGuidModelSelection('openhub');
   const mainModelRef = useMemo<TModelRef | null>(
     () =>
       modelSelection.current_model
@@ -556,7 +556,7 @@ const GuidPage: React.FC = () => {
 
   // Agents that use configured model providers instead of ACP probe-based models.
   // Only nomi now — Gemini runs as a regular ACP backend with ACP-cached models.
-  const PROVIDER_BASED_AGENTS = new Set(['nomi']);
+  const PROVIDER_BASED_AGENTS = new Set(['openhub']);
   const isGeminiMode =
     PROVIDER_BASED_AGENTS.has(effectiveAgentType) &&
     (!agentSelection.is_presetAgent || agentSelection.currentEffectiveAgentInfo.isAvailable);
@@ -588,7 +588,7 @@ const GuidPage: React.FC = () => {
       value={orchestrationCollaborators}
       onChange={handleOrchestrationCollaboratorsChange}
       mainModel={mainModelRef}
-      className='nomi-sendbox-model-btn'
+      className='openhub-sendbox-model-btn'
     />
   );
   const clusterApprovalSelectorNode = (

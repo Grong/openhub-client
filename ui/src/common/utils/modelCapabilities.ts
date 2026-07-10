@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -11,7 +11,7 @@ import type { IProvider, ModelType } from '@/common/config/storage';
  *
  * `image_generation` / `video_generation` are the Creative Workshop generator
  * signals — kept in sync with the backend engine
- * `nomifun_api_types::infer_generation_capabilities`. They double as the source
+ * `openhub_api_types::infer_generation_capabilities`. They double as the source
  * for "which models can generate images/videos" queried by the workshop.
  */
 export const CAPABILITY_PATTERNS: Record<ModelType, RegExp> = {

@@ -43,10 +43,10 @@ moving, while IDMM/model failover try to keep each claimed turn alive.
 
 ## Source Of Truth
 
-- `crates/backend/nomifun-conversation/src/model_failover.rs`
-- `crates/backend/nomifun-conversation/src/failover_seam.rs`
-- `crates/backend/nomifun-app/src/router/model_failover.rs`
-- `crates/backend/nomifun-idmm/src/policy.rs`
+- `crates/backend/openhub-conversation/src/model_failover.rs`
+- `crates/backend/openhub-conversation/src/failover_seam.rs`
+- `crates/backend/openhub-app/src/router/model_failover.rs`
+- `crates/backend/openhub-idmm/src/policy.rs`
 
 Older copies of this page described multi-credential round-robin routing. That
 was not the current implementation and should not be used as operator guidance.

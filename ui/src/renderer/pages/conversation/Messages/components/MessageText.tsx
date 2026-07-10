@@ -1,12 +1,12 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import type { IMessageText, KnowledgeWritebackState, KnowledgeWritebackStatus } from '@/common/chat/chatLib';
 import { toDisplayText } from '@/common/chat/displayText';
-import { NOMIFUN_FILES_MARKER } from '@/common/config/constants';
+import { OPENHUB_FILES_MARKER } from '@/common/config/constants';
 import { useConversationContextSafe } from '@/renderer/hooks/context/ConversationContext';
 import { useLayoutContext } from '@/renderer/hooks/context/LayoutContext';
 import { iconColors } from '@/renderer/styles/colors';
@@ -139,12 +139,12 @@ const MessageKnowledgeWriteback: React.FC<{ state: KnowledgeWritebackState }> = 
 };
 
 const parseFileMarker = (content: string) => {
-  const markerIndex = content.indexOf(NOMIFUN_FILES_MARKER);
+  const markerIndex = content.indexOf(OPENHUB_FILES_MARKER);
   if (markerIndex === -1) {
     return { text: content, files: [] as string[] };
   }
   const text = content.slice(0, markerIndex).trimEnd();
-  const afterMarker = content.slice(markerIndex + NOMIFUN_FILES_MARKER.length).trim();
+  const afterMarker = content.slice(markerIndex + OPENHUB_FILES_MARKER.length).trim();
   const files = afterMarker
     ? afterMarker
         .split('\n')
@@ -256,7 +256,7 @@ const MessageText: React.FC<{ message: IMessageText; hideActions?: boolean }> = 
   );
 
   // 编辑（仅 Nomi 原生、且为最近一条用户文本消息）：把原文回填输入框并截断本地后续消息。
-  const canEdit = conversationContext?.type === 'nomi' && isUserMessage && message.type === 'text' && isLatestUserMessage;
+  const canEdit = conversationContext?.type === 'openhub' && isUserMessage && message.type === 'text' && isLatestUserMessage;
 
   const handleEdit = () => {
     if (!message.msg_id || !message.created_at) return;

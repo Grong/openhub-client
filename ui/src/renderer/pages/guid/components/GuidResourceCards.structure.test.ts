@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -37,12 +37,12 @@ describe('Guid resource cards placement', () => {
   test('contains docs, promo video, and contact feedback cards without recent prompt data access', () => {
     const source = readSource(new URL('./GuidResourceCards.tsx', import.meta.url));
 
-    expect(source.includes('https://www.nomifun.com/docs')).toBe(true);
+    expect(source.includes('https://www.openhub.dev/docs')).toBe(true);
     expect(source.includes('https://www.bilibili.com/video/BV1kwKZ6UE5X/')).toBe(true);
     expect(source.includes('https://youtu.be/AsEToBDFR9s')).toBe(true);
     expect(source.includes('https://youtu.be/gEDo5H0H0Pg')).toBe(false);
-    expect(source.includes('https://www.nomifun.com/contact')).toBe(true);
-    expect(source.includes('https://github.com/nomifun/nomifun-tauri/issues')).toBe(false);
+    expect(source.includes('https://www.openhub.dev/contact')).toBe(true);
+    expect(source.includes('https://github.com/Grong/openhub-client/issues')).toBe(false);
     expect(source.includes('RECENT_PROMPT_LIMIT')).toBe(false);
     expect(source.includes('getConversationMessages')).toBe(false);
     expect(source.includes('useConversationHistoryContext')).toBe(false);

@@ -18,14 +18,14 @@ remote-access panel. The legacy `/settings/webui` route redirects there.
   reviewed separately before enabling them.
 
 > The WebUI remote-access controls are meaningful inside the desktop shell. In a
-> browser tab against `nomifun-web`, you are already using the dedicated Web host;
+> browser tab against `openhub-web`, you are already using the dedicated Web host;
 > use [Web Server Deployment](./web-server-deployment.md) settings instead.
 
 ## What enabling it does
 
 Toggling **Enable WebUI** on starts an additional authenticated server inside the desktop process:
 
-- **Default port `25808`** (`25809` in dev mode, `25810` when `NOMIFUN_MULTI_INSTANCE=1`).
+- **Default port `25808`** (`25809` in dev mode, `25810` when `OPENHUB_MULTI_INSTANCE=1`).
 - An admin user (default name `admin`) is provisioned with a freshly generated random password — shown in plaintext **once**, on this first start, so you can copy it.
 - The server's lifetime is tracked by the desktop main process; the toggle reflects the *real* server state, not a remembered preference, so a silent failure (port conflict, etc.) leaves the switch off rather than misleading you into thinking it is up.
 
@@ -36,7 +36,7 @@ The desktop process serves its backend on **two** sockets that share one in-proc
 - A **permanent loopback listener** on an ephemeral port — the desktop's own webview, trusted via the per-boot secret. Always up; never disturbed by toggling remote access.
 - An **on-demand LAN listener** on `0.0.0.0:25808` — bound only when you enable remote access, torn down when you disable it. Remote browsers reach this one and must log in. Trust is the secret (which only the desktop webview holds), *not* "arrived on loopback", so other OS accounts on a shared workstation and same-host reverse proxies are **not** auto-trusted. The LAN listener additionally enforces a Host/Origin allow-list (IP/localhost only, blocking DNS-rebinding) and rate-limits by real peer address.
 
-Because of the exclusive data-dir lock, the desktop process is the only backend on its data directory — so the LAN listener lives *inside* the desktop app, it is not a co-running `nomifun-web`.
+Because of the exclusive data-dir lock, the desktop process is the only backend on its data directory — so the LAN listener lives *inside* the desktop app, it is not a co-running `openhub-web`.
 
 ## Binding and the access URL
 
@@ -74,23 +74,23 @@ QR login always logs you in as the configured WebUI admin (the primary admin use
 
 ![QR code login on phone](../images/webui-04-qr-login-phone.png)
 
-## How this differs from `nomifun-web`
+## How this differs from `openhub-web`
 
-| | WebUI remote access | `nomifun-web` (Web Server Deployment) |
+| | WebUI remote access | `openhub-web` (Web Server Deployment) |
 |---|---|---|
 | Where it runs | Inside your already-running desktop app | A separate, headless binary |
 | GUI required to start | Yes (the Settings toggle) | No |
-| Admin provisioning | Auto-generated password on first enable | Interactive first-run setup, or `NOMIFUN_ADMIN_PASSWORD` |
+| Admin provisioning | Auto-generated password on first enable | Interactive first-run setup, or `OPENHUB_ADMIN_PASSWORD` |
 | Default port | `25808` (prod), `25809` (dev) | `8787` |
 | Survives reboot | Only if your desktop app is running | Yes, with systemd / Docker `restart: unless-stopped` |
-| TLS | None built in (LAN-oriented) | Caddy / nginx in front; `NOMIFUN_HTTPS=true` |
+| TLS | None built in (LAN-oriented) | Caddy / nginx in front; `OPENHUB_HTTPS=true` |
 | Use case | Quick remote access from a phone on the same network | A real always-on server |
 
 If you find yourself leaving the desktop app running on a server-like box just so the WebUI server stays up, that is the cue to switch to a dedicated [Web Server Deployment](./web-server-deployment.md).
 
 ## Security notes
 
-- The server listens on plain HTTP. Use it on a **trusted local network** (your home Wi-Fi, a VPN, Tailscale, etc.). For exposure beyond that, deploy `nomifun-web` behind a TLS reverse proxy instead.
+- The server listens on plain HTTP. Use it on a **trusted local network** (your home Wi-Fi, a VPN, Tailscale, etc.). For exposure beyond that, deploy `openhub-web` behind a TLS reverse proxy instead.
 - The admin user has the same capabilities as the local desktop user: shell access, file access, agent execution. Treat the admin password and QR tokens accordingly.
 - Changing the password (in-app or via reset) invalidates all existing sessions because the JWT signing secret rotates atomically with the password update.
 - The QR token is one-shot — once scanned and consumed it cannot be reused. A leaked token is therefore self-limiting, but a leaked URL **before** scanning still grants login. Don't post screenshots of the QR.
@@ -107,5 +107,5 @@ If you find yourself leaving the desktop app running on a server-like box just s
 
 ## See also
 
-- [Running NomiFun as a Desktop App](./desktop-app.md)
+- [Running OpenHub as a Desktop App](./desktop-app.md)
 - [Web Server Deployment](./web-server-deployment.md) — when you want a real always-on server, not a desktop side-channel.

@@ -215,7 +215,7 @@ function clearReleaseIntermediatesPreservingBundle(releaseDir, label) {
 function robocopyEmptyMirror(dir) {
   let scratch;
   try {
-    scratch = mkdtempSync(join(tmpdir(), 'nomi-empty-'));
+    scratch = mkdtempSync(join(tmpdir(), 'openhub-empty-'));
     const r = spawnSync(
       'robocopy',
       [scratch, dir, '/MIR', '/XJ', '/R:0', '/W:0', '/MT:16', '/NFL', '/NDL', '/NJH', '/NJS', '/NC', '/NS', '/NP'],

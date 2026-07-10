@@ -1,12 +1,12 @@
 # 智能编排 → Ultracode 增强 · Phase 1:编排模式库 实施计划
 
-> **For agentic workers:** REQUIRED SUB-SKILL: superpowers:subagent-driven-development。前端部分另需 frontend-design。**本阶段是对既有多 agent 编排引擎(crates/backend/nomifun-orchestrator,HEAD bad2de2a)的增强,不是重写。严禁引入 IR/compile()/类型化端口/用户手画图(那是已被撤回的错误方向,存档 tag archive/visual-workflows-rewrite)。**
+> **For agentic workers:** REQUIRED SUB-SKILL: superpowers:subagent-driven-development。前端部分另需 frontend-design。**本阶段是对既有多 agent 编排引擎(crates/backend/openhub-orchestrator,HEAD bad2de2a)的增强,不是重写。严禁引入 IR/compile()/类型化端口/用户手画图(那是已被撤回的错误方向,存档 tag archive/visual-workflows-rewrite)。**
 
 **Goal:** 让主 agent 能像 Claude ultracode 那样编排**结构化多 agent 模式**(fan-out 扇出 / 对抗 verify / judge 评审团 / loop-until-dry / 综合 synthesis),在现有 task-DAG 引擎上以**任务 kind** 实现,主 agent 规划、引擎执行、现有 react-flow DAG 画布可视化(模式感知)。
 
 **Architecture:** 给 `PlannedTask`/`RunTask` 加一个 `kind` 字段(默认 `agent` = 完全现状,零回归)+ 每 kind 的最小 config;教 `PLAN_SYSTEM` 何时用各模式;`engine.rs` 的 dispatch 按 kind 分支(agent=现状;pattern kind=模式执行);现有 DagCanvas 按 kind 渲染(分组/徽标)。模式的语义(N-skeptic 多数票/judge Borda/loop-until-dry)可**参考**存档 tag 里已验证的逻辑思路,但实现在 orch 引擎上(task+worker+dep),不搬其 Program/frame 机制。
 
-**Tech Stack:** Rust(nomifun-orchestrator engine/plan/run_service + nomifun-db migration)+ React/react-flow(DagCanvas/TaskNode)。
+**Tech Stack:** Rust(openhub-orchestrator engine/plan/run_service + openhub-db migration)+ React/react-flow(DagCanvas/TaskNode)。
 
 ## Global Constraints
 - **不引入 IR/compile/typed-graph/用户手画图。** 节点=agent 任务(有 model/prompt/status),由主 agent 规划,用户观测+控制(重跑/换模型/微调 prompt),不手画类型化计算图。
@@ -23,8 +23,8 @@
 - **loop**:对某子任务**迭代重跑直到停止条件**(max_iter / dry / judge-approves)。需在无环引擎里加有界迭代(最大)。
 
 ## File Structure
-- `nomifun-orchestrator/src/{plan.rs(教模式+schema 加 kind), engine.rs(dispatch 按 kind+模式执行+真 synthesis), run_service.rs, events.rs}`;`nomifun-api-types/src/orchestrator.rs`(PlannedTask/RunTask 加 kind+config)+ TS 镜像。
-- `nomifun-db/migrations/0XX_task_kind.sql`(orch_run_tasks 加 kind+pattern_config)+ db_lifecycle 版本同步。
+- `openhub-orchestrator/src/{plan.rs(教模式+schema 加 kind), engine.rs(dispatch 按 kind+模式执行+真 synthesis), run_service.rs, events.rs}`;`openhub-api-types/src/orchestrator.rs`(PlannedTask/RunTask 加 kind+config)+ TS 镜像。
+- `openhub-db/migrations/0XX_task_kind.sql`(orch_run_tasks 加 kind+pattern_config)+ db_lifecycle 版本同步。
 - `ui/src/renderer/pages/orchestrator/{RunDetail/DagCanvas,nodes/TaskNode,…}`(按 kind 渲染/分组/徽标)。
 
 ## 分期(1a 先交付→你验收→再 1b-1d)

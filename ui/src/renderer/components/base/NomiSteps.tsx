@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -58,10 +58,10 @@ export interface NomiStepsProps extends StepsProps {
  * </NomiSteps>
  * ```
  *
- * @see arco-override.css for custom styles (.nomifun-steps)
+ * @see arco-override.css for custom styles (.openhub-steps)
  */
 const NomiSteps: React.FC<NomiStepsProps> & { Step: typeof Steps.Step } = ({ className, ...props }) => {
-  return <Steps {...props} className={classNames('nomifun-steps', className)} />;
+  return <Steps {...props} className={classNames('openhub-steps', className)} />;
 };
 
 NomiSteps.displayName = 'NomiSteps';

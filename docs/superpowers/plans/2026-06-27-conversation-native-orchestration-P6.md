@@ -12,7 +12,7 @@
 - 不破坏 P1-P5/orchestrator_run_e2e/run 生命周期/IDMM。**禁合并 main**(已 merge main 进本分支=反向同步,OK)。
 
 ## File Structure（已勘察）
-- 后端:`nomifun-gateway/src/caps_orchestrator.rs`(nomi_run_create 默认 autonomy=interactive) 或 `nomifun-orchestrator/src/run_service.rs`(create_adhoc 默认);可能 `routes.rs`(approve 已存在)。
+- 后端:`openhub-gateway/src/caps_orchestrator.rs`(openhub_run_create 默认 autonomy=interactive) 或 `openhub-orchestrator/src/run_service.rs`(create_adhoc 默认);可能 `routes.rs`(approve 已存在)。
 - 前端状态条:新 `ui/src/renderer/pages/orchestrator/RunDetail/OrchestrationStatusStrip.tsx` + 挂载于会话(ChatLayout header `headerExtra`/`headerLeading` 或 NomiConversationPanel 顶部);新 hook 派生 lead 状态。
 - 前端自动展开:`OrchestrationStatusStrip`/ChatSlider 在 run 出现时 `dispatchWorkspaceToggleEvent`/展开(workspaceEvents.ts)。
 - 前端 inspector:`WorkerTranscriptPanel.tsx`(加「配置」段:role/model/persona/skills/status)。
@@ -22,16 +22,16 @@
 
 ## Task 1: 多 agent 默认 interactive(审批闸)
 
-**Files:** Modify `nomifun-gateway/src/caps_orchestrator.rs`(create handler);测试内联。
+**Files:** Modify `openhub-gateway/src/caps_orchestrator.rs`(create handler);测试内联。
 
-**改动:** `nomi_run_create` 构造 `CreateAdhocRunRequest` 时,`autonomy` 默认 `"interactive"`(不再走 create_adhoc 的 supervised 默认)。这样:用户提交→主管调 nomi_run_create→run `plan()`→状态 `awaiting_plan_approval`(不自动 engine.start)→等用户批准。nomi_run_create 工具返回应包含 `status: "awaiting_plan_approval"` + 提示主管告知用户"已拟定 N 个子任务的团队,待你在编排面板批准"。
+**改动:** `openhub_run_create` 构造 `CreateAdhocRunRequest` 时,`autonomy` 默认 `"interactive"`(不再走 create_adhoc 的 supervised 默认)。这样:用户提交→主管调 openhub_run_create→run `plan()`→状态 `awaiting_plan_approval`(不自动 engine.start)→等用户批准。openhub_run_create 工具返回应包含 `status: "awaiting_plan_approval"` + 提示主管告知用户"已拟定 N 个子任务的团队,待你在编排面板批准"。
 - 核对 P3b 的 plan→awaiting_plan_approval 分支对 create_adhoc 路径生效(plan() 按 run.autonomy 决定是否 awaiting)。若 create_adhoc 的 run 也走同一 plan(),则只需传 interactive。
 - approve 路由已存在(routes.rs approve_run→approve_plan+engine.start)。确认 adhoc run(workspace_id NULL)approve 不依赖 workspace。
 
-- [ ] **Step 1: 测试(失败优先)** — nomi_run_create(mock conv extra lead+range)→create_adhoc 收到 autonomy="interactive";run 经 plan 后状态=awaiting_plan_approval(非 running);approve 后 running。
-- [ ] **Step 2: RED** `cargo nextest run -p nomifun-gateway -p nomifun-orchestrator`。
+- [ ] **Step 1: 测试(失败优先)** — openhub_run_create(mock conv extra lead+range)→create_adhoc 收到 autonomy="interactive";run 经 plan 后状态=awaiting_plan_approval(非 running);approve 后 running。
+- [ ] **Step 2: RED** `cargo nextest run -p openhub-gateway -p openhub-orchestrator`。
 - [ ] **Step 3: 实现** interactive 默认 + 工具返回措辞 + 核对 approve 对 adhoc 生效。
-- [ ] **Step 4: GREEN** + `cargo build -p nomifun-app` + e2e 4/4(注意:既有 e2e 若假设 supervised 直跑,可能需显式传 autonomy 保持;**勿改 e2e 语义**,e2e 自带 autonomy 即可)。
+- [ ] **Step 4: GREEN** + `cargo build -p openhub-app` + e2e 4/4(注意:既有 e2e 若假设 supervised 直跑,可能需显式传 autonomy 保持;**勿改 e2e 语义**,e2e 自带 autonomy 即可)。
 - [ ] **Step 5: 提交** `git commit -m "feat(orchestrator): 多 agent 默认 interactive(主管出计划待用户审批)"`
 
 ---
@@ -80,8 +80,8 @@
 
 ## Task 4: 集成 + 真机冒烟（截图自检）
 
-- [ ] **Step 1:** `cargo build --workspace` 绿 + `cargo nextest run -p nomifun-orchestrator -p nomifun-gateway -p nomifun-db -p nomifun-api-types -p nomifun-app`(e2e 4/4);前端 typecheck0+build。
-- [ ] **Step 2: 真机冒烟(controller,截图)** — `nomifun-web --dist --insecure-no-auth`(temp target/_p6_smoke,debug 二进制)。种一个 lead 会话 + awaiting_plan_approval 的 run(带 role 任务/成员快照)+ 一个 running run。验证:①状态条在会话顶部显示对应态(awaiting/running)②点状态条/Run 起 → 右栏自动展开 DAG③点节点 → inspector 显配置段(角色/模型/人设/技能)④awaiting 态可见「批准」⑤零 console error⑥UI 漂亮。**controller 亲自 Read 截图判定美观**(用户对 UI 严格,勿仅靠子 agent)。截图 target/_p6_smoke。
+- [ ] **Step 1:** `cargo build --workspace` 绿 + `cargo nextest run -p openhub-orchestrator -p openhub-gateway -p openhub-db -p openhub-api-types -p openhub-app`(e2e 4/4);前端 typecheck0+build。
+- [ ] **Step 2: 真机冒烟(controller,截图)** — `openhub-web --dist --insecure-no-auth`(temp target/_p6_smoke,debug 二进制)。种一个 lead 会话 + awaiting_plan_approval 的 run(带 role 任务/成员快照)+ 一个 running run。验证:①状态条在会话顶部显示对应态(awaiting/running)②点状态条/Run 起 → 右栏自动展开 DAG③点节点 → inspector 显配置段(角色/模型/人设/技能)④awaiting 态可见「批准」⑤零 console error⑥UI 漂亮。**controller 亲自 Read 截图判定美观**(用户对 UI 严格,勿仅靠子 agent)。截图 target/_p6_smoke。
 - [ ] **Step 3: 记账 + 总结**(交付 + 用户验收[配 provider 跑真 interactive run])。
 
 ## Self-Review（用户 4 点）

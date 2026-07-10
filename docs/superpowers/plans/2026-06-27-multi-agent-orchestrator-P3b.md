@@ -17,8 +17,8 @@
 - 后端禁 cargo fmt;只跑触碰 crate;app 必编过。前端 typecheck0+build;禁 any/ts-ignore;theme vars;useArcoMessage。**禁合并 main**。
 
 ## File Structure
-- 修改 `nomifun-orchestrator/src/run_service.rs`(approve_plan/pause/resume/steer 方法 + autonomy 在 plan 后的状态决策)、`engine.rs`(paused 状态读取 + run_loop 尊重 paused;steer 转发若在引擎)。
-- 修改 `nomifun-orchestrator/src/routes.rs`(POST .../runs/{id}/approve|pause|resume + POST .../runs/{id}/tasks/{task}/steer)。
+- 修改 `openhub-orchestrator/src/run_service.rs`(approve_plan/pause/resume/steer 方法 + autonomy 在 plan 后的状态决策)、`engine.rs`(paused 状态读取 + run_loop 尊重 paused;steer 转发若在引擎)。
+- 修改 `openhub-orchestrator/src/routes.rs`(POST .../runs/{id}/approve|pause|resume + POST .../runs/{id}/tasks/{task}/steer)。
 - 修改 `api-types`(SteerRequest 等若需)。
 - 修改 app `build_orchestrator_state`(IDMM hook 注入 conv_service;steer 需 conv_service 已有)。
 - 前端:RunDetailHeader 加 approve/pause/resume 按钮 + 节点 steer 输入;ipcBridge.runs.{approve,pause,resume,steer};i18n。
@@ -39,7 +39,7 @@ impl RunService {
   pub async fn steer_task(&self, run_id:&str, task_id:&str, text:&str) -> Result<(), AppError>; // 该 task 的 worker conv → ConversationService::steer_message; 无 conv/未运行 → BadRequest
 }
 ```
-- **autonomy gate**:`nomi_run_create`/POST runs 现做 create→plan→engine.start。改为:create→plan;若 run.autonomy=='interactive' 且 plan 成功 → 状态='awaiting_plan_approval',**不** engine.start(等 approve);否则 status='running' + engine.start。`approve_plan`:awaiting_plan_approval→running + engine.start。
+- **autonomy gate**:`openhub_run_create`/POST runs 现做 create→plan→engine.start。改为:create→plan;若 run.autonomy=='interactive' 且 plan 成功 → 状态='awaiting_plan_approval',**不** engine.start(等 approve);否则 status='running' + engine.start。`approve_plan`:awaiting_plan_approval→running + engine.start。
 - **pause/resume**:RunEngine run_loop 每轮(fill 前)读 run.status;若 'paused' → 不 fill(跳过派新),若有在飞则 await 在飞完成处理 outcome,若无在飞则 idle-await(sleep/notify)直到 resume 或 cancel(不 busy-spin、不判 completed)。resume 设 running(engine 若已停则重 start;若 loop 仍在则它下轮恢复 fill)。**注意**:engine 持久 loop 仍在跑(只是 paused 时不 fill),所以 pause 不需停 loop;但若 loop 在 paused+无在飞 idle,要能被 resume 唤醒(用 run 的 wake notify 或周期 re-check status)。
 - **steer**:steer_task 找 task.conversation_id → `conv_service.steer_message(SYSTEM_USER_ID, conv_id.to_string(), SendMessageRequest{...text...}, &task_manager)`（读 steer_message 签名;它中途注入运行中回合,Nomi-only;失败→fallback/BadRequest）。RunService 需持 conv_service + task_manager（engine 已持;steer 可走 engine 或 service——放能拿到 conv_service 的层）。
 - 路由:POST `/api/orchestrator/runs/{id}/approve`、`/pause`、`/resume`;POST `/api/orchestrator/runs/{id}/tasks/{task_id}/steer`(body {text})。薄 handler。
@@ -47,9 +47,9 @@ impl RunService {
 参照模板：`ConversationService::steer_message`/`cancel`(service.rs);P2 engine run_loop(paused 检查插在 fill 前);P0 routes handler。
 
 - [ ] **Step 1: 测试(失败优先)** — (a) interactive run: create→plan 后 status='awaiting_plan_approval'(engine 未跑);approve→running;(b) pause: 运行中 pause→status=paused,engine 不派新 worker(mock worker 计数不增),在飞跑完;resume→继续完成;(c) steer_task: 对有 conv 的 running task 调用 → conv_service.steer 被调(mock);无 conv→BadRequest。用 mock worker(delay)。
-- [ ] **Step 2: RED** `cargo nextest run -p nomifun-orchestrator`(engine/run_service)。
+- [ ] **Step 2: RED** `cargo nextest run -p openhub-orchestrator`(engine/run_service)。
 - [ ] **Step 3: 实现** autonomy gate(plan 状态决策)+ approve/pause/resume + steer_task + engine paused 尊重(无 busy-spin)+ 路由 + DTO。
-- [ ] **Step 4: GREEN** + `cargo build -p nomifun-orchestrator`。
+- [ ] **Step 4: GREEN** + `cargo build -p openhub-orchestrator`。
 - [ ] **Step 5: 提交** `git commit -m "feat(orchestrator): 自主级别闸 + pause/resume + steer-worker"`
 
 ---
@@ -70,7 +70,7 @@ impl RunService {
 
 - [ ] **Step 1: 探可行性** — 读 build_idmm_state + build_orchestrator_state + ConversationService::with_supervision_hook;确认能把 idmm manager 传进 orchestrator builder 且无依赖环。若不可行 → 报 BLOCKED,本任务标记延后。
 - [ ] **Step 2: 接线** conv_service.with_supervision_hook(idmm_manager) in build_orchestrator_state(+ build_module_states 传参)。
-- [ ] **Step 3: `cargo build -p nomifun-app`(关键闸)** + 跑 orchestrator/app 触碰测试确认无回归(IDMM 武装难以纯单测;以「app 编译 + 既有 e2e 不破 + hook 注册存在」为验证;真 IDMM 自动作答需 provider 真跑,留用户)。
+- [ ] **Step 3: `cargo build -p openhub-app`(关键闸)** + 跑 orchestrator/app 触碰测试确认无回归(IDMM 武装难以纯单测;以「app 编译 + 既有 e2e 不破 + hook 注册存在」为验证;真 IDMM 自动作答需 provider 真跑,留用户)。
 - [ ] **Step 4: 提交** `git commit -m "feat(orchestrator): IDMM 武装 worker 会话(自动值守)"`（或若 BLOCKED:记账延后,跳到 Task 3）。
 
 ---

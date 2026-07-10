@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -209,17 +209,17 @@ export function getFileExtension(file_name: string): string {
   return lastDotIndex > -1 ? file_name.substring(lastDotIndex).toLowerCase() : '';
 }
 
-import { NOMIFUN_TIMESTAMP_REGEX } from '@/common/config/constants';
+import { OPENHUB_TIMESTAMP_REGEX } from '@/common/config/constants';
 
-// 清理Nomifun时间戳后缀，返回原始文件名
-export function cleanNomifunTimestamp(file_name: string): string {
-  return file_name.replace(NOMIFUN_TIMESTAMP_REGEX, '$1');
+// 清理Openhub时间戳后缀，返回原始文件名
+export function cleanOpenhubTimestamp(file_name: string): string {
+  return file_name.replace(OPENHUB_TIMESTAMP_REGEX, '$1');
 }
 
 // 从文件路径获取清理后的文件名（用于UI显示）
 export function getCleanFileName(file_path: string): string {
   const file_name = file_path.split(/[\\/]/).pop() || '';
-  return cleanNomifunTimestamp(file_name);
+  return cleanOpenhubTimestamp(file_name);
 }
 
 // 从文件路径数组获取清理后的文件名数组（用于消息格式化）

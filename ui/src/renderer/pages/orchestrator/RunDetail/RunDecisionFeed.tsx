@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -10,7 +10,7 @@ import { Spin } from '@arco-design/web-react';
 import { Branch, Brain, Comment, Down, Gavel, Lightning, Lock, Merge, Refresh, Right, Robot, Shield } from '@icon-park/react';
 import { useLeadThinking, type LeadThinkingState } from '../useLeadThinking';
 // The decision feed is the DEFAULT (对话) view, where the DAG canvas/roster (which
-// own dag-canvas.css, incl. the `nomi-dag-pulse` running-dot animation) are NOT
+// own dag-canvas.css, incl. the `openhub-dag-pulse` running-dot animation) are NOT
 // mounted — import the stylesheet here so the feed's status pulse works standalone.
 import './dag-canvas.css';
 import type {
@@ -154,7 +154,7 @@ const DecisionTaskRow: React.FC<{
           {index}
         </span>
         <span
-          className={`mt-5px size-8px shrink-0 rd-full ${meta.pulse ? 'nomi-dag-pulse' : ''}`}
+          className={`mt-5px size-8px shrink-0 rd-full ${meta.pulse ? 'openhub-dag-pulse' : ''}`}
           style={{ background: meta.color, boxShadow: `0 0 0 2px color-mix(in srgb, ${meta.color} 20%, transparent)` }}
         />
         <span className='min-w-0 flex-1 text-13px font-600 leading-18px text-t-primary'>{task.title}</span>

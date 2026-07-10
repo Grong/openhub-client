@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -39,7 +39,7 @@ const TerminalCreatePage: React.FC = () => {
   const [creating, setCreating] = useState(false);
   // Recent custom launch commands (read once on mount; the page unmounts on launch).
   const [recentCommands] = useState<string[]>(() => getRecentLaunchCommands());
-  // Optional knowledge bases bound at creation (mounted into {cwd}/.nomi/knowledge/).
+  // Optional knowledge bases bound at creation (mounted into {cwd}/.openhub/knowledge/).
   const [knowledgeBases, setKnowledgeBases] = useState<IKnowledgeBase[]>([]);
   const [kbIds, setKbIds] = useState<string[]>([]);
   // Draft IDMM config — applied after session creation and before AutoWork.

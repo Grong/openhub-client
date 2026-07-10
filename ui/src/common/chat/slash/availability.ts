@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -33,5 +33,5 @@ export function isSlashCommandListEnabled(input: SlashCommandListAvailabilityInp
   if (input.conversation_type === 'codex') {
     return input.codexStatus === 'session_active';
   }
-  return input.conversation_type === 'acp' || input.conversation_type === 'nomi';
+  return input.conversation_type === 'acp' || input.conversation_type === 'openhub';
 }

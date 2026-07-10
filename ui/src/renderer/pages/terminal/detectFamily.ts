@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -83,7 +83,7 @@ export function detectFamily(command: string): AgentFamily | null {
 /**
  * Agent families terminal AutoWork can actually drive: only those with a
  * lifecycle-hook renderer on the backend (Stop → TurnEnd). Mirrors the Rust
- * `AgentCli::supports_lifecycle_hooks` (`nomifun-terminal/src/enhance.rs`).
+ * `AgentCli::supports_lifecycle_hooks` (`openhub-terminal/src/enhance.rs`).
  * Gemini is intentionally excluded — it has no launch-time hook injection, so
  * the orchestrator cannot detect turn-end and the backend gate rejects it.
  */
@@ -91,7 +91,7 @@ const AUTOWORK_CAPABLE_FAMILIES: AgentFamily[] = ['claude', 'codex'];
 
 /**
  * Whether a terminal launch is eligible for AutoWork. Mirrors the backend gate
- * (`nomifun_terminal::terminal_autowork_capable`): a declared `backend` wins
+ * (`openhub_terminal::terminal_autowork_capable`): a declared `backend` wins
  * (preset launches), otherwise resolve the family from the command + args (so
  * wrappers like `stepcode claude` / `npx codex` and bare custom commands count),
  * then require a lifecycle-hook-capable family.

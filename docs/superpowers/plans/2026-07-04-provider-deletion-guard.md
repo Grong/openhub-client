@@ -10,23 +10,23 @@
 
 ## Global Constraints
 
-- **提交署名**：所有提交用 `git -c user.name=nomifun commit ...`（复用已配置 email）；**不加** `Co-Authored-By` / "Generated with Claude Code" 尾注。
-- **DTO 落位**：`ProviderUsage` 系列放 `nomifun-common`（`nomifun-api-types` 依赖 `nomifun-common`，反之不行；`AppError` 在 `nomifun-common` 需引用它）。
+- **提交署名**：所有提交用 `git -c user.nameopenhubcommit ...`（复用已配置 email）；**不加** `Co-Authored-By` / "Generated with Claude Code" 尾注。
+- **DTO 落位**：`ProviderUsage` 系列放 `openhub-common`（`openhub-api-types` 依赖 `openhub-common`，反之不行；`AppError` 在 `openhub-common` 需引用它）。
 - **前端验证**：改动前端后跑 `cd ui && bun run build`（不能只靠 tsc）。前端单测用 `bun:test`（`import { describe, expect, test } from 'bun:test'`），逻辑函数就地 `*.test.ts`。
 - **`knowledge.autogenModel` 与 `nomi.defaultModel` 是纯前端配置**，后端不可清理/读取；归前端自愈。
 - **IDMM 拦截 v1 仅覆盖全局备份** `idmm_backup_provider_id`（单键）；per-conversation watch 的 `bypass_model` 不在 v1 扫描范围（无跨用户列举会话的仓库方法），由组件 B 兜底——务必 `log` 说明此范围。
 - **后端软清理 v1 仅 `agent.model_failover` 队列**；`idmm_backup_*` 是被保护引用（拦截删除、不清理）；渠道 `assistant.{platform}.defaultModel` 由组件 B 兜底，不在 v1 清理。
 - 供应商 id 形如 `prov_{uuidv7}`；空 `provider_id` 视为未配置。
-- 错误变体遵循 `nomifun-common/src/error.rs` 现有 `WorkspacePathEdgeWhitespace` 范式（专用变体 + `error_details()` 输出结构化 JSON）。
+- 错误变体遵循 `openhub-common/src/error.rs` 现有 `WorkspacePathEdgeWhitespace` 范式（专用变体 + `error_details()` 输出结构化 JSON）。
 
 ---
 
-### Task 1: DTO + AppError 变体（nomifun-common）
+### Task 1: DTO + AppError 变体（openhub-common）
 
 **Files:**
-- Create: `crates/backend/nomifun-common/src/provider_usage.rs`
-- Modify: `crates/backend/nomifun-common/src/error.rs`（enum + status_code + error_code + error_details）
-- Modify: `crates/backend/nomifun-common/src/lib.rs`（导出模块）
+- Create: `crates/backend/openhub-common/src/provider_usage.rs`
+- Modify: `crates/backend/openhub-common/src/error.rs`（enum + status_code + error_code + error_details）
+- Modify: `crates/backend/openhub-common/src/lib.rs`（导出模块）
 
 **Interfaces:**
 - Produces:
@@ -38,7 +38,7 @@
 
 - [ ] **Step 1: 写失败测试（DTO 序列化 + error 映射）**
 
-在 `crates/backend/nomifun-common/src/provider_usage.rs` 末尾（先创建文件含类型再加测试，见 Step 3；此步先写测试内容占位于同文件）：实际操作顺序是先建文件骨架。为遵循 TDD，先在 `error.rs` 的 `#[cfg(test)] mod tests` 追加：
+在 `crates/backend/openhub-common/src/provider_usage.rs` 末尾（先创建文件含类型再加测试，见 Step 3；此步先写测试内容占位于同文件）：实际操作顺序是先建文件骨架。为遵循 TDD，先在 `error.rs` 的 `#[cfg(test)] mod tests` 追加：
 
 ```rust
     #[tokio::test]
@@ -72,12 +72,12 @@
 
 - [ ] **Step 2: 运行测试确认失败**
 
-Run: `cargo test -p nomifun-common provider_ 2>&1 | tail -20`
+Run: `cargo test -p openhub-common provider_ 2>&1 | tail -20`
 Expected: 编译失败（`provider_usage` 模块不存在、`AppError::ProviderInUse`/`ProviderUnavailable` 未定义）。
 
 - [ ] **Step 3: 建 DTO 文件**
 
-`crates/backend/nomifun-common/src/provider_usage.rs`：
+`crates/backend/openhub-common/src/provider_usage.rs`：
 
 ```rust
 //! Provider-in-use reporting types shared between the deletion guard,
@@ -156,28 +156,28 @@ pub use provider_usage::{ProviderInUseDetails, ProviderUsage, ProviderUsageFeatu
 
 - [ ] **Step 5: 运行测试确认通过**
 
-Run: `cargo test -p nomifun-common provider_ 2>&1 | tail -20`
+Run: `cargo test -p openhub-common provider_ 2>&1 | tail -20`
 Expected: `provider_in_use_response_shape` + `provider_unavailable_code_and_status` PASS。
 
 - [ ] **Step 6: 提交**
 
 ```bash
-git add crates/backend/nomifun-common/src/provider_usage.rs crates/backend/nomifun-common/src/error.rs crates/backend/nomifun-common/src/lib.rs
-git -c user.name=nomifun commit -m "feat(common): ProviderUsage DTO + ProviderInUse/ProviderUnavailable AppError variants"
+git add crates/backend/openhub-common/src/provider_usage.rs crates/backend/openhub-common/src/error.rs crates/backend/openhub-common/src/lib.rs
+git -c user.nameopenhubcommit -m "feat(common): ProviderUsage DTO + ProviderInUse/ProviderUnavailable AppError variants"
 ```
 
 ---
 
-### Task 2: Coordinator trait + ProviderService 拦截（nomifun-system）
+### Task 2: Coordinator trait + ProviderService 拦截（openhub-system）
 
 **Files:**
-- Create: `crates/backend/nomifun-system/src/provider_deletion.rs`
-- Modify: `crates/backend/nomifun-system/src/provider.rs`（字段 + builder + delete 逻辑）
-- Modify: `crates/backend/nomifun-system/src/lib.rs`（导出 trait）
-- Modify: `crates/backend/nomifun-system/Cargo.toml`（加 `async-trait`、dev-dep `tokio` 已有则跳过）
+- Create: `crates/backend/openhub-system/src/provider_deletion.rs`
+- Modify: `crates/backend/openhub-system/src/provider.rs`（字段 + builder + delete 逻辑）
+- Modify: `crates/backend/openhub-system/src/lib.rs`（导出 trait）
+- Modify: `crates/backend/openhub-system/Cargo.toml`（加 `async-trait`、dev-dep `tokio` 已有则跳过）
 
 **Interfaces:**
-- Consumes: `nomifun_common::{ProviderUsage, ProviderInUseDetails, AppError}`（Task 1）。
+- Consumes: `openhub_common::{ProviderUsage, ProviderInUseDetails, AppError}`（Task 1）。
 - Produces:
   - `trait ProviderDeletionCoordinator: Send + Sync { async fn usages(&self, provider_id:&str)->Result<Vec<ProviderUsage>,AppError>; async fn cleanup_soft_refs(&self, provider_id:&str)->Result<(),AppError>; }`
   - `ProviderService::with_deletion_coordinator(self, Arc<dyn ProviderDeletionCoordinator>) -> Self`
@@ -191,18 +191,18 @@ git -c user.name=nomifun commit -m "feat(common): ProviderUsage DTO + ProviderIn
 #[cfg(test)]
 mod delete_guard_tests {
     use super::*;
-    use nomifun_common::{ProviderUsage, ProviderUsageFeature};
-    use nomifun_db::models::Provider;
+    use openhub_common::{ProviderUsage, ProviderUsageFeature};
+    use openhub_db::models::Provider;
     use std::sync::atomic::{AtomicBool, Ordering};
 
     struct CountingRepo { deleted: AtomicBool }
     #[async_trait::async_trait]
     impl IProviderRepository for CountingRepo {
-        async fn list(&self) -> Result<Vec<Provider>, nomifun_db::DbError> { Ok(vec![]) }
-        async fn find_by_id(&self, _: &str) -> Result<Option<Provider>, nomifun_db::DbError> { Ok(None) }
-        async fn create(&self, _: nomifun_db::CreateProviderParams<'_>) -> Result<Provider, nomifun_db::DbError> { unimplemented!() }
-        async fn update(&self, _: &str, _: nomifun_db::UpdateProviderParams<'_>) -> Result<Provider, nomifun_db::DbError> { unimplemented!() }
-        async fn delete(&self, _: &str) -> Result<(), nomifun_db::DbError> { self.deleted.store(true, Ordering::SeqCst); Ok(()) }
+        async fn list(&self) -> Result<Vec<Provider>, openhub_db::DbError> { Ok(vec![]) }
+        async fn find_by_id(&self, _: &str) -> Result<Option<Provider>, openhub_db::DbError> { Ok(None) }
+        async fn create(&self, _: openhub_db::CreateProviderParams<'_>) -> Result<Provider, openhub_db::DbError> { unimplemented!() }
+        async fn update(&self, _: &str, _: openhub_db::UpdateProviderParams<'_>) -> Result<Provider, openhub_db::DbError> { unimplemented!() }
+        async fn delete(&self, _: &str) -> Result<(), openhub_db::DbError> { self.deleted.store(true, Ordering::SeqCst); Ok(()) }
     }
 
     struct FakeCoord { usages: Vec<ProviderUsage>, cleaned: AtomicBool }
@@ -239,19 +239,19 @@ mod delete_guard_tests {
 
 - [ ] **Step 2: 运行确认失败**
 
-Run: `cargo test -p nomifun-system delete_guard 2>&1 | tail -20`
+Run: `cargo test -p openhub-system delete_guard 2>&1 | tail -20`
 Expected: 编译失败（`provider_deletion` 模块 / `with_deletion_coordinator` 不存在）。
 
 - [ ] **Step 3: 建 trait 模块**
 
-`crates/backend/nomifun-system/src/provider_deletion.rs`：
+`crates/backend/openhub-system/src/provider_deletion.rs`：
 
 ```rust
 //! Cross-subsystem provider-deletion guard hook. Implemented at the app layer
 //! (the only place that sees companion/idmm/orchestrator), injected into
 //! `ProviderService` so deletion can refuse in-use providers.
 
-use nomifun_common::{AppError, ProviderUsage};
+use openhub_common::{AppError, ProviderUsage};
 use std::sync::Arc;
 
 #[async_trait::async_trait]
@@ -272,7 +272,7 @@ pub type SharedProviderDeletionCoordinator = Arc<dyn ProviderDeletionCoordinator
 
 `provider.rs`：
 
-顶部 imports 追加：`use crate::provider_deletion::SharedProviderDeletionCoordinator;` 与 `use nomifun_common::{ProviderInUseDetails};`（`AppError` 已在）、`use tracing::warn;`（若无 tracing 依赖，见 note）。
+顶部 imports 追加：`use crate::provider_deletion::SharedProviderDeletionCoordinator;` 与 `use openhub_common::{ProviderInUseDetails};`（`AppError` 已在）、`use tracing::warn;`（若无 tracing 依赖，见 note）。
 
 结构体加字段：
 
@@ -322,23 +322,23 @@ pub struct ProviderService {
 
 - [ ] **Step 5: 运行确认通过**
 
-Run: `cargo test -p nomifun-system delete_guard 2>&1 | tail -20`
+Run: `cargo test -p openhub-system delete_guard 2>&1 | tail -20`
 Expected: 两个测试 PASS。
 
 - [ ] **Step 6: 提交**
 
 ```bash
-git add crates/backend/nomifun-system/src/provider_deletion.rs crates/backend/nomifun-system/src/provider.rs crates/backend/nomifun-system/src/lib.rs crates/backend/nomifun-system/Cargo.toml
-git -c user.name=nomifun commit -m "feat(system): ProviderDeletionCoordinator hook + in-use guard in ProviderService::delete"
+git add crates/backend/openhub-system/src/provider_deletion.rs crates/backend/openhub-system/src/provider.rs crates/backend/openhub-system/src/lib.rs crates/backend/openhub-system/Cargo.toml
+git -c user.nameopenhubcommit -m "feat(system): ProviderDeletionCoordinator hook + in-use guard in ProviderService::delete"
 ```
 
 ---
 
-### Task 3: Fleet 按 provider 查询（nomifun-db）
+### Task 3: Fleet 按 provider 查询（openhub-db）
 
 **Files:**
-- Modify: `crates/backend/nomifun-db/src/repository/orch_fleet.rs`（trait 加方法）
-- Modify: `crates/backend/nomifun-db/src/repository/sqlite_orch_fleet.rs`（impl + 测试）
+- Modify: `crates/backend/openhub-db/src/repository/orch_fleet.rs`（trait 加方法）
+- Modify: `crates/backend/openhub-db/src/repository/sqlite_orch_fleet.rs`（impl + 测试）
 
 **Interfaces:**
 - Produces: `IFleetRepository::fleets_using_provider(&self, provider_id: &str) -> Result<Vec<(String, String)>, sqlx::Error>`（返回 `(fleet_id, fleet_name)` 去重）。
@@ -375,7 +375,7 @@ git -c user.name=nomifun commit -m "feat(system): ProviderDeletionCoordinator ho
 
 - [ ] **Step 2: 运行确认失败**
 
-Run: `cargo test -p nomifun-db fleets_using_provider 2>&1 | tail -20`
+Run: `cargo test -p openhub-db fleets_using_provider 2>&1 | tail -20`
 Expected: 编译失败（方法不存在）。
 
 - [ ] **Step 3: trait 加方法**
@@ -408,26 +408,26 @@ Expected: 编译失败（方法不存在）。
 
 - [ ] **Step 5: 运行确认通过**
 
-Run: `cargo test -p nomifun-db fleets_using_provider 2>&1 | tail -20`
+Run: `cargo test -p openhub-db fleets_using_provider 2>&1 | tail -20`
 Expected: PASS。
 
 - [ ] **Step 6: 提交**
 
 ```bash
-git add crates/backend/nomifun-db/src/repository/orch_fleet.rs crates/backend/nomifun-db/src/repository/sqlite_orch_fleet.rs
-git -c user.name=nomifun commit -m "feat(db): IFleetRepository::fleets_using_provider for provider-in-use scan"
+git add crates/backend/openhub-db/src/repository/orch_fleet.rs crates/backend/openhub-db/src/repository/sqlite_orch_fleet.rs
+git -c user.nameopenhubcommit -m "feat(db): IFleetRepository::fleets_using_provider for provider-in-use scan"
 ```
 
 ---
 
-### Task 4: 伙伴 in-use 扫描（nomifun-companion）
+### Task 4: 伙伴 in-use 扫描（openhub-companion）
 
 **Files:**
-- Modify: `crates/backend/nomifun-companion/src/service.rs`（新方法 + 测试）
-- Modify: `crates/backend/nomifun-companion/Cargo.toml`（确认依赖 `nomifun-common`，已有则跳过）
+- Modify: `crates/backend/openhub-companion/src/service.rs`（新方法 + 测试）
+- Modify: `crates/backend/openhub-companion/Cargo.toml`（确认依赖 `openhub-common`，已有则跳过）
 
 **Interfaces:**
-- Consumes: `nomifun_common::{ProviderUsage, ProviderUsageFeature}`。
+- Consumes: `openhub_common::{ProviderUsage, ProviderUsageFeature}`。
 - Produces: `CompanionService::providers_in_use(&self, provider_id:&str) -> Vec<ProviderUsage>`（扫每个 companion 的 chat `model` + 共享 learn/evolve `model`；`feature=DesktopCompanion`；label=伙伴名/`"共享学习模型"`/`"共享进化模型"`；target_id=伙伴 id 或 None）。
 
 - [ ] **Step 1: 写失败测试**（复用文件顶部 `service(dir)` helper、`registry.create`、`patch_companion`、`patch_config`）
@@ -451,18 +451,18 @@ git -c user.name=nomifun commit -m "feat(db): IFleetRepository::fleets_using_pro
         let svc = service(dir.path()).await;
         svc.patch_config(serde_json::json!({"learn":{"model":{"provider_id":"prov_learn","model":"m"}}})).await.unwrap();
         let hits = svc.providers_in_use("prov_learn").await;
-        assert!(hits.iter().any(|u| matches!(u.feature, nomifun_common::ProviderUsageFeature::DesktopCompanion)));
+        assert!(hits.iter().any(|u| matches!(u.feature, openhub_common::ProviderUsageFeature::DesktopCompanion)));
     }
 ```
 
 - [ ] **Step 2: 运行确认失败**
 
-Run: `cargo test -p nomifun-companion providers_in_use 2>&1 | tail -20`
+Run: `cargo test -p openhub-companion providers_in_use 2>&1 | tail -20`
 Expected: 编译失败（方法不存在）。
 
 - [ ] **Step 3: 实现方法**
 
-`service.rs`（`use nomifun_common::{ProviderUsage, ProviderUsageFeature};` 若未引入则加）：
+`service.rs`（`use openhub_common::{ProviderUsage, ProviderUsageFeature};` 若未引入则加）：
 
 ```rust
     /// Every desktop-companion reference to `provider_id`: per-companion chat
@@ -499,22 +499,22 @@ Expected: 编译失败（方法不存在）。
 
 - [ ] **Step 4: 运行确认通过**
 
-Run: `cargo test -p nomifun-companion providers_in_use 2>&1 | tail -20`
+Run: `cargo test -p openhub-companion providers_in_use 2>&1 | tail -20`
 Expected: PASS（两个测试）。
 
 - [ ] **Step 5: 提交**
 
 ```bash
-git add crates/backend/nomifun-companion/src/service.rs crates/backend/nomifun-companion/Cargo.toml
-git -c user.name=nomifun commit -m "feat(companion): CompanionService::providers_in_use scan (chat + shared learn/evolve)"
+git add crates/backend/openhub-companion/src/service.rs crates/backend/openhub-companion/Cargo.toml
+git -c user.nameopenhubcommit -m "feat(companion): CompanionService::providers_in_use scan (chat + shared learn/evolve)"
 ```
 
 ---
 
-### Task 5: 对外伙伴 in-use 扫描（nomifun-public-agent）
+### Task 5: 对外伙伴 in-use 扫描（openhub-public-agent）
 
 **Files:**
-- Modify: `crates/backend/nomifun-public-agent/src/service.rs`（新方法 + 测试）
+- Modify: `crates/backend/openhub-public-agent/src/service.rs`（新方法 + 测试）
 
 **Interfaces:**
 - Produces: `PublicAgentService::providers_in_use(&self, provider_id:&str) -> Vec<ProviderUsage>`（扫 `list()` 每个 agent 的 `model.provider_id`；`feature=PublicCompanion`；label=agent 名；target_id=agent id）。
@@ -537,19 +537,19 @@ git -c user.name=nomifun commit -m "feat(companion): CompanionService::providers
 
 - [ ] **Step 2: 运行确认失败**
 
-Run: `cargo test -p nomifun-public-agent providers_in_use 2>&1 | tail -20`
+Run: `cargo test -p openhub-public-agent providers_in_use 2>&1 | tail -20`
 Expected: 编译失败。
 
 - [ ] **Step 3: 实现**
 
 ```rust
-    pub async fn providers_in_use(&self, provider_id: &str) -> Vec<nomifun_common::ProviderUsage> {
+    pub async fn providers_in_use(&self, provider_id: &str) -> Vec<openhub_common::ProviderUsage> {
         self.list()
             .await
             .into_iter()
             .filter(|a| a.model.provider_id == provider_id)
-            .map(|a| nomifun_common::ProviderUsage {
-                feature: nomifun_common::ProviderUsageFeature::PublicCompanion,
+            .map(|a| openhub_common::ProviderUsage {
+                feature: openhub_common::ProviderUsageFeature::PublicCompanion,
                 label: a.name,
                 target_id: Some(a.id),
             })
@@ -559,46 +559,46 @@ Expected: 编译失败。
 
 - [ ] **Step 4: 运行确认通过**
 
-Run: `cargo test -p nomifun-public-agent providers_in_use 2>&1 | tail -20`
+Run: `cargo test -p openhub-public-agent providers_in_use 2>&1 | tail -20`
 Expected: PASS。
 
 - [ ] **Step 5: 提交**
 
 ```bash
-git add crates/backend/nomifun-public-agent/src/service.rs
-git -c user.name=nomifun commit -m "feat(public-agent): PublicAgentService::providers_in_use scan"
+git add crates/backend/openhub-public-agent/src/service.rs
+git -c user.nameopenhubcommit -m "feat(public-agent): PublicAgentService::providers_in_use scan"
 ```
 
 ---
 
-### Task 6: app 层聚合协调器 + 装配（nomifun-app）
+### Task 6: app 层聚合协调器 + 装配（openhub-app）
 
 **Files:**
-- Create: `crates/backend/nomifun-app/src/provider_deletion.rs`
-- Modify: `crates/backend/nomifun-app/src/lib.rs` 或 `mod.rs`（挂 `mod provider_deletion;`）
-- Modify: `crates/backend/nomifun-app/src/router/state.rs`（`build_system_state` 装配）
+- Create: `crates/backend/openhub-app/src/provider_deletion.rs`
+- Modify: `crates/backend/openhub-app/src/lib.rs` 或 `mod.rs`（挂 `mod provider_deletion;`）
+- Modify: `crates/backend/openhub-app/src/router/state.rs`（`build_system_state` 装配）
 
 **Interfaces:**
-- Consumes: `CompanionService::providers_in_use`（T4）、`PublicAgentService::providers_in_use`（T5）、`IFleetRepository::fleets_using_provider`（T3）、`IClientPreferenceRepository`（`get_by_keys`/`upsert_batch`）、`nomifun_conversation::model_failover::{get_global_failover_config, set_global_failover_config}`、`nomifun_idmm::sidecar::PREF_BACKUP_PROVIDER`。
+- Consumes: `CompanionService::providers_in_use`（T4）、`PublicAgentService::providers_in_use`（T5）、`IFleetRepository::fleets_using_provider`（T3）、`IClientPreferenceRepository`（`get_by_keys`/`upsert_batch`）、`openhub_conversation::model_failover::{get_global_failover_config, set_global_failover_config}`、`openhub_idmm::sidecar::PREF_BACKUP_PROVIDER`。
 - Produces: `AppProviderDeletionCoordinator` 实现 `ProviderDeletionCoordinator`；在 `build_system_state` 里注入。
 
-- [ ] **Step 1: 写失败测试**（`crates/backend/nomifun-app/src/provider_deletion.rs` 内 `#[cfg(test)]`；用 `init_database_memory` + tempdir 服务）
+- [ ] **Step 1: 写失败测试**（`crates/backend/openhub-app/src/provider_deletion.rs` 内 `#[cfg(test)]`；用 `init_database_memory` + tempdir 服务）
 
 ```rust
 #[cfg(test)]
 mod tests {
     use super::*;
-    use nomifun_common::ProviderUsageFeature;
-    use nomifun_db::{init_database_memory, SqliteClientPreferenceRepository, SqliteFleetRepository};
+    use openhub_common::ProviderUsageFeature;
+    use openhub_db::{init_database_memory, SqliteClientPreferenceRepository, SqliteFleetRepository};
     use std::sync::Arc;
 
-    async fn coordinator(dir: &std::path::Path) -> (AppProviderDeletionCoordinator, Arc<nomifun_db::Database>) {
+    async fn coordinator(dir: &std::path::Path) -> (AppProviderDeletionCoordinator, Arc<openhub_db::Database>) {
         let db = Arc::new(init_database_memory().await.unwrap());
-        let companion = /* CompanionService::start(dir, …) 复制 nomifun-companion 测试 helper 的四参构造 */;
-        let public_agent = nomifun_public_agent::PublicAgentService::start(dir);
-        let client_prefs: Arc<dyn nomifun_db::IClientPreferenceRepository> =
+        let companion = /* CompanionService::start(dir, …) 复制 openhub-companion 测试 helper 的四参构造 */;
+        let public_agent = openhub_public_agent::PublicAgentService::start(dir);
+        let client_prefs: Arc<dyn openhub_db::IClientPreferenceRepository> =
             Arc::new(SqliteClientPreferenceRepository::new(db.pool().clone()));
-        let fleet_repo: Arc<dyn nomifun_db::IFleetRepository> =
+        let fleet_repo: Arc<dyn openhub_db::IFleetRepository> =
             Arc::new(SqliteFleetRepository::new(db.pool().clone()));
         (AppProviderDeletionCoordinator { companion, public_agent, client_prefs, fleet_repo }, db)
     }
@@ -607,7 +607,7 @@ mod tests {
     async fn aggregates_idmm_backup_usage() {
         let dir = tempfile::tempdir().unwrap();
         let (coord, _db) = coordinator(dir.path()).await;
-        coord.client_prefs.upsert_batch(&[(nomifun_idmm::sidecar::PREF_BACKUP_PROVIDER, "prov_x")]).await.unwrap();
+        coord.client_prefs.upsert_batch(&[(openhub_idmm::sidecar::PREF_BACKUP_PROVIDER, "prov_x")]).await.unwrap();
         let usages = coord.usages("prov_x").await.unwrap();
         assert!(usages.iter().any(|u| matches!(u.feature, ProviderUsageFeature::SmartDecision)));
         assert!(coord.usages("prov_none").await.unwrap().is_empty());
@@ -615,13 +615,13 @@ mod tests {
 
     #[tokio::test]
     async fn cleanup_strips_failover_queue_entry() {
-        use nomifun_conversation::model_failover::{get_global_failover_config, set_global_failover_config};
+        use openhub_conversation::model_failover::{get_global_failover_config, set_global_failover_config};
         let dir = tempfile::tempdir().unwrap();
         let (coord, _db) = coordinator(dir.path()).await;
         let mut cfg = get_global_failover_config(&coord.client_prefs).await;
         cfg.queue = vec![
-            nomifun_common::types::ProviderWithModel { provider_id: "prov_x".into(), model: "m".into(), use_model: None },
-            nomifun_common::types::ProviderWithModel { provider_id: "prov_keep".into(), model: "m2".into(), use_model: None },
+            openhub_common::types::ProviderWithModel { provider_id: "prov_x".into(), model: "m".into(), use_model: None },
+            openhub_common::types::ProviderWithModel { provider_id: "prov_keep".into(), model: "m2".into(), use_model: None },
         ];
         set_global_failover_config(&coord.client_prefs, &cfg).await.unwrap();
 
@@ -633,31 +633,31 @@ mod tests {
 }
 ```
 
-> `ProviderWithModel` 的确切路径以 `nomifun-common/src/types.rs:34-39` 为准；`ModelFailoverConfig.queue` 字段名见 `nomifun-api-types/src/idmm.rs`。
+> `ProviderWithModel` 的确切路径以 `openhub-common/src/types.rs:34-39` 为准；`ModelFailoverConfig.queue` 字段名见 `openhub-api-types/src/idmm.rs`。
 
 - [ ] **Step 2: 运行确认失败**
 
-Run: `cargo test -p nomifun-app aggregates_idmm_backup 2>&1 | tail -20`
+Run: `cargo test -p openhub-app aggregates_idmm_backup 2>&1 | tail -20`
 Expected: 编译失败（`AppProviderDeletionCoordinator` 不存在）。
 
 - [ ] **Step 3: 实现协调器**
 
-`crates/backend/nomifun-app/src/provider_deletion.rs`：
+`crates/backend/openhub-app/src/provider_deletion.rs`：
 
 ```rust
 //! App-layer aggregation of every subsystem's provider-in-use scan + soft-ref cleanup.
 
 use std::sync::Arc;
 
-use nomifun_common::{AppError, ProviderUsage, ProviderUsageFeature};
-use nomifun_conversation::model_failover::{get_global_failover_config, set_global_failover_config};
-use nomifun_db::{IClientPreferenceRepository, IFleetRepository};
-use nomifun_idmm::sidecar::PREF_BACKUP_PROVIDER;
-use nomifun_system::provider_deletion::ProviderDeletionCoordinator;
+use openhub_common::{AppError, ProviderUsage, ProviderUsageFeature};
+use openhub_conversation::model_failover::{get_global_failover_config, set_global_failover_config};
+use openhub_db::{IClientPreferenceRepository, IFleetRepository};
+use openhub_idmm::sidecar::PREF_BACKUP_PROVIDER;
+use openhub_system::provider_deletion::ProviderDeletionCoordinator;
 
 pub struct AppProviderDeletionCoordinator {
-    pub companion: Arc<nomifun_companion::CompanionService>,
-    pub public_agent: Arc<nomifun_public_agent::PublicAgentService>,
+    pub companion: Arc<openhub_companion::CompanionService>,
+    pub public_agent: Arc<openhub_public_agent::PublicAgentService>,
     pub client_prefs: Arc<dyn IClientPreferenceRepository>,
     pub fleet_repo: Arc<dyn IFleetRepository>,
 }
@@ -737,29 +737,29 @@ impl ProviderDeletionCoordinator for AppProviderDeletionCoordinator {
     }
 ```
 
-顶部按需 `use` 引入 `SqliteClientPreferenceRepository`、`SqliteFleetRepository`、`IClientPreferenceRepository`、`IFleetRepository`（均 `nomifun_db` 根导出）。
+顶部按需 `use` 引入 `SqliteClientPreferenceRepository`、`SqliteFleetRepository`、`IClientPreferenceRepository`、`IFleetRepository`（均 `openhub_db` 根导出）。
 
 - [ ] **Step 5: 运行确认通过 + 全后端编译**
 
-Run: `cargo test -p nomifun-app aggregates_idmm_backup cleanup_strips 2>&1 | tail -20`
+Run: `cargo test -p openhub-app aggregates_idmm_backup cleanup_strips 2>&1 | tail -20`
 Expected: 两测试 PASS。
-Run: `cargo build -p nomifun-app 2>&1 | tail -15`
+Run: `cargo build -p openhub-app 2>&1 | tail -15`
 Expected: 编译成功（装配无类型错误）。
 
 - [ ] **Step 6: 提交**
 
 ```bash
-git add crates/backend/nomifun-app/src/provider_deletion.rs crates/backend/nomifun-app/src/router/state.rs crates/backend/nomifun-app/src/lib.rs
-git -c user.name=nomifun commit -m "feat(app): aggregate provider-in-use guard + failover-queue cleanup, wire into ProviderService"
+git add crates/backend/openhub-app/src/provider_deletion.rs crates/backend/openhub-app/src/router/state.rs crates/backend/openhub-app/src/lib.rs
+git -c user.nameopenhubcommit -m "feat(app): aggregate provider-in-use guard + failover-queue cleanup, wire into ProviderService"
 ```
 
 ---
 
-### Task 7: Nomi 送出时供应商回退（nomifun-ai-agent）
+### Task 7: Nomi 送出时供应商回退（openhub-ai-agent）
 
 **Files:**
-- Modify: `crates/backend/nomifun-ai-agent/src/factory/provider_config.rs`（新 helper + 测试）
-- Modify: `crates/backend/nomifun-ai-agent/src/factory/nomi.rs`（改用 helper）
+- Modify: `crates/backend/openhub-ai-agent/src/factory/provider_config.rs`（新 helper + 测试）
+- Modify: `crates/backend/openhub-ai-agent/src/factory/nomi.rs`（改用 helper）
 
 **Interfaces:**
 - Consumes: `resolve_provider_fields`（现有）、`crate::resolve_default_model`（现有，`Option<(String,String)>`）、`AppError::ProviderUnavailable`（T1）。
@@ -802,7 +802,7 @@ git -c user.name=nomifun commit -m "feat(app): aggregate provider-in-use guard +
 
 - [ ] **Step 2: 运行确认失败**
 
-Run: `cargo test -p nomifun-ai-agent resolve_provider_fields_with_fallback fallback_ 2>&1 | tail -20`
+Run: `cargo test -p openhub-ai-agent resolve_provider_fields_with_fallback fallback_ 2>&1 | tail -20`
 Expected: 编译失败（helper 不存在）。
 
 - [ ] **Step 3: 实现 helper**
@@ -869,16 +869,16 @@ pub(crate) async fn resolve_provider_fields_with_fallback(
 
 - [ ] **Step 5: 运行确认通过 + crate 编译**
 
-Run: `cargo test -p nomifun-ai-agent fallback_ 2>&1 | tail -20`
+Run: `cargo test -p openhub-ai-agent fallback_ 2>&1 | tail -20`
 Expected: 四测试 PASS。
-Run: `cargo build -p nomifun-ai-agent 2>&1 | tail -15`
+Run: `cargo build -p openhub-ai-agent 2>&1 | tail -15`
 Expected: 成功。
 
 - [ ] **Step 6: 提交**
 
 ```bash
-git add crates/backend/nomifun-ai-agent/src/factory/provider_config.rs crates/backend/nomifun-ai-agent/src/factory/nomi.rs
-git -c user.name=nomifun commit -m "feat(ai-agent): send-time provider fallback to first enabled model (no hard crash)"
+git add crates/backend/openhub-ai-agent/src/factory/provider_config.rs crates/backend/openhub-ai-agent/src/factory/nomi.rs
+git -c user.nameopenhubcommit -m "feat(ai-agent): send-time provider fallback to first enabled model (no hard crash)"
 ```
 
 ---
@@ -1070,7 +1070,7 @@ Expected: 构建成功（无类型错误）。
 
 ```bash
 git add ui/src/renderer/components/settings/SettingsModal/contents/providerInUse.ts ui/src/renderer/components/settings/SettingsModal/contents/providerInUse.test.ts ui/src/renderer/components/settings/SettingsModal/contents/ModelModalContent.tsx ui/src/renderer/services/i18n/locales/zh-CN/settings.json ui/src/renderer/services/i18n/locales/en-US/settings.json
-git -c user.name=nomifun commit -m "feat(ui): PROVIDER_IN_USE delete-block modal with per-feature unbind links"
+git -c user.nameopenhubcommit -m "feat(ui): PROVIDER_IN_USE delete-block modal with per-feature unbind links"
 ```
 
 ---
@@ -1169,7 +1169,7 @@ Expected: 成功。
 
 ```bash
 git add ui/src/renderer/pages/conversation/utils/conversationCreateError.ts ui/src/renderer/pages/conversation/utils/providerErrorMessage.test.ts ui/src/renderer/services/i18n/locales/zh-CN/conversation.json ui/src/renderer/services/i18n/locales/en-US/conversation.json
-git -c user.name=nomifun commit -m "feat(ui): friendly PROVIDER_UNAVAILABLE message replacing raw provider-id error"
+git -c user.nameopenhubcommit -m "feat(ui): friendly PROVIDER_UNAVAILABLE message replacing raw provider-id error"
 ```
 
 ---
@@ -1177,8 +1177,8 @@ git -c user.name=nomifun commit -m "feat(ui): friendly PROVIDER_UNAVAILABLE mess
 ### Task 10: 普通会话前端自愈 + 轻提示（ChatConversation.tsx）
 
 **Files:**
-- Create: `ui/src/renderer/pages/conversation/platforms/nomi/healConversationModel.ts`（纯逻辑 + 测试）
-- Create: `ui/src/renderer/pages/conversation/platforms/nomi/healConversationModel.test.ts`
+- Create: `ui/src/renderer/pages/conversation/platforms/openhub/healConversationModel.ts`（纯逻辑 + 测试）
+- Create: `ui/src/renderer/pages/conversation/platforms/openhub/healConversationModel.test.ts`
 - Modify: `ui/src/renderer/pages/conversation/components/ChatConversation.tsx`（加自愈 effect）
 
 **Interfaces:**
@@ -1221,7 +1221,7 @@ describe('resolveHealModel', () => {
 
 - [ ] **Step 2: 运行确认失败**
 
-Run: `cd ui && bun test src/renderer/pages/conversation/platforms/nomi/healConversationModel.test.ts 2>&1 | tail -20`
+Run: `cd ui && bun test src/renderer/pages/conversation/platforms/openhub/healConversationModel.test.ts 2>&1 | tail -20`
 Expected: 失败。
 
 - [ ] **Step 3: 实现纯逻辑**
@@ -1269,7 +1269,7 @@ export function resolveHealModel(
 
 - [ ] **Step 4: 运行确认通过**
 
-Run: `cd ui && bun test src/renderer/pages/conversation/platforms/nomi/healConversationModel.test.ts 2>&1 | tail -20`
+Run: `cd ui && bun test src/renderer/pages/conversation/platforms/openhub/healConversationModel.test.ts 2>&1 | tail -20`
 Expected: 4 测试 PASS。
 
 - [ ] **Step 5: 接入自愈 effect**
@@ -1300,7 +1300,7 @@ Expected: 4 测试 PASS。
   }, [conversation.id, conversation.model?.id, conversation.model?.use_model, healProviders, healGetAvailable, t]);
 ```
 
-imports 补：`import { resolveHealModel } from '../platforms/nomi/healConversationModel';`（路径按文件相对位置调整）、`import { configService } from '@/common/config/configService';`（若未引入）、`useModelProviderList`、`Message`、`useTranslation`（多已在，缺则补）。
+imports 补：`import { resolveHealModel } from '../platforms/openhub/healConversationModel';`（路径按文件相对位置调整）、`import { configService } from '@/common/config/configService';`（若未引入）、`useModelProviderList`、`Message`、`useTranslation`（多已在，缺则补）。
 
 i18n（两语言 `conversation.json` 的 `chat` 段）加 `modelHealedToDefault`：
 - zh-CN：`"modelHealedToDefault": "已回退到默认模型 {{model}}"`
@@ -1314,8 +1314,8 @@ Expected: 成功。
 - [ ] **Step 7: 提交**
 
 ```bash
-git add ui/src/renderer/pages/conversation/platforms/nomi/healConversationModel.ts ui/src/renderer/pages/conversation/platforms/nomi/healConversationModel.test.ts ui/src/renderer/pages/conversation/components/ChatConversation.tsx ui/src/renderer/services/i18n/locales/zh-CN/conversation.json ui/src/renderer/services/i18n/locales/en-US/conversation.json
-git -c user.name=nomifun commit -m "feat(ui): self-heal stale conversation model to default + notice"
+git add ui/src/renderer/pages/conversation/platforms/openhub/healConversationModel.ts ui/src/renderer/pages/conversation/platforms/openhub/healConversationModel.test.ts ui/src/renderer/pages/conversation/components/ChatConversation.tsx ui/src/renderer/services/i18n/locales/zh-CN/conversation.json ui/src/renderer/services/i18n/locales/en-US/conversation.json
+git -c user.nameopenhubcommit -m "feat(ui): self-heal stale conversation model to default + notice"
 ```
 
 ---
@@ -1326,13 +1326,13 @@ git -c user.name=nomifun commit -m "feat(ui): self-heal stale conversation model
 
 - [ ] **Step 1: 后端全测**
 
-Run: `cargo test -p nomifun-common -p nomifun-system -p nomifun-db -p nomifun-companion -p nomifun-public-agent -p nomifun-app -p nomifun-ai-agent 2>&1 | tail -30`
+Run: `cargo test -p openhub-common -p openhub-system -p openhub-db -p openhub-companion -p openhub-public-agent -p openhub-app -p openhub-ai-agent 2>&1 | tail -30`
 Expected: 全绿。（`release:win` 偶发链接堆损坏与本改动无关，重跑即过。）
 
 - [ ] **Step 2: 前端构建 + 单测**
 
 Run: `cd ui && bun run build 2>&1 | tail -15`
-Run: `cd ui && bun test src/renderer/components/settings/SettingsModal/contents/providerInUse.test.ts src/renderer/pages/conversation/utils/providerErrorMessage.test.ts src/renderer/pages/conversation/platforms/nomi/healConversationModel.test.ts 2>&1 | tail -20`
+Run: `cd ui && bun test src/renderer/components/settings/SettingsModal/contents/providerInUse.test.ts src/renderer/pages/conversation/utils/providerErrorMessage.test.ts src/renderer/pages/conversation/platforms/openhub/healConversationModel.test.ts 2>&1 | tail -20`
 Expected: 构建成功 + 三测试文件全绿。
 
 - [ ] **Step 3: 手动回归（对应截图场景）**
@@ -1346,7 +1346,7 @@ Expected: 构建成功 + 三测试文件全绿。
 - [ ] **Step 4: 收尾提交（若手动回归需微调）**
 
 ```bash
-git -c user.name=nomifun commit -am "fix(provider-guard): manual-regression follow-ups"   # 仅当有修改
+git -c user.nameopenhubcommit -am "fix(provider-guard): manual-regression follow-ups"   # 仅当有修改
 ```
 
 ---
@@ -1355,5 +1355,5 @@ git -c user.name=nomifun commit -am "fix(provider-guard): manual-regression foll
 
 - **Spec 覆盖**：组件 A=Task1–6/8；组件 B=Task7（后端不崩）+Task10（前端自愈+提示）；组件 C=Task1（ProviderUnavailable 码）+Task9（i18n 文案）。软清理=Task6（failover）。✅
 - **范围偏移修正**：`knowledge.autogenModel` 改判为前端-only（后端不清理）；IDMM 拦截 v1 缩到全局备份；渠道 defaultModel 由 B 兜底——均在 Global Constraints 标注。
-- **类型一致性**：`ProviderUsage/ProviderUsageFeature/ProviderInUseDetails` 后端（nomifun-common）与前端（providerInUse.ts）镜像，camelCase 对齐（`desktopCompanion` 等）；`resolve_provider_fields_with_fallback` 在 T7 定义、nomi.rs 调用同名；`fleets_using_provider`/`providers_in_use`/`with_deletion_coordinator`/`cleanup_soft_refs` 全计划一致。
+- **类型一致性**：`ProviderUsage/ProviderUsageFeature/ProviderInUseDetails` 后端（openhub-common）与前端（providerInUse.ts）镜像，camelCase 对齐（`desktopCompanion` 等）；`resolve_provider_fields_with_fallback` 在 T7 定义、nomi.rs 调用同名；`fleets_using_provider`/`providers_in_use`/`with_deletion_coordinator`/`cleanup_soft_refs` 全计划一致。
 - **占位符**：Task3 的 `sample_fleet_params()`/`sample_member()` 明确标注为"以本文件既有测试真实构造替换"，非交付占位。

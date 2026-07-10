@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -65,22 +65,22 @@ describe('sidebarDisplayPreferences', () => {
   });
 
   test('formats workpath labels for folder, full path, and two-line strategies', () => {
-    const path = '/Users/muri/code/nomifun/nomifun-tauri';
+    const path = '/Users/muri/code/openhub/openhub-client';
 
-    expect(formatWorkpathDisplay(path, 'nomifun-tauri', 'folder')).toEqual({
+    expect(formatWorkpathDisplay(path, 'openhub-client', 'folder')).toEqual({
       kind: 'single',
-      primary: 'nomifun-tauri',
+      primary: 'openhub-client',
       tooltip: path,
     });
-    expect(formatWorkpathDisplay(path, 'nomifun-tauri', 'full')).toEqual({
+    expect(formatWorkpathDisplay(path, 'openhub-client', 'full')).toEqual({
       kind: 'single',
       primary: path,
       tooltip: path,
     });
-    expect(formatWorkpathDisplay(path, 'nomifun-tauri', 'folderWithPath')).toEqual({
+    expect(formatWorkpathDisplay(path, 'openhub-client', 'folderWithPath')).toEqual({
       kind: 'twoLine',
-      primary: 'nomifun-tauri',
-      secondary: '/Users/muri/code/nomifun',
+      primary: 'openhub-client',
+      secondary: '/Users/muri/code/openhub',
       tooltip: path,
     });
   });

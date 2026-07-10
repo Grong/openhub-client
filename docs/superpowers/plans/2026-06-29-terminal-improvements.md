@@ -4,13 +4,13 @@
 
 **Goal:** 终端会话自动标题、claude/codex 卡死后可靠回退 shell、App 退出时清理全部会话。
 
-**Architecture:** 后端按功能分三块改 `nomifun-terminal`（service/routes/新 title.rs）、`nomifun-db`（repo delete_all）、`nomifun-app`（services 接线 + desktop shutdown 桥）、`apps/desktop`（RunEvent 钩子）；前端集中在 `ui/.../terminal/*` + `ipcBridge/httpBridge` + i18n。复用既有 `relaunch`/`update_meta`/`one_shot_completion`/`LiveKnowledgeCompleter`/`SHELL_SENTINEL` 模式。
+**Architecture:** 后端按功能分三块改 `openhub-terminal`（service/routes/新 title.rs）、`openhub-db`（repo delete_all）、`openhub-app`（services 接线 + desktop shutdown 桥）、`apps/desktop`（RunEvent 钩子）；前端集中在 `ui/.../terminal/*` + `ipcBridge/httpBridge` + i18n。复用既有 `relaunch`/`update_meta`/`one_shot_completion`/`LiveKnowledgeCompleter`/`SHELL_SENTINEL` 模式。
 
 **Tech Stack:** Rust（axum、sqlx 运行时查询、tokio、async-trait、dashmap）、React + TypeScript（xterm.js、Arco、bun:test）。
 
 ## Global Constraints
 
-- 注释/文案随上下文用中文；交流用中文。提交署名 `nomifun <rika00@qq.com>`，**不**加 `Co-Authored-By`：`git -c user.name=nomifun -c user.email=rika00@qq.com commit --author="nomifun <rika00@qq.com>" -m ...`。
+- 注释/文案随上下文用中文；交流用中文。提交署名 openhub<rika00@qq.com>`，**不**加 `Co-Authored-By`：`git -c user.nameopenhub-c user.email=rika00@qq.com commit --author=openhub<rika00@qq.com>" -m ...`。
 - 分支：`feat/terminal-improvements`（已建，设计文档已提交）。
 - Rust 测试：`cargo test -p <crate> <filter>`。sqlx 用运行时查询（`sqlx::query`/`query_as`），占位符匿名 `?` 顺序 `.bind`。
 - 前端测试 `bun:test`：`cd ui && bun test <path>`，`import { describe, expect, test } from 'bun:test'`。
@@ -24,9 +24,9 @@
 ### Task C1：repo `delete_all`（trait + sqlite + MemRepo）
 
 **Files:**
-- Modify: `crates/backend/nomifun-db/src/repository/terminal.rs`（trait 末尾加方法）
-- Modify: `crates/backend/nomifun-db/src/repository/sqlite_terminal.rs`（impl + 测试）
-- Modify: `crates/backend/nomifun-terminal/src/service.rs`（MemRepo impl）
+- Modify: `crates/backend/openhub-db/src/repository/terminal.rs`（trait 末尾加方法）
+- Modify: `crates/backend/openhub-db/src/repository/sqlite_terminal.rs`（impl + 测试）
+- Modify: `crates/backend/openhub-terminal/src/service.rs`（MemRepo impl）
 
 **Interfaces:**
 - Produces: `async fn delete_all(&self) -> Result<u64, DbError>`（删除全部 terminal_sessions 行，scrollback 经 FK CASCADE 删除；返回删除行数）。
@@ -35,12 +35,12 @@
 - [ ] **Step 2**：sqlite 实现 `DELETE FROM terminal_sessions`（无 WHERE），返回 `result.rows_affected()`。
 - [ ] **Step 3**：MemRepo（service.rs tests）实现：清空 `rows` 与 `scrollback`，返回清空前 rows 数。
 - [ ] **Step 4**：sqlite 测试 `delete_all_clears_rows_and_scrollback_cascade`：建 2 行 + save_scrollback → delete_all 返回 2 → list 为空 + load_scrollback None。
-- [ ] **Step 5**：`cargo test -p nomifun-db sqlite_terminal`。
+- [ ] **Step 5**：`cargo test -p openhub-db sqlite_terminal`。
 - [ ] **Step 6**：提交。
 
 ### Task C2：`TerminalService::shutdown_cleanup`
 
-**Files:** Modify `crates/backend/nomifun-terminal/src/service.rs`
+**Files:** Modify `crates/backend/openhub-terminal/src/service.rs`
 
 **Interfaces:**
 - Consumes: `repo.delete_all()`。
@@ -48,20 +48,20 @@
 
 - [ ] **Step 1**：实现：`for e in self.live.iter() { let _ = e.value().kill(); }`，`self.live.clear()`，`self.pending_spawn.clear()`，`let n = self.repo.delete_all().await?;` `Ok(n)`。注释强调仅 real-quit 调用。
 - [ ] **Step 2**：测试 `shutdown_cleanup_kills_and_deletes_all`：建 2 个 `cat` 会话 → shutdown_cleanup → `list("u")` 为空。
-- [ ] **Step 3**：`cargo test -p nomifun-terminal shutdown_cleanup`。
+- [ ] **Step 3**：`cargo test -p openhub-terminal shutdown_cleanup`。
 - [ ] **Step 4**：提交。
 
 ### Task C3：`DesktopServer` 持有 terminal_service + 阻塞清理桥
 
-**Files:** Modify `crates/backend/nomifun-app/src/desktop.rs`
+**Files:** Modify `crates/backend/openhub-app/src/desktop.rs`
 
 **Interfaces:**
 - Consumes: `AppServices.terminal_service: Arc<TerminalService>`（pub）、`self.runtime: Handle`。
 - Produces: `pub fn shutdown_terminals_blocking(&self)`（在 backend runtime 上 spawn `shutdown_cleanup` 并用 std mpsc `recv_timeout(3s)` 阻塞等待；超时/错误仅 warn）。
 
-- [ ] **Step 1**：`DesktopServer` 加字段 `terminal_service: Arc<nomifun_terminal::TerminalService>`；`start()` 构造时 `terminal_service: services.terminal_service.clone()`（在 move 进 keep_alive 前）。
+- [ ] **Step 1**：`DesktopServer` 加字段 `terminal_service: Arc<openhub_terminal::TerminalService>`；`start()` 构造时 `terminal_service: services.terminal_service.clone()`（在 move 进 keep_alive 前）。
 - [ ] **Step 2**：实现 `shutdown_terminals_blocking`：`let ts = self.terminal_service.clone(); let (tx, rx) = std::sync::mpsc::channel(); self.runtime.spawn(async move { let r = tokio::time::timeout(Duration::from_secs(3), ts.shutdown_cleanup()).await; let _ = tx.send(r); });` 然后 `match rx.recv_timeout(Duration::from_secs(4)) { ... }` 仅 log。
-- [ ] **Step 3**：`cargo build -p nomifun-app`。
+- [ ] **Step 3**：`cargo build -p openhub-app`。
 - [ ] **Step 4**：提交。
 
 ### Task C4：`apps/desktop` RunEvent::ExitRequested 钩子
@@ -69,7 +69,7 @@
 **Files:** Modify `apps/desktop/src/main.rs`
 
 - [ ] **Step 1**：重写 `handle_run_event`：保留 macOS Reopen 分支；新增（全平台）`tauri::RunEvent::ExitRequested { .. } => { if let Some(server) = app.try_state::<Arc<DesktopServer>>() { server.shutdown_terminals_blocking(); } }`。注释说明：ExitRequested 只在真正退出时触发（close-to-tray 走 prevent_close 不触发），故无需 QuitFlag 守卫即安全。删除 `#[cfg(not(macos))] let _=(app,event)`（现在两平台都用到）。
-- [ ] **Step 2**：`cargo build -p nomifun-desktop`（或 workspace build）。
+- [ ] **Step 2**：`cargo build -p openhub-desktop`（或 workspace build）。
 - [ ] **Step 3**：提交。
 
 ---
@@ -78,7 +78,7 @@
 
 ### Task B1：`TerminalService::relaunch_as_shell`
 
-**Files:** Modify `crates/backend/nomifun-terminal/src/service.rs`
+**Files:** Modify `crates/backend/openhub-terminal/src/service.rs`
 
 **Interfaces:**
 - Produces: `pub async fn relaunch_as_shell(&self, id: i64) -> Result<TerminalSessionResponse, TerminalError>`。
@@ -90,15 +90,15 @@
   - `clear_scrollback`；`update_status("running", None)`；`emit_updated`；`arm_supervision`。
 - [ ] **Step 2**：repo 加 `async fn update_command(&self, id, command: &str, args: &str, backend: Option<&str>) -> Result<(), DbError>`（trait + sqlite `UPDATE ... SET command=?, args=?, backend=?, updated_at=?` + MemRepo）。
 - [ ] **Step 3**：测试 `relaunch_as_shell_swaps_command_and_emits_updated`：建 `cat` 会话 → relaunch_as_shell → row.command == `$SHELL`、last_status==running、捕获到 `terminal.updated`。
-- [ ] **Step 4**：`cargo test -p nomifun-terminal relaunch_as_shell`。
+- [ ] **Step 4**：`cargo test -p openhub-terminal relaunch_as_shell`。
 - [ ] **Step 5**：提交。
 
 ### Task B2：路由 `POST /api/terminals/{id}/relaunch-shell`
 
-**Files:** Modify `crates/backend/nomifun-terminal/src/routes.rs`
+**Files:** Modify `crates/backend/openhub-terminal/src/routes.rs`
 
 - [ ] **Step 1**：加 route + handler `relaunch_shell_terminal`（仿 `relaunch_terminal`，调 `relaunch_as_shell`）。
-- [ ] **Step 2**：`cargo build -p nomifun-terminal`。
+- [ ] **Step 2**：`cargo build -p openhub-terminal`。
 - [ ] **Step 3**：提交。
 
 ---
@@ -108,9 +108,9 @@
 ### Task A1：`title.rs`（提示词 + completer trait + Live 实现）
 
 **Files:**
-- Create: `crates/backend/nomifun-terminal/src/title.rs`
-- Modify: `crates/backend/nomifun-terminal/src/lib.rs`（`mod title;` + re-export）
-- Modify: `crates/backend/nomifun-terminal/Cargo.toml`（加 `nomifun-ai-agent`）
+- Create: `crates/backend/openhub-terminal/src/title.rs`
+- Modify: `crates/backend/openhub-terminal/src/lib.rs`（`mod title;` + re-export）
+- Modify: `crates/backend/openhub-terminal/Cargo.toml`（加 `openhub-ai-agent`）
 
 **Interfaces:**
 - Produces:
@@ -122,12 +122,12 @@
 - [ ] **Step 1**：写 `fallback_title` 失败测试（首行截断、去 `\r\n`、去 ANSI/控制符、空输入返回空）。
 - [ ] **Step 2**：实现 `fallback_title` + `TITLE_SYSTEM` + trait + `LiveTerminalTitleCompleter`（依 knowledge_completer.rs 拷贝 resolve/complete）。
 - [ ] **Step 3**：Cargo.toml 加依赖；lib.rs `mod title; pub use title::{...};`。
-- [ ] **Step 4**：`cargo test -p nomifun-terminal title::`。
+- [ ] **Step 4**：`cargo test -p openhub-terminal title::`。
 - [ ] **Step 5**：提交。
 
 ### Task A2：service 接入触发（首行捕获 + TurnEnd + 一次性守卫）
 
-**Files:** Modify `crates/backend/nomifun-terminal/src/service.rs`
+**Files:** Modify `crates/backend/openhub-terminal/src/service.rs`
 
 **Interfaces:**
 - Consumes: `title::{TerminalTitleCompleter, fallback_title}`、`default_name`、`update_meta`。
@@ -141,15 +141,15 @@
 - [ ] **Step 2**：`spawn_pty` 的 lifecycle 消费者（515-529）：收到首个 `TurnEnd` 时取 `payload["last_assistant_message"]`，`spawn` 调 `maybe_autotitle(id, Some(msg))`。
 - [ ] **Step 3**：守卫实现：先查 `titled.insert(id,()).is_none()` 抢占（已存在则 return）；reload row，比对 `row.name == default_name(row.command, row.backend)`，不等则 return（用户改过名或已命名）。
 - [ ] **Step 4**：测试：①无 completer 时 shell 首行 `echo hi` → 标题变 `hi`（fallback）；② 注入 fake completer → maybe_autotitle 用其结果；③ 已改名（name!=default）→ 不覆盖；④ 触发两次只生效一次。
-- [ ] **Step 5**：`cargo test -p nomifun-terminal autotitle`。
+- [ ] **Step 5**：`cargo test -p openhub-terminal autotitle`。
 - [ ] **Step 6**：提交。
 
 ### Task A3：services.rs 注入 Live completer
 
-**Files:** Modify `crates/backend/nomifun-app/src/services.rs`
+**Files:** Modify `crates/backend/openhub-app/src/services.rs`
 
-- [ ] **Step 1**：在 terminal 接线块（440-459）后：`terminal_service.with_title_completer(Arc::new(LiveTerminalTitleCompleter { provider_repo: provider_repo.clone(), encryption_key, workspace: data_dir.clone() }));`（`nomifun_terminal::LiveTerminalTitleCompleter`）。
-- [ ] **Step 2**：`cargo build -p nomifun-app`。
+- [ ] **Step 1**：在 terminal 接线块（440-459）后：`terminal_service.with_title_completer(Arc::new(LiveTerminalTitleCompleter { provider_repo: provider_repo.clone(), encryption_key, workspace: data_dir.clone() }));`（`openhub_terminal::LiveTerminalTitleCompleter`）。
+- [ ] **Step 2**：`cargo build -p openhub-app`。
 - [ ] **Step 3**：提交。
 
 ---

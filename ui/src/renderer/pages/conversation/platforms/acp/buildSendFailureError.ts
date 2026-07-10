@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -21,7 +21,7 @@ export const buildSendFailureError = (error: unknown, message: string): AgentStr
     return {
       message,
       code: workspacePathErrorCode,
-      ownership: 'nomifun',
+      ownership: 'openhub',
       detail: message,
       ...(workspacePath ? { workspacePath } : {}),
       retryable: false,
@@ -43,8 +43,8 @@ export const buildSendFailureError = (error: unknown, message: string): AgentStr
   if (isConversationBusyError(error)) {
     return {
       message,
-      code: 'NOMIFUN_CONVERSATION_BUSY',
-      ownership: 'nomifun',
+      code: 'OPENHUB_CONVERSATION_BUSY',
+      ownership: 'openhub',
       detail: message,
       retryable: false,
       feedback_recommended: false,
@@ -54,8 +54,8 @@ export const buildSendFailureError = (error: unknown, message: string): AgentStr
 
   return {
     message,
-    code: 'NOMIFUN_INTERNAL_ERROR',
-    ownership: 'nomifun',
+    code: 'OPENHUB_INTERNAL_ERROR',
+    ownership: 'openhub',
     detail: message,
     retryable: true,
     feedback_recommended: true,

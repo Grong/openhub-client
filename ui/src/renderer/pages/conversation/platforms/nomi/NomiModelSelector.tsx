@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -81,7 +81,7 @@ const NomiModelSelector: React.FC<{
                 {models.map((modelName) => (
                   <Menu.Item
                     key={`${provider.id}-${modelName}`}
-                    data-testid={`nomi-model-option-${modelName}`}
+                    data-testid={`openhub-model-option-${modelName}`}
                     className={(current_model?.id ?? '') + (current_model?.use_model ?? '') === provider.id + modelName ? '!bg-2' : ''}
                     onClick={() => void handleSelectModel(provider, modelName)}
                   >
@@ -97,7 +97,7 @@ const NomiModelSelector: React.FC<{
       }
     >
       <Button
-        data-testid='nomi-model-selector'
+        data-testid='openhub-model-selector'
         className={classNames(
           'sendbox-model-btn header-model-btn min-w-0',
           compact ? '!max-w-[120px]' : '!max-w-[280px]',

@@ -94,16 +94,16 @@
 
 ### 后端设计（Rust，仅 Nomi）
 
-- **Repo**（`crates/backend/nomifun-db`）
+- **Repo**（`crates/backend/openhub-db`）
   - `IConversationRepository::delete_messages_from(conversation_id, created_at, id) -> Result<u64>`（`repository/conversation.rs`）+ SQLite 实现（`repository/sqlite_conversation.rs`）：
     `DELETE FROM messages WHERE conversation_id=?1 AND (created_at>?2 OR (created_at=?2 AND id>=?3))`，命中 keyset 索引 `idx_messages_conv_created_id`。
-- **Engine**（`crates/agent/nomi-agent/src/engine.rs`）
+- **Engine**（`crates/agent/openhub-agent/src/engine.rs`）
   - 新增字段 `last_turn_start_len: Option<usize>`，在 `run_inner` push 用户消息前（约 `:670`）记录 `self.messages.len()`；持久化进 session（restart 后 resume 可用）。
   - microcompaction 重写 transcript 时（`:1158`）置 `last_turn_start_len = None`（失效）。
   - `pub fn rewind_last_turn(&mut self) -> bool`：若锚点存在且 `start <= messages.len()` 且 `messages[start]` 为 `Role::User` 文本（sanity），则 `self.messages.truncate(start)` + 清锚点 + `save_session()`，返回 `true`；否则 `false`。
-- **Manager**（`nomifun-ai-agent` 的 `NomiAgentManager`）
+- **Manager**（`openhub-ai-agent` 的 `NomiAgentManager`）
   - 暴露 `rewind_last_turn()` 透传到引擎（仿 `clear_context` 的"先 request_stop 再操作"模式）。
-- **Service**（`crates/backend/nomifun-conversation/src/service.rs`）
+- **Service**（`crates/backend/openhub-conversation/src/service.rs`）
   - `edit_and_resubmit(conversation_id, msg_id, input, files) -> Result<{ msg_id }>`：
     鉴权 → 校验该 `msg_id` 是该会话**最近一条** `position='right'` 文本消息（否则 4xx）→ `cancel` 在飞 turn → 取该消息 `(created_at,id)` → `agent.rewind_last_turn()`（失败则回退：返回可读错误，提示"上下文已压缩，无法精确回退"）→ `repo.delete_messages_from(...)` → 复用 `send_message` 发送新内容并返回新 `msg_id`。
   - 仅当会话 agent 类型为 Nomi 时可用，其它类型返回 4xx（UI 不会触发）。
@@ -112,7 +112,7 @@
 ### 前端设计
 
 - **emitter**（`utils/emitter.ts`）：新增 `'sendbox.edit': [{ msgId: string; createdAt: number; content: string }]`。
-- **MessageText.tsx**：用户消息（`isUserMessage && type==='text'`）的悬浮工具行（`:232-245`，桌面端）在 `copyButton` 旁加「编辑」图标按钮，复用其样式。显示条件：会话 `type==='nomi'` && 非运行中 && **该消息是最近一条用户消息**。点击 emit `'sendbox.edit'`。
+- **MessageText.tsx**：用户消息（`isUserMessage && type==='text'`）的悬浮工具行（`:232-245`，桌面端）在 `copyButton` 旁加「编辑」图标按钮，复用其样式。显示条件：会话 `type==='openhub'` && 非运行中 && **该消息是最近一条用户消息**。点击 emit `'sendbox.edit'`。
   - 移动端：当前无 per-message 工具行。最近一条用户气泡长按 → 轻量动作菜单（复制/编辑）。此为次优先项，可在实现期决定是否随首版交付。
 - **SendBox/index.tsx**（通用、平台无关）：
   - 新增可选 prop `onEditResubmit?: (msgId: string, message: string) => Promise<void>`。
@@ -125,8 +125,8 @@
 
 ### 受影响文件（问题二）
 
-后端：`repository/conversation.rs`、`repository/sqlite_conversation.rs`、`agent/nomi-agent/src/engine.rs`、`nomifun-ai-agent`（manager）、`nomifun-conversation/src/{service.rs,routes.rs}`。
-前端：`utils/emitter.ts`、`Messages/components/MessageText.tsx`、`components/chat/SendBox/index.tsx`、`platforms/nomi/NomiSendBox.tsx`、`pages/conversation/Messages/hooks.ts`（`useRemoveMessagesFrom`）、`common/adapter/ipcBridge.ts`、`locales/{en-US,zh-CN}/conversation.json`。
+后端：`repository/conversation.rs`、`repository/sqlite_conversation.rs`、`agent/openhub-agent/src/engine.rs`、`openhub-ai-agent`（manager）、`openhub-conversation/src/{service.rs,routes.rs}`。
+前端：`utils/emitter.ts`、`Messages/components/MessageText.tsx`、`components/chat/SendBox/index.tsx`、`platforms/openhub/NomiSendBox.tsx`、`pages/conversation/Messages/hooks.ts`（`useRemoveMessagesFrom`）、`common/adapter/ipcBridge.ts`、`locales/{en-US,zh-CN}/conversation.json`。
 
 ---
 

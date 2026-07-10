@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -51,8 +51,8 @@ import NomiModelSelector from './NomiModelSelector';
 import { ContextUsageRing } from './ContextUsageRing';
 import type { NomiModelSelection } from './useNomiModelSelection';
 
-const useNomiSendBoxDraft = getSendBoxDraftHook('nomi', {
-  _type: 'nomi',
+const useNomiSendBoxDraft = getSendBoxDraftHook('openhub', {
+  _type: 'openhub',
   atPath: [],
   content: '',
   uploadFile: [],
@@ -187,7 +187,7 @@ const NomiSendBox: React.FC<{
   }, [conversation_id, prepareRuntimeSync, t]);
 
   const slash_commands = useSlashCommands(conversation_id, {
-    conversation_type: 'nomi',
+    conversation_type: 'openhub',
     agentStatus: agentWarmed ? 'active' : null,
   });
 
@@ -315,8 +315,8 @@ const NomiSendBox: React.FC<{
   useEffect(() => {
     if (!conversation_id || !current_model?.use_model) return;
 
-    const storageKey = `nomi_initial_message_${conversation_id}`;
-    const processedKey = `nomi_initial_processed_${conversation_id}`;
+    const storageKey = `openhub_initial_message_${conversation_id}`;
+    const processedKey = `openhub_initial_processed_${conversation_id}`;
 
     const processInitialMessage = async () => {
       if (sessionStorage.getItem(processedKey)) return;
@@ -506,7 +506,7 @@ const NomiSendBox: React.FC<{
         await prepareRuntimeSync();
         await ipcBridge.acpConversation.setMode.invoke({ conversation_id, mode });
         setCurrentMode(mode);
-        void savePreferredMode('nomi', mode);
+        void savePreferredMode('openhub', mode);
         Message.success(t('agentMode.switchSuccess'));
       } catch (error) {
         console.error('[NomiSendBox] Failed to switch mode via sheet:', error);
@@ -729,7 +729,7 @@ const NomiSendBox: React.FC<{
         onClear={clear}
       />
       <SendBox
-        data-testid='nomi-sendbox'
+        data-testid='openhub-sendbox'
         showPinnedPlan
         onMobilePlusClick={isMobile ? () => setIsMobileSheetOpen(true) : undefined}
         value={content}
@@ -766,13 +766,13 @@ const NomiSendBox: React.FC<{
         }
         rightTools={
           hideModeSelector ? undefined : (
-            <div className='flex items-center gap-2 min-w-0' data-testid='nomi-sendbox-config-group'>
+            <div className='flex items-center gap-2 min-w-0' data-testid='openhub-sendbox-config-group'>
               {hasContextUsage && <ContextUsageRing used={tokenUsage?.context_tokens} max={tokenUsage?.context_window} />}
-              <NomiModelSelector selection={modelSelection} className='nomi-sendbox-model-btn' />
+              <NomiModelSelector selection={modelSelection} className='openhub-sendbox-model-btn' />
               {collaboratorSelectorNode}
               {extraRightTools}
               <AgentModeSelector
-                backend='nomi'
+                backend='openhub'
                 conversation_id={conversation_id}
                 compact
                 initialMode={session_mode}
@@ -793,7 +793,7 @@ const NomiSendBox: React.FC<{
                 {uploadFile.map((path) => (
                   <FilePreview
                     key={path}
-                    data-testid={`nomi-file-tag-${uploadFile.indexOf(path)}`}
+                    data-testid={`openhub-file-tag-${uploadFile.indexOf(path)}`}
                     path={path}
                     onRemove={() => setUploadFile(uploadFile.filter((v) => v !== path))}
                   />
@@ -809,7 +809,7 @@ const NomiSendBox: React.FC<{
                     return (
                       <Tag
                         key={item.path}
-                        data-testid={`nomi-folder-tag-${folderIndex}`}
+                        data-testid={`openhub-folder-tag-${folderIndex}`}
                         bordered={false}
                         className='!bg-primary-1 !text-primary-6'
                         closable

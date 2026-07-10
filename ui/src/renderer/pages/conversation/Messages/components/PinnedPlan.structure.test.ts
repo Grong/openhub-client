@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -48,7 +48,7 @@ describe('PinnedPlan compact composer layout', () => {
     expect(sendBoxSource.includes('absolute right-4px bottom-[calc(100%+4px)] h-36px')).toBe(false);
     expect(sendBoxSource.includes("data-testid='sendbox-top-row'")).toBe(false);
     expect(sendBoxSource.includes('top-1/2 -translate-y-1/2')).toBe(false);
-    expect(nomiSendBoxSource.includes("data-testid='nomi-context-usage-slot'")).toBe(false);
+    expect(nomiSendBoxSource.includes("data-testid='openhub-context-usage-slot'")).toBe(false);
     expect(nomiSendBoxSource.includes('topRightTools=')).toBe(false);
 
     const panelIndex = sendBoxSource.indexOf('sendbox-panel relative');

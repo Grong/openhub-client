@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,8 +9,8 @@
  *
  * Two layers, per the M0 contract (`docs/superpowers/specs/2026-07-05-creative-workshop-m0-contracts.md`):
  *
- * 1. **Wire types (§3)** — the REST payloads exchanged with `nomifun-workshop` /
- *    `nomifun-creation`. Field names are **snake_case**, mirroring the backend
+ * 1. **Wire types (§3)** — the REST payloads exchanged with `openhub-workshop` /
+ *    `openhub-creation`. Field names are **snake_case**, mirroring the backend
  *    JSON exactly.
  * 2. **Canvas doc types (§4)** — the shape of the opaque `canvas.json` the
  *    backend only stores/serves. This is **frontend-owned**; the backend never

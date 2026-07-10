@@ -157,7 +157,7 @@
     "source_chat_compact": "From chat"
   },
   "collect": {
-    "intro": "Choose what your companions may learn from. Nothing is collected by default; enabled sources are written to the local companion/nomi/ directory and can be wiped anytime.",
+    "intro": "Choose what your companions may learn from. Nothing is collected by default; enabled sources are written to the local companion/openhub/ directory and can be wiped anytime.",
     "sensitivity": {
       "low": "Low",
       "medium": "Medium",
@@ -166,7 +166,7 @@
     "today": "Today",
     "total": "Total",
     "clear": "Clear all collected data",
-    "clearConfirm": "This deletes everything under companion/nomi/events. Learned memories are unaffected. Continue?",
+    "clearConfirm": "This deletes everything under companion/openhub/events. Learned memories are unaffected. Continue?",
     "cleared": "Collected data cleared",
     "clearHint": "Deletes raw event files only; learned memories stay.",
     "disableAll": "Turn everything off",

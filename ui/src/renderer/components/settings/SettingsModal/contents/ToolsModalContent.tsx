@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -35,7 +35,7 @@ type MessageInstance = Required<ReturnType<typeof Message.useMessage>[0]>;
 
 const isBuiltinImageGenServer = (server: IMcpServer) =>
   server.builtin === true && (String(server.id) === BUILTIN_IMAGE_GEN_ID || server.name === BUILTIN_IMAGE_GEN_NAME);
-const SPEECH_TO_TEXT_CONFIG_CHANGED_EVENT = 'nomifun:speech-to-text-config-changed';
+const SPEECH_TO_TEXT_CONFIG_CHANGED_EVENT = 'openhub:speech-to-text-config-changed';
 const areEnvRecordsEqual = (a: Record<string, string>, b: Record<string, string>) => {
   const aKeys = Object.keys(a);
   const bKeys = Object.keys(b);
@@ -821,7 +821,7 @@ const ToolsModalContent: React.FC = () => {
                         <div>
                           {t('settings.needHelpTooltip')}
                           <a
-                            href='https://github.com/nomifun/nomifun-app/wiki/Nomifun-Image-Generation-Tool-Model-Configuration-Guide'
+                            href='https://github.com/openhub/openhub-app/wiki/Openhub-Image-Generation-Tool-Model-Configuration-Guide'
                             target='_blank'
                             rel='noopener noreferrer'
                             className='text-[rgb(var(--primary-6))] hover:text-[rgb(var(--primary-5))] underline ml-4px'
@@ -833,7 +833,7 @@ const ToolsModalContent: React.FC = () => {
                       }
                     >
                       <a
-                        href='https://github.com/nomifun/nomifun-app/wiki/Nomifun-Image-Generation-Tool-Model-Configuration-Guide'
+                        href='https://github.com/openhub/openhub-app/wiki/Openhub-Image-Generation-Tool-Model-Configuration-Guide'
                         target='_blank'
                         rel='noopener noreferrer'
                         className='ml-8px text-[rgb(var(--primary-6))] hover:text-[rgb(var(--primary-5))] cursor-pointer'

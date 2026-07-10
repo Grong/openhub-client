@@ -1,6 +1,6 @@
-# Running NomiFun as a Desktop App
+# Running OpenHub as a Desktop App
 
-The desktop app (`nomifun-desktop`) is a [Tauri](https://tauri.app/) shell that links the Rust backend (`nomifun-app`) **into the same process**. There is no spawned backend binary, no Electron, no bundled `nomicore`. The shell starts the backend as an async task on a free `127.0.0.1` port, then loads the bundled SPA (`ui/dist`) into a WebView and points it at `http://127.0.0.1:<port>/api`.
+The desktop app (`openhub-desktop`) is a [Tauri](https://tauri.app/) shell that links the Rust backend (`openhub-app`) **into the same process**. There is no spawned backend binary, no Electron, no bundled `openhub-core`. The shell starts the backend as an async task on a free `127.0.0.1` port, then loads the bundled SPA (`ui/dist`) into a WebView and points it at `http://127.0.0.1:<port>/api`.
 
 The desktop WebView does not show a login screen. Instead, the embedded backend
 runs under `AuthPolicy::TrustLocalToken`: the shell injects a per-boot local
@@ -10,7 +10,7 @@ see [WebUI Remote Access](./webui-remote-access.md) for the in-app feature, or
 [Self-Host the Web Server](./web-server-deployment.md) for the standalone
 server.
 
-![NomiFun desktop main window](../images/desktop-01-main-window.png)
+![OpenHub desktop main window](../images/desktop-01-main-window.png)
 
 ## Quick start
 
@@ -31,7 +31,7 @@ bun install
 bun run dev
 ```
 
-This runs `tauri dev --config apps/desktop/tauri.conf.json`. It starts the Vite dev server (`http://localhost:5173`) for the SPA, builds and launches `nomifun-desktop`, and the embedded backend is started on a fresh free localhost port at every boot.
+This runs `tauri dev --config apps/desktop/tauri.conf.json`. It starts the Vite dev server (`http://localhost:5173`) for the SPA, builds and launches `openhub-desktop`, and the embedded backend is started on a fresh free localhost port at every boot.
 
 ### Build a release bundle
 
@@ -45,13 +45,13 @@ A successful build prints the bundle locations, for example on macOS:
 
 ```text
 $ bun run build
-   Compiling nomifun-app v0.1.0
+   Compiling openhub-app v0.1.0
     Finished `release` profile [optimized] target(s)
-    Bundling NomiFun.app (macos)
-    Bundling NomiFun_0.1.0_aarch64.dmg (macos)
+    Bundling OpenHub.app (macos)
+    Bundling OpenHub_0.1.0_aarch64.dmg (macos)
     Finished 2 bundles at:
-      target/release/bundle/macos/NomiFun.app
-      target/release/bundle/dmg/NomiFun_0.1.0_aarch64.dmg
+      target/release/bundle/macos/OpenHub.app
+      target/release/bundle/dmg/OpenHub_0.1.0_aarch64.dmg
 ```
 
 ## Window and titlebar
@@ -60,7 +60,7 @@ The main window is **frameless** on Windows and Linux: the React titlebar compon
 
 - Default size: `1280 × 832`, minimum `880 × 600`.
 - Resizable everywhere (edge-resize and Snap still work on Windows even without OS-drawn decorations).
-- Title bar: `NomiFun`.
+- Title bar: `OpenHub`.
 
 > The exact chrome differs per OS: a frameless titlebar with in-app controls on
 > Windows and Linux, and the native traffic-light buttons (content under an
@@ -68,11 +68,11 @@ The main window is **frameless** on Windows and Linux: the React titlebar compon
 
 ## Single instance
 
-`tauri-plugin-single-instance` enforces a single running copy of the app on Windows and Linux. Trying to launch a second `nomifun-desktop` will silently focus the existing window instead of starting another backend on a different port.
+`tauri-plugin-single-instance` enforces a single running copy of the app on Windows and Linux. Trying to launch a second `openhub-desktop` will silently focus the existing window instead of starting another backend on a different port.
 
 ## Deep links
 
-The app registers the `nomifun://` URL scheme (configured in `apps/desktop/tauri.conf.json` under `plugins.deep-link.desktop.schemes`). When the OS launches Nomi via a `nomifun://...` URL, the shell forwards the URLs to the renderer over the Tauri event `deep-link://received`. The renderer can subscribe with `listen('deep-link://received', ...)` from `@tauri-apps/api/event` to handle the payload.
+The app registers the `openhub://` URL scheme (configured in `apps/desktop/tauri.conf.json` under `plugins.deep-link.desktop.schemes`). When the OS launches Nomi via a `openhub://...` URL, the shell forwards the URLs to the renderer over the Tauri event `deep-link://received`. The renderer can subscribe with `listen('deep-link://received', ...)` from `@tauri-apps/api/event` to handle the payload.
 
 `register_all()` is called at startup to install the scheme; on platforms that need an out-of-band registration step (some Linux desktops, dev contexts) the call is best-effort and a failure is ignored.
 
@@ -86,18 +86,18 @@ The shell ships `tauri-plugin-autostart` so the renderer can opt the app into "l
 
 ## Where data is stored
 
-The desktop app persists the SQLite database, agent state, logs, and the Bun runtime cache under the per-user application-data directory — **`%LOCALAPPDATA%\NomiFun\Nomi`** on Windows, **`~/Library/Application Support/NomiFun/Nomi`** on macOS, **`$XDG_DATA_HOME/NomiFun/Nomi`** on Linux (resolved by the shared `nomifun_app::cli::default_data_dir()`). This is the same default the `nomifun-web` host and the dev scripts use, so a provider or companion configured in one host is visible in the others.
+The desktop app persists the SQLite database, agent state, logs, and the Bun runtime cache under the per-user application-data directory — **`%LOCALAPPDATA%\OpenHub\Nomi`** on Windows, **`~/Library/Application Support/OpenHub/Nomi`** on macOS, **`$XDG_DATA_HOME/OpenHub/Nomi`** on Linux (resolved by the shared `openhub_app::cli::default_data_dir()`). This is the same default the `openhub-web` host and the dev scripts use, so a provider or companion configured in one host is visible in the others.
 
-Set `NOMIFUN_DATA_DIR=<absolute path>` before launching the app and the data dir becomes `$NOMIFUN_DATA_DIR/Nomi`. The backend takes an exclusive `server.lock` on the data dir at startup; if it fails to start — for example because another instance already holds the directory — the desktop shell shows a native error dialog and exits.
+Set `OPENHUB_DATA_DIR=<absolute path>` before launching the app and the data dir becomes `$OPENHUB_DATA_DIR/Nomi`. The backend takes an exclusive `server.lock` on the data dir at startup; if it fails to start — for example because another instance already holds the directory — the desktop shell shows a native error dialog and exits.
 
-> Older builds defaulted to `<system temp>/nomifun-data/Nomi`. An install found there is relocated to the per-user location automatically on launch (one-shot): data is copied, absolute paths stored in the database are rewritten, and the legacy directory is kept as a backup. Regenerable caches (the extracted Bun runtime, logs, browser profile, …) are not carried over — they rebuild on first use.
+> Older builds defaulted to `<system temp>/openhub-data/Nomi`. An install found there is relocated to the per-user location automatically on launch (one-shot): data is copied, absolute paths stored in the database are rewritten, and the legacy directory is kept as a backup. Regenerable caches (the extracted Bun runtime, logs, browser profile, …) are not carried over — they rebuild on first use.
 
 To start fresh, **quit the app** and delete that directory. To migrate, copy the directory to a new machine.
 
 ```text
-~/Library/Application Support/NomiFun/Nomi/    # macOS (see paths above for Windows/Linux)
-├── nomifun-backend.db        # SQLite state (conversations, settings, sessions, …)
-├── logs/                     # nomicore.log
+~/Library/Application Support/OpenHub/Nomi/    # macOS (see paths above for Windows/Linux)
+├── openhub-backend.db        # SQLite state (conversations, settings, sessions, …)
+├── logs/                     # openhub-core.log
 ├── companion/                # companions + the shared memory hub
 ├── knowledge/                # managed knowledge bases
 ├── runtime/                  # extracted Bun runtime cache (regenerable)
@@ -118,7 +118,7 @@ everything the agent can do, including shell and file access.
 If you want to access the same install from another device, do **not** expose the embedded port. Use one of:
 
 - **WebUI remote access** (a per-instance feature, see [WebUI Remote Access](./webui-remote-access.md)) — turns on a separate authenticated server and gives you a QR-code login.
-- **Self-hosted web server** ([Web Server Deployment](./web-server-deployment.md)) — runs the same backend headlessly under `nomifun-web` with auth required.
+- **Self-hosted web server** ([Web Server Deployment](./web-server-deployment.md)) — runs the same backend headlessly under `openhub-web` with auth required.
 
 ## Updater status
 
@@ -141,12 +141,12 @@ code-signing certificate.
 Make sure the WebView runtime is installed (WebView2 on Windows 10 needs the Evergreen Bootstrapper). On Linux, `libwebkit2gtk-4.1-0` is required.
 
 **"Failed to bind backend port".**
-Another process is holding `127.0.0.1` ephemeral ports. The backend tries `pick_free_port()` and falls back to `8799` if that fails — quit any other NomiFun instance and try again.
+Another process is holding `127.0.0.1` ephemeral ports. The backend tries `pick_free_port()` and falls back to `8799` if that fails — quit any other OpenHub instance and try again.
 
 **Agent commands fail with `bun: command not found`.**
-The agent engine spawns Bun as a child process for tool execution. Install Bun (`curl -fsSL https://bun.sh/install | bash`) and make sure it is on the system `PATH`, or build the desktop bundle with `NOMIFUN_EMBED_BUN=1` to embed it.
+The agent engine spawns Bun as a child process for tool execution. Install Bun (`curl -fsSL https://bun.sh/install | bash`) and make sure it is on the system `PATH`, or build the desktop bundle with `OPENHUB_EMBED_BUN=1` to embed it.
 
 ## See also
 
-- [Web Server Deployment](./web-server-deployment.md) — run the same backend headlessly under `nomifun-web`.
+- [Web Server Deployment](./web-server-deployment.md) — run the same backend headlessly under `openhub-web`.
 - [WebUI Remote Access](./webui-remote-access.md) — expose your desktop instance for remote browser/phone use.

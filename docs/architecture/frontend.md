@@ -1,7 +1,7 @@
 # Frontend
 
 The frontend is a single React 19 SPA in [`ui/`](../../ui/). The Tauri desktop
-shell and the `nomifun-web` host load the same Vite build from `ui/dist`; the
+shell and the `openhub-web` host load the same Vite build from `ui/dist`; the
 renderer talks to the backend through HTTP and WebSocket, with a small Tauri
 adapter only for desktop shell operations.
 
@@ -39,7 +39,7 @@ Desktop:
 - `apps/desktop/src/main.rs` injects `window.__backendPort`.
 - It also injects a per-boot `window.__nomiLocalTrust` secret.
 - The init script patches `fetch` and `XMLHttpRequest` so requests to the
-  embedded loopback backend include `x-nomi-local-trust`.
+  embedded loopback backend include `x-openhub-local-trust`.
 
 Web:
 

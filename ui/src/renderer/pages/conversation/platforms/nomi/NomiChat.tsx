@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -71,7 +71,7 @@ const NomiChat: React.FC<{
     onConfigChanged: (capabilities) => {
       const modes = (capabilities as { modes?: string[] })?.modes;
       if (modes && modes.length > 0) {
-        setDynamicModes(mergeWithCapabilities('nomi', modes));
+        setDynamicModes(mergeWithCapabilities('openhub', modes));
       }
     },
   });
@@ -83,7 +83,7 @@ const NomiChat: React.FC<{
     return {
       conversation_id: conversation_id,
       workspace,
-      type: 'nomi',
+      type: 'openhub',
       cron_job_id,
       hideSendBox,
       isProcessing: isProcessing === true || turnActivity.running,

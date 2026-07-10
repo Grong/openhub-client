@@ -18,15 +18,15 @@
 
 ## File Structure
 - 前端：`ui/src/renderer/pages/conversation/SessionList/hooks/useConversationListSync.ts`（过滤改 task_id）、`ui/src/renderer/pages/conversation/components/ChatSlider.tsx`（加 DAG extraTab）、`ui/src/renderer/pages/orchestrator/RunDetail/DagCanvas.tsx`（加 embedded 隐藏返回钮）、可能新增 `ui/src/renderer/pages/orchestrator/RunDetail/DagRailTab.tsx`（封装 canvas+transcript+state）。
-- 后端：`crates/backend/nomifun-db/src/repository/sqlite_conversation.rs`（list 过滤改 task_id）+ 回归测试。
+- 后端：`crates/backend/openhub-db/src/repository/sqlite_conversation.rs`（list 过滤改 task_id）+ 回归测试。
 
 ---
 
 ## Task 1: 修复 lead 会话被 worker 过滤器误隐藏（前端 + 后端 + 回归）
 
-**Files:** Modify `useConversationListSync.ts`、`sqlite_conversation.rs`；测试 `nomifun-db`。
+**Files:** Modify `useConversationListSync.ts`、`sqlite_conversation.rs`；测试 `openhub-db`。
 
-**根因：** P1 的 `nomi_run_create` 把 `orchestrator_run_id` 写回 lead 会话 extra；而 worker 隐藏过滤器（b8ce2e55 引入）键在 `orchestrator_run_id`：
+**根因：** P1 的 `openhub_run_create` 把 `orchestrator_run_id` 写回 lead 会话 extra；而 worker 隐藏过滤器（b8ce2e55 引入）键在 `orchestrator_run_id`：
 - 前端 `useConversationListSync.ts:129`：`const isOrchestratorWorkerConversation = !!extra?.orchestrator_run_id;`
 - 后端 `sqlite_conversation.rs:779`：`json_extract(c.extra,'$.orchestrator_run_id') IS NULL`
 
@@ -36,10 +36,10 @@
 - 前端：`const isOrchestratorWorkerConversation = !!extra?.orchestrator_task_id;`
 - 后端：`where_parts.push("json_extract(c.extra, '$.orchestrator_task_id') IS NULL".to_string());`
 
-- [ ] **Step 1: 测试（失败优先）** — `nomifun-db` conversation list 测试：种入 (a) 普通会话、(b) lead 会话（extra 仅 `orchestrator_run_id`）、(c) worker 会话（extra 含 `orchestrator_run_id`+`orchestrator_task_id`）；断言 list 返回 (a)+(b)、排除 (c)。先按旧 SQL 跑应 RED（lead 被误排除）。
-- [ ] **Step 2: RED** `cargo nextest run -p nomifun-db`（新断言失败：lead 当前被隐藏）。
+- [ ] **Step 1: 测试（失败优先）** — `openhub-db` conversation list 测试：种入 (a) 普通会话、(b) lead 会话（extra 仅 `orchestrator_run_id`）、(c) worker 会话（extra 含 `orchestrator_run_id`+`orchestrator_task_id`）；断言 list 返回 (a)+(b)、排除 (c)。先按旧 SQL 跑应 RED（lead 被误排除）。
+- [ ] **Step 2: RED** `cargo nextest run -p openhub-db`（新断言失败：lead 当前被隐藏）。
 - [ ] **Step 3: 实现** 后端 SQL 改 `orchestrator_task_id`；前端同改。
-- [ ] **Step 4: GREEN** `cargo nextest run -p nomifun-db` + `cargo build -p nomifun-db -p nomifun-app`；前端 `cd ui && npm run typecheck`(0)。
+- [ ] **Step 4: GREEN** `cargo nextest run -p openhub-db` + `cargo build -p openhub-db -p openhub-app`；前端 `cd ui && npm run typecheck`(0)。
 - [ ] **Step 5: 提交** `git commit -m "fix(orchestrator): worker 隐藏过滤器改键 orchestrator_task_id(修 lead 会话被误隐藏)"`
 
 ---
@@ -75,8 +75,8 @@
 
 **Files:** 无（或微调）。验证为主。
 
-- [ ] **Step 1:** 前端 `cd ui && npm run typecheck`(0) + `bun run build`(绿)。`cargo build --workspace` 绿 + `cargo nextest run -p nomifun-db`（Task1 回归）。
-- [ ] **Step 2: 真机冒烟（controller）** — `nomifun-web --dist --insecure-no-auth`（临时 NOMIFUN_DATA_DIR target/_p2_smoke，先 free-ports）。直插 DB 种数据：一个 lead 会话（`type=nomi`, extra `{orchestrator_role:'lead', orchestrator_run_id:'run_xxx', workspace:'/x', model_range:{...}}`）+ 一个 `orch_runs`（id=run_xxx, work_dir, fleet_snapshot=2成员, status='running'）+ 2 个 `orch_run_tasks`（其一 conversation_id 指向一个种入的 worker 会话；含 graph_x/y）+ 1 条 dep。打开该 lead 会话 → 右栏出现「编排」tab → 点开渲染 DAG（2 节点 + 边）→ 点一个有 conversation_id 的节点 → WorkerTranscriptPanel Drawer 打开渲染转录。验证：①lead 会话在侧栏可见（Task1 修复）②worker 会话不在侧栏 ③DAG canvas 非零高度渲染 ④点节点转录无 `usePreviewContext` 崩溃 ⑤零 console error ⑥UI 漂亮。截图 target/_p2_smoke。
+- [ ] **Step 1:** 前端 `cd ui && npm run typecheck`(0) + `bun run build`(绿)。`cargo build --workspace` 绿 + `cargo nextest run -p openhub-db`（Task1 回归）。
+- [ ] **Step 2: 真机冒烟（controller）** — `openhub-web --dist --insecure-no-auth`（临时 OPENHUB_DATA_DIR target/_p2_smoke，先 free-ports）。直插 DB 种数据：一个 lead 会话（`type=nomi`, extra `{orchestrator_role:'lead', orchestrator_run_id:'run_xxx', workspace:'/x', model_range:{...}}`）+ 一个 `orch_runs`（id=run_xxx, work_dir, fleet_snapshot=2成员, status='running'）+ 2 个 `orch_run_tasks`（其一 conversation_id 指向一个种入的 worker 会话；含 graph_x/y）+ 1 条 dep。打开该 lead 会话 → 右栏出现「编排」tab → 点开渲染 DAG（2 节点 + 边）→ 点一个有 conversation_id 的节点 → WorkerTranscriptPanel Drawer 打开渲染转录。验证：①lead 会话在侧栏可见（Task1 修复）②worker 会话不在侧栏 ③DAG canvas 非零高度渲染 ④点节点转录无 `usePreviewContext` 崩溃 ⑤零 console error ⑥UI 漂亮。截图 target/_p2_smoke。
 - [ ] **Step 3: 记账 + 提交**（若有微调）；账本追加 P2 完成行。
 
 ## Self-Review（spec §7/§12）

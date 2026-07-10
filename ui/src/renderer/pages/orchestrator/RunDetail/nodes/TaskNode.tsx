@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -273,7 +273,7 @@ function TaskNodeImpl({ data, selected }: NodeProps<TaskFlowNode>) {
           data.onOpen();
         }
       }}
-      className='nomi-dag-card nomi-dag-enter group relative flex w-220px cursor-pointer select-none flex-col gap-8px rd-12px px-14px pb-12px pt-14px outline-none'
+      className='openhub-dag-card openhub-dag-enter group relative flex w-220px cursor-pointer select-none flex-col gap-8px rd-12px px-14px pb-12px pt-14px outline-none'
       data-status={data.status}
       data-selected={selected ? 'true' : undefined}
       data-question={hasQuestion ? 'true' : undefined}
@@ -287,8 +287,8 @@ function TaskNodeImpl({ data, selected }: NodeProps<TaskFlowNode>) {
       }
     >
       {/* 顶部状态条纹：常态 2px 主题色；running 时叠加 shimmer 进度光带。 */}
-      <span className='nomi-dag-accent' aria-hidden='true'>
-        {meta.pulse && <span className='nomi-dag-shimmer' />}
+      <span className='openhub-dag-accent' aria-hidden='true'>
+        {meta.pulse && <span className='openhub-dag-shimmer' />}
       </span>
 
       {/* Incoming-dependency anchor (top) */}
@@ -302,32 +302,32 @@ function TaskNodeImpl({ data, selected }: NodeProps<TaskFlowNode>) {
       {/* Title row: status dot + task title (+ kind badge, right-aligned) */}
       <div className='flex items-start gap-8px'>
         <span
-          className={`mt-4px size-9px shrink-0 rd-full ${meta.pulse ? 'nomi-dag-pulse' : ''}`}
+          className={`mt-4px size-9px shrink-0 rd-full ${meta.pulse ? 'openhub-dag-pulse' : ''}`}
           style={{ background: meta.color, boxShadow: `0 0 0 3px color-mix(in srgb, ${meta.color} 20%, transparent)` }}
         />
         <span className='min-w-0 flex-1 text-13px font-600 leading-18px text-t-primary line-clamp-2'>
           {data.title}
         </span>
         {isSynthesis && (
-          <span className={`nomi-dag-kind-badge ${PILL_CLASS}`} style={tintedPill(SYNTH_ACCENT)} title={data.synthesisLabel}>
+          <span className={`openhub-dag-kind-badge ${PILL_CLASS}`} style={tintedPill(SYNTH_ACCENT)} title={data.synthesisLabel}>
             <Merge theme='outline' size='10' strokeWidth={4} className='line-height-0' />
             {data.synthesisLabel}
           </span>
         )}
         {isVerify && (
-          <span className={`nomi-dag-kind-badge ${PILL_CLASS}`} style={tintedPill(VERIFY_ACCENT)} title={data.verifyLabel}>
+          <span className={`openhub-dag-kind-badge ${PILL_CLASS}`} style={tintedPill(VERIFY_ACCENT)} title={data.verifyLabel}>
             <Shield theme='outline' size='10' strokeWidth={4} className='line-height-0' />
             {data.verifyLabel}
           </span>
         )}
         {isJudge && (
-          <span className={`nomi-dag-kind-badge ${PILL_CLASS}`} style={tintedPill(JUDGE_ACCENT)} title={data.judgeLabel}>
+          <span className={`openhub-dag-kind-badge ${PILL_CLASS}`} style={tintedPill(JUDGE_ACCENT)} title={data.judgeLabel}>
             <Gavel theme='outline' size='10' strokeWidth={4} className='line-height-0' />
             {data.judgeLabel}
           </span>
         )}
         {isLoop && (
-          <span className={`nomi-dag-kind-badge ${PILL_CLASS}`} style={tintedPill(LOOP_ACCENT)} title={data.loopLabel}>
+          <span className={`openhub-dag-kind-badge ${PILL_CLASS}`} style={tintedPill(LOOP_ACCENT)} title={data.loopLabel}>
             <Refresh theme='outline' size='10' strokeWidth={4} className='line-height-0' />
             {data.loopLabel}
           </span>
@@ -460,10 +460,10 @@ function TaskNodeImpl({ data, selected }: NodeProps<TaskFlowNode>) {
           点击整卡即投影进 worker 会话作答。 */}
       {hasQuestion && (
         <div
-          className='nomi-dag-question flex items-start gap-6px rd-8px px-8px py-6px'
+          className='openhub-dag-question flex items-start gap-6px rd-8px px-8px py-6px'
           title={data.pendingQuestion}
         >
-          <span className='nomi-dag-question-pulse mt-1px shrink-0 line-height-0' style={{ color: 'var(--warning)' }}>
+          <span className='openhub-dag-question-pulse mt-1px shrink-0 line-height-0' style={{ color: 'var(--warning)' }}>
             <Help theme='filled' size='13' />
           </span>
           <span className='min-w-0 flex-1 text-11px leading-15px line-clamp-2' style={{ color: 'var(--warning)' }}>
