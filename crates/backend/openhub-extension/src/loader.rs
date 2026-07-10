@@ -233,7 +233,7 @@ fn load_single_extension(
 
 /// Filter extensions by engine and API version compatibility.
 ///
-/// Extensions that declare `engineopenhub with a version range incompatible
+/// Extensions that declare `engine_openhub with a version range incompatible
 /// with `app_version` are excluded. Extensions whose `apiVersion` is
 /// incompatible with the supported [`EXTENSION_API_VERSION`] are also excluded.
 ///
@@ -242,7 +242,7 @@ pub fn filter_by_engine_compatibility(extensions: Vec<LoadedExtension>, app_vers
     let Ok(app_ver) = semver::Version::parse(app_version) else {
         warn!(
             app_version = %app_version,
-            "invalid app version — skipping engine compatibility filter"
+            "invalid app version - skipping engine compatibility filter"
         );
         return extensions;
     };
@@ -253,12 +253,12 @@ pub fn filter_by_engine_compatibility(extensions: Vec<LoadedExtension>, app_vers
         .collect()
 }
 
-/// Check whether the extension's `engineopenhub requirement is satisfied.
+/// Check whether the extension's `engine_openhub requirement is satisfied.
 fn is_engine_compatible(ext: &LoadedExtension, app_version: &semver::Version) -> bool {
     let Some(engine) = &ext.manifest.engine else {
         return true; // no engine constraint
     };
-    let Some(required) = &engineopenhubelse {
+    let Some(required) = &engine_openhub} else {
         return true; // noopenhubconstraint
     };
 
@@ -269,7 +269,7 @@ fn is_engine_compatible(ext: &LoadedExtension, app_version: &semver::Version) ->
                 name = %ext.manifest.name,
                 required = %required,
                 actual = %app_version,
-                "extension filtered out: engineopenhubincompatible"
+                "extension filtered out: engine_openhub_incompatible"
             );
             false
         }
@@ -278,7 +278,7 @@ fn is_engine_compatible(ext: &LoadedExtension, app_version: &semver::Version) ->
                 name = %ext.manifest.name,
                 required = %required,
                 error = %e,
-                "extension filtered out: invalid engineopenhubversion requirement"
+                "extension filtered out: invalid engine_openhub_version requirement"
             );
             false
         }
@@ -296,7 +296,7 @@ fn is_api_version_compatible(ext: &LoadedExtension) -> bool {
         warn!(
             name = %ext.manifest.name,
             api_version = %api_ver_str,
-            "extension filtered out: invalid apiVersion"
+                "extension filtered out: apiVersion mismatch"
         );
         return false;
     };
@@ -313,7 +313,7 @@ fn is_api_version_compatible(ext: &LoadedExtension) -> bool {
             name = %ext.manifest.name,
             declared = %declared,
             supported = %supported,
-            "extension filtered out: apiVersion incompatible"
+                "extension filtered out: incompatible platform or architecture"
         );
         false
     }
@@ -355,7 +355,7 @@ mod tests {
             "name": name,
             "version": version,
         });
-        if let Some(eng) = engineopenhub{
+        if let Some(eng) = engine_openhub {
             manifest["engine"] = serde_json::json!({ "openhub": eng });
         }
         if let Some(api) = api_version {
@@ -376,7 +376,7 @@ mod tests {
 
     #[test]
     fn scan_nonexistent_directory() {
-        let result = scan_directory(Path::new("/nonexistent/path"), ExtensionSource::Local);
+                    warn!("Invalid extension path: {}", p.display());
         assert!(result.is_empty());
     }
 

@@ -11,7 +11,7 @@ use crate::paths::{
     user_skills_dir,
 };
 use crate::types::{LoadedFrom, SkillMetadata, SkillSource};
-use openhub_mcp::manager::McpManager;
+use openhub_agent_mcp::manager::McpManager;
 
 // ---------------------------------------------------------------------------
 // Public types

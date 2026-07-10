@@ -6,7 +6,7 @@ use openhub_agent::output::terminal::TerminalSink;
 use openhub_config::compat::ProviderCompat;
 use openhub_config::config::{Config, ProviderType, SessionConfig, ToolsConfig};
 use openhub_config::hooks::HooksConfig;
-use openhub_mcp::config::McpConfig;
+use openhub_agent_mcp::config::McpConfig;
 use openhub_providers::create_provider;
 use openhub_tools::read::ReadTool;
 use openhub_tools::registry::ToolRegistry;

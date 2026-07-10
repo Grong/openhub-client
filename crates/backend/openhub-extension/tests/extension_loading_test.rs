@@ -23,7 +23,7 @@ fn write_manifest_full(dir: &Path, name: &str, version: &str, engine_openhub: Op
         "name": name,
         "version": version,
     });
-    if let Some(eng) = engineopenhub{
+    if let Some(eng) = engine_openhub {
         manifest["engine"] = serde_json::json!({ "openhub": eng });
     }
     if let Some(api) = api_version {

@@ -3,7 +3,7 @@
 use openhub_config::compat::ProviderCompat;
 use openhub_config::config::{BedrockConfig, Config, ProviderType, SessionConfig, ToolsConfig};
 use openhub_config::hooks::HooksConfig;
-use openhub_mcp::config::McpConfig;
+use openhub_agent_mcp::config::McpConfig;
 
 // ---------------------------------------------------------------------------
 // Provider detection

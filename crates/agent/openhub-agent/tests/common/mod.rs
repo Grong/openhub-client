@@ -10,7 +10,7 @@ use tokio::sync::mpsc;
 use openhub_agent::confirm::ToolConfirmer;
 use openhub_config::config::{Config, ProviderType, SessionConfig, ToolsConfig};
 use openhub_config::hooks::HooksConfig;
-use openhub_mcp::config::McpConfig;
+use openhub_agent_mcp::config::McpConfig;
 use openhub_protocol::events::ToolCategory;
 use openhub_providers::{LlmProvider, ProviderError};
 use openhub_tools::Tool;

@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use crate::frontmatter::{parse_frontmatter, parse_skill_fields};
 use crate::loader::LoadedSkill;
 use crate::types::{LoadedFrom, SkillSource};
-use openhub_mcp::manager::McpManager;
+use openhub_agent_mcp::manager::McpManager;
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -98,9 +98,9 @@ fn uri_to_skill_name(server_name: &str, uri: &str) -> String {
 mod tests {
     use super::*;
     use async_trait::async_trait;
-    use openhub_mcp::manager::McpManager;
-    use openhub_mcp::protocol::{JsonRpcRequest, JsonRpcResponse};
-    use openhub_mcp::transport::{McpError, McpTransport};
+    use openhub_agent_mcp::manager::McpManager;
+    use openhub_agent_mcp::protocol::{JsonRpcRequest, JsonRpcResponse};
+    use openhub_agent_mcp::transport::{McpError, McpTransport};
     use std::sync::Mutex;
 
     // -----------------------------------------------------------------------
