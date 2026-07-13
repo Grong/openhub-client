@@ -23,7 +23,7 @@
 - api-types：`openhub-api-types/src/orchestrator.rs`（`ModelRange`、`CreateAdhocRunRequest`、`Run.workspace_id` → `Option<String>`）
 - orchestrator：`run_service.rs`（`create_adhoc`）、`engine.rs`（work_dir 适配）
 - gateway：`openhub-gateway/src/caps_orchestrator.rs`（`openhub_run_create` 改签名）
-- ai-agent：`openhub-api-types/src/agent_build_extra.rs`（`NomiBuildExtra.orchestrator_role`）、`openhub-ai-agent/src/factory/openhub.rs`（lead 主管提示注入）
+- ai-agent：`openhub-api-types/src/agent_build_extra.rs`（`OpenHubBuildExtra.orchestrator_role`）、`openhub-ai-agent/src/factory/openhub.rs`（lead 主管提示注入）
 - 前端：`ui/src/renderer/pages/guid/hooks/useGuidModelSelection.ts`、`components/GuidModelSelector.tsx`、`GuidPage.tsx`、`hooks/useGuidSend.ts`、`ui/src/common/adapter/ipcBridge.ts`（`ICreateConversationParams.extra` 加字段）
 
 ---
@@ -188,15 +188,15 @@ let run = deps.orchestrator_run_service.create_adhoc(user, req).await ...;
 
 ## Task 4: 后端 lead 主管武装（orchestrator_role + 主管系统提示注入）
 
-**Files:** Modify `openhub-api-types/src/agent_build_extra.rs`（`NomiBuildExtra.orchestrator_role`）、`openhub-ai-agent/src/factory/openhub.rs`（lead 时注入主管提示）；测试内联。
+**Files:** Modify `openhub-api-types/src/agent_build_extra.rs`（`OpenHubBuildExtra.orchestrator_role`）、`openhub-ai-agent/src/factory/openhub.rs`（lead 时注入主管提示）；测试内联。
 
 **改动：**
-- `agent_build_extra.rs:219-305`：`NomiBuildExtra` 加 `#[serde(default)] pub orchestrator_role: Option<String>`。
+- `agent_build_extra.rs:219-305`：`OpenHubBuildExtra` 加 `#[serde(default)] pub orchestrator_role: Option<String>`。
 - `factory/openhub.rs`：在组装 `system_prompt`（:291 附近，preset_rules 合并之后）时，若 `overrides.orchestrator_role.as_deref()==Some("lead")`，把**主管系统提示**前置/合并进 `system_prompt`。主管提示常量（中文，server-authored）：
   > 「你是 OpenHub 的编排主管。用户已在本会话限定可用模型范围（见运行上下文）。对简单或单步需求：直接作答。对复杂、可拆分为多个并行/有依赖子任务的需求：调用工具 `openhub_run_create(goal)` 把需求拆成任务 DAG 并行执行（模型范围与工作目录会自动取用），随后用 `openhub_run_status`/`openhub_run_result` 跟进并向用户汇报进展与产出。不要询问 workspace 或 fleet——它们已不存在。」
 - 工具可达性：lead 会话在受信桌面会话上已默认获得 desktopGateway（含 caps_orchestrator），无需新增 gateway 代码（见 spec §3.3 勘察）。**不**从客户端标记强制开 gateway（避免非受信会话自授权）；WebUI/非受信编排门控列 carry-forward。
 
-- [ ] **Step 1: 测试（失败优先）** — `NomiBuildExtra` 反序列化 `{"orchestrator_role":"lead"}` → 字段为 `Some("lead")`；factory 单测（若有可测的 system_prompt 组装函数）断言 lead 时 system_prompt 含主管提示片段；非 lead 不含。
+- [ ] **Step 1: 测试（失败优先）** — `OpenHubBuildExtra` 反序列化 `{"orchestrator_role":"lead"}` → 字段为 `Some("lead")`；factory 单测（若有可测的 system_prompt 组装函数）断言 lead 时 system_prompt 含主管提示片段；非 lead 不含。
 - [ ] **Step 2: RED** `cargo nextest run -p openhub-api-types -p openhub-ai-agent`。
 - [ ] **Step 3: 实现** 字段 + 注入。
 - [ ] **Step 4: GREEN** nextest + `cargo build -p openhub-ai-agent -p openhub-app`。
@@ -211,7 +211,7 @@ let run = deps.orchestrator_run_service.create_adhoc(user, req).await ...;
 **改动：**
 - `ipcBridge.ts:1659-1713` `ICreateConversationParams['extra']` 加：`orchestrator_role?: 'lead'`、`model_range?: { mode:'single'; model:{provider_id:string;model:string} } | { mode:'auto' } | { mode:'range'; models:Array<{provider_id:string;model:string}> }`、`desktopGateway?: boolean`。
 - `useGuidModelSelection.ts`：加 `const [selectionMode, setSelectionMode] = useState<'single'|'auto'|'range'>('single')` + `const [selectedRange, setSelectedRange] = useState<TProviderWithModel[]>([])`；加进 `GuidModelSelectionResult` 返回。持久化（可选）到 config。
-- `GuidModelSelector.tsx`（isGeminiMode 分支 91-182）：droplist 顶部加 `Radio.Group type='button' size='small'`（单一/自动/范围，对齐 `pages/openhub/index.tsx:167` 模式）；`range` 态把单选 `Menu.Item` 换为多选（`Checkbox.Group` 或 `NomiSelect mode="multiple"` + OptGroup 复用 provider 分组）；`auto` 态隐藏列表+提示"全部启用模型"。触发按钮 label 反映当前态（单一→模型名；自动→"自动编排"；范围→"N 个模型"）。视觉对齐既有 round/small 按钮 + icon-park outline。
+- `GuidModelSelector.tsx`（isGeminiMode 分支 91-182）：droplist 顶部加 `Radio.Group type='button' size='small'`（单一/自动/范围，对齐 `pages/openhub/index.tsx:167` 模式）；`range` 态把单选 `Menu.Item` 换为多选（`Checkbox.Group` 或 `OpenHubSelect mode="multiple"` + OptGroup 复用 provider 分组）；`auto` 态隐藏列表+提示"全部启用模型"。触发按钮 label 反映当前态（单一→模型名；自动→"自动编排"；范围→"N 个模型"）。视觉对齐既有 round/small 按钮 + icon-park outline。
 - `GuidPage.tsx`：把 `selectionMode`/`selectedRange` 经 props 透传给 `GuidModelSelector`（514-522）与 `useGuidSend`（155-180）。
 
 - [ ] **Step 1: 实现** ipcBridge 类型 + hook 状态 + 选择器三态 UI + GuidPage 透传。

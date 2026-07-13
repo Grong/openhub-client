@@ -54,7 +54,7 @@ use crate::engine::BrowserError;
 /// 待 P6 接真实持久登录开关时只需把其 LIVE 值灌进本字段，互斥即自动生效（无需改门逻辑）。
 ///
 /// **SD-6 已接线**：`persistent_login` 现由 factory `read_bool_pref("agent.browserUse.persistentLogin",
-/// true)` LIVE 读，经 `NomiResolvedConfig.browser_persistent_login` → `BrowserConfig.persistent_login`
+/// true)` LIVE 读，经 `OpenHubResolvedConfig.browser_persistent_login` → `BrowserConfig.persistent_login`
 /// → `BrowserTool.evaluate_persistent_login` → `EngineConfig.evaluate_persistent_login` → 本字段。
 /// 产品默认 ON（host_default=true），代码级 Default 仍 false（default-deny 基线）。
 //

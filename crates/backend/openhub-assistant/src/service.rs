@@ -172,7 +172,7 @@ impl AssistantService {
     ///
     /// Inference rule (ELECTRON-1J1 / 1KV):
     /// 1. If any enabled provider exists (Anthropic, OpenAI, custom,
-    ///    Bedrock, Vertex, …), return `"openhub"`. Nomi speaks both
+    ///    Bedrock, Vertex, …), return `"openhub"`. OpenHub speaks both
     ///    OpenAI-compatible and Anthropic-protocol APIs over the
     ///    user-configured base URL and does not require any third-party
     ///    CLI to be installed. CLI-based agents (`claude`, `gemini`)
@@ -907,7 +907,7 @@ impl AssistantRuleDispatcher for AssistantService {
 
 /// Last-resort fallback for the assistant `preset_agent_type` when no
 /// provider list is reachable (extension-contributed rows, sync display
-/// conversions). `"openhub"` is the only Nomi agent that does not require
+/// conversions). `"openhub"` is the only OpenHub agent that does not require
 /// a third-party CLI to be installed, so it never fails the
 /// `Agent '<name>' CLI not found in PATH` guard at agent build time.
 ///
@@ -1768,7 +1768,7 @@ mod tests {
     // Default agent-type inference (ELECTRON-1J1 / 1KV regression coverage)
     // -----------------------------------------------------------------------
 
-    /// Anthropic provider routes to Nomi, not the Claude Code CLI:
+    /// Anthropic provider routes to OpenHub, not the Claude Code CLI:
     /// having an Anthropic API key does not imply the user has
     /// `claude` on `PATH`. CLI-based agents must be opted into
     /// explicitly.
@@ -1783,7 +1783,7 @@ mod tests {
         assert_eq!(resolved, "openhub");
     }
 
-    /// OpenAI / custom provider falls back to Nomi, the only Nomi
+    /// OpenAI / custom provider falls back to OpenHub, the only OpenHub
     /// agent that doesn't require a third-party CLI.
     #[tokio::test]
     async fn resolve_default_agent_type_falls_back_to_openhub_for_openai_provider() {
@@ -1796,7 +1796,7 @@ mod tests {
         assert_eq!(resolved, "openhub");
     }
 
-    /// Custom (non-anthropic, non-openai) platform also routes to Nomi,
+    /// Custom (non-anthropic, non-openai) platform also routes to OpenHub,
     /// which handles OpenAI-compatible custom URLs.
     #[tokio::test]
     async fn resolve_default_agent_type_handles_custom_platform_as_openhub() {

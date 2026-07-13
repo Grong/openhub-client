@@ -12,9 +12,9 @@ use super::cli_helpers::{DETECT_TIMEOUT, is_cli_installed, run_cli_strict};
 
 const CLI_NAME: &str = "openhub";
 
-/// MCP Agent adapter for Nomi.
+/// MCP Agent adapter for OpenHub.
 ///
-/// Nomi stores MCP configuration in a TOML config file. The config path
+/// OpenHub stores MCP configuration in a TOML config file. The config path
 /// is obtained via `openhub --config-path`.
 ///
 /// # Config Format (TOML)

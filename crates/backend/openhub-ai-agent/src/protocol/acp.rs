@@ -555,7 +555,7 @@ fn is_streaming_chunk(body: &str) -> bool {
     matches!(kind, Some(k) if STREAMING_KINDS.contains(&k))
 }
 
-/// Log a JSON-RPC request from Nomi to the ACP agent.
+/// Log a JSON-RPC request from OpenHub to the ACP agent.
 /// `session/prompt` carries large user input and stays at debug.
 fn log_client_request(method: &str, body: &str) {
     if method == "session/prompt" {
@@ -575,7 +575,7 @@ fn log_agent_response(method: &str, body: &str) {
     }
 }
 
-/// Log a fire-and-forget notification from Nomi to the agent.
+/// Log a fire-and-forget notification from OpenHub to the agent.
 fn log_client_notify(method: &str, body: &str) {
     info!(direction = "client_notify", method, body, "[ACP] -> ${method}");
 }
@@ -595,7 +595,7 @@ fn log_agent_request(method: &str, body: &str) {
     info!(direction = "agent_request", method, body, "[ACP] <- ${method}");
 }
 
-/// Log a JSON-RPC response from Nomi back to the agent.
+/// Log a JSON-RPC response from OpenHub back to the agent.
 fn log_client_response(method: &str, body: &str) {
     info!(direction = "client_response", method, body, "[ACP] -> ${method}");
 }

@@ -9,7 +9,7 @@ Use this skill for UI/UX design work: visual direction, landing pages, dashboard
 
 ## Search First
 
-The local database lives in this skill package. In Nomi workspaces the skill is linked at `.openhub/skills/ui-ux-pro-max/`.
+The local database lives in this skill package. In OpenHub workspaces the skill is linked at `.openhub/skills/ui-ux-pro-max/`.
 
 ```bash
 python3 .openhub/skills/ui-ux-pro-max/scripts/search.py "<keywords>" --domain <domain> -n 5

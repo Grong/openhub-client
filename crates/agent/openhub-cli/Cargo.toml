@@ -1,6 +1,6 @@
 [package]
 name = "openhub-cli"
-description = "CLI binary for Nomi — a multi-provider AI agent with tool orchestration"
+description = "CLI binary for OpenHub — a multi-provider AI agent with tool orchestration"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

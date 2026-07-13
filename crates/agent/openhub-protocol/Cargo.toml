@@ -1,6 +1,6 @@
 [package]
 name = "openhub-protocol"
-description = "JSON stream protocol (events, commands, approval manager) for Nomi host integration"
+description = "JSON stream protocol (events, commands, approval manager) for OpenHub host integration"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

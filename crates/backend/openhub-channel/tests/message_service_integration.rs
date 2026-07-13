@@ -78,7 +78,7 @@ impl ScriptedAgent {
 #[async_trait]
 impl IAgentTask for ScriptedAgent {
     fn agent_type(&self) -> AgentType {
-        AgentType::Nomi
+        AgentType::OpenHub
     }
 
     fn conversation_id(&self) -> &str {
@@ -408,7 +408,7 @@ impl openhub_channel::message_service::MasterAgentProfile for StubProfile {
 /// would own), returning its i64 id.
 async fn seed_companion_session(svc: &Arc<ConversationService>, companion_id: &str) -> i64 {
     let req = openhub_api_types::CreateConversationRequest {
-        r#type: AgentType::Nomi,
+        r#type: AgentType::OpenHub,
         name: Some(format!("和 {companion_id} 聊天")),
         model: Some(openhub_common::ProviderWithModel {
             provider_id: "p".to_owned(),
@@ -623,7 +623,7 @@ async fn public_agent_bound_platform_builds_clamped_session() {
         .await
         .unwrap();
 
-    assert_eq!(conv.r#type, AgentType::Nomi);
+    assert_eq!(conv.r#type, AgentType::OpenHub);
     assert_eq!(conv.extra["public_agent_id"], serde_json::json!("pubagent_1"));
     assert_eq!(conv.extra["channelPlatform"], serde_json::json!("telegram"));
     assert!(

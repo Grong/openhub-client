@@ -551,7 +551,7 @@ impl AppServices {
                 tracing::info!(path = %crate::mcp_endpoints::beacon_path(&data_dir).display(), "MCP endpoint beacon written");
             }
             // Pass the beacon path to the terminal service so spawned PTYs receive
-            // `NOMI_MCP_ENDPOINTS_FILE` — the knowledge bridge reads it for endpoint
+            // `OPENHUB_MCP_ENDPOINTS_FILE` — the knowledge bridge reads it for endpoint
             // discovery without needing to compute the data-dir path itself.
             terminal_service.with_mcp_endpoints_path(
                 crate::mcp_endpoints::beacon_path(&data_dir)

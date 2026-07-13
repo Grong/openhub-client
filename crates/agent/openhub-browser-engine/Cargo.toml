@@ -1,6 +1,6 @@
 [package]
 name = "openhub-browser-engine"
-description = "In-process self-hosted Rust CDP browser engine for Nomi browser-use (Chromium-only, no bundled Playwright/Node)"
+description = "In-process self-hosted Rust CDP browser engine for OpenHub browser-use (Chromium-only, no bundled Playwright/Node)"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

@@ -1,19 +1,19 @@
-//! Build channel (`NOMI_CHANNEL`) — the single source of truth that lets a
+//! Build channel (`OPENHUB_CHANNEL`) — the single source of truth that lets a
 //! non-stable build (e.g. `dev`) coexist with the installed stable app by
 //! deriving a per-channel suffix for the data directory and OS identity.
 //!
-//! The channel is baked at compile time from the `NOMI_CHANNEL` env var (set by
+//! The channel is baked at compile time from the `OPENHUB_CHANNEL` env var (set by
 //! the dev build script); unset means `stable`. Only the exact string `stable`
 //! maps to the production data directory — every other value (including typos)
 //! gets an isolated suffix, so a mis-set channel can never write into the
 //! installed app's state.
 
-/// The compile-time channel. `stable` when `NOMI_CHANNEL` is unset.
+/// The compile-time channel. `stable` when `OPENHUB_CHANNEL` is unset.
 pub fn channel() -> &'static str {
-    option_env!("NOMI_CHANNEL").unwrap_or("stable")
+    option_env!("OPENHUB_CHANNEL").unwrap_or("stable")
 }
 
-/// Path suffix appended to the `Nomi` data-dir leaf for this channel.
+/// Path suffix appended to the `OpenHub` data-dir leaf for this channel.
 /// `stable` → "" (production); anything else → "-<channel>" (isolated).
 pub fn dir_suffix() -> String {
     suffix_for(channel())
@@ -25,7 +25,7 @@ pub fn is_stable() -> bool {
 }
 
 /// Whether `channel` is a recognized channel name (vs a typo). Used by the
-/// startup self-check to warn on `NOMI_CHANNEL=Dev` and friends.
+/// startup self-check to warn on `OPENHUB_CHANNEL=Dev` and friends.
 pub fn is_known(channel: &str) -> bool {
     matches!(channel, "stable" | "dev" | "beta" | "canary")
 }

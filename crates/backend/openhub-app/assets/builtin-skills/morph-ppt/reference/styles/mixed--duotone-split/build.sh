@@ -218,7 +218,7 @@ echo '[
     "text":"3","size":"64","color":"FFFFFF",
     "x":"20cm","y":"10cm","width":"8cm","height":"3cm"}},
   {"command":"set","path":"/slide[4]/shape[15]","props":{
-    "text":"Pritzker Nominations","size":"18","color":"FFFFFF",
+    "text":"Pritzker OpenHubnations","size":"18","color":"FFFFFF",
     "x":"20cm","y":"13cm","width":"10cm","height":"1.5cm"}}
 ]' | officecli batch "$DECK"
 

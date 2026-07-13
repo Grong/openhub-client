@@ -1743,7 +1743,7 @@ struct SteerableAgent {
     event_tx: broadcast::Sender<AgentStreamEvent>,
     status: Option<ConversationStatus>,
     steer_result: bool,
-    /// When set, `steer()` returns `Err(BadRequest)` (the non-Nomi
+    /// When set, `steer()` returns `Err(BadRequest)` (the non-OpenHub
     /// `steer_unsupported` path) instead of `Ok(steer_result)`.
     steer_err: bool,
     steered: Mutex<Vec<String>>,
@@ -1765,7 +1765,7 @@ impl SteerableAgent {
     }
 
     /// A live (Running) turn whose `steer()` rejects with `BadRequest`,
-    /// modelling a non-Nomi engine (the `steer_unsupported` route maps this
+    /// modelling a non-OpenHub engine (the `steer_unsupported` route maps this
     /// to a client-side queue fallback).
     fn new_steer_err(conversation_id: &str) -> Self {
         Self {
@@ -1786,7 +1786,7 @@ impl SteerableAgent {
 #[async_trait::async_trait]
 impl IAgentTask for SteerableAgent {
     fn agent_type(&self) -> AgentType {
-        AgentType::Nomi
+        AgentType::OpenHub
     }
     fn conversation_id(&self) -> &str {
         &self.conversation_id
@@ -3029,7 +3029,7 @@ async fn steer_message_race_tail_falls_back_and_persists_once() {
 }
 
 /// Non-steerable (`steer_unsupported`) path: a live Running agent whose
-/// `steer()` returns `Err(BadRequest)` (non-Nomi engine). `steer_message` must
+/// `steer()` returns `Err(BadRequest)` (non-OpenHub engine). `steer_message` must
 /// propagate the error and persist NOTHING itself — the client falls back to
 /// the pending queue, which sends (and persists) later. Persisting before the
 /// steer (the old ordering) would leave an orphan row that the queue then
@@ -3121,7 +3121,7 @@ async fn send_message_does_not_evict_non_acp_task_after_terminal_error() {
                 Some(AgentErrorCode::UnknownUpstreamError),
             ))]],
         )
-        .with_agent_type(AgentType::Nomi),
+        .with_agent_type(AgentType::OpenHub),
     );
     task_mgr.insert_agent(&conv.id.to_string(), AgentInstance::Mock(scripted_agent));
 
@@ -4123,7 +4123,7 @@ fn provider_fault_then_finish_agent(conv_id: &str) -> Arc<ScriptedAgent> {
                 ],
             ],
         )
-        .with_agent_type(AgentType::Nomi),
+        .with_agent_type(AgentType::OpenHub),
     )
 }
 
@@ -4262,7 +4262,7 @@ async fn failover_mid_response_fault_does_not_switch_and_surfaces_error() {
                 )),
             ]],
         )
-        .with_agent_type(AgentType::Nomi),
+        .with_agent_type(AgentType::OpenHub),
     );
     let task_mgr = Arc::new(PersistentScriptedTaskManager::new(scripted));
     let task_mgr_dyn: Arc<dyn IWorkerTaskManager> = task_mgr.clone();
@@ -4318,7 +4318,7 @@ async fn failover_post_toolcall_fault_does_not_switch_and_surfaces_error() {
                 )),
             ]],
         )
-        .with_agent_type(AgentType::Nomi),
+        .with_agent_type(AgentType::OpenHub),
     );
     let task_mgr = Arc::new(PersistentScriptedTaskManager::new(scripted));
     let task_mgr_dyn: Arc<dyn IWorkerTaskManager> = task_mgr.clone();
@@ -4365,7 +4365,7 @@ async fn failover_queue_exhausted_surfaces_original_error() {
                 Some(AgentErrorCode::UserLlmProviderRateLimited),
             ))]],
         )
-        .with_agent_type(AgentType::Nomi),
+        .with_agent_type(AgentType::OpenHub),
     );
     let task_mgr = Arc::new(PersistentScriptedTaskManager::new(scripted));
     let task_mgr_dyn: Arc<dyn IWorkerTaskManager> = task_mgr.clone();
@@ -4401,7 +4401,7 @@ async fn failover_non_provider_error_does_not_switch() {
                 Some(AgentErrorCode::OpenhubConversationBusy),
             ))]],
         )
-        .with_agent_type(AgentType::Nomi),
+        .with_agent_type(AgentType::OpenHub),
     );
     let task_mgr = Arc::new(PersistentScriptedTaskManager::new(scripted));
     let task_mgr_dyn: Arc<dyn IWorkerTaskManager> = task_mgr.clone();
@@ -4461,7 +4461,7 @@ async fn failover_is_bounded_by_max_switches() {
                 ))],
             ],
         )
-        .with_agent_type(AgentType::Nomi),
+        .with_agent_type(AgentType::OpenHub),
     );
     let task_mgr = Arc::new(PersistentScriptedTaskManager::new(scripted));
     let task_mgr_dyn: Arc<dyn IWorkerTaskManager> = task_mgr.clone();
@@ -4566,7 +4566,7 @@ async fn failover_send_loop_excludes_acp_conversation() {
 #[tokio::test]
 async fn idmm_failover_conversation_returns_false_for_acp_conversation() {
     // review #11(2): the SHARED bottleneck `perform_model_failover` (review #9)
-    // gates on AgentType::Nomi AFTER loading the row, so the IDMM path
+    // gates on AgentType::OpenHub AFTER loading the row, so the IDMM path
     // (`idmm_failover_conversation`) reports `Ok(false)` for an ACP conversation
     // even with deps wired + an enabled queue — and performs NO kill / model write.
     let (svc, _broadcaster, repo, provider_repo) =
@@ -4627,7 +4627,7 @@ async fn perform_model_failover_returns_none_for_acp_conversation() {
 
 // ── edit_and_resubmit tests ─────────────────────────────────────
 
-/// 非 Nomi 会话调用 edit_and_resubmit → BadRequest（Nomi 门禁在取 agent/查消息之前）。
+/// 非 OpenHub 会话调用 edit_and_resubmit → BadRequest（OpenHub 门禁在取 agent/查消息之前）。
 #[tokio::test]
 async fn edit_and_resubmit_rejects_non_openhub() {
     let (svc, _broadcaster, _repo, _task_mgr) = make_service();
@@ -4643,10 +4643,10 @@ async fn edit_and_resubmit_rejects_non_openhub() {
         .unwrap_err();
 
     assert!(matches!(err, AppError::BadRequest(_)));
-    assert!(err.to_string().contains("Nomi"), "应为 Nomi 门禁错误，实际: {err}");
+    assert!(err.to_string().contains("OpenHub"), "应为 OpenHub 门禁错误，实际: {err}");
 }
 
-/// Nomi 会话但没有可编辑的用户消息 → BadRequest（消息查找守卫，在取 agent 之前）。
+/// OpenHub 会话但没有可编辑的用户消息 → BadRequest（消息查找守卫，在取 agent 之前）。
 #[tokio::test]
 async fn edit_and_resubmit_rejects_when_no_editable_message() {
     let (svc, _broadcaster, _repo, _task_mgr) = make_service();

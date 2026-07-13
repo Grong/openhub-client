@@ -45,18 +45,18 @@ impl RequirementMcpConfig {
     /// stays within Anthropic's 64-char tool-name limit (see ELECTRON-1JY).
     pub const SERVER_NAME: &'static str = "openhub-requirement";
     /// env key the stdio bridge reads to learn the backend HTTP port.
-    pub const ENV_PORT: &'static str = "NOMI_REQ_MCP_PORT";
+    pub const ENV_PORT: &'static str = "OPENHUB_REQ_MCP_PORT";
     /// env key the stdio bridge reads to learn the auth token.
-    pub const ENV_TOKEN: &'static str = "NOMI_REQ_MCP_TOKEN";
+    pub const ENV_TOKEN: &'static str = "OPENHUB_REQ_MCP_TOKEN";
     /// env key the stdio bridge reads to learn the owning session id (numeric),
     /// used to scope mutations to the calling session. Carries the owner id for
     /// either conversations or terminals (the `ENV_OWNER_KIND` disambiguates).
-    pub const ENV_CONVERSATION_ID: &'static str = "NOMI_REQ_MCP_CONVERSATION_ID";
+    pub const ENV_CONVERSATION_ID: &'static str = "OPENHUB_REQ_MCP_CONVERSATION_ID";
     /// env key the stdio bridge reads to learn the owner domain of the calling
     /// session: `"conversation"` (default/back-compat) or `"terminal"`.
     /// `verify_scope` pairs this with the requirement's `owner_kind` to prevent
     /// cross-domain privilege escalation (conv#5 vs term#5).
-    pub const ENV_OWNER_KIND: &'static str = "NOMI_REQ_MCP_OWNER_KIND";
+    pub const ENV_OWNER_KIND: &'static str = "OPENHUB_REQ_MCP_OWNER_KIND";
 }
 
 /// Wiring for the per-session knowledge-search MCP (ACP external CLIs). Mirrors
@@ -72,14 +72,14 @@ pub struct KnowledgeMcpConfig {
 
 impl KnowledgeMcpConfig {
     pub const SERVER_NAME: &'static str = "openhub-knowledge";
-    pub const ENV_PORT: &'static str = "NOMI_KB_MCP_PORT";
-    pub const ENV_TOKEN: &'static str = "NOMI_KB_MCP_TOKEN";
-    pub const ENV_KB_IDS: &'static str = "NOMI_KB_MCP_KB_IDS";
+    pub const ENV_PORT: &'static str = "OPENHUB_KB_MCP_PORT";
+    pub const ENV_TOKEN: &'static str = "OPENHUB_KB_MCP_TOKEN";
+    pub const ENV_KB_IDS: &'static str = "OPENHUB_KB_MCP_KB_IDS";
 }
 
 /// Connection config for the Desktop Gateway MCP stdio bridge.
 ///
-/// Passed through `AcpBuildExtra::gateway_mcp_config` / `NomiBuildExtra::gateway_mcp_config`
+/// Passed through `AcpBuildExtra::gateway_mcp_config` / `OpenHubBuildExtra::gateway_mcp_config`
 /// by the factory when a conversation carries the backend-set `desktopGateway`
 /// extra flag (channel master-agent sessions, companion companion threads). The
 /// session assembler injects `nomicore mcp-gateway-stdio` as a stdio MCP
@@ -102,32 +102,32 @@ impl GatewayMcpConfig {
     /// within Anthropic's 64-char tool-name limit (see ELECTRON-1JY).
     pub const SERVER_NAME: &'static str = "openhub-desktop";
     /// env key the stdio bridge reads to learn the backend HTTP port.
-    pub const ENV_PORT: &'static str = "NOMI_GW_MCP_PORT";
+    pub const ENV_PORT: &'static str = "OPENHUB_GW_MCP_PORT";
     /// env key the stdio bridge reads to learn the auth token.
-    pub const ENV_TOKEN: &'static str = "NOMI_GW_MCP_TOKEN";
+    pub const ENV_TOKEN: &'static str = "OPENHUB_GW_MCP_TOKEN";
     /// env key carrying the calling conversation id (self-protection scope:
     /// a session may not delete itself or inject messages into itself).
-    pub const ENV_CONVERSATION_ID: &'static str = "NOMI_GW_MCP_CONVERSATION_ID";
+    pub const ENV_CONVERSATION_ID: &'static str = "OPENHUB_GW_MCP_CONVERSATION_ID";
     /// env key carrying the owning user id; every gateway tool scopes its
     /// data access to this user.
-    pub const ENV_USER_ID: &'static str = "NOMI_GW_MCP_USER_ID";
+    pub const ENV_USER_ID: &'static str = "OPENHUB_GW_MCP_USER_ID";
     /// env key carrying the companion the calling session is bound to (multi-companion
     /// upgrade). Optional — absent for sessions with no companion binding; the
     /// gateway treats a missing/empty value as "no specific companion".
-    pub const ENV_COMPANION_ID: &'static str = "NOMI_GW_MCP_COMPANION_ID";
+    pub const ENV_COMPANION_ID: &'static str = "OPENHUB_GW_MCP_COMPANION_ID";
     /// env key carrying the IM platform when this is a channel master-agent
     /// session (e.g. "lark", "discord"). Optional — absent for plain
     /// companion/desktop sessions. The gateway uses it to resolve the write
     /// surface (channel → write-disabled in P1).
-    pub const ENV_CHANNEL_PLATFORM: &'static str = "NOMI_GW_MCP_CHANNEL_PLATFORM";
+    pub const ENV_CHANNEL_PLATFORM: &'static str = "OPENHUB_GW_MCP_CHANNEL_PLATFORM";
     /// env key carrying the caller's resolved session approval mode.
-    pub const ENV_SESSION_MODE: &'static str = "NOMI_GW_MCP_SESSION_MODE";
+    pub const ENV_SESSION_MODE: &'static str = "OPENHUB_GW_MCP_SESSION_MODE";
     /// Optional gateway tool profile. The stdio bridge maps this to a curated
     /// capability-domain list before answering `tools/list`.
-    pub const ENV_PROFILE: &'static str = "NOMI_GW_MCP_PROFILE";
+    pub const ENV_PROFILE: &'static str = "OPENHUB_GW_MCP_PROFILE";
     /// Optional comma-separated capability-domain allow-list. When present it
     /// takes precedence over [`Self::ENV_PROFILE`].
-    pub const ENV_DOMAINS: &'static str = "NOMI_GW_MCP_DOMAINS";
+    pub const ENV_DOMAINS: &'static str = "OPENHUB_GW_MCP_DOMAINS";
 
     pub const PROFILE_LITE: &'static str = "lite";
     pub const PROFILE_WORK: &'static str = "work";

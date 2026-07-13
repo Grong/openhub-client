@@ -35,7 +35,7 @@ export async function savePreferredModelId(agentKey: string, model_id: string): 
 }
 
 /** Save default openhub provider/model so the Guid page restores it next session. */
-export async function saveNomiDefaultModel(provider_id: string, use_model: string): Promise<void> {
+export async function saveOpenHubDefaultModel(provider_id: string, use_model: string): Promise<void> {
   try {
     await configService.set('openhub.defaultModel', { id: provider_id, use_model });
   } catch {

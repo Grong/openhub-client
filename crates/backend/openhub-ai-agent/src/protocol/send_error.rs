@@ -84,7 +84,7 @@ impl AgentSendError {
                 },
             },
             AppError::Internal(_) => Self::new(
-                "Nomi failed while sending the message",
+                "OpenHub failed while sending the message",
                 AgentErrorCode::OpenhubInternalError,
                 AgentErrorOwnership::Openhub,
                 Some(detail),
@@ -96,7 +96,7 @@ impl AgentSendError {
                 ),
             ),
             AppError::Forbidden(_) => Self::new(
-                "Nomi blocked the request before it reached the Agent",
+                "OpenHub blocked the request before it reached the Agent",
                 AgentErrorCode::OpenhubPermissionError,
                 AgentErrorOwnership::Openhub,
                 Some(detail),
@@ -309,7 +309,7 @@ impl From<AcpError> for AgentSendError {
                 ),
             ),
             AcpError::NotConnected => Self::new(
-                "Nomi lost its Agent protocol connection",
+                "OpenHub lost its Agent protocol connection",
                 AgentErrorCode::OpenhubInternalError,
                 AgentErrorOwnership::Openhub,
                 Some(detail),
@@ -1007,7 +1007,7 @@ mod tests {
 
     #[test]
     fn classifies_provider_504_html_body_as_timeout_with_stripped_detail() {
-        let raw = "Nomi agent error: Provider error: API error 504: <html>\r\n<head><title>504 Gateway Time-out</title></head>\r\n<body>\r\n<center><h1>504 Gateway Time-out</h1></center>\r\n<hr><center>openresty</center>\r\n</body>\r\n</html>";
+        let raw = "OpenHub agent error: Provider error: API error 504: <html>\r\n<head><title>504 Gateway Time-out</title></head>\r\n<body>\r\n<center><h1>504 Gateway Time-out</h1></center>\r\n<hr><center>openresty</center>\r\n</body>\r\n</html>";
         let err = AgentSendError::from_app_error(AppError::BadGateway(raw.into()));
 
         assert_eq!(err.code(), Some(AgentErrorCode::UserLlmProviderTimeout));
@@ -1106,25 +1106,25 @@ mod tests {
     #[test]
     fn classifies_provider_billing_auth_and_rate_limit() {
         assert_classification(
-            "Nomi agent error: Provider error: API error 402: {\"error\":{\"message\":\"Insufficient Balance\"}}",
+            "OpenHub agent error: Provider error: API error 402: {\"error\":{\"message\":\"Insufficient Balance\"}}",
             AgentErrorCode::UserLlmProviderBillingRequired,
             AgentErrorOwnership::UserLlmProvider,
             AgentErrorResolutionKind::CheckProviderBilling,
         );
         assert_classification(
-            "Nomi agent error: Provider error: API error 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"}}",
+            "OpenHub agent error: Provider error: API error 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"}}",
             AgentErrorCode::UserLlmProviderBillingRequired,
             AgentErrorOwnership::UserLlmProvider,
             AgentErrorResolutionKind::CheckProviderBilling,
         );
         assert_classification(
-            "Nomi agent error: Provider error: API error 401: invalid x-api-key",
+            "OpenHub agent error: Provider error: API error 401: invalid x-api-key",
             AgentErrorCode::UserLlmProviderAuthFailed,
             AgentErrorOwnership::UserLlmProvider,
             AgentErrorResolutionKind::CheckProviderCredentials,
         );
         assert_classification(
-            "Nomi agent error: Provider error: Rate limited, retry after 5000ms",
+            "OpenHub agent error: Provider error: Rate limited, retry after 5000ms",
             AgentErrorCode::UserLlmProviderRateLimited,
             AgentErrorOwnership::UserLlmProvider,
             AgentErrorResolutionKind::Retry,
@@ -1192,13 +1192,13 @@ mod tests {
     #[test]
     fn classifies_bedrock_invalid_model_identifier_as_model_not_found() {
         assert_classification(
-            "Nomi agent error: Provider error: API error 400: {\"message\":\"The provided model identifier is invalid.\"}",
+            "OpenHub agent error: Provider error: API error 400: {\"message\":\"The provided model identifier is invalid.\"}",
             AgentErrorCode::UserLlmProviderModelNotFound,
             AgentErrorOwnership::UserLlmProvider,
             AgentErrorResolutionKind::ChangeModel,
         );
         assert_resolution_target(
-            "Nomi agent error: Provider error: API error 400: {\"message\":\"The provided model identifier is invalid.\"}",
+            "OpenHub agent error: Provider error: API error 400: {\"message\":\"The provided model identifier is invalid.\"}",
             AgentErrorResolutionTarget::ProviderSettings,
         );
     }
@@ -1274,13 +1274,13 @@ mod tests {
             AgentErrorResolutionTarget::ProviderSettings,
         );
         assert_classification(
-            "Nomi agent error: API error: Connection error: error decoding response body",
+            "OpenHub agent error: API error: Connection error: error decoding response body",
             AgentErrorCode::UserLlmProviderNetworkError,
             AgentErrorOwnership::UserLlmProvider,
             AgentErrorResolutionKind::CheckProviderBaseUrl,
         );
         assert_classification(
-            "Nomi agent error: API error: error sending request for url",
+            "OpenHub agent error: API error: error sending request for url",
             AgentErrorCode::UserLlmProviderNetworkError,
             AgentErrorOwnership::UserLlmProvider,
             AgentErrorResolutionKind::CheckProviderBaseUrl,
@@ -1295,7 +1295,7 @@ mod tests {
 
     #[test]
     fn classifies_bare_provider_404_as_endpoint_not_found() {
-        let detail = "Nomi agent error: Provider error: API error 404: {\"detail\":\"Not Found\"}";
+        let detail = "OpenHub agent error: Provider error: API error 404: {\"detail\":\"Not Found\"}";
         assert_classification(
             detail,
             AgentErrorCode::UserLlmProviderEndpointNotFound,

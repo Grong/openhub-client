@@ -95,7 +95,7 @@
       "name": "star-office-helper",
       "name_i18n": { "zh-CN": "star-office-helper" },
       "description_i18n": {
-        "zh-CN": "安装、启动、连接和排查 Nomi/OpenClaw 可视化伴侣项目的技能，默认推荐 Star-Office-UI，适合端口、鉴权、预览面板和 Python 环境问题。"
+        "zh-CN": "安装、启动、连接和排查 OpenHub/OpenClaw 可视化伴侣项目的技能，默认推荐 Star-Office-UI，适合端口、鉴权、预览面板和 Python 环境问题。"
       },
       "audience_tags": ["office", "general"],
       "scenario_tags": ["document"]
@@ -194,7 +194,7 @@
       "name": "openhub-skills",
       "name_i18n": { "zh-CN": "openhub-skills" },
       "description_i18n": {
-        "zh-CN": "访问 Nomi Skills 注册表的技能，可发现和下载 AI agent 技能，并管理 Nomi Skills 平台上的 agent 凭据。"
+        "zh-CN": "访问 OpenHub Skills 注册表的技能，可发现和下载 AI agent 技能，并管理 OpenHub Skills 平台上的 agent 凭据。"
       },
       "audience_tags": ["developer", "general"],
       "scenario_tags": ["setup"]

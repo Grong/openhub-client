@@ -47,10 +47,10 @@ struct Args {
     #[arg(long, env = "OPENHUB_WEB_PORT", default_value_t = 8787)]
     port: u16,
     /// Data directory for the backend (db + storage). Defaults to the same
-    /// per-user dir as the desktop shell (`%LOCALAPPDATA%\OpenHub\Nomi` on
+    /// per-user dir as the desktop shell (`%LOCALAPPDATA%\OpenHub\OpenHub` on
     /// Windows, see `openhub_app::cli::default_data_dir`) so every host and
     /// dev loop shares one state by default. The env value is taken literally
-    /// (no `/Nomi` suffix) — production deployments (Docker `/data`, systemd
+    /// (no `/OpenHub` suffix) — production deployments (Docker `/data`, systemd
     /// `/var/libopenhub) rely on that.
     #[arg(
         long,

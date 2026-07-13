@@ -10,8 +10,8 @@ what lives where, how it's named, and how it's protected.
 
 | Host | Default path | Override |
 | --- | --- | --- |
-| Desktop (`openhub-desktop`) | Per-user app data: `%LOCALAPPDATA%\OpenHub\Nomi` on Windows, `~/Library/Application Support/OpenHub/Nomi` on macOS, `$XDG_DATA_HOME/OpenHub/Nomi` (usually `~/.local/share/OpenHub/Nomi`) on Linux. With `OPENHUB_DATA_DIR` set, becomes `$OPENHUB_DATA_DIR/Nomi`. Legacy installs under `<system temp>/openhub-data/Nomi` are auto-relocated on launch (one-shot; the old dir is kept as a backup). | env `OPENHUB_DATA_DIR` |
-| Web (`openhub-web`) and the `openhub-core` bin | The **same** per-user directory as the desktop shell — `%LOCALAPPDATA%\OpenHub\Nomi` / `~/Library/Application Support/OpenHub/Nomi` / `$XDG_DATA_HOME/OpenHub/Nomi` (the old `./data`-relative default is gone). With `OPENHUB_DATA_DIR` set, the value is taken **literally** (no `/Nomi` suffix), so Docker `/data` and systemd `/var/libopenhub deployments are unaffected. | flag `--data-dir` or env `OPENHUB_DATA_DIR` |
+| Desktop (`openhub-desktop`) | Per-user app data: `%LOCALAPPDATA%\OpenHub\OpenHub` on Windows, `~/Library/Application Support/OpenHub/OpenHub` on macOS, `$XDG_DATA_HOME/OpenHub/OpenHub` (usually `~/.local/share/OpenHub/OpenHub`) on Linux. With `OPENHUB_DATA_DIR` set, becomes `$OPENHUB_DATA_DIR/OpenHub`. Legacy installs under `<system temp>/openhub-data/OpenHub` are auto-relocated on launch (one-shot; the old dir is kept as a backup). | env `OPENHUB_DATA_DIR` |
+| Web (`openhub-web`) and the `openhub-core` bin | The **same** per-user directory as the desktop shell — `%LOCALAPPDATA%\OpenHub\OpenHub` / `~/Library/Application Support/OpenHub/OpenHub` / `$XDG_DATA_HOME/OpenHub/OpenHub` (the old `./data`-relative default is gone). With `OPENHUB_DATA_DIR` set, the value is taken **literally** (no `/OpenHub` suffix), so Docker `/data` and systemd `/var/libopenhub deployments are unaffected. | flag `--data-dir` or env `OPENHUB_DATA_DIR` |
 
 Inside the data directory:
 
@@ -27,14 +27,14 @@ Inside the data directory:
 
 All three hosts resolve the unset default through one shared helper,
 [`openhub_app::cli::default_data_dir()`](../../crates/backend/openhub-app/src/cli.rs):
-`dirs::data_local_dir()/OpenHub/Nomi` (the per-user application-data
-location), with the system temp dir (`<system temp>/openhub-data/Nomi`)
+`dirs::data_local_dir()/OpenHub/OpenHub` (the per-user application-data
+location), with the system temp dir (`<system temp>/openhub-data/OpenHub`)
 only as an extreme fallback when the OS reports no user dir. Env semantics
-stay host-specific: the desktop shell appends `"Nomi"` to `OPENHUB_DATA_DIR`
+stay host-specific: the desktop shell appends `"OpenHub"` to `OPENHUB_DATA_DIR`
 (see [`apps/desktop/src/main.rs`](../../apps/desktop/src/main.rs)), while
 `openhub-web` and `openhub-core` take the env value literally (a clap `env`
 binding — new for `openhub-core`, which previously ignored the variable).
-A pre-existing legacy install under `<system temp>/openhub-data/Nomi` is
+A pre-existing legacy install under `<system temp>/openhub-data/OpenHub` is
 relocated to the new location once at launch
 ([`apps/desktop/src/relocate.rs`](../../apps/desktop/src/relocate.rs)):
 data is copied (regenerable caches/logs are left behind), the legacy dir is
@@ -173,7 +173,7 @@ directory name in a workspace path may begin or end with whitespace (or
 consist entirely of whitespace). Such names break Win32 path round-tripping
 and are visually indistinguishable in any UI. Interior whitespace is fully
 supported — the default per-user data dir on macOS
-(`~/Library/Application Support/OpenHub/Nomi`) contains a space, and every
+(`~/Library/Application Support/OpenHub/OpenHub`) contains a space, and every
 process-spawn pipeline passes the workspace as a discrete argument
 (`Command::current_dir`, PTY cwd, ACP session JSON), which is
 whitespace-safe.
@@ -211,7 +211,7 @@ layout:
 ```
 
 The legacy single-companion layout `companion/openhub/` is migrated automatically on
-first boot into `shared/` plus a first companion named "Nomi"; the old
+first boot into `shared/` plus a first companion named "OpenHub"; the old
 directory gets a `.migrated` marker and is kept around (cleanup after
 one release cycle).
 
@@ -238,9 +238,9 @@ The runtime cache is anchored to the backend's `data_dir`:
 [`openhub_runtime::init(&data_dir)`](../../crates/backend/openhub-runtime/src/cache.rs)
 records `<data_dir>/runtime` as the cache root, so on the desktop the bun
 binary extracts under `<data_dir>/runtime/bun-<version>-<sha12>/` —
-i.e. `%LOCALAPPDATA%\OpenHub\Nomi\runtime\bun-…\` by default on Windows
+i.e. `%LOCALAPPDATA%\OpenHub\OpenHub\runtime\bun-…\` by default on Windows
 (the per-user app-data equivalents on macOS/Linux), or
-`$OPENHUB_DATA_DIR/Nomi/runtime/bun-…/` when the env var is set. When
+`$OPENHUB_DATA_DIR/OpenHub/runtime/bun-…/` when the env var is set. When
 `init` has not been called (the `mcp-*` subcommands, unit tests, `build.rs`)
 the cache falls back to the platform cache dir via `dirs::cache_dir()`:
 `%LOCALAPPDATA%openhubruntime\` on Windows, `~/Library/Caches/openhub/runtime/`

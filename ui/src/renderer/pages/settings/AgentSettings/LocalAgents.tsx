@@ -73,14 +73,14 @@ const LocalAgents: React.FC = () => {
     (s) => !installedBackends.has(s.backend) && (Boolean(s.website) || s.installHint.trim().length > 0)
   );
 
-  const { start: startNomiInstall } = useOpenHubQuickStart();
+  const { start: startOpenHubInstall } = useOpenHubQuickStart();
   const [installingBackend, setInstallingBackend] = useState<string | null>(null);
 
   const handleOneClickInstall = useCallback(
     async (agent: SupportedAgent) => {
       setInstallingBackend(agent.backend);
       const hint = agent.installHint || t('settings.agentManagement.installHintUnknown');
-      await startNomiInstall({
+      await startOpenHubInstall({
         name: t('settings.agentManagement.installConversationName', { name: agent.name }),
         prompt: t('settings.agentManagement.installPrompt', {
           name: agent.name,
@@ -91,7 +91,7 @@ const LocalAgents: React.FC = () => {
       });
       setInstallingBackend(null);
     },
-    [startNomiInstall, t]
+    [startOpenHubInstall, t]
   );
 
   const [editorVisible, setEditorVisible] = useState(false);
@@ -148,7 +148,7 @@ const LocalAgents: React.FC = () => {
     [mutateAgents]
   );
 
-  // Nomi first among detected agents
+  // OpenHub first among detected agents
   const nomiAgent = detectedAgents?.find((a) => a.agent_type === 'openhub' || a.backend === 'openhub');
   const otherDetected = detectedAgents?.filter((a) => a.agent_type !== 'openhub' && a.backend !== 'openhub') ?? [];
 

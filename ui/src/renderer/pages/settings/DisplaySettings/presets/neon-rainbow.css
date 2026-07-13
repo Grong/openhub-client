@@ -52,7 +52,7 @@ body {
   --color-brand-fill: #9d3ce0;
   --color-brand-bg: #f4ebff;
 
-  /* Nomi Brand Scale - 品牌色阶（1 最浅 → 10 最深） */
+  /* OpenHub Brand Scale - 品牌色阶（1 最浅 → 10 最深） */
   --aou-1: #f6edff;
   --aou-2: #ead7ff;
   --aou-3: #d9b6ff;
@@ -181,7 +181,7 @@ body {
   --color-brand-fill: #bd5cff;
   --color-brand-bg: #2a0e40;
 
-  /* Nomi Brand Scale - 品牌色阶（暗模式反转：1 最深 → 10 最浅） */
+  /* OpenHub Brand Scale - 品牌色阶（暗模式反转：1 最深 → 10 最浅） */
   --aou-1: #1c0a2b;
   --aou-2: #2a0e40;
   --aou-3: #3d1560;

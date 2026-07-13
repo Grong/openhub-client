@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 use openhub_agent::session::SessionManager;
 use openhub_config::config::{McpServerConfig, TransportType};
-use openhub_api_types::{GatewayMcpConfig, NomiBuildExtra, SessionMcpServer, SessionMcpTransport};
+use openhub_api_types::{GatewayMcpConfig, OpenHubBuildExtra, SessionMcpServer, SessionMcpTransport};
 use openhub_common::AppError;
 use openhub_db::IMcpServerRepository;
 use openhub_db::ISettingsRepository;
@@ -14,15 +14,15 @@ use tracing::{debug, info, warn};
 use crate::agent_task::AgentInstance;
 use crate::factory::AgentFactoryDeps;
 use crate::factory::context::FactoryContext;
-use crate::manager::openhub::{NomiAgentManager, sanitize_session_messages};
-use crate::types::{BuildTaskOptions, NomiCompatOverrides, NomiResolvedConfig};
+use crate::manager::openhub::{OpenHubAgentManager, sanitize_session_messages};
+use crate::types::{BuildTaskOptions, OpenHubCompatOverrides, OpenHubResolvedConfig};
 
 pub(super) async fn build(
     deps: Arc<AgentFactoryDeps>,
     options: BuildTaskOptions,
     ctx: FactoryContext,
 ) -> Result<AgentInstance, AppError> {
-    let mut overrides: NomiBuildExtra = serde_json::from_value(options.extra).unwrap_or_default();
+    let mut overrides: OpenHubBuildExtra = serde_json::from_value(options.extra).unwrap_or_default();
 
     // 对外服务钳制（execution-time 后端权威闸）：exposure 的权威来源是入口显式盖章
     // （`extra.exposure`，Remote/渠道公开令牌用）与下面的对外伙伴 id。取更严者；
@@ -410,7 +410,7 @@ pub(super) async fn build(
         None
     };
 
-    let config = NomiResolvedConfig {
+    let config = OpenHubResolvedConfig {
         provider: fields.provider,
         api_key: fields.api_key,
         model: fields.model.clone(),
@@ -539,7 +539,7 @@ pub(super) async fn build(
     };
 
     let conv_id_for_cron = ctx.conversation_id.clone();
-    let agent = NomiAgentManager::new(
+    let agent = OpenHubAgentManager::new(
         ctx.conversation_id,
         ctx.workspace,
         config,
@@ -568,7 +568,7 @@ pub(super) async fn build(
     if let Some(make_sink) = deps.cron_sink_factory.as_ref() {
         agent.register_cron_sink(make_sink(&conv_id_for_cron)).await;
     }
-    Ok(AgentInstance::Nomi(Arc::new(agent)))
+    Ok(AgentInstance::OpenHub(Arc::new(agent)))
 }
 
 /// Host-level default for opt-in tool capabilities ("1"/"true" enables).
@@ -724,7 +724,7 @@ fn reply_language_directive(lang: &str) -> &'static str {
 /// its preset_context — single source of truth, no more structural copies.
 fn append_knowledge_context(
     base: Option<String>,
-    config: &NomiBuildExtra,
+    config: &OpenHubBuildExtra,
     conversation_id: &str,
     has_write_tool: bool,
 ) -> Option<String> {
@@ -834,11 +834,11 @@ pub(crate) fn resolve_native_write_root(
 /// 对外服务钳制（execution-time 后端权威闸，纯函数除类型外无副作用，可单测）。
 /// `ExposureMode::PublicService` 是不可信陌生人档：把会话的能力授予**硬性收窄**到
 /// 安全白名单，并关闭桌面网关 / computer / browser —— 覆盖任何 client/host 传入值。
-/// `NomiBuildExtra` 上没有 `in_process_spawn` 字段（它是工厂派生值），故本函数只钳制
+/// `OpenHubBuildExtra` 上没有 `in_process_spawn` 字段（它是工厂派生值），故本函数只钳制
 /// 字段，spawn 在其派生点按 `overrides.exposure` 单独收口。返回是否发生了钳制。
 ///
 /// 缺省 `Private`（及 `TrustedRemote`）不钳制 → 今日行为，零回归。
-pub(crate) fn apply_exposure_clamp(overrides: &mut NomiBuildExtra) -> bool {
+pub(crate) fn apply_exposure_clamp(overrides: &mut OpenHubBuildExtra) -> bool {
     match openhub_api_types::exposure_clamp(overrides.exposure) {
         None => false,
         Some(clamp) => {
@@ -890,7 +890,7 @@ pub(crate) fn build_public_agent_prompt(runtime: &crate::factory::PublicAgentRun
     out
 }
 
-/// Map Nomi DB platform name to the openhub provider identifier.
+/// Map OpenHub DB platform name to the openhub provider identifier.
 ///
 /// Mirrors the frontend `src/process/agent/openhub/envBuilder.ts` mapping.
 /// For `new-api` platform, per-model protocol overrides from `model_protocols`
@@ -932,8 +932,8 @@ pub(crate) fn resolve_openhub_url_and_compat(
     raw_base_url: &str,
     mapped_provider: &str,
     is_full_url: bool,
-) -> (Option<String>, NomiCompatOverrides) {
-    let mut compat = NomiCompatOverrides::default();
+) -> (Option<String>, OpenHubCompatOverrides) {
+    let mut compat = OpenHubCompatOverrides::default();
 
     if is_full_url {
         let trimmed = raw_base_url.trim_end_matches('/');
@@ -1275,7 +1275,7 @@ fn resolve_stdio_command(command: &str) -> String {
 }
 
 fn resolve_mcp_servers(
-    overrides: &NomiBuildExtra,
+    overrides: &OpenHubBuildExtra,
     conversation_id: &str,
 ) -> HashMap<String, McpServerConfig> {
     let mut servers = HashMap::new();
@@ -1289,7 +1289,7 @@ fn resolve_mcp_servers(
     servers
 }
 
-fn resolved_session_mode(overrides: &NomiBuildExtra) -> String {
+fn resolved_session_mode(overrides: &OpenHubBuildExtra) -> String {
     overrides
         .session_mode
         .as_deref()
@@ -1305,7 +1305,7 @@ fn resolved_session_mode(overrides: &NomiBuildExtra) -> String {
 /// rides along for attribution.
 fn gateway_mcp_to_config(
     cfg: &GatewayMcpConfig,
-    overrides: &NomiBuildExtra,
+    overrides: &OpenHubBuildExtra,
     conversation_id: &str,
 ) -> HashMap<String, McpServerConfig> {
     let mut env = HashMap::new();
@@ -1467,7 +1467,7 @@ mod tests {
 
     #[test]
     fn resolve_mcp_servers_adds_gateway_when_flag_set() {
-        let overrides = NomiBuildExtra {
+        let overrides = OpenHubBuildExtra {
             desktop_gateway: true,
             gateway_mcp_config: Some(GatewayMcpConfig {
                 port: 41237,
@@ -1515,7 +1515,7 @@ mod tests {
             Some(GatewayMcpConfig::PROFILE_WORK)
         );
         assert_eq!(
-            env.get("NOMI_GW_MCP_SESSION_MODE").map(String::as_str),
+            env.get("OPENHUB_GW_MCP_SESSION_MODE").map(String::as_str),
             Some("yolo"),
             "gateway bridge must receive the resolved default full-auto session mode"
         );
@@ -1523,7 +1523,7 @@ mod tests {
 
     #[test]
     fn gateway_env_omits_companion_id_when_unbound() {
-        let overrides = NomiBuildExtra {
+        let overrides = OpenHubBuildExtra {
             desktop_gateway: true,
             gateway_mcp_config: Some(GatewayMcpConfig {
                 port: 41237,
@@ -1544,7 +1544,7 @@ mod tests {
 
     #[test]
     fn gateway_env_uses_lite_profile_for_channel_sessions() {
-        let overrides = NomiBuildExtra {
+        let overrides = OpenHubBuildExtra {
             desktop_gateway: true,
             gateway_mcp_config: Some(GatewayMcpConfig {
                 port: 41237,
@@ -1564,7 +1564,7 @@ mod tests {
 
     #[test]
     fn resolve_mcp_servers_skips_gateway_without_flag() {
-        let overrides = NomiBuildExtra {
+        let overrides = OpenHubBuildExtra {
             desktop_gateway: false,
             gateway_mcp_config: Some(GatewayMcpConfig {
                 port: 41237,
@@ -1805,7 +1805,7 @@ mod tests {
 
     #[test]
     fn resolve_mcp_servers_ignores_guide_configs() {
-        let overrides = NomiBuildExtra {
+        let overrides = OpenHubBuildExtra {
             guide_mcp_config: Some(GuideMcpConfig {
                 port: 8000,
                 token: "guide-tok".into(),
@@ -1821,7 +1821,7 @@ mod tests {
 
     #[test]
     fn resolve_mcp_servers_ignores_guide_for_solo_sessions() {
-        let overrides = NomiBuildExtra {
+        let overrides = OpenHubBuildExtra {
             guide_mcp_config: Some(GuideMcpConfig {
                 port: 8000,
                 token: "guide-tok".into(),
@@ -1838,14 +1838,14 @@ mod tests {
 
     #[test]
     fn resolve_mcp_servers_empty_when_no_config() {
-        let overrides = NomiBuildExtra::default();
+        let overrides = OpenHubBuildExtra::default();
         let result = resolve_mcp_servers(&overrides, "conv-3");
         assert!(result.is_empty());
     }
 
     #[test]
     fn resolve_mcp_servers_guide_skipped_for_unknown_backend() {
-        let overrides = NomiBuildExtra {
+        let overrides = OpenHubBuildExtra {
             guide_mcp_config: Some(GuideMcpConfig {
                 port: 8000,
                 token: "tok".into(),
@@ -1861,7 +1861,7 @@ mod tests {
 
     #[test]
     fn resolve_mcp_servers_guide_skipped_when_backend_none() {
-        let overrides = NomiBuildExtra {
+        let overrides = OpenHubBuildExtra {
             guide_mcp_config: Some(GuideMcpConfig {
                 port: 8000,
                 token: "tok".into(),
@@ -1958,7 +1958,7 @@ mod tests {
         let json = serde_json::json!({
             "preset_rules": "You are a data analyst. Always use Python.",
         });
-        let mut overrides: NomiBuildExtra = serde_json::from_value(json).unwrap();
+        let mut overrides: OpenHubBuildExtra = serde_json::from_value(json).unwrap();
 
         if let Some(rules) = overrides.preset_rules.take() {
             overrides.system_prompt = Some(match overrides.system_prompt.take() {
@@ -1980,7 +1980,7 @@ mod tests {
             "system_prompt": "Be concise.",
             "preset_rules": "You are a data analyst.",
         });
-        let mut overrides: NomiBuildExtra = serde_json::from_value(json).unwrap();
+        let mut overrides: OpenHubBuildExtra = serde_json::from_value(json).unwrap();
 
         if let Some(rules) = overrides.preset_rules.take() {
             overrides.system_prompt = Some(match overrides.system_prompt.take() {
@@ -2000,7 +2000,7 @@ mod tests {
         let json = serde_json::json!({
             "system_prompt": "Be concise.",
         });
-        let mut overrides: NomiBuildExtra = serde_json::from_value(json).unwrap();
+        let mut overrides: OpenHubBuildExtra = serde_json::from_value(json).unwrap();
 
         if let Some(rules) = overrides.preset_rules.take() {
             overrides.system_prompt = Some(match overrides.system_prompt.take() {
@@ -2107,7 +2107,7 @@ mod tests {
     #[test]
     fn public_service_exposure_clamps_session() {
         // 上游即便要网关 + computer + browser + 危险工具…
-        let mut o = NomiBuildExtra {
+        let mut o = OpenHubBuildExtra {
             exposure: openhub_api_types::ExposureMode::PublicService,
             desktop_gateway: true,
             computer_use: Some(true),
@@ -2132,7 +2132,7 @@ mod tests {
     #[test]
     fn private_and_default_sessions_are_not_clamped() {
         // 缺省 = Private = 今日行为，零回归。
-        let mut o = NomiBuildExtra {
+        let mut o = OpenHubBuildExtra {
             desktop_gateway: true,
             allowed_tools: vec!["Bash".to_owned()],
             ..Default::default()
@@ -2144,17 +2144,17 @@ mod tests {
 
     #[test]
     fn openhub_build_extra_deserializes_public_service_exposure() {
-        let extra: NomiBuildExtra =
+        let extra: OpenHubBuildExtra =
             serde_json::from_value(serde_json::json!({ "exposure": "public_service" })).unwrap();
         assert_eq!(extra.exposure, openhub_api_types::ExposureMode::PublicService);
         // 缺省不回归
-        let d: NomiBuildExtra = serde_json::from_value(serde_json::json!({})).unwrap();
+        let d: OpenHubBuildExtra = serde_json::from_value(serde_json::json!({})).unwrap();
         assert_eq!(d.exposure, openhub_api_types::ExposureMode::Private);
     }
 
     #[test]
     fn append_knowledge_context_without_mounts_is_passthrough() {
-        let config = NomiBuildExtra::default();
+        let config = OpenHubBuildExtra::default();
         assert_eq!(
             append_knowledge_context(None, &config, "conv-1", true),
             None
@@ -2169,7 +2169,7 @@ mod tests {
     fn append_knowledge_context_renders_mounts_and_writeback() {
         use openhub_api_types::KnowledgeMountInfo;
 
-        let mut config = NomiBuildExtra {
+        let mut config = OpenHubBuildExtra {
             knowledge_mounts: vec![KnowledgeMountInfo {
                 id: "kb1".into(),
                 name: "领域知识".into(),
@@ -2239,7 +2239,7 @@ mod tests {
             "knowledge_writeback_mode": "staged",
             "knowledge_writeback_eagerness": "aggressive",
         });
-        let overrides: NomiBuildExtra = serde_json::from_value(json).unwrap();
+        let overrides: OpenHubBuildExtra = serde_json::from_value(json).unwrap();
         assert_eq!(overrides.knowledge_mounts.len(), 1);
         assert!(overrides.knowledge_writeback);
         assert_eq!(
@@ -2272,14 +2272,14 @@ mod tests {
         use openhub_knowledge::{KnowledgeBinding, WriteMode, WriteSurface, resolve_write_policy};
 
         // Absent in JSON → serde default false (the previous, broken behavior).
-        let off: NomiBuildExtra = serde_json::from_value(serde_json::json!({
+        let off: OpenHubBuildExtra = serde_json::from_value(serde_json::json!({
             "knowledge_writeback": true,
         }))
         .unwrap();
         assert!(!off.knowledge_channel_write_enabled);
 
         // Present and true → carried through.
-        let on: NomiBuildExtra = serde_json::from_value(serde_json::json!({
+        let on: OpenHubBuildExtra = serde_json::from_value(serde_json::json!({
             "knowledge_writeback": true,
             "knowledge_channel_write_enabled": true,
         }))
@@ -2288,7 +2288,7 @@ mod tests {
 
         // Reconstruct the binding exactly as build_openhub does and confirm the
         // policy flips from Disabled to Staged for an external channel.
-        let reconstruct = |extra: &NomiBuildExtra| KnowledgeBinding {
+        let reconstruct = |extra: &OpenHubBuildExtra| KnowledgeBinding {
             enabled: true,
             writeback: extra.knowledge_writeback,
             writeback_mode: extra

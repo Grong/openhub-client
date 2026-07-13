@@ -22,7 +22,7 @@
 //! that shape is valid and required by every provider.
 //!
 //! This logic is intentionally a free function (not a method on
-//! `NomiAgentManager`) so it can be unit-tested in isolation and so we do
+//! `OpenHubAgentManager`) so it can be unit-tested in isolation and so we do
 //! not add yet another field to a manager (per `AGENTS.md`).
 
 use std::collections::HashSet;

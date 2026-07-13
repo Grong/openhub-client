@@ -249,14 +249,14 @@ git -c user.nameopenhub-c user.email=rika00@qq.com commit -m "feat(openhub-agent
 ### Task 4: 后端工厂/manager 灌门控值
 
 **Files:**
-- Modify: `crates/backend/openhub-api-types/src/agent_build_extra.rs`（`NomiBuildExtra` 加 `allowed_tools`）
-- Modify: `crates/backend/openhub-ai-agent/src/types.rs:61-144`（`NomiResolvedConfig` 加两字段）
-- Modify: `crates/backend/openhub-ai-agent/src/factory/openhub.rs`（计算 + 填充；~:377-433 `NomiResolvedConfig` 构造处）
+- Modify: `crates/backend/openhub-api-types/src/agent_build_extra.rs`（`OpenHubBuildExtra` 加 `allowed_tools`）
+- Modify: `crates/backend/openhub-ai-agent/src/types.rs:61-144`（`OpenHubResolvedConfig` 加两字段）
+- Modify: `crates/backend/openhub-ai-agent/src/factory/openhub.rs`（计算 + 填充；~:377-433 `OpenHubResolvedConfig` 构造处）
 - Modify: `crates/backend/openhub-ai-agent/src/manager/openhub/agent.rs:236-261`（灌入 config.tools，紧邻 browser/computer）
 
 **Interfaces:**
 - Consumes: Task 2 的 `ToolsConfig` 字段。
-- Produces: `NomiBuildExtra.allowed_tools: Vec<String>`（serde default 空；worker extra JSON 的 `allowed_tools` 键反序列化到此）；`NomiResolvedConfig.in_process_spawn: bool` + `allowed_tools: Vec<String>`；纯函数 `pub(crate) fn engine_spawn_enabled(desktop_gateway: bool, channel_platform: Option<&str>) -> bool`。
+- Produces: `OpenHubBuildExtra.allowed_tools: Vec<String>`（serde default 空；worker extra JSON 的 `allowed_tools` 键反序列化到此）；`OpenHubResolvedConfig.in_process_spawn: bool` + `allowed_tools: Vec<String>`；纯函数 `pub(crate) fn engine_spawn_enabled(desktop_gateway: bool, channel_platform: Option<&str>) -> bool`。
 
 - [ ] **Step 1: 写纯函数失败测试**（加到 `factory/openhub.rs` 既有 `mod tests`，紧邻 `is_orchestration_lead_policy`）
 
@@ -279,7 +279,7 @@ Expected: FAIL（函数未定义）
 
 - [ ] **Step 3: 实现**
 
-(a) `agent_build_extra.rs` 的 `NomiBuildExtra`（`orchestrator_role` 字段后）加：
+(a) `agent_build_extra.rs` 的 `OpenHubBuildExtra`（`orchestrator_role` 字段后）加：
 
 ```rust
     /// Per-session 工具白名单（受限角色的编排 worker 用）。非空时引擎只保留
@@ -288,12 +288,12 @@ Expected: FAIL（函数未定义）
     pub allowed_tools: Vec<String>,
 ```
 
-(b) `types.rs` 的 `NomiResolvedConfig`（`owner_token` 字段后）加：
+(b) `types.rs` 的 `OpenHubResolvedConfig`（`owner_token` 字段后）加：
 
 ```rust
     /// 是否注册进程内 Spawn（工厂按 engine_spawn_enabled 计算；CLI 恒 true）。
     pub in_process_spawn: bool,
-    /// Per-session 工具白名单（空 = 不限制），源自 NomiBuildExtra.allowed_tools。
+    /// Per-session 工具白名单（空 = 不限制），源自 OpenHubBuildExtra.allowed_tools。
     pub allowed_tools: Vec<String>,
 ```
 
@@ -308,7 +308,7 @@ pub(crate) fn engine_spawn_enabled(desktop_gateway: bool, channel_platform: Opti
 }
 ```
 
-在 `NomiResolvedConfig { ... }` 构造处（~:390 `session_mode` 附近）加：
+在 `OpenHubResolvedConfig { ... }` 构造处（~:390 `session_mode` 附近）加：
 
 ```rust
         in_process_spawn: engine_spawn_enabled(
@@ -328,7 +328,7 @@ pub(crate) fn engine_spawn_enabled(desktop_gateway: bool, channel_platform: Opti
         config.tools.builtin_allowlist = config_extra.allowed_tools.clone();
 ```
 
-(e) **编译修复**：`cargo check -p openhub-ai-agent 2>&1 | grep error` 找出所有 `NomiResolvedConfig { ... }` 构造点（含测试 `make_test_config`），补 `in_process_spawn: true, allowed_tools: Vec::new(),`。
+(e) **编译修复**：`cargo check -p openhub-ai-agent 2>&1 | grep error` 找出所有 `OpenHubResolvedConfig { ... }` 构造点（含测试 `make_test_config`），补 `in_process_spawn: true, allowed_tools: Vec::new(),`。
 
 - [ ] **Step 4: 跑测试确认通过**
 
@@ -513,7 +513,7 @@ git -c user.nameopenhub-c user.email=rika00@qq.com commit -m "feat(orchestrator)
 - Modify: `crates/backend/openhub-orchestrator/src/engine.rs:1272-1283`（dispatch 调 `run_restricted` 传 `task.role`）
 
 **Interfaces:**
-- Consumes: Task 4 的 `NomiBuildExtra.allowed_tools`（extra JSON 键 `allowed_tools`）。
+- Consumes: Task 4 的 `OpenHubBuildExtra.allowed_tools`（extra JSON 键 `allowed_tools`）。
 - Produces: `WorkerRunner::run_restricted(role, ...)` trait 默认方法（默认忽略 role 委托 `run` —— **17 处 mock 零翻修**）；`fn role_allowed_tools(role: Option<&str>) -> Option<Vec<&'static str>>`。
 
 - [ ] **Step 1: 写失败测试**（加到 worker.rs 既有 `mod tests`，紧邻 `build_worker_extra_carries_correlation_keys_and_brief`）

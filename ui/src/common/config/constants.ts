@@ -5,14 +5,14 @@
  */
 
 /**
- * Nomi应用程序共用常量
+ * OpenHub应用程序共用常量
  */
 
 // ===== 文件处理相关常量 =====
 
 /** 用于匹配和清理时间戳后缀的正则表达式 */
 export const OPENHUB_TIMESTAMP_REGEX = /_openhub_\d{13}(\.\w+)?$/;
-export const OPENHUB_FILES_MARKER = '[[NOMI_FILES]]';
+export const OPENHUB_FILES_MARKER = '[[OPENHUB_FILES]]';
 
 // ===== 媒体类型相关常量 =====
 

@@ -334,7 +334,7 @@ impl LlmPlanProducer {
 /// before `parse_plan`'s fail-soft can ever run — so every real run would stall
 /// in `planning`. The real provider+model live on the fleet members, so derive
 /// the lead from the FIRST member that carries BOTH a non-empty `provider_id`
-/// AND a non-empty `model` (mirroring the Nomi-engine member contract in
+/// AND a non-empty `model` (mirroring the OpenHub-engine member contract in
 /// `worker.rs`). If no member qualifies, fall back to the construction-time
 /// `lead` override.
 fn pick_lead(members: &[FleetMember], fallback: &ProviderWithModel) -> ProviderWithModel {

@@ -114,9 +114,9 @@ cargo run -p openhub-app --bin nomicore -- doctor
 
 所有 host 未显式覆盖时共享同一个默认数据目录：
 
-- Windows：`%LOCALAPPDATA%\OpenHub\Nomi`
-- macOS：`~/Library/Application Support/OpenHub/Nomi`
-- Linux：`$XDG_DATA_HOME/OpenHub/Nomi` 或 `~/.local/share/OpenHub/Nomi`
+- Windows：`%LOCALAPPDATA%\OpenHub\OpenHub`
+- macOS：`~/Library/Application Support/OpenHub/OpenHub`
+- Linux：`$XDG_DATA_HOME/OpenHub/OpenHub` 或 `~/.local/share/OpenHub/OpenHub`
 
 数据目录包含 SQLite、日志、Bun runtime cache、extension 数据和 agent 状态。
 后端启动时会先拿 `{data_dir}/server.lock` 独占锁，避免两个活跃后端同时写同一
@@ -129,7 +129,7 @@ OPENHUB_DATA_DIR=/tmp/openhub-dev bun run serve:web
 OPENHUB_DATA_DIR=/tmp/openhub-dev bun run dev
 ```
 
-桌面端会追加 channel 对应的 `Nomi` leaf；Web host 和 `nomicore` 按 env 值字面
+桌面端会追加 channel 对应的 `OpenHub` leaf；Web host 和 `nomicore` 按 env 值字面
 使用。自动化脚本依赖这个行为前，请先读
 [`../reference/configuration.zh.md`](../reference/configuration.zh.md)。
 

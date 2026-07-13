@@ -75,7 +75,7 @@
 **Interfaces — Consumes:** Task3 `effective_superpowers_dir`、Task4 `is_coding_scenario`/`SUPERPOWERS_BOOTSTRAP`、既有 `AgentBootstrap::extra_skill_dirs`。
 - [ ] Step1 失败测试：给定编码场景的 resolved config，组装后的 `system_prompt` 含 `SUPERPOWERS_BOOTSTRAP` 标记串；非编码场景不含；且 bootstrap 编码场景下追加于 persona 之后（可查子串顺序）。
 - [ ] Step2 FAIL。
-- [ ] Step3 实现：在 system_prompt 组装链（`compose_subagent_hint` 同款位置）按场景追加引导；把 `effective_superpowers_dir(data_dir)` 经 config/overrides 传到 `NomiAgentManager`→`AgentBootstrap::extra_skill_dirs`。
+- [ ] Step3 实现：在 system_prompt 组装链（`compose_subagent_hint` 同款位置）按场景追加引导；把 `effective_superpowers_dir(data_dir)` 经 config/overrides 传到 `OpenHubAgentManager`→`AgentBootstrap::extra_skill_dirs`。
 - [ ] Step4 `cargo test -p openhub-ai-agent` 相关绿。
 - [ ] Step5 提交 `feat(superpowers): feed skills to openhub engine + inject bootstrap on coding scenarios`。
 

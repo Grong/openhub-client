@@ -34,7 +34,7 @@ computer-use crates to expose those capabilities as stdio/public tools.
 
 OpenHub supports several runtime families:
 
-- **Nomi engine**: in-tree engine from `openhub-agent`, with providers, built-in
+- **OpenHub engine**: in-tree engine from `openhub-agent`, with providers, built-in
   tools, skills, MCP, memory, browser, and computer-use support.
 - **ACP-style CLI agents**: Claude Code, Codex, Gemini CLI, Qwen/OpenCode-style
   integrations, and related CLIs managed by `openhub-ai-agent`.
@@ -61,7 +61,7 @@ Common sources include:
 - Windows/open helper bridge,
 - feature-gated computer-use and browser-use stdio bridges,
 - runtime-native skills or first-message skill injection,
-- Nomi's native tool registry.
+- OpenHub's native tool registry.
 
 When documenting tool availability, cite the factory files above rather than
 assuming all agents receive the same injected servers.
@@ -71,7 +71,7 @@ assuming all agents receive the same injected servers.
 Skills are instruction/tool bundles whose materialization depends on runtime
 capability:
 
-- Nomi has a real `Skill` tool path in the engine.
+- OpenHub has a real `Skill` tool path in the engine.
 - Native CLI runtimes may receive symlinked/copied skill files or lightweight
   first-message guidance when the runtime supports it.
 - Custom workspace or non-native paths can be summarized in a first-message
@@ -91,13 +91,13 @@ UI request
   -> openhub-conversation route/service
   -> openhub-ai-agent AgentService / WorkerTaskManager
   -> runtime family factory
-  -> Nomi engine or external CLI process
+  -> OpenHub engine or external CLI process
   -> AgentStreamEvent
   -> openhub-realtime /ws
   -> renderer stream handlers
 ```
 
-Nomi-engine sessions run inside the process. ACP-style sessions spawn and manage
+OpenHub-engine sessions run inside the process. ACP-style sessions spawn and manage
 child CLIs. Public remote capability calls enter through `openhub-public` and
 the Desktop Gateway registry rather than the conversation HTTP route.
 

@@ -368,13 +368,13 @@ impl OnConversationDelete for WorkerTaskManagerImpl {
 /// rebaseline) — the cross-conversation "memory bleed" this guards against,
 /// complementing the per-session `owner_token` check in the openhub factory.
 /// Best-effort: every failure is logged, never fatal.
-pub struct NomiSessionFilesCascade {
+pub struct OpenHubSessionFilesCascade {
     pub data_dir: PathBuf,
     pub work_dir: PathBuf,
 }
 
 #[async_trait]
-impl OnConversationDelete for NomiSessionFilesCascade {
+impl OnConversationDelete for OpenHubSessionFilesCascade {
     async fn on_conversation_deleted(&self, conversation_id: i64) {
         let id = conversation_id.to_string();
 

@@ -123,7 +123,7 @@ async fn create(deps: Arc<GatewayDeps>, ctx: CallerCtx, p: CronCreateParams) -> 
     match deps.conversation_service.get(&ctx.user_id, &target_conversation).await {
         Ok(conv) => {
             let model_missing = conv.model.as_ref().is_none_or(|m| m.provider_id.trim().is_empty());
-            if conv.r#type == AgentType::Nomi && model_missing {
+            if conv.r#type == AgentType::OpenHub && model_missing {
                 match tools_provider::resolve_openhub_model(&deps, &ctx, None, None).await {
                     Ok((m, source)) => {
                         let req = UpdateConversationRequest {

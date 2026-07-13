@@ -1,6 +1,6 @@
 [package]
 name = "openhub-computer"
-description = "Computer-use tool for Nomi (screenshot, mouse/keyboard synthesis, window control)"
+description = "Computer-use tool for OpenHub (screenshot, mouse/keyboard synthesis, window control)"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

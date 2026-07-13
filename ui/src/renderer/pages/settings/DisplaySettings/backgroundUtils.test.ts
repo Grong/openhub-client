@@ -18,7 +18,7 @@ describe('manual theme background CSS', () => {
   test('keeps the image in one shared background rule and switches masks with theme variables', () => {
     const css = injectBackgroundCssBlock('', IMAGE_DATA_URL);
 
-    expect(css.includes('/* Nomi Theme Background Mask v2 */')).toBe(true);
+    expect(css.includes('/* OpenHub Theme Background Mask v2 */')).toBe(true);
     expect(css.includes('--openhub-manual-bg-mask: rgba(255, 255, 255, 0.34);')).toBe(true);
     expect(css.includes("html[data-theme='dark']")).toBe(true);
     expect(css.includes('--openhub-manual-bg-mask: rgba(0, 0, 0, 0.34);')).toBe(true);

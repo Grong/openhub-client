@@ -14,7 +14,7 @@
  * behaviour exhaustively testable.
  */
 
-export interface NomiTurnState {
+export interface OpenHubTurnState {
   /** The model stream is active (text/thinking/tool output flowing). */
   streamRunning: boolean;
   /** One or more tools are executing / confirming / pending. */
@@ -24,7 +24,7 @@ export interface NomiTurnState {
   waitingResponse: boolean;
 }
 
-export type NomiTurnEvent =
+export type OpenHubTurnEvent =
   /** New conversation / explicit stop: clear everything. */
   | { type: 'reset' }
   /** Async hydration from backend `is_processing`. Raise-only: never lowers a
@@ -46,21 +46,21 @@ export type NomiTurnEvent =
   /** Error terminal event. */
   | { type: 'error' };
 
-export const initialNomiTurnState: NomiTurnState = {
+export const initialOpenHubTurnState: OpenHubTurnState = {
   streamRunning: false,
   hasActiveTools: false,
   waitingResponse: false,
 };
 
 /** Combined "is this turn doing anything" flag the UI spins on. */
-export function isTurnRunning(s: NomiTurnState): boolean {
+export function isTurnRunning(s: OpenHubTurnState): boolean {
   return s.waitingResponse || s.streamRunning || s.hasActiveTools;
 }
 
-export function nomiTurnReducer(state: NomiTurnState, event: NomiTurnEvent): NomiTurnState {
+export function nomiTurnReducer(state: OpenHubTurnState, event: OpenHubTurnEvent): OpenHubTurnState {
   switch (event.type) {
     case 'reset':
-      return { ...initialNomiTurnState };
+      return { ...initialOpenHubTurnState };
 
     case 'hydrate':
       // Raise-only: OR the backend's running signal onto whatever is already
@@ -97,7 +97,7 @@ export function nomiTurnReducer(state: NomiTurnState, event: NomiTurnEvent): Nom
     case 'error':
       // Terminal: the turn is over. Clear ALL activity — notably hasActiveTools,
       // which the old code left set and caused a permanently stuck spinner.
-      return { ...initialNomiTurnState };
+      return { ...initialOpenHubTurnState };
 
     default:
       return state;

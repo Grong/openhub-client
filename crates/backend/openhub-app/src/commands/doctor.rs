@@ -52,7 +52,7 @@ pub async fn run_doctor(cli: &Cli, merged_path: &str) -> Result<ExitCode> {
 
 fn print_environment(merged_path: &str, data_dir: &Path) {
     let path_segments = merged_path.split(if cfg!(windows) { ';' } else { ':' }).count();
-    println!("Nomi backend doctor — agent CLI detection self-check");
+    println!("OpenHub backend doctor — agent CLI detection self-check");
     println!("  data-dir       : {}", data_dir.display());
     println!("  PATH segments  : {path_segments}");
     println!("  PATH length    : {}", merged_path.len());

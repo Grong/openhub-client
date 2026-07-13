@@ -20,7 +20,7 @@
  * in `agentLogo.ts`. `website` is optional — when absent the card hides the
  * "manual install" button. `installHint` is a locale-neutral install command
  * embedded into the one-click install prompt; keep it empty unless the command
- * is product-owned, current, and low-risk enough for Nomi-assisted install.
+ * is product-owned, current, and low-risk enough for OpenHub-assisted install.
  */
 export interface SupportedAgent {
   /** Stable backend key — matches detected `agent.backend` and the logo map. */

@@ -109,7 +109,7 @@ impl ConversationService {
     /// send-loop(D3)与 IDMM 故障值守(D6)共用此方法:一份实现,两处触发。
     ///
     /// **ACP 边界(review #9,plan D7)**:加载会话行后在此**统一**判定 agent 类型——
-    /// 仅 `AgentType::Nomi` 放行,其余(ACP / 终端 CLI / 远程 …)`warn` + 返回 `None`
+    /// 仅 `AgentType::OpenHub` 放行,其余(ACP / 终端 CLI / 远程 …)`warn` + 返回 `None`
     /// (不 kill、不写 model)。send-loop 自己也有一道便宜的早闸,但**这里**才是
     /// 唯一的强制点:send-loop 与 IDMM 两条路径都过这道闸,所以 ACP 会话无论从哪条
     /// 路径进来都安全地被拒。
@@ -154,7 +154,7 @@ impl ConversationService {
                 return None;
             }
         };
-        if agent_type != AgentType::Nomi {
+        if agent_type != AgentType::OpenHub {
             warn!(
                 conversation_id,
                 agent_type = ?agent_type,
@@ -266,7 +266,7 @@ impl ConversationService {
             }
         };
         let agent_type: AgentType = string_to_enum(&row.r#type).ok()?;
-        if agent_type != AgentType::Nomi {
+        if agent_type != AgentType::OpenHub {
             return None;
         }
         let pm = provider_model_from_conversation_row(&row);
@@ -321,7 +321,7 @@ impl ConversationService {
         // (5) 仅 openhub 自有引擎的普通会话。便宜的早闸(避免无谓加载);真正的强制点
         //     在 `perform_model_failover` 的 ACP 边界闸(review #9),send-loop 与 IDMM
         //     共用那一处。
-        if agent_type != AgentType::Nomi {
+        if agent_type != AgentType::OpenHub {
             return None;
         }
         // (1) provider 故障的终态错误。

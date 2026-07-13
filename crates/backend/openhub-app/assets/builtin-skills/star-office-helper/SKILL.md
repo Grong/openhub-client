@@ -1,11 +1,11 @@
 ---
 name: star-office-helper
-description: Install, start, connect, and troubleshoot visualization companion projects for Nomi/OpenClaw, with Star-Office-UI as the default recommendation. Use when users ask for Star Office setup, URL/port connection, Unauthorized page diagnosis, Python venv/pip issues (PEP 668), preview panel wiring, real-time monitor wake-up checks, or similar open-source visualizer alternatives.
+description: Install, start, connect, and troubleshoot visualization companion projects for OpenHub/OpenClaw, with Star-Office-UI as the default recommendation. Use when users ask for Star Office setup, URL/port connection, Unauthorized page diagnosis, Python venv/pip issues (PEP 668), preview panel wiring, real-time monitor wake-up checks, or similar open-source visualizer alternatives.
 ---
 
 # Star Office Helper
 
-Guide users from zero to usable visualization integration in Nomi. Prefer Star-Office-UI first, then provide alternatives only when requested or when Star Office does not fit.
+Guide users from zero to usable visualization integration in OpenHub. Prefer Star-Office-UI first, then provide alternatives only when requested or when Star Office does not fit.
 
 ## What is Star Office
 
@@ -46,7 +46,7 @@ When Star Office is **not detected**:
 1. Confirm objective:
 
 - Install and run a visualization companion locally (default: Star-Office-UI).
-- Connect Nomi preview/monitor URL to a running visualizer service.
+- Connect OpenHub preview/monitor URL to a running visualizer service.
 - Diagnose why UI does not animate or shows `Unauthorized`.
 
 2. Run environment diagnosis first:
@@ -65,7 +65,7 @@ When Star Office is **not detected**:
 - Confirm preview URL (default recommend `http://127.0.0.1:19000`).
 - Re-run doctor to verify port and HTTP response.
 
-5. Connect in Nomi:
+5. Connect in OpenHub:
 
 - Open OpenClaw mode preview panel (TV icon).
 - Input URL and save.
@@ -86,7 +86,7 @@ When Star Office is **not detected**:
 
 When the user triggers one-stop install/repair (e.g. via the TV icon), follow these rules:
 
-- Star Office UI is a THIRD-PARTY local project. It is NOT built-in to Nomi/OpenClaw and NOT a required core service.
+- Star Office UI is a THIRD-PARTY local project. It is NOT built-in to OpenHub/OpenClaw and NOT a required core service.
 - If launched from a clearly labeled install/repair UI, the user has already
   consented to automated install/repair actions. In all other chat flows, ask
   for explicit confirmation before cloning, installing dependencies, starting
@@ -104,8 +104,8 @@ When the user triggers one-stop install/repair (e.g. via the TV icon), follow th
   3. Process command/path clearly points to Star-Office-UI repo/backend.
 - If strict signals are absent, report Star Office as not running/uninstalled; do not claim residual runtime based only on generic Python workers.
 - Do NOT treat generic `python`/`python3` processes as Star Office residuals unless their command/path explicitly references Star-Office-UI or its backend app.
-- Do NOT claim "openclaw-gateway/Nomi auto-restarts Star Office app.py" unless you have explicit evidence from process parent chain, Nomi config, or logs in this session.
-- Never claim Star Office is "built-in", "bound to Nomi", or "cannot be independently uninstalled" without explicit product evidence from this repo.
+- Do NOT claim "openclaw-gateway/OpenHub auto-restarts Star Office app.py" unless you have explicit evidence from process parent chain, OpenHub config, or logs in this session.
+- Never claim Star Office is "built-in", "bound to OpenHub", or "cannot be independently uninstalled" without explicit product evidence from this repo.
 
 ### Install Workflow
 
@@ -166,7 +166,7 @@ bash skills/star-office-helper/scripts/star_office_uninstall.sh /path/to/Star-Of
   - `Unauthorized` root causes
   - wrong port (`18791` vs `19000`)
   - why "connected but not moving"
-  - Nomi preview URL mapping checklist
+  - OpenHub preview URL mapping checklist
 - Read `references/discovery.md` for:
   - how to find similar visualization open-source projects
   - filtering rules for mechanism compatibility

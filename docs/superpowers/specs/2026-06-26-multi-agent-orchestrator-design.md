@@ -25,7 +25,7 @@
 - README、归档的阶段文档、`agents_version='1.0.1'`、过时命令、gateway 显式禁止 `openhub_team_*` 出现在任何 surface——都标志它早于本引擎的意图。
 
 ### 1.3 可复用的现有资产（站在巨人肩上）
-- **5 个可插拔 agent 引擎**：`AgentType` 枚举（Acp / Nomi / OpenclawGateway / Nanobot / Remote）→ 单一工厂 `build_agent` → `AgentInstance` 枚举。新增引擎 = 新枚举分支 + 新工厂分支。
+- **5 个可插拔 agent 引擎**：`AgentType` 枚举（Acp / OpenHub / OpenclawGateway / Nanobot / Remote）→ 单一工厂 `build_agent` → `AgentInstance` 枚举。新增引擎 = 新枚举分支 + 新工厂分支。
 - **`AgentRegistry`**：`agent_metadata` 表水化成内存目录，是「哪个 agent 能做什么」的现成查询（`team_capable`、`BehaviorPolicy`、handshake `agent_capabilities` 含 image/audio/mcp）。
 - **`ProviderWithModel { provider_id, model, use_model }`**：解耦引擎与凭证/模型——任意子 agent 可被赋予任意 provider/model。
 - **`AgentStreamEvent` 广播 + `StreamRelay`**：与 agent 类型无关的通用事件扇出（WS + DB 持久化 + 续写/failover）。
@@ -33,7 +33,7 @@
 - **Gateway 能力内核**（`openhub-gateway`）：单一能力 Registry（~132 工具，DangerTier×Surface 权限矩阵），`openhub_agent_run`/`openhub_agent_result` **已实现** fire-and-poll 委派（生成一个自主 openhub 子会话、流式回传进度）；`openhub_create_conversation`+`openhub_send_to_conversation`+`openhub_conversation_status` 让「主管」可创建/驱动/观察子会话。Remote 前门 + per-companion 令牌已就位。
 - **会话引擎**（`openhub-conversation`）：`ConversationService`（串行 TurnClaim，每会话至多一个活回合）、`IWorkerTaskManager`（每会话一个 `AgentInstance`，`Arc<OnceCell>` 语义）、steering inbox、协作式取消。
 - **DB/接线规范**：仓库模式（`I*Repository`+`Sqlite*Repository`）、迁移 append-only（最新 017）、设备边界 ID 规则、ts-rs `#[ts(type="number")]` 防 bigint、realtime（`EventBroadcaster`+`WebSocketManager`+域 `*EventEmitter`）。模板 = `openhub-webhook` / `openhub-cron`。
-- **前端**：`ChatLayout`（三栏壳）、`ContentSider`、`MessageList`+流式 store、`useNomiMessage` 订阅、`MessageToolGroupSummary`/`MessageText`/`MermaidBlock`、`NomiModal`、`AssistantTagFilterBar`（chip 筛选）、`ContextUsagePill`、CSS 变量主题、`react-flow`（无限画布调研选型）。
+- **前端**：`ChatLayout`（三栏壳）、`ContentSider`、`MessageList`+流式 store、`useOpenHubMessage` 订阅、`MessageToolGroupSummary`/`MessageText`/`MermaidBlock`、`OpenHubModal`、`AssistantTagFilterBar`（chip 筛选）、`ContextUsagePill`、CSS 变量主题、`react-flow`（无限画布调研选型）。
 
 ### 1.4 核心缺口（本引擎要新建的东西）
 - **没有任何任务路由层**：能力元数据只描述 agent「能做什么」，没有把任务对 agent/模型能力打分并自动选择的机制。当前引擎+backend+模型由人在建会话时手选。
@@ -113,7 +113,7 @@ draft ─▶ planning ─▶ awaiting_plan_approval(协同) ─▶ running ⇄ p
 orchestrator **直接驱动会话并消费其事件流**，而非 team 的散文转述 mailbox 唤醒。任务间通过**结构化产物传递**（上游 task 的 `output_summary` + 产物文件路径注入下游 task 的输入），而非自由文本广播。
 
 ### 4.4 主管 Agent 与执行哲学
-主管是一个 **Nomi 引擎 agent**，被授予一套**编排工具集**（gateway 新域 `caps_orchestrator`，见 §8）。回合流程：
+主管是一个 **OpenHub 引擎 agent**，被授予一套**编排工具集**（gateway 新域 `caps_orchestrator`，见 §8）。回合流程：
 1. **规划**：拆目标为 RunTask DAG（结构化计划，工具 `openhub_run_plan` 写入 tasks+deps）。
 2. **分派**：每任务由 Router（§6）提名成员；主管可接受或调整。
 3. **调度**：调度器把就绪任务**真并行**跑在 worker 上（受编队/Run 并发上限约束）。
@@ -303,7 +303,7 @@ CREATE TABLE orch_assignments (
 
 **收编遗留 `openhub_agent_run`**：把单发委派语义并入 Run 模型（一个单任务 Run 即等价于旧 `openhub_agent_run`），逐步弃用旧工具（与 team 移除同期）。
 
-主管的规划/分派工具即住此域——主管作为一个挂了 `caps_orchestrator` + desktopGateway 的 Nomi 会话，通过这些工具操作 Run 状态，调度器观察状态变化并执行。
+主管的规划/分派工具即住此域——主管作为一个挂了 `caps_orchestrator` + desktopGateway 的 OpenHub 会话，通过这些工具操作 Run 状态，调度器观察状态变化并执行。
 
 ---
 

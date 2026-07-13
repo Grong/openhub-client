@@ -125,18 +125,18 @@ fn resolve_webui_spa_dir(app: &tauri::App) -> Option<PathBuf> {
 
 /// Data root resolution, in priority order:
 ///
-/// 1. `OPENHUB_DATA_DIR` env — explicit override; the shell appends `/Nomi`
+/// 1. `OPENHUB_DATA_DIR` env — explicit override; the shell appends `/OpenHub`
 ///    (semantics unchanged since the Electron era).
 /// 2. The shared per-host default from `openhub_app::cli::default_data_dir()`:
-///    `%LOCALAPPDATA%\OpenHub\Nomi` on Windows, `~/Library/Application
-///    Support/OpenHub/Nomi` on macOS, `$XDG_DATA_HOME/OpenHub/Nomi` on Linux,
-///    with the historic `<system temp>/openhub-data/Nomi` as the extreme
+///    `%LOCALAPPDATA%\OpenHub\OpenHub` on Windows, `~/Library/Application
+///    Support/OpenHub/OpenHub` on macOS, `$XDG_DATA_HOME/OpenHub/OpenHub` on Linux,
+///    with the historic `<system temp>/openhub-data/OpenHub` as the extreme
 ///    fallback (installs that used to land there are auto-relocated, see
 ///    `relocate.rs`). The web host and the `nomicore` bin resolve to the SAME
 ///    directory, so dev loops and the installed app share one state.
 fn default_data_dir() -> PathBuf {
     if let Some(dir) = std::env::var_os("OPENHUB_DATA_DIR") {
-        return PathBuf::from(dir).join("Nomi");
+        return PathBuf::from(dir).join("OpenHub");
     }
     openhub_app::cli::default_data_dir()
 }
@@ -534,14 +534,14 @@ fn main() -> std::process::ExitCode {
     let mut cli = openhub_app::cli::Cli::parse_from(["openhub-desktop"]);
     cli.data_dir = data_dir;
     // Opt-in verbose backend logging without a custom build, e.g.
-    //   NOMI_LOG_LEVEL=debug            (everything)
-    //   NOMI_LOG_LEVEL=info             (default)
+    //   OPENHUB_LOG_LEVEL=debug            (everything)
+    //   OPENHUB_LOG_LEVEL=info             (default)
     // At `debug`, the `openhub_providers` target logs the outgoing request body and
     // each SSE chunk, and `openhub_mcp` logs MCP connect results — exactly what is
     // needed to diagnose a provider/gateway stall. Console output appears in the
     // terminal that launched `tauri dev`; it is also written to the log files
     // under {data-dir}/logs/.
-    if let Ok(level) = std::env::var("NOMI_LOG_LEVEL") {
+    if let Ok(level) = std::env::var("OPENHUB_LOG_LEVEL") {
         let level = level.trim();
         if !level.is_empty() {
             cli.log_level = Some(level.to_owned());

@@ -4,7 +4,7 @@
 
 **Goal:** 让被"硬绑定"功能（伙伴/智能决策/智能编排）使用的模型供应商无法被误删，普通会话在供应商丢失时优雅回退不再崩，且任何残留报错以可操作文案展示而非裸 `prov_xxx`。
 
-**Architecture:** 三层。(A) app 层聚合各子系统的 in-use 扫描，删除前拦截并返回结构化 409；(B) Nomi 工厂送出时对丢失供应商回退到首个可用（后端不崩），前端在会话加载时把会话模型自愈为用户默认并轻提示；(C) 无可用模型的终态错误带专用 code，前端按 code→i18n 展示。
+**Architecture:** 三层。(A) app 层聚合各子系统的 in-use 扫描，删除前拦截并返回结构化 409；(B) OpenHub 工厂送出时对丢失供应商回退到首个可用（后端不崩），前端在会话加载时把会话模型自愈为用户默认并轻提示；(C) 无可用模型的终态错误带专用 code，前端按 code→i18n 展示。
 
 **Tech Stack:** Rust（axum + sqlx + async-trait + tokio-test），前端 React + TypeScript + Arco Design + i18next + bun:test。
 
@@ -755,7 +755,7 @@ git -c user.nameopenhubcommit -m "feat(app): aggregate provider-in-use guard + f
 
 ---
 
-### Task 7: Nomi 送出时供应商回退（openhub-ai-agent）
+### Task 7: OpenHub 送出时供应商回退（openhub-ai-agent）
 
 **Files:**
 - Modify: `crates/backend/openhub-ai-agent/src/factory/provider_config.rs`（新 helper + 测试）
@@ -865,7 +865,7 @@ pub(crate) async fn resolve_provider_fields_with_fallback(
     ).await?;
 ```
 
-`model_id` 在回退时不再等于 `fields.model`；后续 `NomiResolvedConfig { model: model_id, .. }`（openhub.rs:416）应改用解析后的模型，避免用到已删模型名：把该行改为 `model: fields.model.clone(),`（`ResolvedProviderFields.model` 已是最终解析模型）。
+`model_id` 在回退时不再等于 `fields.model`；后续 `OpenHubResolvedConfig { model: model_id, .. }`（openhub.rs:416）应改用解析后的模型，避免用到已删模型名：把该行改为 `model: fields.model.clone(),`（`ResolvedProviderFields.model` 已是最终解析模型）。
 
 - [ ] **Step 5: 运行确认通过 + crate 编译**
 
@@ -1274,7 +1274,7 @@ Expected: 4 测试 PASS。
 
 - [ ] **Step 5: 接入自愈 effect**
 
-`ChatConversation.tsx`（已含 `onSelectModel`、`ipcBridge.conversation.update`、`saveNomiDefaultModel`、`useModelProviderList`/`getAvailableModels`；`Message` from arco、`configService`、`useTranslation`）新增 effect（放在 `onSelectModel`/`modelSelection` 定义之后）：
+`ChatConversation.tsx`（已含 `onSelectModel`、`ipcBridge.conversation.update`、`saveOpenHubDefaultModel`、`useModelProviderList`/`getAvailableModels`；`Message` from arco、`configService`、`useTranslation`）新增 effect（放在 `onSelectModel`/`modelSelection` 定义之后）：
 
 ```tsx
   const { providers: healProviders, getAvailableModels: healGetAvailable } = useModelProviderList();
@@ -1292,7 +1292,7 @@ Expected: 4 测试 PASS。
       const selected = { ...heal.provider, use_model: heal.use_model } as TProviderWithModel;
       const ok = await ipcBridge.conversation.update.invoke({ id: conversation.id, updates: { model: selected } });
       if (ok) {
-        void saveNomiDefaultModel(heal.provider.id, heal.use_model);
+        void saveOpenHubDefaultModel(heal.provider.id, heal.use_model);
         Message.info(t('conversation.chat.modelHealedToDefault', { model: heal.use_model }));
       }
     })();

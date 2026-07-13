@@ -9,7 +9,7 @@
 //!    (`~/.cargo/bin/nomicore` → `target/debug/nomicore`) and
 //!    `std::env::current_exe().parent()` would resolve to the symlink's
 //!    directory, not the real binary's, missing the `assets/` sibling.
-//! 2. Prod: `Nomi/scripts/prepareOpenhubBackend.js` only copies the
+//! 2. Prod: `OpenHub/scripts/prepareOpenhubBackend.js` only copies the
 //!    binary from GitHub releases — the `assets/` directory never shipped.
 //!
 //! Embedding avoids both. E2E tests that want to inject a custom fixture

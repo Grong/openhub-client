@@ -21,7 +21,7 @@ native CDP engine. ACP/Codex-style sessions can reach the same engine through
 the `mcp-browser-stdio` bridge.
 
 Computer use is desktop-oriented. It can observe the screen and synthesize
-input, so it is compiled into desktop/Nomi CLI builds but omitted from the
+input, so it is compiled into desktop/OpenHub CLI builds but omitted from the
 headless web/server build.
 
 ## Enabling And Disabling Capabilities
@@ -54,10 +54,10 @@ OPENHUB_COMPUTER_USE=1
 OPENHUB_BROWSER_USE=1
 ```
 
-These set default availability for Nomi-engine sessions in the host where they
+These set default availability for OpenHub-engine sessions in the host where they
 are read. They do not bypass build-time feature gates.
 
-### Nomi Engine Config
+### OpenHub Engine Config
 
 `~/.openhub/config.toml` or project `.openhub/config.toml`:
 

@@ -8,7 +8,7 @@
 //!
 //! Tool calls are forwarded as authenticated HTTP POSTs to the in-process
 //! `RequirementMcpServer` running in the main backend process at
-//! `http://127.0.0.1:{NOMI_REQ_MCP_PORT}/tool`. This stdio→HTTP hop exists
+//! `http://127.0.0.1:{OPENHUB_REQ_MCP_PORT}/tool`. This stdio→HTTP hop exists
 //! because the spawned process cannot share the main process's
 //! `RequirementService`, and because claude / codex / gemini advertise
 //! stdio-only MCP capabilities (a direct HTTP MCP server would be dropped by

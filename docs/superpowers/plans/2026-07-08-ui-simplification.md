@@ -38,7 +38,7 @@
 // 删除以下导入:
 // SiderAssetLibraryEntry,
 // SiderAssistantSkillsEntry,
-// SiderNomiEntry,
+// SiderOpenHubEntry,
 // SiderOpenCapabilitiesEntry,
 // SiderPublicServiceEntry,
 // SiderRequirementsEntry,
@@ -50,7 +50,7 @@
 ```tsx
 // 删除以下 handler:
 // handleScheduledClick, handleRequirementsClick, handleAssetLibraryClick,
-// handleNomiClick, handleWorkshopClick, handlePublicServiceClick,
+// handleOpenHubClick, handleWorkshopClick, handlePublicServiceClick,
 // handleAssistantSkillsClick, handleMcpClick, handleOpenCapabilitiesClick
 ```
 
@@ -142,7 +142,7 @@ const isSessionRoute =
 git add ui/src/renderer/components/layout/Sider/index.tsx
 git commit -m "feat: simplify sidebar from 13 entries to 5 core entries
 
-Remove: Nomi, Workshop, PublicService, AssetLibrary, Scheduled,
+Remove: OpenHub, Workshop, PublicService, AssetLibrary, Scheduled,
 Requirements, AssistantSkills, MCP, OpenCapabilities from sidebar.
 Add: Plugin entry (unified MCP+Skill+Extension).
 Keep: Conversation, Knowledge, ModelHub, Settings.
@@ -695,7 +695,7 @@ const CompanionStep: React.FC<CompanionStepProps> = ({ onNext }) => {
       </div>
       <Typography.Title heading={4}>
         {t('onboarding.companion.title', {
-          defaultValue: '你好，我是 Nomi（诺米）',
+          defaultValue: '你好，我是 OpenHub（诺米）',
         })}
       </Typography.Title>
       <Typography.Text type="secondary">

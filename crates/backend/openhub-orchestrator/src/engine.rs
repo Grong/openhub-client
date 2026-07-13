@@ -87,7 +87,7 @@ impl ConversationCanceller for NoopConversationCanceller {
 /// the supervisor can nudge a running task without restarting it. The app injects
 /// an implementation wrapping
 /// [`ConversationService::steer_message`](openhub_conversation::ConversationService::steer_message)
-/// (Nomi-only mid-turn injection; falls back to a fresh send when no live turn
+/// (OpenHub-only mid-turn injection; falls back to a fresh send when no live turn
 /// exists). Defined as a trait (not a bare `Fn`) so the impl can be `async` and
 /// the orchestrator crate stays free of a `openhub-conversation` dependency (the
 /// wiring lives in `build_orchestrator_state`, exactly like
@@ -95,7 +95,7 @@ impl ConversationCanceller for NoopConversationCanceller {
 #[async_trait]
 pub trait ConversationSteerer: Send + Sync {
     /// Inject `text` into the conversation identified by `conversation_id`.
-    /// Returns an error when the injection cannot be performed (e.g. a non-Nomi
+    /// Returns an error when the injection cannot be performed (e.g. a non-OpenHub
     /// engine that does not support steering); the engine maps that to a 400.
     async fn steer(&self, conversation_id: i64, text: &str) -> Result<(), AppError>;
 }
@@ -783,7 +783,7 @@ impl RunEngine {
     /// - run / task not found → `NotFound` (404);
     /// - task not in `run_id` → `NotFound` (404);
     /// - task has no `conversation_id` (never dispatched) → `BadRequest` (400);
-    /// - a non-Nomi engine that cannot steer → the steerer's `BadRequest` (400).
+    /// - a non-OpenHub engine that cannot steer → the steerer's `BadRequest` (400).
     pub async fn steer_task(
         &self,
         run_id: &str,
@@ -7725,7 +7725,7 @@ mod tests {
     /// Records the conversation ids it was asked to steer (P3b steer test).
     struct RecordingSteerer {
         steered: Arc<Mutex<Vec<(i64, String)>>>,
-        /// When true, `steer` errors (simulates a non-Nomi engine that cannot steer).
+        /// When true, `steer` errors (simulates a non-OpenHub engine that cannot steer).
         fail: bool,
     }
     impl RecordingSteerer {

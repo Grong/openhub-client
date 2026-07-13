@@ -1,25 +1,25 @@
 import { describe, expect, test } from 'bun:test';
 
 import {
-  initialNomiTurnState,
+  initialOpenHubTurnState,
   isTurnRunning,
   nomiTurnReducer,
-  type NomiTurnEvent,
-  type NomiTurnState,
+  type OpenHubTurnEvent,
+  type OpenHubTurnState,
 } from './openhubTurnState';
 
 /** Fold a sequence of events over the initial state. */
-function run(events: NomiTurnEvent[], from: NomiTurnState = initialNomiTurnState): NomiTurnState {
+function run(events: OpenHubTurnEvent[], from: OpenHubTurnState = initialOpenHubTurnState): OpenHubTurnState {
   return events.reduce(nomiTurnReducer, from);
 }
 
 describe('nomiTurnReducer — basic transitions', () => {
   test('initial state is idle', () => {
-    expect(isTurnRunning(initialNomiTurnState)).toBe(false);
+    expect(isTurnRunning(initialOpenHubTurnState)).toBe(false);
   });
 
   test('activity raises streamRunning without touching waiting', () => {
-    const s = nomiTurnReducer({ ...initialNomiTurnState, waitingResponse: true }, { type: 'activity' });
+    const s = nomiTurnReducer({ ...initialOpenHubTurnState, waitingResponse: true }, { type: 'activity' });
     expect(s.streamRunning).toBe(true);
     expect(s.waitingResponse).toBe(true);
   });
@@ -32,7 +32,7 @@ describe('nomiTurnReducer — basic transitions', () => {
   });
 
   test('setWaiting toggles only waitingResponse', () => {
-    const on = nomiTurnReducer(initialNomiTurnState, { type: 'setWaiting', value: true });
+    const on = nomiTurnReducer(initialOpenHubTurnState, { type: 'setWaiting', value: true });
     expect(on).toEqual({ streamRunning: false, hasActiveTools: false, waitingResponse: true });
     const off = nomiTurnReducer(on, { type: 'setWaiting', value: false });
     expect(off.waitingResponse).toBe(false);
@@ -41,7 +41,7 @@ describe('nomiTurnReducer — basic transitions', () => {
 
 describe('nomiTurnReducer — tool groups', () => {
   test('active tools mark the turn running', () => {
-    const s = nomiTurnReducer(initialNomiTurnState, { type: 'toolGroup', hasActive: true, hasAny: true });
+    const s = nomiTurnReducer(initialOpenHubTurnState, { type: 'toolGroup', hasActive: true, hasAny: true });
     expect(s.hasActiveTools).toBe(true);
     expect(s.streamRunning).toBe(true);
     expect(isTurnRunning(s)).toBe(true);
@@ -73,7 +73,7 @@ describe('nomiTurnReducer — terminal events clear ALL activity (stuck-spinner 
     const mid = run([{ type: 'toolGroup', hasActive: true, hasAny: true }]);
     expect(mid.hasActiveTools).toBe(true);
     const done = nomiTurnReducer(mid, { type: 'finish' });
-    expect(done).toEqual(initialNomiTurnState);
+    expect(done).toEqual(initialOpenHubTurnState);
     expect(isTurnRunning(done)).toBe(false);
   });
 
@@ -98,20 +98,20 @@ describe('nomiTurnReducer — auto-recover after a premature finish', () => {
 
 describe('nomiTurnReducer — hydrate is raise-only', () => {
   test('hydrate(true) raises running', () => {
-    const s = nomiTurnReducer(initialNomiTurnState, { type: 'hydrate', isRunning: true });
+    const s = nomiTurnReducer(initialOpenHubTurnState, { type: 'hydrate', isRunning: true });
     expect(isTurnRunning(s)).toBe(true);
   });
 
   test('hydrate(false) does NOT lower a locally-raised waiting flag', () => {
     // A send raised waitingResponse before the stale is_processing=false query
     // resolved; hydrate must not clobber it.
-    const local = nomiTurnReducer(initialNomiTurnState, { type: 'setWaiting', value: true });
+    const local = nomiTurnReducer(initialOpenHubTurnState, { type: 'setWaiting', value: true });
     const s = nomiTurnReducer(local, { type: 'hydrate', isRunning: false });
     expect(s.waitingResponse).toBe(true);
   });
 
   test('hydrate(false) on a fresh state stays idle', () => {
-    const s = nomiTurnReducer(initialNomiTurnState, { type: 'hydrate', isRunning: false });
+    const s = nomiTurnReducer(initialOpenHubTurnState, { type: 'hydrate', isRunning: false });
     expect(isTurnRunning(s)).toBe(false);
   });
 
@@ -131,13 +131,13 @@ describe('nomiTurnReducer — reset', () => {
     ]);
     expect(isTurnRunning(busy)).toBe(true);
     const s = nomiTurnReducer(busy, { type: 'reset' });
-    expect(s).toEqual(initialNomiTurnState);
+    expect(s).toEqual(initialOpenHubTurnState);
   });
 });
 
 describe('nomiTurnReducer — a representative full turn', () => {
   test('send → start → content → tool active → tool done → content → finish', () => {
-    let s = initialNomiTurnState;
+    let s = initialOpenHubTurnState;
     s = nomiTurnReducer(s, { type: 'setWaiting', value: true }); // send
     expect(isTurnRunning(s)).toBe(true);
     s = nomiTurnReducer(s, { type: 'activity' }); // start

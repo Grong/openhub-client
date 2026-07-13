@@ -1,6 +1,6 @@
 //! Phase 3 模型故障转移队列(spec §5.5)的纯逻辑层 + 配置读写。
 //!
-//! 故障转移**只能**在会话服务层(send loop)做:`NomiAgentManager` 不保留重建
+//! 故障转移**只能**在会话服务层(send loop)做:`OpenHubAgentManager` 不保留重建
 //! 输入、engine 也无法原地换 provider,所以"换模型"等于改 `conversation.model` +
 //! 杀任务、下次 send 重建。本模块只承担两件无副作用/低副作用的事:
 //!

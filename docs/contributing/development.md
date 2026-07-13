@@ -118,9 +118,9 @@ prints a table to stdout.
 
 All hosts share the same unset default data directory:
 
-- Windows: `%LOCALAPPDATA%\OpenHub\Nomi`
-- macOS: `~/Library/Application Support/OpenHub/Nomi`
-- Linux: `$XDG_DATA_HOME/OpenHub/Nomi` or `~/.local/share/OpenHub/Nomi`
+- Windows: `%LOCALAPPDATA%\OpenHub\OpenHub`
+- macOS: `~/Library/Application Support/OpenHub/OpenHub`
+- Linux: `$XDG_DATA_HOME/OpenHub/OpenHub` or `~/.local/share/OpenHub/OpenHub`
 
 The data dir contains SQLite state, logs, Bun runtime cache, extension data,
 agent state, and other persistent local state. The backend takes an exclusive
@@ -134,7 +134,7 @@ OPENHUB_DATA_DIR=/tmp/openhub-dev bun run serve:web
 OPENHUB_DATA_DIR=/tmp/openhub-dev bun run dev
 ```
 
-Desktop app semantics append the channel-specific `Nomi` leaf; web and
+Desktop app semantics append the channel-specific `OpenHub` leaf; web and
 `nomicore` take the env value literally. See
 [`../reference/configuration.md`](../reference/configuration.md) before relying
 on this in automation.

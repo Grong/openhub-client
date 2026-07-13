@@ -1,13 +1,13 @@
 # 应用内终端
 
-Nomi 在应用内附带了一个真正的终端。每个终端都是一个由后端管理的
+OpenHub 在应用内附带了一个真正的终端。每个终端都是一个由后端管理的
 PTY 会话，你可以从浏览器/桌面窗口中以交互方式驱动它 —— 当你把它
 绑定到一个 tag 上时，AutoWork 也可以代你来驱动它。
 
 > 需要自动化指南？参见 [AutoWork & Requirements](./autowork-requirements.md)。
 > 需要按计划运行 agent？参见 [定时任务](./scheduled-tasks.zh.md)。
 
-![Nomi 应用内终端](../images/terminal-01-session.png)
+![OpenHub 应用内终端](../images/terminal-01-session.png)
 
 ## 应用内终端是什么
 

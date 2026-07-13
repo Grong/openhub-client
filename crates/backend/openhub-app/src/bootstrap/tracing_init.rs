@@ -13,7 +13,7 @@ use tracing_subscriber::{EnvFilter, Layer, fmt, layer::SubscriberExt, util::Subs
 
 const NOISE_SUPPRESSIONS: &[&str] = &["sqlx::query=warn", "hyper_util=warn", "reqwest=warn"];
 
-const NOMI_TARGETS: &[&str] = &[
+const OPENHUB_TARGETS: &[&str] = &[
     "openhub_agent",
     "openhub_config",
     "openhub_compact",
@@ -34,7 +34,7 @@ fn build_env_filter(log_level: Option<&str>) -> EnvFilter {
 fn build_backend_filter(log_level: Option<&str>) -> EnvFilter {
     let user_directives = log_level.unwrap_or("info");
     let suppressions = NOISE_SUPPRESSIONS.join(",");
-    let openhub_off: String = NOMI_TARGETS
+    let openhub_off: String = OPENHUB_TARGETS
         .iter()
         .map(|t| format!("{t}=off"))
         .collect::<Vec<_>>()
@@ -68,10 +68,10 @@ pub fn init_tracing(log_dir: &Path, log_level: Option<&str>) -> LogGuards {
         .with_target(true)
         .with_filter(build_backend_filter(log_level));
 
-    // Nomi file layer — only openhub_* targets
+    // OpenHub file layer — only openhub_* targets
     let openhub_level = {
         let level = log_level.unwrap_or("info");
-        NOMI_TARGETS
+        OPENHUB_TARGETS
             .iter()
             .map(|t| format!("{t}={level}"))
             .collect::<Vec<_>>()

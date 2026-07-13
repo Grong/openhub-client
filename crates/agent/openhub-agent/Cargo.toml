@@ -1,6 +1,6 @@
 [package]
 name = "openhub-agent"
-description = "Agent engine, session management, output sinks, and orchestration for Nomi"
+description = "Agent engine, session management, output sinks, and orchestration for OpenHub"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

@@ -147,11 +147,11 @@
 
 ---
 
-### Task F3: 会话域 `OrchestrationProvider` + 接入 NomiConversationPanel
+### Task F3: 会话域 `OrchestrationProvider` + 接入 OpenHubConversationPanel
 
 **Files:**
 - Create: `ui/src/renderer/pages/conversation/orchestration/OrchestrationContext.tsx`(provider + `useOrchestration()` hook)
-- Modify: `ui/src/renderer/pages/conversation/components/ChatConversation.tsx`(`NomiConversationPanel` `:140-201` 外包 `OrchestrationProvider`,传入 `conversation`)
+- Modify: `ui/src/renderer/pages/conversation/components/ChatConversation.tsx`(`OpenHubConversationPanel` `:140-201` 外包 `OrchestrationProvider`,传入 `conversation`)
 - Test: `npm run typecheck` 0 新错
 
 **Interfaces:**
@@ -179,7 +179,7 @@
 - `projectTask` 存 `payload.task.id` + 缓存 payload(供内容区解析 conversation_id);换 run / `returnToMain` 重置 `projectedTaskId=null`。**默认 `projectedTaskId=null`(即 main)、`canvasOpen=false`。**
 
 - [ ] 实现 context（state：projectedTaskId / canvasOpen；接 useConversationRun）。
-- [ ] `NomiConversationPanel` 外层包 `OrchestrationProvider`（仅 openhub 会话）。
+- [ ] `OpenHubConversationPanel` 外层包 `OrchestrationProvider`（仅 openhub 会话）。
 - [ ] `npm run typecheck` = 0 新错。
 - [ ] 提交 `feat(conversation/ui): 会话域 OrchestrationProvider(run/投射/画布状态)`。
 
@@ -227,7 +227,7 @@
 
 **Files:**
 - Create: `ui/src/renderer/pages/conversation/orchestration/OrchestrationCanvasOverlay.tsx` + `.module.css`
-- Modify: `ui/src/renderer/pages/conversation/components/ChatConversation.tsx`(`NomiConversationPanel` 内挂 overlay,受 `canvasOpen` 控制)
+- Modify: `ui/src/renderer/pages/conversation/components/ChatConversation.tsx`(`OpenHubConversationPanel` 内挂 overlay,受 `canvasOpen` 控制)
 - Test: `npm run typecheck` 0 新错 + 手测
 
 **Interfaces:**
@@ -250,7 +250,7 @@
 **Files:**
 - Create: `ui/src/renderer/pages/conversation/orchestration/ConversationContentSwitcher.tsx`
 - Create: `ui/src/renderer/pages/conversation/orchestration/ProjectedWorkerView.tsx`(解析 conversation_id + ReadOnlyConversationView + banner)
-- Modify: `ui/src/renderer/pages/conversation/components/ChatConversation.tsx`(`NomiConversationPanel` 的内容 children 包一层 switcher)
+- Modify: `ui/src/renderer/pages/conversation/components/ChatConversation.tsx`(`OpenHubConversationPanel` 的内容 children 包一层 switcher)
 - Test: `npm run typecheck` 0 新错 + 手测
 
 **Interfaces:**
@@ -261,7 +261,7 @@
 - **默认 main**:`projectedTaskId===null` → 只见 `OpenHubChat`。
 
 - [ ] 实现 switcher + ProjectedWorkerView(OpenHubChat 常挂、worker 只读覆盖、banner 三动作)。
-- [ ] NomiConversationPanel 内容包 switcher;`OpenHubChat` 仍在同一 PreviewProvider/Conversation 作用域内。
+- [ ] OpenHubConversationPanel 内容包 switcher;`OpenHubChat` 仍在同一 PreviewProvider/Conversation 作用域内。
 - [ ] `npm run typecheck` = 0 新错;手测:点节点 → 内容区变 worker 只读 + banner;返回 main → 复原且主会话状态保留。
 - [ ] 提交 `feat(conversation/ui): 内容区投射(默认 main / worker 只读 / 返回)`。
 
@@ -270,7 +270,7 @@
 ### Task F8: 会话头部「agent 画布」入口 pill
 
 **Files:**
-- Modify: `ui/src/renderer/pages/conversation/components/ChatConversation.tsx`(`NomiConversationPanel` 组 `headerExtra`:run 存在时插入入口 pill)
+- Modify: `ui/src/renderer/pages/conversation/components/ChatConversation.tsx`(`OpenHubConversationPanel` 组 `headerExtra`:run 存在时插入入口 pill)
 - Create(可选): `ui/src/renderer/pages/conversation/orchestration/CanvasEntryPill.tsx`
 - Test: `npm run typecheck` 0 新错 + 手测
 
@@ -278,7 +278,7 @@
 - Consumes:`useOrchestration()`(`runId`/`detail.run.status`/`openCanvas`/`leadThinking.active`)、`STATUS_META`、既有 `ChatLayout` `headerExtra` 槽。
 - Produces:`CanvasEntryPill`:`runId` 存在时渲染一枚 pill「🕸 agent 画布 · <状态>」(`leadThinking.active` 脉冲),点击 `openCanvas()`;无 run 不渲染(头部保持干净)。与既有 `CronJobManager`/能力控件并存于 `headerExtra`。
 
-- [ ] 实现 pill;接入 NomiConversationPanel 的 `headerExtra`(与现有 extra 内容合并,不覆盖)。
+- [ ] 实现 pill;接入 OpenHubConversationPanel 的 `headerExtra`(与现有 extra 内容合并,不覆盖)。
 - [ ] icon-park 具名禁别名;`<div role=button>`/Arco Button;移动端 headerExtra 走既有 portal 逻辑不破。
 - [ ] `npm run typecheck` = 0 新错;手测:有 run 见 pill 点开画布、无 run 不见。
 - [ ] 提交 `feat(conversation/ui): 会话头部 agent 画布入口 pill`。

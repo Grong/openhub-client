@@ -16,7 +16,7 @@
 ## File Structure（移除/回退清单，spec §6）
 - **删文件**：`ui/src/renderer/pages/orchestrator/RunDetail/OrchestrationStatusStrip.tsx`、`RunDetail/DagRailTab.tsx`、`RunDetail/useOrchestrationStatus.ts`、`pages/guid/components/GuidOrchestrationMode.tsx`。
 - **改 `pages/conversation/components/ChatSlider.tsx`**：去掉 orchestration-dag extraTab(+ DagRailTab/leadRunId 引用)。
-- **改 `pages/conversation/components/ChatConversation.tsx`**：去掉 OrchestrationStatusStrip 挂载(NomiConversationPanel)。
+- **改 `pages/conversation/components/ChatConversation.tsx`**：去掉 OrchestrationStatusStrip 挂载(OpenHubConversationPanel)。
 - **改 `pages/guid/hooks/useGuidSend.ts`**：去 lead 标记(orchestrator_role)+model_range 注入;openhub 会话创建回普通(session_mode 用 selectedMode,不强制 yolo)。
 - **改 `pages/guid/components/GuidModelSelector.tsx`** + `hooks/useGuidModelSelection.ts`：回退单选——去 selectionMode/selectedRange/toggleRangeModel/三态 droplist/主管模型(leadLabel/leadHint)/auto/range body,只留单选 Menu。
 - **改 `pages/guid/GuidPage.tsx`**：去 orchestrationModeNode + hideModelSelector/主管模型逻辑;modelSelectorNode 恒渲染单选。

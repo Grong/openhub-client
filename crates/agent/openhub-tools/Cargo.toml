@@ -1,6 +1,6 @@
 [package]
 name = "openhub-tools"
-description = "Built-in agent tools for Nomi (Read, Write, Edit, Bash, Grep, Glob, Spawn)"
+description = "Built-in agent tools for OpenHub (Read, Write, Edit, Bash, Grep, Glob, Spawn)"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

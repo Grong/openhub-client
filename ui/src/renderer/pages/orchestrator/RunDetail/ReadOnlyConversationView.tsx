@@ -9,7 +9,7 @@ import type { IProvider, TChatConversation, TProviderWithModel } from '@/common/
 import { Spin } from '@arco-design/web-react';
 import React, { Suspense, useCallback } from 'react';
 import { useOpenHubModelSelection } from '@/renderer/pages/conversation/platforms/openhub/useOpenHubModelSelection';
-import { saveNomiDefaultModel } from '@/renderer/pages/guid/hooks/agentSelectionUtils';
+import { saveOpenHubDefaultModel } from '@/renderer/pages/guid/hooks/agentSelectionUtils';
 import { PreviewProvider } from '@/renderer/pages/conversation/Preview';
 
 const AcpChat = React.lazy(() => import('@/renderer/pages/conversation/platforms/acp/AcpChat'));
@@ -18,7 +18,7 @@ const OpenClawChat = React.lazy(() => import('@/renderer/pages/conversation/plat
 const NanobotChat = React.lazy(() => import('@/renderer/pages/conversation/platforms/nanobot/NanobotChat'));
 const RemoteChat = React.lazy(() => import('@/renderer/pages/conversation/platforms/remote/RemoteChat'));
 
-// Narrow to Nomi conversations so model field is always available
+// Narrow to OpenHub conversations so model field is always available
 type OpenHubConversation = Extract<TChatConversation, { type: 'openhub' }>;
 
 /**
@@ -36,8 +36,8 @@ export type OrchestratorNodeBinding = {
   applyModelOverride: (providerId: string, model: string) => Promise<void>;
 };
 
-/** Nomi sub-component manages model selection state without adding a ChatLayout wrapper */
-const NomiReadOnlyChat: React.FC<{
+/** OpenHub sub-component manages model selection state without adding a ChatLayout wrapper */
+const OpenHubReadOnlyChat: React.FC<{
   conversation: OpenHubConversation;
   agent_name?: string;
   hideSendBox?: boolean;
@@ -49,7 +49,7 @@ const NomiReadOnlyChat: React.FC<{
       const selected = { ..._provider, use_model: modelName } as TProviderWithModel;
       const ok = await ipcBridge.conversation.update.invoke({ id: conversation.id, updates: { model: selected } });
       if (ok) {
-        void saveNomiDefaultModel(_provider.id, modelName);
+        void saveOpenHubDefaultModel(_provider.id, modelName);
         // Write the model pick THROUGH as this node's override — one pick pins both the
         // live chat model and the node's next-重跑 model. Best-effort: a failure here
         // must not break the live model switch (which already succeeded above).
@@ -57,7 +57,7 @@ const NomiReadOnlyChat: React.FC<{
           try {
             await nodeBinding.applyModelOverride(_provider.id, modelName);
           } catch (e) {
-            console.error('[NomiReadOnlyChat] write-through node override failed:', e);
+            console.error('[OpenHubReadOnlyChat] write-through node override failed:', e);
           }
         }
       }
@@ -142,7 +142,7 @@ const ReadOnlyConversationView: React.FC<ReadOnlyConversationViewProps> = ({
         );
       case 'openhub':
         return (
-          <NomiReadOnlyChat
+          <OpenHubReadOnlyChat
             key={conversation.id}
             conversation={conversation as OpenHubConversation}
             agent_name={agent_name}

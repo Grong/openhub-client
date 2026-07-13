@@ -18,7 +18,7 @@ use tokio::sync::broadcast;
 
 use crate::manager::acp::AcpAgentManager;
 use crate::manager::nanobot::NanobotAgentManager;
-use crate::manager::openhub::NomiAgentManager;
+use crate::manager::openhub::OpenHubAgentManager;
 use crate::manager::openclaw::OpenClawAgentManager;
 use crate::manager::remote::RemoteAgentManager;
 use crate::protocol::events::AgentStreamEvent;
@@ -160,7 +160,7 @@ pub trait IMockAgent: IAgentTask {
 #[derive(Clone)]
 pub enum AgentInstance {
     Acp(Arc<AcpAgentManager>),
-    Nomi(Arc<NomiAgentManager>),
+    OpenHub(Arc<OpenHubAgentManager>),
     OpenClaw(Arc<OpenClawAgentManager>),
     Nanobot(Arc<NanobotAgentManager>),
     Remote(Arc<RemoteAgentManager>),
@@ -182,7 +182,7 @@ impl AgentInstance {
     pub fn as_task(&self) -> &dyn IAgentTask {
         match self {
             Self::Acp(m) => m.as_ref(),
-            Self::Nomi(m) => m.as_ref(),
+            Self::OpenHub(m) => m.as_ref(),
             Self::OpenClaw(m) => m.as_ref(),
             Self::Nanobot(m) => m.as_ref(),
             Self::Remote(m) => m.as_ref(),
@@ -252,7 +252,7 @@ impl AgentInstance {
             Self::Acp(m) => m.kill_and_wait(reason),
             Self::OpenClaw(m) => m.kill_and_wait(reason),
             Self::Nanobot(m) => m.kill_and_wait(reason),
-            Self::Nomi(m) => m.kill_and_wait(reason),
+            Self::OpenHub(m) => m.kill_and_wait(reason),
             Self::Remote(m) => m.kill_and_wait(reason),
             #[cfg(any(test, feature = "test-support"))]
             Self::Mock(_) => Box::pin(std::future::ready(())),
@@ -269,12 +269,12 @@ impl AgentInstance {
     /// Pending confirmation items for this task.
     ///
     /// ACP surfaces pending permission prompts through its permission
-    /// router. Nomi / OpenClaw / Remote maintain inline confirmation lists.
+    /// router. OpenHub / OpenClaw / Remote maintain inline confirmation lists.
     /// Nanobot has no concept of confirmations.
     pub fn get_confirmations(&self) -> Vec<openhub_common::Confirmation> {
         match self {
             Self::Acp(m) => m.get_confirmations(),
-            Self::Nomi(m) => m.get_confirmations(),
+            Self::OpenHub(m) => m.get_confirmations(),
             Self::OpenClaw(m) => m.get_confirmations(),
             Self::Nanobot(_) => Vec::new(),
             Self::Remote(m) => m.get_confirmations(),
@@ -293,7 +293,7 @@ impl AgentInstance {
     ) -> Result<(), AppError> {
         match self {
             Self::Acp(m) => m.confirm(msg_id, call_id, data, always_allow),
-            Self::Nomi(m) => m.confirm(msg_id, call_id, data, always_allow),
+            Self::OpenHub(m) => m.confirm(msg_id, call_id, data, always_allow),
             Self::OpenClaw(m) => m.confirm(msg_id, call_id, data, always_allow),
             Self::Nanobot(m) => m.confirm(msg_id, call_id, data, always_allow),
             Self::Remote(m) => m.confirm(msg_id, call_id, data, always_allow),
@@ -306,7 +306,7 @@ impl AgentInstance {
     pub fn check_approval(&self, action: &str, command_type: Option<&str>) -> bool {
         match self {
             Self::Acp(_) => false,
-            Self::Nomi(m) => m.check_approval(action, command_type),
+            Self::OpenHub(m) => m.check_approval(action, command_type),
             Self::OpenClaw(m) => m.check_approval(action, command_type),
             Self::Nanobot(_) => false,
             Self::Remote(m) => m.check_approval(action, command_type),
@@ -319,19 +319,19 @@ impl AgentInstance {
     pub fn get_session_key(&self) -> Option<String> {
         match self {
             Self::OpenClaw(m) => m.get_session_key(),
-            Self::Acp(_) | Self::Nomi(_) | Self::Nanobot(_) | Self::Remote(_) => None,
+            Self::Acp(_) | Self::OpenHub(_) | Self::Nanobot(_) | Self::Remote(_) => None,
             #[cfg(any(test, feature = "test-support"))]
             Self::Mock(m) => m.get_session_key(),
         }
     }
 
-    /// Get the current session mode. Only ACP and Nomi model a mode;
+    /// Get the current session mode. Only ACP and OpenHub model a mode;
     /// other variants report `mode = "default"`, `initialized = false`
     /// so cron / UI can skip mode reconciliation.
     pub async fn get_mode(&self) -> Result<openhub_api_types::AgentModeResponse, AppError> {
         match self {
             Self::Acp(m) => m.mode().await,
-            Self::Nomi(m) => m.mode().await,
+            Self::OpenHub(m) => m.mode().await,
             Self::OpenClaw(_) | Self::Nanobot(_) | Self::Remote(_) => Ok(openhub_api_types::AgentModeResponse {
                 mode: "default".into(),
                 initialized: false,
@@ -342,12 +342,12 @@ impl AgentInstance {
     }
 
     /// Set the session mode. Unsupported for variants other than ACP /
-    /// Nomi — returns a `BadRequest` so the caller can surface an
+    /// OpenHub — returns a `BadRequest` so the caller can surface an
     /// actionable error rather than silently no-op.
     pub async fn set_mode(&self, mode: &str) -> Result<(), AppError> {
         match self {
             Self::Acp(m) => m.set_mode(mode).await,
-            Self::Nomi(m) => m.set_mode(mode).await,
+            Self::OpenHub(m) => m.set_mode(mode).await,
             Self::OpenClaw(_) | Self::Nanobot(_) | Self::Remote(_) => Err(AppError::BadRequest(
                 "Mode switching is not supported for this agent type".into(),
             )),
@@ -358,13 +358,13 @@ impl AgentInstance {
 
     /// Clear the conversation context ("release model context") in place,
     /// keeping the agent/process alive. ACP rotates to a fresh `session/new`;
-    /// Nomi empties its engine history; OpenClaw / Remote forget their gateway
+    /// OpenHub empties its engine history; OpenClaw / Remote forget their gateway
     /// session key so the next send re-creates a clean session. Nanobot has no
     /// resumable session and returns a `BadRequest` the caller can surface.
     pub async fn clear_context(&self) -> Result<(), AppError> {
         match self {
             Self::Acp(m) => m.clear_context().await,
-            Self::Nomi(m) => m.clear_context().await,
+            Self::OpenHub(m) => m.clear_context().await,
             Self::OpenClaw(m) => m.clear_context().await,
             Self::Remote(m) => m.clear_context().await,
             Self::Nanobot(_) => Err(AppError::BadRequest(
@@ -376,14 +376,14 @@ impl AgentInstance {
     }
 
     /// Push a mid-turn steering interjection into the running turn. Only the
-    /// Nomi native engine can inject mid-turn; every other variant is an
+    /// OpenHub native engine can inject mid-turn; every other variant is an
     /// external process that cannot be steered, so they return a `BadRequest`
     /// the service maps to `steer_unsupported` (client falls back to the
     /// pending queue). `Ok(true)` = queued into a live turn; `Ok(false)` = no
     /// turn running (caller should send normally).
     pub fn steer(&self, text: String) -> Result<bool, AppError> {
         match self {
-            Self::Nomi(m) => m.steer(text),
+            Self::OpenHub(m) => m.steer(text),
             Self::Acp(_) | Self::OpenClaw(_) | Self::Nanobot(_) | Self::Remote(_) => Err(
                 AppError::BadRequest("Steering is not supported for this agent type".into()),
             ),
@@ -393,13 +393,13 @@ impl AgentInstance {
     }
 
     /// Rewind the last user turn (edit & resubmit the most recent user message).
-    /// Only the Nomi native engine can rewind its in-memory transcript; every
+    /// Only the OpenHub native engine can rewind its in-memory transcript; every
     /// other variant is an external process whose context cannot be rewound, so
     /// they return a `BadRequest` (the frontend never exposes the entry for
-    /// non-Nomi conversations).
+    /// non-OpenHub conversations).
     pub async fn rewind_last_turn(&self) -> Result<(), AppError> {
         match self {
-            Self::Nomi(m) => m.rewind_last_turn().await,
+            Self::OpenHub(m) => m.rewind_last_turn().await,
             Self::Acp(_) | Self::OpenClaw(_) | Self::Nanobot(_) | Self::Remote(_) => Err(
                 AppError::BadRequest("Edit & resubmit is not supported for this agent type".into()),
             ),
@@ -424,7 +424,7 @@ impl AgentInstance {
                 let model_info = merge_model_info(sdk_info, cc_switch_info);
                 Ok(GetModelInfoResponse { model_info })
             }
-            Self::Nomi(_) | Self::OpenClaw(_) | Self::Nanobot(_) | Self::Remote(_) => {
+            Self::OpenHub(_) | Self::OpenClaw(_) | Self::Nanobot(_) | Self::Remote(_) => {
                 Ok(GetModelInfoResponse { model_info: None })
             }
             #[cfg(any(test, feature = "test-support"))]
@@ -441,7 +441,7 @@ impl AgentInstance {
         }
         match self {
             Self::Acp(m) => m.set_model(model_id).await,
-            Self::Nomi(_) | Self::OpenClaw(_) | Self::Nanobot(_) | Self::Remote(_) => Err(AppError::BadRequest(
+            Self::OpenHub(_) | Self::OpenClaw(_) | Self::Nanobot(_) | Self::Remote(_) => Err(AppError::BadRequest(
                 "Model switching is not supported for this agent type".into(),
             )),
             #[cfg(any(test, feature = "test-support"))]
@@ -453,7 +453,7 @@ impl AgentInstance {
     /// structure mirrors the ACP SDK `UsageUpdate` schema
     /// (`used` / `size` / `cost` / `_meta`), normalised via
     /// [`openhub_common::normalize_keys_to_snake_case`] so keys land as
-    /// `used` / `size` / `cost` to match the Nomi wire convention —
+    /// `used` / `size` / `cost` to match the OpenHub wire convention —
     /// `_meta` passes through verbatim.
     ///
     /// Non-ACP agents return `None`.
@@ -466,7 +466,7 @@ impl AgentInstance {
                 openhub_common::normalize_keys_to_snake_case(&mut value);
                 Ok(Some(value))
             }
-            Self::Nomi(_) | Self::OpenClaw(_) | Self::Nanobot(_) | Self::Remote(_) => Ok(None),
+            Self::OpenHub(_) | Self::OpenClaw(_) | Self::Nanobot(_) | Self::Remote(_) => Ok(None),
             #[cfg(any(test, feature = "test-support"))]
             Self::Mock(m) => m.get_usage().await,
         }
@@ -478,7 +478,7 @@ impl AgentInstance {
     pub async fn get_slash_commands(&self) -> Result<Vec<SlashCommandItem>, AppError> {
         match self {
             Self::Acp(m) => m.load_slash_commands().await,
-            Self::Nomi(m) => m.get_slash_commands().await,
+            Self::OpenHub(m) => m.get_slash_commands().await,
             Self::OpenClaw(_) | Self::Nanobot(_) | Self::Remote(_) => Ok(Vec::new()),
             #[cfg(any(test, feature = "test-support"))]
             Self::Mock(m) => m.get_slash_commands().await,
@@ -506,7 +506,7 @@ impl AgentInstance {
                     answer: Some("Side question support will be fully wired in app integration phase.".into()),
                 })
             }
-            Self::Nomi(_) | Self::OpenClaw(_) | Self::Nanobot(_) | Self::Remote(_) => Ok(SideQuestionResponse {
+            Self::OpenHub(_) | Self::OpenClaw(_) | Self::Nanobot(_) | Self::Remote(_) => Ok(SideQuestionResponse {
                 status: "unsupported".into(),
                 answer: None,
             }),
@@ -521,7 +521,7 @@ impl AgentInstance {
     pub async fn get_openclaw_runtime(&self) -> Result<serde_json::Value, AppError> {
         match self {
             Self::OpenClaw(m) => Ok(m.get_diagnostics().await),
-            Self::Acp(_) | Self::Nomi(_) | Self::Nanobot(_) | Self::Remote(_) => Ok(serde_json::Value::Null),
+            Self::Acp(_) | Self::OpenHub(_) | Self::Nanobot(_) | Self::Remote(_) => Ok(serde_json::Value::Null),
             #[cfg(any(test, feature = "test-support"))]
             Self::Mock(m) => m.get_openclaw_runtime().await,
         }

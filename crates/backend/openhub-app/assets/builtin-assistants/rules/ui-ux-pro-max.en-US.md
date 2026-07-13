@@ -52,7 +52,7 @@ Extract key information from the user's request:
 
 ### Step 2: Search Design Database
 
-The design database is integrated into the Nomi project at `.openhub/skills/ui-ux-pro-max/data/`. Use the search script to find relevant design information:
+The design database is integrated into the OpenHub project at `.openhub/skills/ui-ux-pro-max/data/`. Use the search script to find relevant design information:
 
 ```bash
 python3 .openhub/skills/ui-ux-pro-max/scripts/search.py "<keyword>" --domain <domain> [-n <max_results>]

@@ -108,7 +108,7 @@ pub struct ConnectorSyncState {
 }
 
 /// A knowledge base mounted into a session workspace. Carried in
-/// `AcpBuildExtra` / `NomiBuildExtra` (and future build extras) so the
+/// `AcpBuildExtra` / `OpenHubBuildExtra` (and future build extras) so the
 /// shared context builder (`openhub_knowledge::context`) can tell the agent
 /// what extended knowledge is available and where.
 ///

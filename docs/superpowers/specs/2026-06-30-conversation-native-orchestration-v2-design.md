@@ -8,7 +8,7 @@
 
 > 「你的智能编排底层能力是符合预期的……但是 UI 实在太丑,会话交互体验、侧边栏交互都没有和标准的『会话』对齐……请把多 agent 编排的底层能力、编排画布 UI、编排修改/调整能力**直接复用迁移给「会话」**,并基于会话优秀的交互/UI**原生增强**,使功能更成熟。会话内容区依旧干净合理。进入会话后,**增加一个查看 agent 画布的功能入口**;点击弹出**悬浮画布**,**点节点把该节点上下文投射到会话内容区**,**点 main 回到主 agent 会话内容区**,**默认始终显示 main 内容区**。」
 
-参照面:标准会话页(`/conversation/:id` → `ChatConversation` → `ChatLayout` + `OpenHubChat` + `NomiSendBox`)。
+参照面:标准会话页(`/conversation/:id` → `ChatConversation` → `ChatLayout` + `OpenHubChat` + `OpenHubSendBox`)。
 
 ## 历史教训(必须规避)
 
@@ -56,7 +56,7 @@
    - 无 run:空态 + **「发起多 agent 编排」**(Path B 入口)→ 内嵌 `OrchestratorComposer`(模型范围 + 自主度 pill)→ `createAdhoc({ goal, model_range, autonomy, lead_conv_id: conversation.id })`。
 3. **悬浮画布 `OrchestrationCanvasOverlay`**:展开态 = 可拖拽浮层,内含玻璃头(`RunTitleEditor` 行内重命名 + 状态 pill + `RunControls` 取消/暂停/恢复/批准/重规划 + `ViewToggle` 画布⟷决策)+ body(`DagCanvas`(含 main 节点)/ `RunDecisionFeed`)+ 底部 `RunIntentBox`(adjust 意图)。可「收起」成小浮标(缩略预览),再点展开。`React.lazy` 载 DagCanvas。
 4. **DagCanvas「main」节点增强**:新增可选 `onOpenMain?: () => void`;为真时在 DAG 根上方渲染一个合成「main」节点(代表 lead/main 会话),边连向各根任务;点击 → `returnToMain()`。保持向后兼容(无 `onOpenMain` 则不渲染,行为同今)。主题/布局沿用现有 CSS 变量 + `data-theme` MutationObserver。
-5. **内容区投射(`ConversationContentSwitcher`,在 `NomiConversationPanel` 内)**:
+5. **内容区投射(`ConversationContentSwitcher`,在 `OpenHubConversationPanel` 内)**:
    - 默认 `projectedTaskId === null` → 渲染 `OpenHubChat`(主 agent,完整可发消息)。**默认即 main。**
    - 点画布节点 → `projectTask(payload)` 置 `projectedTaskId`,解析 `task.conversation_id`(`conversation.get`)→ 内容区**覆盖渲染** `ReadOnlyConversationView`(只读 + `hideSendBox`),顶部细 banner:`查看:<task.title> · [重跑] [转向…] · ← 返回 main`。
    - **`OpenHubChat` 始终挂载**(投射时 `display:none` 隐藏)以保住滚动/状态;`ReadOnlyConversationView` 自带独立 PreviewProvider,与主会话 preview 隔离。

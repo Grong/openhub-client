@@ -100,7 +100,7 @@ pub(crate) fn http_client_build_count() -> usize {
 /// first-token path of EVERY turn — the single largest avoidable首字 cost.
 ///
 /// A stalled upstream produces a `reqwest` timeout error, which the SSE loop
-/// converts into `LlmEvent::Error` (surfaced as `Nomi agent error: ...`) instead
+/// converts into `LlmEvent::Error` (surfaced as `OpenHub agent error: ...`) instead
 /// of an indefinite hang. The detected proxy is captured at first build; a
 /// runtime proxy change takes effect on the next app start.
 pub(crate) fn http_client() -> reqwest::Client {

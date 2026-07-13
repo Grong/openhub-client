@@ -1,6 +1,6 @@
 [package]
 name = "openhub-browser"
-description = "BrowserTool facade for Nomi browser-use (wraps the in-process CDP engine)"
+description = "BrowserTool facade for OpenHub browser-use (wraps the in-process CDP engine)"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

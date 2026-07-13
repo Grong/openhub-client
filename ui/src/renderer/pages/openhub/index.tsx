@@ -40,7 +40,7 @@ type TabKey = (typeof COMPANION_TABS)[number] | (typeof SHARED_TABS)[number];
 type Domain = 'companion' | 'shared' | 'figures';
 
 /** openhub 配置中心：伙伴条 + 双域（伙伴/共享）Tab。深链 /openhub?companion=<id>&tab=<key>。 */
-const NomiConfigPage: React.FC = () => {
+const OpenHubConfigPage: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -283,4 +283,4 @@ const NomiConfigPage: React.FC = () => {
   );
 };
 
-export default NomiConfigPage;
+export default OpenHubConfigPage;

@@ -91,7 +91,7 @@ const DistributionLegend: React.FC<{
   </div>
 );
 
-const NomiSessionMetricsPanel: React.FC<{ conversation: TChatConversation }> = ({ conversation }) => {
+const OpenHubSessionMetricsPanel: React.FC<{ conversation: TChatConversation }> = ({ conversation }) => {
   const { t } = useTranslation();
   const [usage, setUsage] = useState<TokenUsageData | null>(() => getPersistedUsage(conversation));
 
@@ -282,4 +282,4 @@ const NomiSessionMetricsPanel: React.FC<{ conversation: TChatConversation }> = (
   );
 };
 
-export default NomiSessionMetricsPanel;
+export default OpenHubSessionMetricsPanel;

@@ -22,7 +22,7 @@ use openhub_protocol::{ToolApprovalManager, ToolApprovalResult};
 #[derive(Parser)]
 #[command(
     name = "openhub",
-    about = "Nomi agent CLI — multi-provider AI agent with tool orchestration",
+    about = "OpenHub agent CLI — multi-provider AI agent with tool orchestration",
     version
 )]
 struct Cli {

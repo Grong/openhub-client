@@ -793,8 +793,8 @@ const CompanionPage: React.FC = () => {
           setBubbleLoading(false);
           const browser = browserNarrationFor(message.data);
           const hint = browser
-            ? t(browser.key, { name: profileRef.current?.name || 'Nomi', ...browser.params })
-            : t('openhub.companion.usingTools', { name: profileRef.current?.name || 'Nomi' });
+            ? t(browser.key, { name: profileRef.current?.name || 'OpenHub', ...browser.params })
+            : t('openhub.companion.usingTools', { name: profileRef.current?.name || 'OpenHub' });
           setBubble((prev) => (prev && prev !== '…' ? prev : hint));
           armBubbleDismiss(STREAM_STALL_MS, () => endTurn(''));
           break;
@@ -1348,7 +1348,7 @@ const CompanionPage: React.FC = () => {
   );
 
   const openNativeContextMenu = useCallback(async () => {
-    const entries = buildCompanionMenuEntries({ name: profileRef.current?.name || 'Nomi', t });
+    const entries = buildCompanionMenuEntries({ name: profileRef.current?.name || 'OpenHub', t });
     try {
       const [{ Menu }, { getCurrentWindow }] = await Promise.all([
         import('@tauri-apps/api/menu'),
@@ -1558,7 +1558,7 @@ const CompanionPage: React.FC = () => {
           <textarea
             className='openhub-companion-composer__input'
             value={composerText}
-            placeholder={t('openhub.companion.chatPlaceholder', { name: profile?.name || 'Nomi' })}
+            placeholder={t('openhub.companion.chatPlaceholder', { name: profile?.name || 'OpenHub' })}
             autoFocus
             onChange={(e) => setComposerText(e.target.value)}
             onFocus={onComposerFocus}
@@ -1618,7 +1618,7 @@ const CompanionPage: React.FC = () => {
         >
           <input
             value={input}
-            placeholder={t('openhub.companion.chatPlaceholder', { name: profile?.name || 'Nomi' })}
+            placeholder={t('openhub.companion.chatPlaceholder', { name: profile?.name || 'OpenHub' })}
             onChange={(e) => setInput(e.target.value)}
             onPaste={onComposerPaste}
             onKeyDown={(e) => {

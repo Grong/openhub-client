@@ -9,7 +9,7 @@ pub enum AgentType {
     OpenclawGateway,
     Nanobot,
     Remote,
-    Nomi,
+    OpenHub,
     /// Legacy Gemini conversations. Kept solely so that historical rows
     /// with `type='gemini'` remain readable in the conversation list and
     /// message history. Any attempt to run the agent (send a message,
@@ -26,7 +26,7 @@ impl AgentType {
             AgentType::OpenclawGateway => "OpenClaw Gateway",
             AgentType::Nanobot => "Nanobot",
             AgentType::Remote => "Remote",
-            AgentType::Nomi => "Nomi",
+            AgentType::OpenHub => "OpenHub",
             AgentType::Gemini => "Gemini (legacy)",
         }
     }
@@ -37,7 +37,7 @@ impl AgentType {
             AgentType::OpenclawGateway => "openclaw-gateway",
             AgentType::Nanobot => "nanobot",
             AgentType::Remote => "remote",
-            AgentType::Nomi => "openhub",
+            AgentType::OpenHub => "openhub",
             AgentType::Gemini => "gemini",
         }
     }
@@ -57,7 +57,7 @@ impl AgentType {
     /// path during workspace provisioning.
     pub fn native_skills_dirs(&self) -> Option<&'static [&'static str]> {
         match self {
-            AgentType::Nomi => Some(&[".openhub/skills"]),
+            AgentType::OpenHub => Some(&[".openhub/skills"]),
             AgentType::Acp
             | AgentType::OpenclawGateway
             | AgentType::Nanobot
@@ -85,7 +85,7 @@ impl AgentType {
                 Some("cursor") => "agent",
                 _ => "yolo",
             },
-            AgentType::Nomi
+            AgentType::OpenHub
             | AgentType::Gemini
             | AgentType::OpenclawGateway
             | AgentType::Nanobot
@@ -258,7 +258,7 @@ pub enum McpSource {
     CodeBuddy,
     #[serde(rename = "opencode")]
     OpenCode,
-    Nomi,
+    OpenHub,
     Nanobot,
     Openhub,
 }
@@ -280,7 +280,7 @@ mod tests {
     #[test]
     fn test_agent_type_display_names() {
         assert_eq!(AgentType::OpenclawGateway.display_name(), "OpenClaw Gateway");
-        assert_eq!(AgentType::Nomi.display_name(), "Nomi");
+        assert_eq!(AgentType::OpenHub.display_name(), "OpenHub");
         assert_eq!(AgentType::Nanobot.display_name(), "Nanobot");
         assert_eq!(AgentType::Remote.display_name(), "Remote");
         assert_eq!(AgentType::Acp.display_name(), "ACP");
@@ -302,7 +302,7 @@ mod tests {
             (AgentType::OpenclawGateway, "openclaw-gateway"),
             (AgentType::Nanobot, "nanobot"),
             (AgentType::Remote, "remote"),
-            (AgentType::Nomi, "openhub"),
+            (AgentType::OpenHub, "openhub"),
         ];
         for (variant, expected) in cases {
             let json = serde_json::to_string(&variant).unwrap();
@@ -365,7 +365,7 @@ mod tests {
             (McpSource::Codex, r#""codex""#),
             (McpSource::CodeBuddy, r#""codebuddy""#),
             (McpSource::OpenCode, r#""opencode""#),
-            (McpSource::Nomi, r#""openhub""#),
+            (McpSource::OpenHub, r#""openhub""#),
             (McpSource::Nanobot, r#""nanobot""#),
             (McpSource::Openhub, r#""openhub""#),
         ];
@@ -399,7 +399,7 @@ mod tests {
         assert_eq!(AgentType::Acp.full_auto_mode_id(Some("claude")), "bypassPermissions");
         assert_eq!(AgentType::Acp.full_auto_mode_id(Some("gemini")), "yolo");
         assert_eq!(AgentType::Acp.full_auto_mode_id(None), "yolo");
-        assert_eq!(AgentType::Nomi.full_auto_mode_id(None), "yolo");
+        assert_eq!(AgentType::OpenHub.full_auto_mode_id(None), "yolo");
         assert_eq!(AgentType::Remote.full_auto_mode_id(None), "yolo");
     }
 }

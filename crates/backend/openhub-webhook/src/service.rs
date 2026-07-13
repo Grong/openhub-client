@@ -150,7 +150,7 @@ impl WebhookService {
             .await?
             .ok_or_else(|| AppError::NotFound(format!("webhook {id}")))?;
         let fields = vec![
-            ("Nomi".to_string(), "Webhook test message".to_string()),
+            ("OpenHub".to_string(), "Webhook test message".to_string()),
             ("Webhook".to_string(), row.name.clone()),
         ];
         self.sender
@@ -158,7 +158,7 @@ impl WebhookService {
                 WebhookPlatform::from_db(&row.platform),
                 &row.url,
                 row.secret.as_deref(),
-                "Nomi Webhook Test",
+                "OpenHub Webhook Test",
                 &fields,
             )
             .await

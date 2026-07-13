@@ -198,9 +198,9 @@ interface IChatConversation<T, Extra> {
 // Token 使用统计数据类型
 export interface TokenUsageData {
   total_tokens: number;
-  /** Cumulative input tokens reported by the Nomi session usage payload. */
+  /** Cumulative input tokens reported by the OpenHub session usage payload. */
   input_tokens?: number;
-  /** Cumulative output tokens reported by the Nomi session usage payload. */
+  /** Cumulative output tokens reported by the OpenHub session usage payload. */
   output_tokens?: number;
   /** Tokens written into the provider prompt cache. */
   cache_creation_tokens?: number;
@@ -350,7 +350,7 @@ export type TChatConversation =
   // open historical rows with type='gemini' (message history is served
   // by the shared messages table). The backend factory rejects any
   // attempt to resume this conversation — see
-  // Nomicore/crates/openhub-common/src/enums.rs and factory.rs.
+  // OpenHubcore/crates/openhub-common/src/enums.rs and factory.rs.
   // Every field is optional because legacy rows shape-varies across
   // several older Gemini-runtime versions.
   | Omit<
@@ -684,7 +684,7 @@ export interface IMcpServer {
   created_at: number;
   updated_at: number;
   original_json: string; // 存储原始JSON配置，用于编辑时的准确显示
-  /** Built-in MCP server managed by Nomi (hide edit/delete in UI) */
+  /** Built-in MCP server managed by OpenHub (hide edit/delete in UI) */
   builtin?: boolean;
 }
 

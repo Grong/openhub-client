@@ -6,8 +6,8 @@
 
 import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, test } from 'bun:test';
-import enNomi from '../../services/i18n/locales/en-US/openhub.json';
-import zhNomi from '../../services/i18n/locales/zh-CN/openhub.json';
+import enOpenHub from '../../services/i18n/locales/en-US/openhub.json';
+import zhOpenHub from '../../services/i18n/locales/zh-CN/openhub.json';
 
 const readSource = (url: URL) => readFileSync(url, 'utf8');
 
@@ -66,8 +66,8 @@ describe('Custom figure card action polish', () => {
   test('custom figure upload entry no longer advertises or handles drag upload', () => {
     const wizard = readSource(new URL('./CustomFigureWizard/index.tsx', import.meta.url));
 
-    expect(zhNomi.customFigure.dropHint.includes('拖拽')).toBe(false);
-    expect(/\b(drag|drop)\b/.test(enNomi.customFigure.dropHint.toLowerCase())).toBe(false);
+    expect(zhOpenHub.customFigure.dropHint.includes('拖拽')).toBe(false);
+    expect(/\b(drag|drop)\b/.test(enOpenHub.customFigure.dropHint.toLowerCase())).toBe(false);
     expect(wizard.includes('onDragOver')).toBe(false);
     expect(wizard.includes('onDragLeave')).toBe(false);
     expect(wizard.includes('onDrop')).toBe(false);

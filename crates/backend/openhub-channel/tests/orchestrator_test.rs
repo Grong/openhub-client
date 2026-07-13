@@ -198,7 +198,7 @@ impl ScriptedAgent {
 #[async_trait]
 impl IAgentTask for ScriptedAgent {
     fn agent_type(&self) -> AgentType {
-        AgentType::Nomi
+        AgentType::OpenHub
     }
 
     fn conversation_id(&self) -> &str {

@@ -50,7 +50,7 @@ cargo run -p openhub-web      # 会自动使用默认 --dist=../../ui/dist
 |---|---|---|---|
 | `--host` | `OPENHUB_WEB_HOST` | `127.0.0.1` | 绑定的 IP。`0.0.0.0` 会接收 LAN/VPN/公网流量；大范围暴露前请先预置管理员或完成首次设置。 |
 | `--port` | `OPENHUB_WEB_PORT` | `8787` | TCP 端口。提供 API、`/ws` 处的 WebSocket，以及 SPA。 |
-| `--data-dir` | `OPENHUB_DATA_DIR` | 按用户目录 | 后端数据目录 (SQLite 数据库、agent 状态、日志、Bun 缓存)。默认是与桌面应用共享的按用户位置 (`%LOCALAPPDATA%\OpenHub\Nomi`、`~/Library/Application Support/OpenHub/Nomi`、`$XDG_DATA_HOME/OpenHub/Nomi`)。**生产环境请仍显式指定绝对路径。** |
+| `--data-dir` | `OPENHUB_DATA_DIR` | 按用户目录 | 后端数据目录 (SQLite 数据库、agent 状态、日志、Bun 缓存)。默认是与桌面应用共享的按用户位置 (`%LOCALAPPDATA%\OpenHub\OpenHub`、`~/Library/Application Support/OpenHub/OpenHub`、`$XDG_DATA_HOME/OpenHub/OpenHub`)。**生产环境请仍显式指定绝对路径。** |
 | `--dist` | `OPENHUB_WEB_DIST` | `../../ui/dist` | 构建好的 SPA 所在目录。**部署时请显式设置。** |
 | `--admin-user` | `OPENHUB_ADMIN_USERNAME` | `admin` | 预置首个管理员时使用的用户名。一旦管理员存在则被忽略。 |
 | `--admin-password` | `OPENHUB_ADMIN_PASSWORD` | — | 在启动时预置首个管理员密码，跳过交互式设置。一旦管理员存在则被忽略。 |
@@ -228,7 +228,7 @@ sudo systemctl status openhub-web
 - 默认绑定 `127.0.0.1:8787`。只有在首次设置完成或已配置
   `OPENHUB_ADMIN_PASSWORD` 后，才应把 `OPENHUB_WEB_HOST` 改成
   `0.0.0.0`。
-- 设置 `OPENHUB_DATA_DIR=/var/libopenhub 以匹配 systemd 管理的 `StateDirectoryopenhub。**保持这两者同步** —— 如果你删除该环境变量行，数据目录会静默回退到服务用户的按用户目录 (`$XDG_DATA_HOME/OpenHub/Nomi`，通常是 `~openhub/.local/share/OpenHub/Nomi`)，与 systemd state 解耦。
+- 设置 `OPENHUB_DATA_DIR=/var/libopenhub 以匹配 systemd 管理的 `StateDirectoryopenhub。**保持这两者同步** —— 如果你删除该环境变量行，数据目录会静默回退到服务用户的按用户目录 (`$XDG_DATA_HOME/OpenHub/OpenHub`，通常是 `~openhub/.local/share/OpenHub/OpenHub`)，与 systemd state 解耦。
 - 以专用的 openhub 用户运行 (`Useropenhub、`Groupopenhub)。
 - 失败时以 3 秒退避重启。
 - 应用适度的硬化 (`NoNewPrivileges=yes`、`PrivateTmp=yes`)。**不要添加** `ProtectHome=yes` 或严格的 `ProtectSystem` —— agent 引擎需要读写操作员指定的文件，过度沙箱化会破坏核心功能。

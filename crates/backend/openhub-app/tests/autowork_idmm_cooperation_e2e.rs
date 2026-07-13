@@ -14,7 +14,7 @@
 //! is enabled on a conversation bound to that tag. It asserts (1) the tag is
 //! resumed by the enable (deterministic, synchronous in the handler) and (2) the
 //! AutoWork loop then claims + runs the requirement to a processed terminal state
-//! (`needs_review` for a Nomi session whose clean turn produced no verdict tool
+//! (`needs_review` for a OpenHub session whose clean turn produced no verdict tool
 //! call). It fails if enable does not auto-resume, or if the two features wedge
 //! each other so the requirement never progresses.
 
@@ -37,19 +37,19 @@ use openhub_common::{AgentKillReason, AgentType, AppError, ConversationStatus, T
 
 use common::{body_json, get_with_token, json_with_token, setup_and_login};
 
-/// A mock Nomi agent that completes any turn cleanly: on `send_message` it emits
+/// A mock OpenHub agent that completes any turn cleanly: on `send_message` it emits
 /// a benign text (NOT a 选择题/开放式提问 — so IDMM's decision watch stays standby)
 /// followed by a clean `Finish`. With no requirement-verdict tool call, AutoWork
-/// parks a Nomi turn at `needs_review` — proof the turn actually RAN.
-struct CompletingNomiAgent {
+/// parks a OpenHub turn at `needs_review` — proof the turn actually RAN.
+struct CompletingOpenHubAgent {
     conversation_id: String,
     event_tx: tokio::sync::broadcast::Sender<AgentStreamEvent>,
 }
 
 #[async_trait::async_trait]
-impl IAgentTask for CompletingNomiAgent {
+impl IAgentTask for CompletingOpenHubAgent {
     fn agent_type(&self) -> AgentType {
-        AgentType::Nomi
+        AgentType::OpenHub
     }
     fn conversation_id(&self) -> &str {
         &self.conversation_id
@@ -84,9 +84,9 @@ impl IAgentTask for CompletingNomiAgent {
 }
 
 #[async_trait::async_trait]
-impl IMockAgent for CompletingNomiAgent {}
+impl IMockAgent for CompletingOpenHubAgent {}
 
-/// Build an app whose agent factory returns a `CompletingNomiAgent`.
+/// Build an app whose agent factory returns a `CompletingOpenHubAgent`.
 async fn build_app_completing() -> (axum::Router, AppServices) {
     let db = openhub_db::init_database_memory().await.unwrap();
     let factory: Arc<
@@ -96,7 +96,7 @@ async fn build_app_completing() -> (axum::Router, AppServices) {
     > = Arc::new(move |opts: BuildTaskOptions| {
         Box::pin(async move {
             let (event_tx, _) = tokio::sync::broadcast::channel(256);
-            Ok(AgentInstance::Mock(Arc::new(CompletingNomiAgent {
+            Ok(AgentInstance::Mock(Arc::new(CompletingOpenHubAgent {
                 conversation_id: opts.conversation_id,
                 event_tx,
             })))
@@ -196,7 +196,7 @@ async fn autowork_and_idmm_enable_auto_resumes_paused_tag_and_runs_requirement()
     );
 
     // (2) The two features cooperate: the AutoWork loop claims the now-resumed
-    // requirement and runs the turn to a processed terminal state. A clean Nomi
+    // requirement and runs the turn to a processed terminal state. A clean OpenHub
     // turn with no verdict tool call parks at `needs_review` (NOT stuck `failed`).
     let mut last = String::new();
     let mut processed = false;

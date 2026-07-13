@@ -23,7 +23,7 @@ Channels are useful when:
 
 ## Where to find it
 
-Open the Nomi page (`/openhub`), select a companion, and switch to the
+Open the OpenHub page (`/openhub`), select a companion, and switch to the
 **Remote** tab (`/openhub?companion=<id>&tab=remote`). That tab lists the
 remote connectors for the selected companion — built-in (Telegram,
 Lark, DingTalk, WeChat, WeCom, Slack, Discord, extensions). For each
@@ -70,7 +70,7 @@ external IM ──▶ plugin (long-poll / WebSocket)
 
 1. Talk to [`@BotFather`](https://t.me/BotFather) and create a bot.
    Save the token (looks like `123456:ABC-DEF…`).
-2. In **Nomi → Remote → Telegram**, paste the token.
+2. In **OpenHub → Remote → Telegram**, paste the token.
 3. Click **Test** — the backend calls `getMe` and shows the bot
    username on success.
 4. Click **Enable**. The plugin starts long-polling
@@ -78,7 +78,7 @@ external IM ──▶ plugin (long-poll / WebSocket)
 
 To pair a Telegram user with the desktop, the user messages your bot;
 the bot replies with a 6-digit code (10-minute TTL). Paste / type the
-code into **Nomi → Remote → Pending pairings** on the desktop
+code into **OpenHub → Remote → Pending pairings** on the desktop
 and click **Approve**. From then on that Telegram user can chat with
 the agent.
 
@@ -125,7 +125,7 @@ A pairing request comes in two ways:
    /Lark / DingTalk). The plugin auto-creates a pending request and
    replies to the user with the code.
 2. You can approve / reject the pending request from
-   **Nomi → Remote → Pending pairings** or programmatically
+   **OpenHub → Remote → Pending pairings** or programmatically
    via `POST /api/channel/pairings/approve` and
    `POST /api/channel/pairings/reject`.
 
@@ -139,7 +139,7 @@ re-pairs from scratch.
 ## Master Agent mode
 
 By default, every channel conversation runs in **Master Agent mode**:
-the remote message is greeted by the Nomi companion itself. The conversation
+the remote message is greeted by the OpenHub companion itself. The conversation
 inherits the companion's personality and memories, and the agent is wired to
 the **Desktop Gateway** tools, so from your phone you're not talking
 to an isolated chat bot — you're talking to the agent that runs your
@@ -220,7 +220,7 @@ memory pipeline, so switching companions never loses memories.
 **How it relates to the agent / model pickers.** The per-platform
 **Default agent** still decides which engine answers; the gateway
 tools are injected for any agent type, while the companion persona and
-memory ride on the Nomi engine. Model resolution in master mode:
+memory ride on the OpenHub engine. Model resolution in master mode:
 the platform's **Default model** (if set) wins, otherwise the
 conversation falls back to the bound companion's own model.
 

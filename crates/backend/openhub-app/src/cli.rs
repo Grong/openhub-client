@@ -10,10 +10,10 @@ use clap::{Parser, Subcommand};
 
 /// The default data directory shared by ALL hosts (desktop shell, `openhub-web`,
 /// the `nomicore` bin): the per-user application-data dir joined with
-/// `OpenHub/Nomi` — `%LOCALAPPDATA%\OpenHub\Nomi` on Windows,
-/// `~/Library/Application Support/OpenHub/Nomi` on macOS,
-/// `$XDG_DATA_HOME/OpenHub/Nomi` on Linux. Extreme fallback when the OS
-/// reports no user dir: `<system temp>/openhub-data/Nomi`.
+/// `OpenHub/OpenHub` — `%LOCALAPPDATA%\OpenHub\OpenHub` on Windows,
+/// `~/Library/Application Support/OpenHub/OpenHub` on macOS,
+/// `$XDG_DATA_HOME/OpenHub/OpenHub` on Linux. Extreme fallback when the OS
+/// reports no user dir: `<system temp>/openhub-data/OpenHub`.
 ///
 /// One default for every host is deliberate: dev loops (`bun run web`,
 /// `dev:webui`, `desktop:dev`) and the installed desktop app all read and
@@ -24,7 +24,7 @@ use clap::{Parser, Subcommand};
 /// server lock (see `bootstrap::server_lock`).
 ///
 /// This is only the *unset* default — it does NOT consult `OPENHUB_DATA_DIR`.
-/// Env semantics stay host-specific: the desktop shell appends `/Nomi` to the
+/// Env semantics stay host-specific: the desktop shell appends `/OpenHub` to the
 /// env value, web/nomicore take it literally (clap `env` binding).
 pub fn default_data_dir() -> PathBuf {
     dirs::data_local_dir()
@@ -33,15 +33,15 @@ pub fn default_data_dir() -> PathBuf {
         .join(openhub_leaf(&openhub_common::channel::dir_suffix()))
 }
 
-/// The data-dir leaf for the active build channel: `Nomi` on stable, `Nomi-dev`
-/// (etc.) on non-stable channels. The channel suffix attaches to the `Nomi`
+/// The data-dir leaf for the active build channel: `OpenHub` on stable, `OpenHub-dev`
+/// (etc.) on non-stable channels. The channel suffix attaches to the `OpenHub`
 /// leaf — NOT to the `OpenHub` vendor segment — so a non-stable build lands in a
-/// sibling directory next to the production one (`…/OpenHub/Nomi-dev`), keeping
+/// sibling directory next to the production one (`…/OpenHub/OpenHub-dev`), keeping
 /// dev state fully isolated from the installed app. Pure, for unit testing;
 /// only `default_data_dir`'s unset default uses it (explicit `OPENHUB_DATA_DIR`
 /// is taken verbatim by clap, channel-agnostic).
 fn openhub_leaf(suffix: &str) -> String {
-    format!("Nomi{suffix}")
+    format!("OpenHub{suffix}")
 }
 
 /// Reject empty `--data-dir` / `OPENHUB_DATA_DIR` values. clap's env binding
@@ -60,7 +60,7 @@ pub fn parse_non_empty_path(s: &str) -> Result<PathBuf, String> {
 }
 
 #[derive(Parser)]
-#[command(name = "nomicore", about = "Nomi Backend Server", version)]
+#[command(name = "nomicore", about = "OpenHub Backend Server", version)]
 pub struct Cli {
     /// Host address to listen on.
     #[arg(long, default_value_t = String::from(openhub_common::constants::DEFAULT_HOST))]
@@ -197,21 +197,21 @@ mod tests {
             "default data dir must be absolute, got {dir:?}"
         );
         assert!(
-            dir.ends_with("OpenHub/Nomi") || dir.ends_with("openhub-data/Nomi"),
-            "default data dir should end with OpenHub/Nomi (or the temp fallback), got {dir:?}"
+            dir.ends_with("OpenHub/OpenHub") || dir.ends_with("openhub-data/OpenHub"),
+            "default data dir should end with OpenHub/OpenHub (or the temp fallback), got {dir:?}"
         );
     }
 
     #[test]
     fn openhub_leaf_stable_is_plain_nomi() {
-        assert_eq!(super::openhub_leaf(""), "Nomi");
+        assert_eq!(super::openhub_leaf(""), "OpenHub");
     }
 
     #[test]
     fn openhub_leaf_non_stable_attaches_suffix_to_nomi() {
-        // The channel suffix must land on the `Nomi` leaf, yielding a sibling of
-        // the production dir (`…/OpenHub/Nomi-dev`) — never on `OpenHub`.
-        assert_eq!(super::openhub_leaf("-dev"), "Nomi-dev");
+        // The channel suffix must land on the `OpenHub` leaf, yielding a sibling of
+        // the production dir (`…/OpenHub/OpenHub-dev`) — never on `OpenHub`.
+        assert_eq!(super::openhub_leaf("-dev"), "OpenHub-dev");
     }
 
     #[test]

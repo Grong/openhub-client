@@ -283,7 +283,7 @@ pub fn save_states_to_file(path: &Path, states: &HashMap<String, ExtensionState>
     Ok(())
 }
 
-/// Resolve the extension state file path using the historical Nomi rules.
+/// Resolve the extension state file path using the historical OpenHub rules.
 ///
 /// Priority:
 /// 1. `OPENHUB_EXTENSION_STATES_FILE`

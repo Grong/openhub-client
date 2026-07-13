@@ -35,7 +35,7 @@ pub async fn csrf_middleware(
     let needs_validation = matches!(method, Method::POST | Method::PUT | Method::DELETE | Method::PATCH);
     let is_exempt = path == "/login" || path == "/api/auth/qr-login" || path == "/api/auth/setup";
 
-    // Locally-trusted requests authenticate via the `X-Nomi-Local-Trust` header,
+    // Locally-trusted requests authenticate via the `X-OpenHub-Local-Trust` header,
     // not an ambient cookie, so they are not a CSRF target — skip validation.
     let local_trusted = request.extensions().get::<crate::trust::LocalTrusted>().is_some();
 

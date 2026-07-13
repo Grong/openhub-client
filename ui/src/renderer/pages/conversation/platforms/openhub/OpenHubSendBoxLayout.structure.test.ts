@@ -9,14 +9,14 @@ import { describe, expect, test } from 'bun:test';
 
 const readSource = (url: URL) => readFileSync(url, 'utf8');
 
-describe('Nomi sendbox control layout', () => {
+describe('OpenHub sendbox control layout', () => {
   test('renders context usage as a click ring before the model selector and removes turn metrics copy', () => {
     const source = readSource(new URL('./OpenHubSendBox.tsx', import.meta.url));
     const sendBoxSource = readSource(new URL('../../../../components/chat/SendBox/index.tsx', import.meta.url));
     const contextRingSource = readSource(new URL('./ContextUsageRing.tsx', import.meta.url));
     const sendBoxIndex = source.indexOf('<SendBox');
     const rightToolsIndex = source.indexOf('rightTools={');
-    const modelIndex = source.indexOf('<NomiModelSelector', rightToolsIndex);
+    const modelIndex = source.indexOf('<OpenHubModelSelector', rightToolsIndex);
     const contextRingIndex = source.indexOf('<ContextUsageRing', rightToolsIndex);
     const collaboratorIndex = source.indexOf('{collaboratorSelectorNode}', rightToolsIndex);
 
@@ -58,7 +58,7 @@ describe('Nomi sendbox control layout', () => {
 
     const rightToolsIndex = sendBoxSource.indexOf('rightTools={');
     const contextRingIndex = sendBoxSource.indexOf('<ContextUsageRing', rightToolsIndex);
-    const modelIndex = sendBoxSource.indexOf('<NomiModelSelector', rightToolsIndex);
+    const modelIndex = sendBoxSource.indexOf('<OpenHubModelSelector', rightToolsIndex);
     const collaboratorIndex = sendBoxSource.indexOf('{collaboratorSelectorNode}', rightToolsIndex);
     const clusterIndex = sendBoxSource.indexOf('{extraRightTools}', rightToolsIndex);
     const permissionIndex = sendBoxSource.indexOf('<AgentModeSelector', rightToolsIndex);

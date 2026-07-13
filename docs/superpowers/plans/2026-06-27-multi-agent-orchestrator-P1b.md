@@ -106,7 +106,7 @@ export function useRunLive(runId: string | undefined): { detail: TRunDetail | nu
 
 **行为:**
 - RunHistory：取 workspaces（useWorkspaces）→ 对每个 workspace useRuns → 合并按 created_at desc 列出（或先做「选一个 workspace 看其 runs」+ 默认首个，**取简单可用**：workspace 下拉 + 该 workspace 的 run 列表）。每行 = goal 截断 + status 徽标 + 时间 + 点击 `onOpenRun(run.id)`（page 注入，setSearchParams `{run:id}`）。空态 + 「新建 Run」。
-- CreateRunModal（NomiModal）：workspace select（useWorkspaces）+ fleet select（useFleets）+ goal textarea + autonomy select（自主/守护/协同，默认守护）→ `ipcBridge.orchestrator.runs.create.invoke({workspace_id,goal,fleet_id,autonomy})` → `mutate` + `useArcoMessage` 成功 → 回调 onCreated(run.id) → page 打开该 run。校验 goal 非空、workspace+fleet 必选。
+- CreateRunModal（OpenHubModal）：workspace select（useWorkspaces）+ fleet select（useFleets）+ goal textarea + autonomy select（自主/守护/协同，默认守护）→ `ipcBridge.orchestrator.runs.create.invoke({workspace_id,goal,fleet_id,autonomy})` → `mutate` + `useArcoMessage` 成功 → 回调 onCreated(run.id) → page 打开该 run。校验 goal 非空、workspace+fleet 必选。
 - i18n：orchestrator.run.{title,emptyTitle,emptyDesc,newRun,goal,workspace,fleet,autonomy,autonomyAutonomous,autonomySupervised,autonomyInteractive,status.*} 双语 + gen:i18n。
 
 参照模板：`WorkspaceList.tsx`（list+create modal 骨架、SWR、role=button 主操作、卡片 rd-12px bg-1）；P0 FleetManager/FleetEditDrawer（select 模式）。
@@ -150,7 +150,7 @@ export function useRunLive(runId: string | undefined): { detail: TRunDetail | nu
 
 **行为:** 复刻 `SubagentDrawer.tsx`：Arco `<Drawer width={560} footer={null} onCancel>`；按 `task.conversation_id`（number，无 string 转换）`ipcBridge.conversation.get.invoke({id})` 取 `TChatConversation`（cancelled-flag effect 兜底）；body `<TeamChatView conversation={conv} hideSendBox agent_name={task.title} />`（`hideSendBox` 即只读开关；不传 team_id）。无 conversation_id（任务未跑）时显示「该任务尚未开始/无对话」。
 
-参照模板：`pages/conversation/components/multiAgent/SubagentDrawer.tsx` + `TeamChatView.tsx`；只读复用见 extraction notes（NomiChat 自挂 provider + 合并实时流，conversation_id 是 number）。
+参照模板：`pages/conversation/components/multiAgent/SubagentDrawer.tsx` + `TeamChatView.tsx`；只读复用见 extraction notes（OpenHubChat 自挂 provider + 合并实时流，conversation_id 是 number）。
 
 - [ ] **Step 1: WorkerTranscriptPanel.tsx**（Drawer + TeamChatView hideSendBox + load-by-id + 无对话兜底）。
 - [ ] **Step 2: typecheck** → 0。

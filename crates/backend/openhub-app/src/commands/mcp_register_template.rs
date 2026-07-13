@@ -2,7 +2,7 @@
 //!
 //! Produces shell/JSON/TOML snippets that users can paste into external/wrapper
 //! CLIs to register the platform `knowledge_search` bridge. CRITICAL: templates
-//! contain NO port, token, or `NOMI_KB_MCP` env — the bridge discovers them at
+//! contain NO port, token, or `OPENHUB_KB_MCP` env — the bridge discovers them at
 //! runtime via the beacon file.
 
 use serde::Serialize;
@@ -134,7 +134,7 @@ mod tests {
             assert!(!lower.contains("token"), "field contains 'token': {field}");
             assert!(
                 !lower.contains("openhub_kb_mcp"),
-                "field contains 'NOMI_KB_MCP': {field}"
+                "field contains 'OPENHUB_KB_MCP': {field}"
             );
             // No port number patterns (port = digits after "port" keyword)
             assert!(!lower.contains("\"port\""), "field contains port key: {field}");
@@ -187,7 +187,7 @@ mod tests {
     #[test]
     fn path_with_backslash_and_quotes_is_safe() {
         // Windows-ish path with both tricky chars
-        let path = r#"C:\Program Files\Nomi "Fun"\nomicore.exe"#;
+        let path = r#"C:\Program Files\OpenHub "Fun"\nomicore.exe"#;
         let t = knowledge_register_template(path);
 
         // JSON must be parseable

@@ -22,12 +22,12 @@ import LocalImageView from '@renderer/components/media/LocalImageView';
 import OpenHubSendBox from './OpenHubSendBox';
 import { mergeWithCapabilities, type AgentModeOption } from '@/renderer/utils/model/agentModes';
 import { useOpenHubMessage } from './useOpenHubMessage';
-import type { NomiModelSelection } from './useOpenHubModelSelection';
+import type { OpenHubModelSelection } from './useOpenHubModelSelection';
 
 const OpenHubChat: React.FC<{
   conversation_id: number;
   workspace: string;
-  modelSelection: NomiModelSelection;
+  modelSelection: OpenHubModelSelection;
   session_mode?: string;
   cron_job_id?: string;
   hideSendBox?: boolean;

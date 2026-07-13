@@ -287,7 +287,7 @@ impl IConversationRepository for StubConvRepo {
             openhub_db::models::ConversationRow {
                 id,
                 user_id: "u1".into(),
-                name: "Nomi Chat".into(),
+                name: "OpenHub Chat".into(),
                 r#type: "openhub".into(),
                 model: Some(
                     serde_json::json!({
@@ -302,7 +302,7 @@ impl IConversationRepository for StubConvRepo {
                 channel_chat_id: None,
                 extra: serde_json::json!({
                     "backend": "anthropic",
-                    "agent_name": "Nomi",
+                    "agent_name": "OpenHub",
                     "workspace": "/tmp/openhub-workspace",
                     "session_mode": "default",
                     "current_model_id": "claude-sonnet-4-20250514"

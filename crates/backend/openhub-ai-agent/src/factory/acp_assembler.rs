@@ -334,7 +334,7 @@ fn requirement_mcp_server(cfg: &RequirementMcpConfig, conversation_id: &str) -> 
 /// forwards `knowledge_search` calls back to the in-process retrieval server.
 ///
 /// SECURITY: the bound `kb_ids` are BAKED into this server's env
-/// (`NOMI_KB_MCP_KB_IDS`) at injection time, NOT supplied by the model — the
+/// (`OPENHUB_KB_MCP_KB_IDS`) at injection time, NOT supplied by the model — the
 /// agent-facing tool takes only `query`/`limit`, so the model cannot widen the
 /// searchable base set. The server uses its OWN port/token (from
 /// `KnowledgeMcpConfig`), never the gateway's.
@@ -1281,7 +1281,7 @@ mod tests {
     ///   - Invariant 1: injected ONLY when config present AND bound bases exist
     ///     (and independent of `desktop_gateway` — never set here).
     ///   - Invariant 2: the bound `kb_ids` are baked into the server env
-    ///     (`NOMI_KB_MCP_KB_IDS`), not supplied by the model.
+    ///     (`OPENHUB_KB_MCP_KB_IDS`), not supplied by the model.
     ///   - Invariant 3: the server carries its OWN port/token consts.
     #[test]
     fn knowledge_mcp_injected_only_with_config_and_bound_bases() {
@@ -1293,7 +1293,7 @@ mod tests {
 
         // Case A: Some(config) + 1 mount → the "openhub-knowledge" server is
         // injected, spawns the right bridge, and bakes the mount id into
-        // NOMI_KB_MCP_KB_IDS with its OWN port/token env (never a gateway's).
+        // OPENHUB_KB_MCP_KB_IDS with its OWN port/token env (never a gateway's).
         // desktop_gateway is deliberately false to prove independence.
         let config_a = AcpBuildExtra {
             backend: Some("claude".into()),
@@ -1325,10 +1325,10 @@ mod tests {
                 .find(|e| e.name == key)
                 .map(|e| e.value.clone())
         };
-        // Invariant 2: the bound kb_ids are baked into NOMI_KB_MCP_KB_IDS — the
+        // Invariant 2: the bound kb_ids are baked into OPENHUB_KB_MCP_KB_IDS — the
         // agent tool never supplies them.
         let baked = env_val(openhub_api_types::KnowledgeMcpConfig::ENV_KB_IDS)
-            .expect("NOMI_KB_MCP_KB_IDS env must be set");
+            .expect("OPENHUB_KB_MCP_KB_IDS env must be set");
         assert!(
             baked.contains("kb_alpha"),
             "baked kb_ids must carry the mount id, got {baked}"

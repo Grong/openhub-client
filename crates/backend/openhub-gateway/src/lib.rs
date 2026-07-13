@@ -1,5 +1,5 @@
 //! `openhub-gateway` — the Desktop Gateway MCP: an in-process HTTP tool server
-//! that exposes the whole Nomi Desktop capability surface (conversations,
+//! that exposes the whole OpenHub Desktop capability surface (conversations,
 //! terminals, cron jobs, global companion memory, requirements, AutoWork, IDMM,
 //! knowledge bases, model providers) to agent sessions that carry the
 //! backend-set `desktopGateway` extra flag.

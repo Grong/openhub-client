@@ -24,8 +24,8 @@ function getFontDir() {
   const candidates = [
     process.env.OPENHUB_FONTS_DIR,
     path.join(__dirname, '../../canvas-design/canvas-fonts'),
-    path.join(process.env.HOME || '', 'Library/Application Support/Nomi/config/skills/canvas-design/canvas-fonts'),
-    path.join(process.env.APPDATA || '', 'Nomi/config/skills/canvas-design/canvas-fonts'),
+    path.join(process.env.HOME || '', 'Library/Application Support/OpenHub/config/skills/canvas-design/canvas-fonts'),
+    path.join(process.env.APPDATA || '', 'OpenHub/config/skills/canvas-design/canvas-fonts'),
   ].filter(Boolean);
 
   for (const dir of candidates) {

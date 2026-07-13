@@ -74,7 +74,7 @@ Cron 语法速查 (5 字段 —— 秒字段会自动添加)：
 
 - **CLI agent** —— `claude` / `codex` / `gemini` (后端在 `PATH`
   上检测到的任何一个)。该任务记录后端标签并端到端使用 ACP。
-- **Nomi (内置)** —— 使用 Nomi 自有引擎以及你选择的
+- **OpenHub (内置)** —— 使用 OpenHub 自有引擎以及你选择的
   provider/model。
 - **Preset assistant** —— 预先配置的 agent 人格；该任务记录
   assistant id。

@@ -72,7 +72,7 @@ The main window is **frameless** on Windows and Linux: the React titlebar compon
 
 ## Deep links
 
-The app registers the `openhub://` URL scheme (configured in `apps/desktop/tauri.conf.json` under `plugins.deep-link.desktop.schemes`). When the OS launches Nomi via a `openhub://...` URL, the shell forwards the URLs to the renderer over the Tauri event `deep-link://received`. The renderer can subscribe with `listen('deep-link://received', ...)` from `@tauri-apps/api/event` to handle the payload.
+The app registers the `openhub://` URL scheme (configured in `apps/desktop/tauri.conf.json` under `plugins.deep-link.desktop.schemes`). When the OS launches OpenHub via a `openhub://...` URL, the shell forwards the URLs to the renderer over the Tauri event `deep-link://received`. The renderer can subscribe with `listen('deep-link://received', ...)` from `@tauri-apps/api/event` to handle the payload.
 
 `register_all()` is called at startup to install the scheme; on platforms that need an out-of-band registration step (some Linux desktops, dev contexts) the call is best-effort and a failure is ignored.
 
@@ -86,16 +86,16 @@ The shell ships `tauri-plugin-autostart` so the renderer can opt the app into "l
 
 ## Where data is stored
 
-The desktop app persists the SQLite database, agent state, logs, and the Bun runtime cache under the per-user application-data directory — **`%LOCALAPPDATA%\OpenHub\Nomi`** on Windows, **`~/Library/Application Support/OpenHub/Nomi`** on macOS, **`$XDG_DATA_HOME/OpenHub/Nomi`** on Linux (resolved by the shared `openhub_app::cli::default_data_dir()`). This is the same default the `openhub-web` host and the dev scripts use, so a provider or companion configured in one host is visible in the others.
+The desktop app persists the SQLite database, agent state, logs, and the Bun runtime cache under the per-user application-data directory — **`%LOCALAPPDATA%\OpenHub\OpenHub`** on Windows, **`~/Library/Application Support/OpenHub/OpenHub`** on macOS, **`$XDG_DATA_HOME/OpenHub/OpenHub`** on Linux (resolved by the shared `openhub_app::cli::default_data_dir()`). This is the same default the `openhub-web` host and the dev scripts use, so a provider or companion configured in one host is visible in the others.
 
-Set `OPENHUB_DATA_DIR=<absolute path>` before launching the app and the data dir becomes `$OPENHUB_DATA_DIR/Nomi`. The backend takes an exclusive `server.lock` on the data dir at startup; if it fails to start — for example because another instance already holds the directory — the desktop shell shows a native error dialog and exits.
+Set `OPENHUB_DATA_DIR=<absolute path>` before launching the app and the data dir becomes `$OPENHUB_DATA_DIR/OpenHub`. The backend takes an exclusive `server.lock` on the data dir at startup; if it fails to start — for example because another instance already holds the directory — the desktop shell shows a native error dialog and exits.
 
-> Older builds defaulted to `<system temp>/openhub-data/Nomi`. An install found there is relocated to the per-user location automatically on launch (one-shot): data is copied, absolute paths stored in the database are rewritten, and the legacy directory is kept as a backup. Regenerable caches (the extracted Bun runtime, logs, browser profile, …) are not carried over — they rebuild on first use.
+> Older builds defaulted to `<system temp>/openhub-data/OpenHub`. An install found there is relocated to the per-user location automatically on launch (one-shot): data is copied, absolute paths stored in the database are rewritten, and the legacy directory is kept as a backup. Regenerable caches (the extracted Bun runtime, logs, browser profile, …) are not carried over — they rebuild on first use.
 
 To start fresh, **quit the app** and delete that directory. To migrate, copy the directory to a new machine.
 
 ```text
-~/Library/Application Support/OpenHub/Nomi/    # macOS (see paths above for Windows/Linux)
+~/Library/Application Support/OpenHub/OpenHub/    # macOS (see paths above for Windows/Linux)
 ├── openhub-backend.db        # SQLite state (conversations, settings, sessions, …)
 ├── logs/                     # openhub-core.log
 ├── companion/                # companions + the shared memory hub

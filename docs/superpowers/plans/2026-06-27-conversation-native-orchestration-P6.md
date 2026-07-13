@@ -13,7 +13,7 @@
 
 ## File Structure（已勘察）
 - 后端:`openhub-gateway/src/caps_orchestrator.rs`(openhub_run_create 默认 autonomy=interactive) 或 `openhub-orchestrator/src/run_service.rs`(create_adhoc 默认);可能 `routes.rs`(approve 已存在)。
-- 前端状态条:新 `ui/src/renderer/pages/orchestrator/RunDetail/OrchestrationStatusStrip.tsx` + 挂载于会话(ChatLayout header `headerExtra`/`headerLeading` 或 NomiConversationPanel 顶部);新 hook 派生 lead 状态。
+- 前端状态条:新 `ui/src/renderer/pages/orchestrator/RunDetail/OrchestrationStatusStrip.tsx` + 挂载于会话(ChatLayout header `headerExtra`/`headerLeading` 或 OpenHubConversationPanel 顶部);新 hook 派生 lead 状态。
 - 前端自动展开:`OrchestrationStatusStrip`/ChatSlider 在 run 出现时 `dispatchWorkspaceToggleEvent`/展开(workspaceEvents.ts)。
 - 前端 inspector:`WorkerTranscriptPanel.tsx`(加「配置」段:role/model/persona/skills/status)。
 - 审批可见:RunDetailHeader 批准钮已存在;状态条 awaiting 态也给「批准」入口。
@@ -38,7 +38,7 @@
 
 ## Task 2: 会话内编排状态条 + 自动展开 DAG（keystone）
 
-**Files:** Create `OrchestrationStatusStrip.tsx` + 一个状态 hook;Modify 会话挂载处(ChatConversation/NomiConversationPanel 或 ChatLayout header)、ChatSlider/DagRailTab(自动展开);i18n。
+**Files:** Create `OrchestrationStatusStrip.tsx` + 一个状态 hook;Modify 会话挂载处(ChatConversation/OpenHubConversationPanel 或 ChatLayout header)、ChatSlider/DagRailTab(自动展开);i18n。
 
 **状态条行为(常驻于 lead 会话顶部/header):** 派生并显示 lead 编排状态,各态都可见:
 - lead 会话首回合处理中且无 run → `主管规划中…`

@@ -572,7 +572,7 @@ const RemoteAgentManagement: React.FC = () => {
         </div>
       )}
 
-      {/* Supported remote connections — discover protocols & get setup help from Nomi */}
+      {/* Supported remote connections — discover protocols & get setup help from OpenHub */}
       <div className='mt-8px border-t border-solid border-[var(--color-border-2)] border-l-0 border-r-0 border-b-0 pt-16px'>
         <div className='px-16px mb-2px'>
           <Typography.Text className='block text-12px font-medium text-t-secondary'>

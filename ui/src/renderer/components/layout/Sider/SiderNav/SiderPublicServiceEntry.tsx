@@ -19,7 +19,7 @@ interface SiderPublicServiceEntryProps {
   onClick: () => void;
 }
 
-/** 对外伙伴 (Public Companion) — top-level rail entry under the 对外服务 group. Mirrors SiderNomiEntry. */
+/** 对外伙伴 (Public Companion) — top-level rail entry under the 对外服务 group. Mirrors SiderOpenHubEntry. */
 const SiderPublicServiceEntry: React.FC<SiderPublicServiceEntryProps> = ({
   isMobile,
   isActive,

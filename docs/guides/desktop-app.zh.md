@@ -69,7 +69,7 @@ $ bun run build
 
 ## 深度链接
 
-应用注册了 `openhub://` URL 协议 (在 `apps/desktop/tauri.conf.json` 的 `plugins.deep-link.desktop.schemes` 下配置)。当操作系统通过 `openhub://...` URL 启动 Nomi 时，外壳会通过 Tauri 事件 `deep-link://received` 将 URL 转发给渲染进程。渲染进程可以使用 `@tauri-apps/api/event` 中的 `listen('deep-link://received', ...)` 订阅以处理负载。
+应用注册了 `openhub://` URL 协议 (在 `apps/desktop/tauri.conf.json` 的 `plugins.deep-link.desktop.schemes` 下配置)。当操作系统通过 `openhub://...` URL 启动 OpenHub 时，外壳会通过 Tauri 事件 `deep-link://received` 将 URL 转发给渲染进程。渲染进程可以使用 `@tauri-apps/api/event` 中的 `listen('deep-link://received', ...)` 订阅以处理负载。
 
 启动时会调用 `register_all()` 来安装该协议；在需要带外注册步骤的平台上 (某些 Linux 桌面、开发环境)，该调用是尽力而为的，失败会被忽略。
 
@@ -83,16 +83,16 @@ $ bun run build
 
 ## 数据存储位置
 
-桌面应用将 SQLite 数据库、agent 状态、日志和 Bun 运行时缓存持久化到按用户的应用数据目录下 —— Windows 上是 **`%LOCALAPPDATA%\OpenHub\Nomi`**，macOS 上是 **`~/Library/Application Support/OpenHub/Nomi`**，Linux 上是 **`$XDG_DATA_HOME/OpenHub/Nomi`** (由共享的 `openhub_app::cli::default_data_dir()` 解析)。这与 `openhub-web` 宿主和开发脚本使用的是同一个默认目录，因此在一个宿主里配置的 provider 或伙伴在其他宿主里同样可见。
+桌面应用将 SQLite 数据库、agent 状态、日志和 Bun 运行时缓存持久化到按用户的应用数据目录下 —— Windows 上是 **`%LOCALAPPDATA%\OpenHub\OpenHub`**，macOS 上是 **`~/Library/Application Support/OpenHub/OpenHub`**，Linux 上是 **`$XDG_DATA_HOME/OpenHub/OpenHub`** (由共享的 `openhub_app::cli::default_data_dir()` 解析)。这与 `openhub-web` 宿主和开发脚本使用的是同一个默认目录，因此在一个宿主里配置的 provider 或伙伴在其他宿主里同样可见。
 
-在启动应用前设置 `OPENHUB_DATA_DIR=<absolute path>`，数据目录就会变为 `$OPENHUB_DATA_DIR/Nomi`。后端启动时会对数据目录取排他的 `server.lock`；若启动失败 (例如该目录已被另一个实例占用)，桌面外壳会弹出原生错误对话框并退出。
+在启动应用前设置 `OPENHUB_DATA_DIR=<absolute path>`，数据目录就会变为 `$OPENHUB_DATA_DIR/OpenHub`。后端启动时会对数据目录取排他的 `server.lock`；若启动失败 (例如该目录已被另一个实例占用)，桌面外壳会弹出原生错误对话框并退出。
 
-> 旧版本默认使用 `<system temp>/openhub-data/Nomi`。在那里发现的安装会在启动时自动迁移到按用户位置 (一次性)：数据被复制，数据库中存储的绝对路径会被改写，旧目录保留作为备份。可再生的缓存 (解压出的 Bun 运行时、日志、浏览器配置 …) 不会带过去 —— 它们会在首次使用时重建。
+> 旧版本默认使用 `<system temp>/openhub-data/OpenHub`。在那里发现的安装会在启动时自动迁移到按用户位置 (一次性)：数据被复制，数据库中存储的绝对路径会被改写，旧目录保留作为备份。可再生的缓存 (解压出的 Bun 运行时、日志、浏览器配置 …) 不会带过去 —— 它们会在首次使用时重建。
 
 要重新开始，**退出应用**并删除该目录。要迁移，将该目录复制到新机器上即可。
 
 ```text
-~/Library/Application Support/OpenHub/Nomi/    # macOS（Windows/Linux 路径见上文）
+~/Library/Application Support/OpenHub/OpenHub/    # macOS（Windows/Linux 路径见上文）
 ├── openhub-backend.db        # SQLite 状态（会话、设置、session 等）
 ├── logs/                     # openhub-core.log
 ├── companion/                # 伙伴 + 共享记忆中枢

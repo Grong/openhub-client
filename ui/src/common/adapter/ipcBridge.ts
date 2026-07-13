@@ -196,7 +196,7 @@ export const conversation = {
     httpPost<TChatConversation, ICreateConversationParams>('/api/conversations', (p) => {
       // Top-level `model` is openhub-only on the backend (spec 2026-05-12).
       // Other agent types carry model info via `extra`.
-      const isNomi = p.type === 'openhub';
+      const isOpenHub = p.type === 'openhub';
       // Conversations are minted by the backend (INTEGER AUTOINCREMENT,
       // numeric-id spec §5) — never send a client-supplied id.
       const body: Record<string, unknown> = {
@@ -204,7 +204,7 @@ export const conversation = {
         name: p.name,
         extra: p.extra,
       };
-      if (isNomi) {
+      if (isOpenHub) {
         const model = toApiModelOptional(p.model);
         if (model) body.model = model;
       }
@@ -214,7 +214,7 @@ export const conversation = {
   ),
   createWithConversation: withResponseMap(
     httpPost<TChatConversation, { conversation: TChatConversation }>('/api/conversations/clone', (p) => {
-      const isNomi = p.conversation.type === 'openhub';
+      const isOpenHub = p.conversation.type === 'openhub';
       // Drop `id` here too: conversations use backend-minted INTEGER ids
       // (numeric-id spec §5), so the clone endpoint assigns a fresh one — the
       // source id must never leak into the new row.
@@ -222,7 +222,7 @@ export const conversation = {
         model?: TProviderWithModel;
       };
       const clonedConversation: Record<string, unknown> = { ...rest };
-      if (isNomi) {
+      if (isOpenHub) {
         const model = toApiModelOptional(_rawModel);
         if (model) clonedConversation.model = model;
       }
@@ -2722,7 +2722,7 @@ export const idmm = {
 
 // ── Phase-3 model failover queue (mirrors `ModelFailoverConfig`, plan D1/D8). ──
 // A global, ordered list of provider+model candidates the conversation send-loop
-// falls back through when a NOMI session hits a pre-response provider fault. Read
+// falls back through when a OPENHUB session hits a pre-response provider fault. Read
 // & written through the `agent.model_failover` client preference (one JSON blob),
 // the same idmm-settings-style channel as `idmm.getSettings`/`updateSettings`.
 

@@ -12,7 +12,7 @@ import { getCurrentCronTimeZone } from '@renderer/pages/cron/cronUtils';
 
 /**
  * Visual + raw editor for a 6-field, seconds-first cron expression
- * (`秒 分 时 日 月 周`), matching the Quartz-style dialect the Nomicore backend
+ * (`秒 分 时 日 月 周`), matching the Quartz-style dialect the OpenHubcore backend
  * parses with the `cron` crate.
  *
  * The raw expression is the single source of truth (`value`); the six

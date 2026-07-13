@@ -548,11 +548,11 @@ const AddPlatformModal = ModalHOC<{
                   setTasks([]);
                   setVisionInput(false);
                   // 预填模型供应商名称：预设平台用其展示名，自定义裸选项留空待用户填写。
-                  // 这样用户在新增时即可命名供应商，便于在 Nomi 中归类（尤其聚合平台）。
+                  // 这样用户在新增时即可命名供应商，便于在 OpenHub 中归类（尤其聚合平台）。
                   // Prefill provider name: preset platforms use their display name,
                   // the bare Custom option stays blank for the user to fill. Lets
                   // users name the provider at add-time for clean grouping in the
-                  // Nomi (especially for same-looking aggregator platforms).
+                  // OpenHub (especially for same-looking aggregator platforms).
                   form.setFieldValue('name', resolvePlatformName(value));
                   setDismissedFixUrl(null);
                 }

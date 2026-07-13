@@ -11,7 +11,7 @@ import {
   splitToolReceiptTargets,
 } from './processFileTargetLabel';
 
-const workspaceRoot = '/Users/muri/Library/Application Support/OpenHub/Nomi-dev/conversations/openhub-temp-39';
+const workspaceRoot = '/Users/muri/Library/Application Support/OpenHub/OpenHub-dev/conversations/openhub-temp-39';
 
 describe('process file target labels', () => {
   test('shows only the file name for absolute targets inside the current workspace', () => {

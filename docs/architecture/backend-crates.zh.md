@@ -20,7 +20,7 @@
 | Crate | 职责 |
 | --- | --- |
 | [`openhub-common`](../../crates/backend/openhub-common/) | `AppError`、错误链、各类枚举（`AgentType`、`ConversationStatus`、`MessageType`、`McpServerStatus` 等）、id 生成（实体 ID 用 `generate_prefixed_id`，令牌用 `generate_id`）、AES-GCM `encrypt_string` / `decrypt_string`、`TimestampMs`、分页辅助、`constants::DEFAULT_HOST/DEFAULT_PORT/BODY_LIMIT/CSRF_*`。 |
-| [`openhub-api-types`](../../crates/backend/openhub-api-types/) | 每个 HTTP 请求 / 响应 DTO，`WebSocketMessage` 信封，ACP / Nomi / OpenClaw / Remote 等扩展。前端 TypeScript 类型镜像该 crate。 |
+| [`openhub-api-types`](../../crates/backend/openhub-api-types/) | 每个 HTTP 请求 / 响应 DTO，`WebSocketMessage` 信封，ACP / OpenHub / OpenClaw / Remote 等扩展。前端 TypeScript 类型镜像该 crate。 |
 | [`openhub-db`](../../crates/backend/openhub-db/) | 通过 `sqlx` 操作 SQLite，内嵌迁移，为用户、会话、MCP、需求、cron、ACP 会话、助手、终端会话、伙伴令牌、知识库、渠道、连接器凭据、IDMM 介入、远程 agent、webhook 等提供仓储 trait 与 Sqlite 实现。持有 `Database` 句柄以及 `init_database`。 |
 | [`openhub-realtime`](../../crates/backend/openhub-realtime/) | `WebSocketManager`、`BroadcastEventBus`，带 token 校验的 `/ws` 升级处理器，消息路由 trait，心跳计时，每连接缓冲常量。 |
 | [`openhub-runtime`](../../crates/backend/openhub-runtime/) | 内嵌 Bun 运行时支持、为子进程增强 `PATH`、跨平台进程树终止，以及携带合并 PATH 的 spawn `Builder`。 |
@@ -36,14 +36,14 @@
 
 | Crate | 职责 |
 | --- | --- |
-| [`openhub-ai-agent`](../../crates/backend/openhub-ai-agent/) | **通往 `crates/agent/` 的唯一桥梁。** 构建 agent 工厂（ACP / Nomi / OpenClaw / Nanobot / Remote 等变体），持有 `AgentRegistry` 与 `WorkerTaskManagerImpl`，持久化 ACP 会话，广播 `AgentStreamEvent`，暴露 `agent_routes`（模型信息、能力、斜杠命令等）和 `remote_agent_routes`。再导出 `openhub_config`、`openhub_types` 和 `RequirementSink` 供其余后端使用。 |
+| [`openhub-ai-agent`](../../crates/backend/openhub-ai-agent/) | **通往 `crates/agent/` 的唯一桥梁。** 构建 agent 工厂（ACP / OpenHub / OpenClaw / Nanobot / Remote 等变体），持有 `AgentRegistry` 与 `WorkerTaskManagerImpl`，持久化 ACP 会话，广播 `AgentStreamEvent`，暴露 `agent_routes`（模型信息、能力、斜杠命令等）和 `remote_agent_routes`。再导出 `openhub_config`、`openhub_types` 和 `RequirementSink` 供其余后端使用。 |
 
 ## 功能 crate（产品的主体）
 
 | Crate | 职责 |
 | --- | --- |
 | [`openhub-conversation`](../../crates/backend/openhub-conversation/) | 会话与消息 CRUD、send-message 路由、**流式中继**（将后端 agent token 投递到 `/ws`）、ACP 错误恢复、响应中间件（如 `/cron` 斜杠命令检测、`<think>` 剥离）、技能解析 / 快照、运行时状态持久化。 |
-| [`openhub-mcp`](../../crates/backend/openhub-mcp/) | MCP 服务器 CRUD、**OAuth 流程**、多 CLI 同步（`adapters/` 下的 `Claude`、`Codex`、`CodeBuddy`、`Gemini`、`Qwen`、`OpenCode`、`Nomi`、`Openhub` 适配器）、连接测试、向会话注入 MCP 能力（含内置图像生成）。 |
+| [`openhub-mcp`](../../crates/backend/openhub-mcp/) | MCP 服务器 CRUD、**OAuth 流程**、多 CLI 同步（`adapters/` 下的 `Claude`、`Codex`、`CodeBuddy`、`Gemini`、`Qwen`、`OpenCode`、`OpenHub`、`Openhub` 适配器）、连接测试、向会话注入 MCP 能力（含内置图像生成）。 |
 | [`openhub-extension`](../../crates/backend/openhub-extension/) | 扩展与技能枢纽：清单、依赖图、分类器、安装 / 启用 / 禁用，捆绑技能 + MCP 服务器 + 助手的扩展包。 |
 | [`openhub-team`](../../crates/backend/openhub-team/) | 多智能协同（多 agent）：调度器、信箱、任务板、崩溃检测、事件循环、协同 MCP 服务器（`mcp/`）、Guide MCP 工具、提示词。（`openhub-team` crate 名与 `team_*` 工具名作为线缆契约有意保留。） |
 | [`openhub-channel`](../../crates/backend/openhub-channel/) | 外部聊天渠道适配器（Telegram、Lark、DingTalk、WeChat）—— 通过 feature 控制。新会话默认进入**主 Agent 模式**：伙伴人格 + 桌面网关工具（可按平台经 `assistant.{platform}.masterAgent` 关闭）。 |

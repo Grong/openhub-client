@@ -2,7 +2,7 @@
 
 The desktop app already runs a backend on a localhost port for its own webview — why not just expose it? Because exposing an unauthenticated backend on a LAN would hand every device on that network full shell, file, and agent access.
 
-**WebUI remote access** solves that. The desktop backend runs under a *trust-local-token* policy: the desktop's own webview is trusted via a per-boot secret it presents on every request (so you never log in locally), while any other client must authenticate. With one switch, an additional listener is bound on a stable LAN port that serves the app to remote browsers behind a login (password + QR), so you can use Nomi from your phone or another browser without giving up local-mode convenience.
+**WebUI remote access** solves that. The desktop backend runs under a *trust-local-token* policy: the desktop's own webview is trusted via a per-boot secret it presents on every request (so you never log in locally), while any other client must authenticate. With one switch, an additional listener is bound on a stable LAN port that serves the app to remote browsers behind a login (password + QR), so you can use OpenHub from your phone or another browser without giving up local-mode convenience.
 
 This is **per-instance** — it lives inside your already-running desktop app — and is distinct from the dedicated [Web Server Deployment](./web-server-deployment.md). Use this when you have an existing desktop install and just want to reach it from another device on the same network. Use the dedicated server when you want a long-lived headless deployment.
 
@@ -99,7 +99,7 @@ If you find yourself leaving the desktop app running on a server-like box just s
 
 **Toggle flips back to off immediately.** Another process is bound to the WebUI port. Pick a different port if you can configure it from the UI; otherwise stop whatever is holding `25808`.
 
-**The QR code shows but my phone gets a connection error.** Check the LAN IP shown in the access URL — if your machine has multiple interfaces (Wi-Fi + Ethernet, VPN adapters), the auto-detected address may not be the one your phone can reach. Confirm your phone is on the same network/subnet, and that the firewall allowed Nomi when prompted.
+**The QR code shows but my phone gets a connection error.** Check the LAN IP shown in the access URL — if your machine has multiple interfaces (Wi-Fi + Ethernet, VPN adapters), the auto-detected address may not be the one your phone can reach. Confirm your phone is on the same network/subnet, and that the firewall allowed OpenHub when prompted.
 
 **`./qr-login?token=…` says "Login failed: …".** The token expired (5-minute TTL) or has already been consumed. Click the refresh button next to the QR to mint a new one.
 

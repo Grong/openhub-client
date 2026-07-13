@@ -16,7 +16,7 @@ application.
 Modern AI workflows are scattered across separate CLIs, terminals, browser
 tabs, MCP servers, and local scripts. OpenHub pulls them into one workspace:
 
-- **Many agents, one surface.** Use the built-in Nomi engine or external
+- **Many agents, one surface.** Use the built-in OpenHub engine or external
   ACP-style CLIs such as Claude Code, Codex, Gemini CLI, Qwen, and OpenCode.
 - **One workspace per conversation.** Conversations can own files, previews,
   diffs, terminals, and knowledge bindings instead of living as isolated chat

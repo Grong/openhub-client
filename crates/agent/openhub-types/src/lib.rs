@@ -1,4 +1,4 @@
-// Pure, provider-neutral data types shared across all Nomi crates.
+// Pure, provider-neutral data types shared across all OpenHub crates.
 // No dependencies on other openhub-* crates.
 
 pub mod compact;

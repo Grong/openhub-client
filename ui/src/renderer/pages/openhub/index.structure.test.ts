@@ -7,7 +7,7 @@
 import { describe, expect, test } from 'bun:test';
 import { readFileSync } from 'node:fs';
 
-describe('Nomi companion tab order', () => {
+describe('OpenHub companion tab order', () => {
   test('places remote connection immediately after overview', () => {
     const source = readFileSync(new URL('./index.tsx', import.meta.url), 'utf8');
     const registry = source.match(/const COMPANION_TABS = \[(.*?)\] as const;/s)?.[1] ?? '';

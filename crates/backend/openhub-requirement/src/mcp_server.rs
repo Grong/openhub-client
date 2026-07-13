@@ -273,7 +273,7 @@ async fn exec_update_status(svc: &RequirementService, args: &Value, caller_id: O
 /// setups never trip it.
 ///
 /// SECURITY (C1, spec §2.2 + Plan 3 D1): the `caller_kind` is sourced from the
-/// env `NOMI_REQ_MCP_OWNER_KIND` baked at bridge spawn (not from the agent
+/// env `OPENHUB_REQ_MCP_OWNER_KIND` baked at bridge spawn (not from the agent
 /// model), so it is trustworthy. Rules:
 ///   - caller_id absent → Ok (lenient: single-session / tests)
 ///   - owner unset → Ok (unclaimed work is mutable by anyone)

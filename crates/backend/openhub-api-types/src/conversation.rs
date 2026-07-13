@@ -173,7 +173,7 @@ pub struct SearchMessagesQuery {
 
 /// Full conversation object returned in API responses.
 ///
-/// `model` is the canonical top-level field **only for `AgentType::Nomi`**.
+/// `model` is the canonical top-level field **only for `AgentType::OpenHub`**.
 /// For every other agent type, `model` is always `None` here and the client
 /// should read agent-specific model/mode fields out of `extra` (e.g. ACP uses
 /// `extra.current_model_id` / `extra.current_mode_id`). See

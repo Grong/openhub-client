@@ -272,7 +272,7 @@ impl ChannelMessageService {
         // channels keep a standalone per-session conversation. The FK is i64
         // (Option A); downstream services are string-keyed, so keep a String.
         let agent_type = parse_agent_type(&session.agent_type);
-        let companion_id = if agent_type == AgentType::Nomi {
+        let companion_id = if agent_type == AgentType::OpenHub {
             self.resolve_session_companion(session, platform).await
         } else {
             None
@@ -455,11 +455,11 @@ impl ChannelMessageService {
         // per-platform binding. NO default-companion fallback — an unbound channel
         // is hosted by no companion. Recorded in extra.companionId so the
         // persona/memory layers and gateway tools know which companion owns the
-        // session. Nomi engine only. Every channel session is a companion master
+        // session. OpenHub engine only. Every channel session is a companion master
         // session now — the former "Master Agent mode" on/off toggle was removed;
         // all companions control the desktop with full capabilities, there is no
         // "plain standalone session" path.
-        let master_companion_id = if agent_type == AgentType::Nomi {
+        let master_companion_id = if agent_type == AgentType::OpenHub {
             self.resolve_session_companion(session, platform).await
         } else {
             None
@@ -468,7 +468,7 @@ impl ChannelMessageService {
         // 模型解析顺序（绑定伙伴的 openhub 会话）：
         // 绑定伙伴的 profile.model 为主（唯一事实源）> 平台 defaultModel（遗留兜底）> 空。
         // 伙伴模型只作用于 openhub 引擎——ACP CLI 自带模型配置，仍走平台 defaultModel。
-        let mut model = if agent_type == AgentType::Nomi
+        let mut model = if agent_type == AgentType::OpenHub
             && let Some(profile) = self.master_profile.as_ref()
             && let Some(companion_id) = master_companion_id.as_deref()
             && let Some(companion_model) = profile.companion_model(companion_id).await
@@ -494,7 +494,7 @@ impl ChannelMessageService {
         );
 
         // Top-level `model` is only accepted for openhub; other types pass via `extra`.
-        let top_level_model = if agent_type == AgentType::Nomi {
+        let top_level_model = if agent_type == AgentType::OpenHub {
             Some(model)
         } else {
             extra["model"] = serde_json::to_value(&model).unwrap_or_default();
@@ -555,7 +555,7 @@ impl ChannelMessageService {
         //
         // NOTE on diagnosis: if this fires while the owner "clearly configured a
         // model", the provider lives in a DIFFERENT running instance/data-dir
-        // (e.g. installed Nomi vs Nomi-dev) than the one serving this channel —
+        // (e.g. installed OpenHub vs OpenHub-dev) than the one serving this channel —
         // the catalog this turn reads is genuinely empty. The message says so.
         let model = profile.public_agent_model(public_agent_id).await.ok_or_else(|| {
             ChannelError::CompanionNotReady(
@@ -567,7 +567,7 @@ impl ChannelMessageService {
         let name = channel_conversation_name(platform, "openhub", None, session.chat_id.as_deref());
 
         let req = CreateConversationRequest {
-            r#type: AgentType::Nomi,
+            r#type: AgentType::OpenHub,
             name: Some(name),
             // Public agents are openhub only → the model rides the top-level field.
             model: Some(model),
@@ -890,7 +890,7 @@ fn apply_master_agent_extra(
     companion_id: Option<&str>,
 ) {
     extra["desktopGateway"] = serde_json::Value::Bool(true);
-    if agent_type == AgentType::Nomi {
+    if agent_type == AgentType::OpenHub {
         extra["companionSession"] = serde_json::Value::Bool(true);
         extra["channelPlatform"] = serde_json::Value::String(platform.to_string());
         if let Some(pid) = companion_id.map(str::trim).filter(|s| !s.is_empty()) {
@@ -957,7 +957,7 @@ fn platform_to_source(platform: PluginType) -> ConversationSource {
         PluginType::Lark => ConversationSource::Lark,
         PluginType::Dingtalk => ConversationSource::Dingtalk,
         PluginType::Weixin => ConversationSource::Weixin,
-        // Reserved / new outbound channels default to Nomi source until a
+        // Reserved / new outbound channels default to OpenHub source until a
         // dedicated ConversationSource variant is added per channel phase.
         PluginType::Slack
         | PluginType::Discord
@@ -979,7 +979,7 @@ fn parse_agent_type(s: &str) -> AgentType {
         "openclaw-gateway" => AgentType::OpenclawGateway,
         "nanobot" => AgentType::Nanobot,
         "remote" => AgentType::Remote,
-        "openhub" => AgentType::Nomi,
+        "openhub" => AgentType::OpenHub,
         _ => {
             warn!(agent_type = %s, "unknown agent type, defaulting to Acp");
             AgentType::Acp
@@ -1159,7 +1159,7 @@ mod tests {
     #[test]
     fn master_extra_openhub_gets_gateway_and_companion() {
         let mut extra = ChannelMessageService::build_channel_extra(None);
-        apply_master_agent_extra(&mut extra, AgentType::Nomi, PluginType::Telegram, Some("companion_1"));
+        apply_master_agent_extra(&mut extra, AgentType::OpenHub, PluginType::Telegram, Some("companion_1"));
         assert_eq!(extra["desktopGateway"], serde_json::json!(true));
         assert_eq!(extra["companionSession"], serde_json::json!(true));
         assert_eq!(extra["channelPlatform"], serde_json::json!("telegram"));
@@ -1171,13 +1171,13 @@ mod tests {
     #[test]
     fn master_extra_openhub_without_companion_omits_companion_id_key() {
         let mut extra = ChannelMessageService::build_channel_extra(None);
-        apply_master_agent_extra(&mut extra, AgentType::Nomi, PluginType::Telegram, None);
+        apply_master_agent_extra(&mut extra, AgentType::OpenHub, PluginType::Telegram, None);
         assert_eq!(extra["companionSession"], serde_json::json!(true));
         assert!(extra.get("companionId").is_none(), "no companion → no companionId key");
 
         // Blank companion id is treated the same as no companion.
         let mut extra = ChannelMessageService::build_channel_extra(None);
-        apply_master_agent_extra(&mut extra, AgentType::Nomi, PluginType::Telegram, Some("  "));
+        apply_master_agent_extra(&mut extra, AgentType::OpenHub, PluginType::Telegram, Some("  "));
         assert!(extra.get("companionId").is_none());
     }
 
@@ -1237,7 +1237,7 @@ mod tests {
         assert_eq!(parse_agent_type("openclaw-gateway"), AgentType::OpenclawGateway);
         assert_eq!(parse_agent_type("nanobot"), AgentType::Nanobot);
         assert_eq!(parse_agent_type("remote"), AgentType::Remote);
-        assert_eq!(parse_agent_type("openhub"), AgentType::Nomi);
+        assert_eq!(parse_agent_type("openhub"), AgentType::OpenHub);
     }
 
     #[test]
@@ -1591,7 +1591,7 @@ mod tests {
         };
         let mut extra = ChannelMessageService::build_channel_extra(Some("codex"));
 
-        let top_level_model = if agent_type == AgentType::Nomi {
+        let top_level_model = if agent_type == AgentType::OpenHub {
             Some(model.clone())
         } else {
             extra["model"] = serde_json::to_value(&model).unwrap();
@@ -1605,7 +1605,7 @@ mod tests {
 
     #[test]
     fn openhub_model_stays_at_top_level() {
-        let agent_type = AgentType::Nomi;
+        let agent_type = AgentType::OpenHub;
         let model = ProviderWithModel {
             provider_id: "prov2".into(),
             model: "gpt-4o".into(),
@@ -1613,7 +1613,7 @@ mod tests {
         };
         let mut extra = ChannelMessageService::build_channel_extra(None);
 
-        let top_level_model = if agent_type == AgentType::Nomi {
+        let top_level_model = if agent_type == AgentType::OpenHub {
             Some(model.clone())
         } else {
             extra["model"] = serde_json::to_value(&model).unwrap();

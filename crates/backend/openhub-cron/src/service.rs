@@ -264,9 +264,9 @@ impl CronService {
         agent_config: Option<&openhub_api_types::CronAgentConfigDto>,
     ) -> Result<(), CronError> {
         match openhub_model_check(agent_type, execution_mode, conversation_id) {
-            NomiModelCheck::Skip => Ok(()),
-            NomiModelCheck::AgentConfig => validate_openhub_agent_config(agent_type, agent_config),
-            NomiModelCheck::BoundConversation => {
+            OpenHubModelCheck::Skip => Ok(()),
+            OpenHubModelCheck::AgentConfig => validate_openhub_agent_config(agent_type, agent_config),
+            OpenHubModelCheck::BoundConversation => {
                 match self.executor.get_conversation_row(conversation_id).await {
                     Ok(Some(row)) => {
                         let model = openhub_conversation::task_options::provider_model_from_conversation_row(&row);
@@ -1334,7 +1334,7 @@ fn get_string(extra: &serde_json::Value, keys: &[&str]) -> Option<String> {
 // Free functions
 // ---------------------------------------------------------------------------
 
-/// Nomi cron jobs require `agent_config.backend` (provider_id) to be set —
+/// OpenHub cron jobs require `agent_config.backend` (provider_id) to be set —
 /// the executor uses it to look up the provider row and build the agent.
 /// Reject add/update requests that would produce an invalid openhub job.
 ///
@@ -1365,7 +1365,7 @@ fn validate_openhub_agent_config(
 /// without performing any I/O, so the routing decision is unit-testable on its
 /// own.
 #[derive(Debug, PartialEq, Eq)]
-enum NomiModelCheck {
+enum OpenHubModelCheck {
     /// Not a openhub job — no model validation applies.
     Skip,
     /// `agent_config.backend` is the model source; apply the static check.
@@ -1386,14 +1386,14 @@ fn openhub_model_check(
     agent_type: &str,
     execution_mode: ExecutionMode,
     conversation_id: &str,
-) -> NomiModelCheck {
+) -> OpenHubModelCheck {
     if agent_type != "openhub" {
-        return NomiModelCheck::Skip;
+        return OpenHubModelCheck::Skip;
     }
     if matches!(execution_mode, ExecutionMode::Existing) && !conversation_id.trim().is_empty() {
-        NomiModelCheck::BoundConversation
+        OpenHubModelCheck::BoundConversation
     } else {
-        NomiModelCheck::AgentConfig
+        OpenHubModelCheck::AgentConfig
     }
 }
 
@@ -1731,11 +1731,11 @@ mod tests {
         // Non-openhub jobs never carry a openhub model requirement, regardless of mode.
         assert_eq!(
             openhub_model_check("acp", ExecutionMode::Existing, "42"),
-            NomiModelCheck::Skip
+            OpenHubModelCheck::Skip
         );
         assert_eq!(
             openhub_model_check("claude", ExecutionMode::NewConversation, ""),
-            NomiModelCheck::Skip
+            OpenHubModelCheck::Skip
         );
     }
 
@@ -1746,7 +1746,7 @@ mod tests {
         // This is the case the desktop create flow hit (agent_config omitted).
         assert_eq!(
             openhub_model_check("openhub", ExecutionMode::Existing, "42"),
-            NomiModelCheck::BoundConversation
+            OpenHubModelCheck::BoundConversation
         );
     }
 
@@ -1756,7 +1756,7 @@ mod tests {
         // (provider_id) must be present.
         assert_eq!(
             openhub_model_check("openhub", ExecutionMode::NewConversation, "42"),
-            NomiModelCheck::AgentConfig
+            OpenHubModelCheck::AgentConfig
         );
     }
 
@@ -1766,11 +1766,11 @@ mod tests {
         // new conversation from agent_config, so agent_config.backend is required.
         assert_eq!(
             openhub_model_check("openhub", ExecutionMode::Existing, ""),
-            NomiModelCheck::AgentConfig
+            OpenHubModelCheck::AgentConfig
         );
         assert_eq!(
             openhub_model_check("openhub", ExecutionMode::Existing, "   "),
-            NomiModelCheck::AgentConfig
+            OpenHubModelCheck::AgentConfig
         );
     }
 

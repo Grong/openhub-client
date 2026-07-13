@@ -391,7 +391,7 @@ mod tests {
     async fn agent_config_openhub_has_no_backend() {
         let repo = Arc::new(MockPrefRepo::with_data(vec![(
             "assistant.lark.agent",
-            r#"{"backend":"openhub","name":"Nomi"}"#,
+            r#"{"backend":"openhub","name":"OpenHub"}"#,
         )]));
         let svc = ChannelSettingsService::new(repo);
 
@@ -419,7 +419,7 @@ mod tests {
     async fn agent_config_reads_new_format_openhub() {
         let repo = Arc::new(MockPrefRepo::with_data(vec![(
             "assistant.lark.agent",
-            r#"{"agent_type":"openhub","name":"Nomi"}"#,
+            r#"{"agent_type":"openhub","name":"OpenHub"}"#,
         )]));
         let svc = ChannelSettingsService::new(repo);
 

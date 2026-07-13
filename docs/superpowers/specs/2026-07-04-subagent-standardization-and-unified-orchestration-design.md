@@ -69,7 +69,7 @@
 
 **删除（桌面会话域）**
 - FE：`ComposerEntryStrip` 的 orchestrate 按钮；`GuidPage.orchestrationMode` 状态/handler；`GuidActionRow` orchestration 分支；`useGuidSend.ts` 的 orchestration 发送分支（181–233）；`SystemModalContent` 的 `openhub.autoOrchestration` Switch；`configKeys.ts` 的 `openhub.autoOrchestration`；相关 i18n（`guid.entry.orchestrate` / `conversation.orchestration.startTitle` / `settings.autoOrchestration*`）。
-- 后端：`factory/openhub.rs` 的 `LEAD_ORCHESTRATOR_PROMPT`、`is_orchestration_lead`、`compose_lead_prompt`、`auto_orchestration` 读取块（187–197）、`PREF_AUTO_ORCHESTRATION`；`NomiBuildExtra.orchestrator_role`（若无其它读者）。
+- 后端：`factory/openhub.rs` 的 `LEAD_ORCHESTRATOR_PROMPT`、`is_orchestration_lead`、`compose_lead_prompt`、`auto_orchestration` 读取块（187–197）、`PREF_AUTO_ORCHESTRATION`；`OpenHubBuildExtra.orchestrator_role`（若无其它读者）。
 
 **保留不动（= 被保留的 subagent 能力本体）**
 - `caps_orchestrator.rs` 全部网关工具；整个 `openhub-orchestrator` crate；迁移 018 表；`link_orchestrator_run` + `extra.orchestrator_run_id`；会话原生画布（`OrchestrationProvider`/`OrchestrationTopPanel`/`ConversationContentSwitcher`/`PlanApprovalBanner`/`useConversationRun`）；`pages/orchestrator/*` 组件库；`engine_spawn_enabled` 路由。
@@ -210,7 +210,7 @@
 
 ### 6.1 协作模型选择器搬进每个会话（决策 D 的「选择器」部分）
 
-**现状**：会话 composer（`NomiModelSelector` in `NomiSendBox.tsx:782`）**只有主模型选择器，无协作模型**；协作选择器只在首页 orchestration 模式下（`GuidCollaboratorSelector`）。`extra.orchestrator_model_range` **只在会话创建时写一次、无更新路径**。
+**现状**：会话 composer（`OpenHubModelSelector` in `OpenHubSendBox.tsx:782`）**只有主模型选择器，无协作模型**；协作选择器只在首页 orchestration 模式下（`GuidCollaboratorSelector`）。`extra.orchestrator_model_range` **只在会话创建时写一次、无更新路径**。
 
 **变更**：
 - 在会话 composer 主模型选择器**旁**新增**协作模型选择器**（复用 `GuidCollaboratorSelector` 组件 + `useModelRange`/`useModelProviderList`；主模型钉为禁用的必选项 `· 主`，其余为协作池）。
@@ -351,4 +351,4 @@
 - 链接：`link_orchestrator_run`/`apply_knowledge_mounts`/`session_workpath_key`（`openhub-conversation/src/service.rs`、`openhub-knowledge/src/workpath.rs`）
 - 自主循环：`openhub-requirement/src/orchestrator.rs`（`run_loop`/`resume_persisted_bindings`/`start_sweeper`/`failure_backoff`）
 - 模型元数据：迁移 `021_model_descriptions.sql`/`025_model_context_limits.sql`/`026`（每节点覆盖）；`ModelType`/`ModelCapability`/`ProviderResponse`（`openhub-api-types/src/provider.rs`）；`ModelDescriptionEditor`（`ModelModalContent.tsx`）
-- FE：`NomiModelSelector`/`NomiSendBox`、`GuidCollaboratorSelector`/`useModelRange`/`useGuidSend`、`OrchestrationTopPanel`/`RunControls`/`DagCanvas`/`NodePreconfigPanel`/`useConversationRun`/`PlanApprovalBanner`
+- FE：`OpenHubModelSelector`/`OpenHubSendBox`、`GuidCollaboratorSelector`/`useModelRange`/`useGuidSend`、`OrchestrationTopPanel`/`RunControls`/`DagCanvas`/`NodePreconfigPanel`/`useConversationRun`/`PlanApprovalBanner`

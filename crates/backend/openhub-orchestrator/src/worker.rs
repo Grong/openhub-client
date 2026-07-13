@@ -7,8 +7,8 @@
 //! `crates/backend/openhub-gateway/src/caps_conversation.rs` —
 //! `agent_run` / `await_turn` / `read_final_text` / `latest_assistant_text`):
 //!
-//! 1. Build a [`ProviderWithModel`] from the member (P1 supports Nomi-engine
-//!    members only — a member without `provider_id` + `model` is rejected; non-Nomi
+//! 1. Build a [`ProviderWithModel`] from the member (P1 supports OpenHub-engine
+//!    members only — a member without `provider_id` + `model` is rejected; non-OpenHub
 //!    / ACP members are out of P1 scope).
 //! 2. Assemble the conversation `extra` (yolo + desktopGateway + orchestrator
 //!    correlation ids + the supervisor brief as `system_prompt` + optional
@@ -240,12 +240,12 @@ impl WorkerRunner for ConversationWorkerRunner {
         timeout: Duration,
         on_started: Box<dyn FnOnce(i64) + Send>,
     ) -> Result<WorkerOutcome, AppError> {
-        // P1 supports Nomi-engine members: both provider_id and model are required.
-        // Non-Nomi / ACP members (which carry their model differently) are out of
+        // P1 supports OpenHub-engine members: both provider_id and model are required.
+        // Non-OpenHub / ACP members (which carry their model differently) are out of
         // P1 scope — reject loudly rather than silently producing an empty pwm.
         let (Some(provider_id), Some(model)) = (member.provider_id.clone(), member.model.clone()) else {
             return Err(AppError::BadRequest(
-                "worker member needs provider+model (P1 supports Nomi-engine members only)".to_owned(),
+                "worker member needs provider+model (P1 supports OpenHub-engine members only)".to_owned(),
             ));
         };
         let pwm = ProviderWithModel {
@@ -274,7 +274,7 @@ impl WorkerRunner for ConversationWorkerRunner {
             .create(
                 &self.user_id,
                 CreateConversationRequest {
-                    r#type: AgentType::Nomi,
+                    r#type: AgentType::OpenHub,
                     name: Some(format!("Run {run_id} · {task_id}")),
                     model: Some(pwm),
                     source: None,

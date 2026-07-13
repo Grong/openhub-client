@@ -802,7 +802,7 @@ async fn t2_1b_send_message_pathological_workspace_returns_runtime_whitespace_co
 }
 
 /// Regression for the macOS per-user data dir: `~/Library/Application
-/// Support/OpenHub/Nomi/conversations/...` contains interior whitespace and
+/// Support/OpenHub/OpenHub/conversations/...` contains interior whitespace and
 /// every conversation auto-provisioned under it must remain sendable.
 #[tokio::test]
 async fn t2_1c_send_message_accepts_interior_whitespace_workspace() {
@@ -811,7 +811,7 @@ async fn t2_1c_send_message_accepts_interior_whitespace_workspace() {
     let conv_id = create_conversation(&mut app, &token, &csrf, "macOS Workspace").await;
 
     let temp = tempfile::tempdir().unwrap();
-    let workspace = temp.path().join("Application Support").join("Nomi").join("conversations").join("openhub-temp-1");
+    let workspace = temp.path().join("Application Support").join("OpenHub").join("conversations").join("openhub-temp-1");
     std::fs::create_dir_all(&workspace).unwrap();
     update_conversation_workspace(&services, conv_id, &workspace.to_string_lossy()).await;
 

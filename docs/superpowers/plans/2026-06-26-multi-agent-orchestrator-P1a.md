@@ -207,9 +207,9 @@ pub struct ConversationWorkerRunner { conv: ConversationService, task_manager: A
 impl ConversationWorkerRunner { pub fn new(conv: ConversationService, task_manager: Arc<dyn IWorkerTaskManager>, user_id: String) -> Self; }
 ```
 - 真实实现 = **复刻 `openhub_agent_run` 配方**（`caps_conversation.rs:426-503` 为权威模板）：
-  1. `ProviderWithModel { provider_id: member.provider_id, model: member.model.clone(), use_model: member.model.clone() }`（ACP 引擎可空模型——P1 先支持 Nomi 引擎成员；非 Nomi 成员超出 P1 范围，记 warn 跳过/失败）。
+  1. `ProviderWithModel { provider_id: member.provider_id, model: member.model.clone(), use_model: member.model.clone() }`（ACP 引擎可空模型——P1 先支持 OpenHub 引擎成员；非 OpenHub 成员超出 P1 范围，记 warn 跳过/失败）。
   2. `extra = json!({ "session_mode":"yolo", "desktopGateway":true, "orchestrator_run_id":run_id, "orchestrator_task_id":task_id, "system_prompt": brief })`；有 workspace_dir 则 `extra["workspace"]=...`。
-  3. `conv.create(&user_id, CreateConversationRequest{ r#type: AgentType::Nomi, name: Some(format!("Run {run_id} · {task_id}")), model: Some(pwm), source:None, channel_chat_id:None, extra })`。
+  3. `conv.create(&user_id, CreateConversationRequest{ r#type: AgentType::OpenHub, name: Some(format!("Run {run_id} · {task_id}")), model: Some(pwm), source:None, channel_chat_id:None, extra })`。
   4. `conv.send_message(&user_id, &conv.id.to_string(), SendMessageRequest{content: task_spec, files:vec![], inject_skills:vec![], hidden:false, origin:Some("orchestrator".into()), channel_platform:None}, &task_manager)`。
   5. `await_turn`（poll `conv.runtime_summary_for(id).is_processing` 每 500ms 至 timeout）→ settle（再 await 5s 细 poll 25ms，避 reasoning model text:null）→ `read_final_text`（list_messages desc 取 position==left&type==text）。
 - Consumes: `ConversationService`（create/send_message/runtime_summary_for/list_messages）、`IWorkerTaskManager`、`CreateConversationRequest`/`SendMessageRequest`/`ListMessagesQuery`、`AgentType`、`ProviderWithModel`。**把 await_turn/read_final_text 私有 helper 照搬进 worker.rs**（caps_conversation.rs:303-363）。

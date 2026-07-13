@@ -85,7 +85,7 @@ impl ArchiveConversationPort for ConversationArchivePort {
 
     async fn reset_context(&self, conversation_id: &str) -> Result<(), AppError> {
         // Warm the agent first so the reset is DURABLE: clear_context only clears
-        // (and persists empty) a LIVE engine; an idle/unloaded Nomi agent would
+        // (and persists empty) a LIVE engine; an idle/unloaded OpenHub agent would
         // otherwise resume its full on-disk session on the next build. warmup
         // builds the task without sending a message; clear_context then empties
         // and persists it.

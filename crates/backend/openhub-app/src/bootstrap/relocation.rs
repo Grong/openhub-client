@@ -1,7 +1,7 @@
 //! Post-relocation absolute-path rewrite for the main database.
 //!
 //! The desktop shell (`apps/desktop/src/relocate.rs`) relocates a legacy
-//! `<temp>/openhub-data/Nomi` data dir to the per-user application-data
+//! `<temp>/openhub-data/OpenHub` data dir to the per-user application-data
 //! location and leaves a [`RELOCATED_FROM_MARKER`] file (JSON, see
 //! [`RelocationMarker`]) in the new data dir. The files move, but absolute
 //! paths stored *inside* the database still point at the old root:
@@ -130,7 +130,7 @@ pub async fn rewrite_relocated_paths(database: &Database, data_dir: &Path) {
 /// drive root or a single top-level directory (`C:\`, `C:\Temp`, `/tmp`):
 /// used as a rewrite prefix it would match — and mangle — most absolute
 /// paths in the database. The legitimate desktop legacy root
-/// (`<temp>/openhub-data/Nomi`) always has at least two non-drive
+/// (`<temp>/openhub-data/OpenHub`) always has at least two non-drive
 /// components, on every platform.
 fn old_root_is_specific(old_root: &str) -> bool {
     old_root
@@ -161,7 +161,7 @@ pub async fn rewrite_path_prefixes(
         // escaping), wrapped in `lower()` because Windows paths are
         // case-insensitive. It requires either full equality or a path
         // separator (`\` or `/`, mixed spellings happen via Path::join) right
-        // after the prefix, so `...\NomiOther` is never mistaken for `...\Nomi`.
+        // after the prefix, so `...\OpenHubOther` is never mistaken for `...\OpenHub`.
         for (table, column) in TEXT_COLUMN_REWRITES {
             let sql = format!(
                 "UPDATE {table} SET {column} = ?2 || substr({column}, length(?1) + 1) \
@@ -226,10 +226,10 @@ mod tests {
     use super::*;
     use openhub_db::sqlx;
 
-    const OLD: &str = r"C:\Users\u\AppData\Local\Temp\openhub-data\Nomi";
-    const NEW: &str = r"C:\Users\u\AppData\Local\OpenHub\Nomi";
-    const OLD_FS: &str = "C:/Users/u/AppData/Local/Temp/openhub-data/Nomi";
-    const NEW_FS: &str = "C:/Users/u/AppData/Local/OpenHub/Nomi";
+    const OLD: &str = r"C:\Users\u\AppData\Local\Temp\openhub-data\OpenHub";
+    const NEW: &str = r"C:\Users\u\AppData\Local\OpenHub\OpenHub";
+    const OLD_FS: &str = "C:/Users/u/AppData/Local/Temp/openhub-data/OpenHub";
+    const NEW_FS: &str = "C:/Users/u/AppData/Local/OpenHub/OpenHub";
 
     async fn insert_kb(pool: &openhub_db::SqlitePool, id: &str, root_path: &str) {
         sqlx::query(
@@ -301,7 +301,7 @@ mod tests {
         insert_kb(pool, "kb_bs", &format!(r"{OLD}\knowledge\kb_bs")).await;
         insert_kb(pool, "kb_fs", &format!("{OLD_FS}/knowledge/kb_fs")).await;
         insert_kb(pool, "kb_exact", OLD).await;
-        // Same leading characters but NOT the old root (`...\NomiX`): the
+        // Same leading characters but NOT the old root (`...\OpenHubX`): the
         // separator-boundary rule must leave it alone.
         insert_kb(pool, "kb_boundary", &format!(r"{OLD}X\f")).await;
         insert_kb(pool, "kb_other", r"D:\somewhere\else").await;
@@ -520,10 +520,10 @@ mod tests {
         }
         // Specific enough: at least two non-drive components.
         for ok in [
-            r"C:\Users\u\AppData\Local\Temp\openhub-data\Nomi",
-            "C:/Users/u/AppData/Local/Temp/openhub-data/Nomi",
-            "/tmp/openhub-data/Nomi",
-            r"C:\Temp\Nomi",
+            r"C:\Users\u\AppData\Local\Temp\openhub-data\OpenHub",
+            "C:/Users/u/AppData/Local/Temp/openhub-data/OpenHub",
+            "/tmp/openhub-data/OpenHub",
+            r"C:\Temp\OpenHub",
         ] {
             assert!(old_root_is_specific(ok), "{ok:?} must be accepted");
         }
@@ -531,13 +531,13 @@ mod tests {
 
     #[test]
     fn variants_deduplicate_unix_style_roots() {
-        let variants = prefix_variants("/tmp/openhub-data/Nomi", "/home/u/.local/share/OpenHub/Nomi");
+        let variants = prefix_variants("/tmp/openhub-data/OpenHub", "/home/u/.local/share/OpenHub/OpenHub");
         // Backslash spelling + forward spelling; both distinct here because
         // the backslash variant mangles separators (it matches nothing real
         // on disk, which is exactly the intent).
         assert_eq!(variants.len(), 2);
-        assert_eq!(variants[1].0, "/tmp/openhub-data/Nomi");
-        assert_eq!(variants[1].1, "/home/u/.local/share/OpenHub/Nomi");
+        assert_eq!(variants[1].0, "/tmp/openhub-data/OpenHub");
+        assert_eq!(variants[1].1, "/home/u/.local/share/OpenHub/OpenHub");
 
         let same = prefix_variants("/same/root", "/same/root");
         assert!(same.is_empty());

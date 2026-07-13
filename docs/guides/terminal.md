@@ -1,13 +1,13 @@
 # In-App Terminals
 
-Nomi ships a real terminal inside the app. Each terminal is a backend-managed
+OpenHub ships a real terminal inside the app. Each terminal is a backend-managed
 PTY session you can drive interactively from your browser/desktop window — and
 that AutoWork can drive on your behalf when you bind it to a tag.
 
 > Need the automation guide? See [AutoWork & Requirements](./autowork-requirements.md).
 > Need to run an agent on a schedule? See [Scheduled Tasks](./scheduled-tasks.md).
 
-![Nomi in-app terminal](../images/terminal-01-session.png)
+![OpenHub in-app terminal](../images/terminal-01-session.png)
 
 ## What an in-app terminal is
 

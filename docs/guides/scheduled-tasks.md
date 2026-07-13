@@ -80,7 +80,7 @@ Pick the agent that runs each fire. Three flavours show up in the picker:
 - **CLI agents** — `claude` / `codex` / `gemini` (whatever the backend
   detected on `PATH`). The job records the backend label and uses ACP
   end-to-end.
-- **Nomi (built-in)** — uses Nomi's own engine with your selected
+- **OpenHub (built-in)** — uses OpenHub's own engine with your selected
   provider/model.
 - **Preset assistants** — pre-configured agent personalities; the job
   records the assistant id.
@@ -147,7 +147,7 @@ then re-arm the timer for the next normal fire.
 ## Skills attached to a job
 
 A **skill** is a `SKILL.md` file the agent reads when it joins a session
-— same mechanism the rest of Nomi uses, but with a per-job scope. You can
+— same mechanism the rest of OpenHub uses, but with a per-job scope. You can
 write/edit the skill on the detail page; behind the scenes the file is
 written to the data directory under `cron/skills/cron-<job_id>/SKILL.md`,
 and the executor injects it into the agent's session each fire.

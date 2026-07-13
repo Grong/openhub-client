@@ -20,6 +20,6 @@ describe('OpenHubChat turn activity ownership', () => {
 
   test('does not let the send box own the stream subscription by itself', () => {
     expect(sendBoxSource.includes('useOpenHubMessage(')).toBe(false);
-    expect(sendBoxSource.includes('turnActivity: NomiMessageRuntime')).toBe(true);
+    expect(sendBoxSource.includes('turnActivity: OpenHubMessageRuntime')).toBe(true);
   });
 });

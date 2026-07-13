@@ -107,7 +107,7 @@ fn default_allowed_roots(work_dir: Option<&std::path::Path>) -> Vec<std::path::P
     ];
     // Auto-provisioned per-conversation workspaces live under
     // `{work_dir}/conversations/{label}-temp-{token}/`. On Windows the
-    // operator may put `work_dir` on a separate drive (e.g. `X:\Nomi`)
+    // operator may put `work_dir` on a separate drive (e.g. `X:\OpenHub`)
     // that's neither under `temp_dir` nor `home_dir`, which previously
     // caused `/api/fs/list` to 403 every Hermes-mode session
     // (ELECTRON-1BT). Including `work_dir` keeps temp + custom-on-drive
@@ -383,7 +383,7 @@ pub fn build_conversation_state(
     // resume stale state (cross-conversation memory bleed). Pairs with the
     // per-session `owner_token` validation in the openhub factory.
     conversation_service.with_delete_hook(Arc::new(
-        openhub_ai_agent::task_manager::NomiSessionFilesCascade {
+        openhub_ai_agent::task_manager::OpenHubSessionFilesCascade {
             data_dir: services.data_dir.clone(),
             work_dir: services.work_dir.clone(),
         },
@@ -997,8 +997,8 @@ impl ConversationCanceller for OrchestratorConversationCanceller {
 /// inject a supervisor message into an in-flight worker conversation (P3b). Holds
 /// a (cloned) `ConversationService` + the shared `worker_task_manager`; runs as
 /// [`openhub_auth::SYSTEM_USER_ID`] (the user the worker creates conversations
-/// as). `steer_message` injects into the live Nomi turn when one exists, else
-/// falls back to a fresh send; a non-Nomi engine that cannot steer surfaces as an
+/// as). `steer_message` injects into the live OpenHub turn when one exists, else
+/// falls back to a fresh send; a non-OpenHub engine that cannot steer surfaces as an
 /// error (the engine maps it to a 400). We discard the returned message id — the
 /// caller only needs success/failure.
 struct OrchestratorConversationSteerer {
@@ -1305,7 +1305,7 @@ pub fn build_orchestrator_state(
     .with_runtime_state(services.conversation_runtime_state.clone());
     // A worker turn runs the same openhub send loop as a plain conversation, so wire
     // the failover deps here too — parity with build_requirement_state's
-    // ConversationService (the seam self-gates on AgentType::Nomi).
+    // ConversationService (the seam self-gates on AgentType::OpenHub).
     conv_service.with_failover_deps(
         Arc::new(SqliteProviderRepository::new(pool.clone())),
         Arc::new(SqliteClientPreferenceRepository::new(pool.clone())),

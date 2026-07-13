@@ -13,14 +13,14 @@ interface AgentHubModalProps {
   onCancel: () => void;
 }
 
-const NOMI_HUB_REPO_URL = 'https://github.com/openhub/NomiHub';
+const OPENHUB_HUB_REPO_URL = 'https://github.com/openhub/OpenHubHub';
 
 export const AgentHubModal: React.FC<AgentHubModalProps> = ({ visible, onCancel }) => {
   const { t } = useTranslation();
   const { agents, loading, error, install, retryInstall, update } = useHubAgents();
   const actionButtonClassName = '!min-w-80px !rounded-9px !px-10px';
-  const openNomiHubRepo = () => {
-    void openExternalUrl(NOMI_HUB_REPO_URL).catch(console.error);
+  const openOpenHubHubRepo = () => {
+    void openExternalUrl(OPENHUB_HUB_REPO_URL).catch(console.error);
   };
 
   const renderActionBtn = (agent: IHubAgentItem) => {
@@ -98,9 +98,9 @@ export const AgentHubModal: React.FC<AgentHubModalProps> = ({ visible, onCancel 
               defaultValue: 'Want a new Agent listed here?',
             })}
           </Typography.Text>
-          <Link className='text-12px leading-18px' onClick={openNomiHubRepo}>
+          <Link className='text-12px leading-18px' onClick={openOpenHubHubRepo}>
             {t('settings.agentManagement.marketContributionAction', {
-              defaultValue: 'Open a PR on NomiHub',
+              defaultValue: 'Open a PR on OpenHubHub',
             })}
           </Link>
         </div>

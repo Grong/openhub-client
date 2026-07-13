@@ -262,7 +262,7 @@ const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
     () => providers.filter((p) => !p.platform?.toLowerCase().includes('gemini-with-google-auth')),
     [providers]
   );
-  const hasNomiProvider = nomiProviders.length > 0;
+  const hasOpenHubProvider = nomiProviders.length > 0;
 
   const filteredProviders = useMemo(
     () => (resolvedBackend === 'openhub' ? nomiProviders : providers),
@@ -624,7 +624,7 @@ const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
             {cliAgents.map((agent) => {
               const agentKey = agent.backend || agent.agent_type;
               const logo = resolveAgentLogo({ icon: agent.icon, backend: agentKey });
-              const disabled = agentKey === 'openhub' && !hasNomiProvider;
+              const disabled = agentKey === 'openhub' && !hasOpenHubProvider;
               return (
                 <Option key={`cli:${agentKey}`} value={`cli:${agentKey}`} disabled={disabled}>
                   <div

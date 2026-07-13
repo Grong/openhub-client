@@ -23,7 +23,7 @@ import ChatSlider from './ChatSlider.tsx';
 import NanobotChat from '../platforms/nanobot/NanobotChat';
 import OpenClawChat from '../platforms/openclaw/OpenClawChat';
 import RemoteChat from '../platforms/remote/RemoteChat';
-import { saveNomiDefaultModel } from '@/renderer/pages/guid/hooks/agentSelectionUtils';
+import { saveOpenHubDefaultModel } from '@/renderer/pages/guid/hooks/agentSelectionUtils';
 import { configService } from '@/common/config/configService';
 import { useModelProviderList } from '@/renderer/hooks/agent/useModelProviderList';
 import { resolveHealModel } from '../platforms/openhub/healConversationModel';
@@ -149,7 +149,7 @@ const _AddNewConversation: React.FC<{ conversation: TChatConversation }> = ({ co
 
 type OpenHubConversation = Extract<TChatConversation, { type: 'openhub' }>;
 
-const NomiConversationPanel: React.FC<{ conversation: OpenHubConversation; sliderTitle: React.ReactNode }> = ({
+const OpenHubConversationPanel: React.FC<{ conversation: OpenHubConversation; sliderTitle: React.ReactNode }> = ({
   conversation,
   sliderTitle,
 }) => {
@@ -200,7 +200,7 @@ const NomiConversationPanel: React.FC<{ conversation: OpenHubConversation; slide
       await ipcBridge.conversation.stop.invoke({ conversation_id: conversation.id });
       const ok = await ipcBridge.conversation.update.invoke({ id: conversation.id, updates: { model: selected } });
       if (ok) {
-        void saveNomiDefaultModel(_provider.id, modelName);
+        void saveOpenHubDefaultModel(_provider.id, modelName);
         // 主模型即 range 的 models[0](lead/planner):切换主模型后同步重写 range,
         // 让协作池仍钉在新主模型之后。
         void persistModelRange({ provider_id: _provider.id, model: modelName }, collaborators);
@@ -258,7 +258,7 @@ const NomiConversationPanel: React.FC<{ conversation: OpenHubConversation; slide
       const selected = { ...heal.provider, use_model: heal.use_model } as TProviderWithModel;
       const ok = await ipcBridge.conversation.update.invoke({ id: conversation.id, updates: { model: selected } });
       if (ok) {
-        void saveNomiDefaultModel(heal.provider.id, heal.use_model);
+        void saveOpenHubDefaultModel(heal.provider.id, heal.use_model);
         Message.info(t('conversation.chat.modelHealedToDefault', { model: heal.use_model }));
       }
     })();
@@ -344,11 +344,11 @@ const ChatConversation: React.FC<{
   const { t } = useTranslation();
   const workspaceEnabled = Boolean(conversation?.extra?.workspace);
 
-  const isNomiConversation = conversation?.type === 'openhub';
+  const isOpenHubConversation = conversation?.type === 'openhub';
 
   // 使用统一的 Hook 获取预设助手信息（ACP/Codex 会话）
   // Use unified hook for preset assistant info (ACP/Codex conversations)
-  const acpConversation = isNomiConversation ? undefined : conversation;
+  const acpConversation = isOpenHubConversation ? undefined : conversation;
   const { info: presetAssistantInfo, isLoading: isLoadingPreset } = usePresetAssistantInfo(acpConversation);
   const acpAssistantId = acpConversation ? (resolveAssistantConfigId(acpConversation) ?? undefined) : undefined;
 
@@ -356,7 +356,7 @@ const ChatConversation: React.FC<{
   const assistantDisplayName = presetAssistantInfo?.name || conversationAgentName;
 
   const conversationNode = useMemo(() => {
-    if (!conversation || isNomiConversation) return null;
+    if (!conversation || isOpenHubConversation) return null;
     switch (conversation.type) {
       case 'acp':
         {
@@ -454,7 +454,7 @@ const ChatConversation: React.FC<{
       default:
         return null;
     }
-  }, [conversation, isNomiConversation, assistantDisplayName, hideSendBox]);
+  }, [conversation, isOpenHubConversation, assistantDisplayName, hideSendBox]);
 
   const sliderTitle = useMemo(() => {
     return (
@@ -470,7 +470,7 @@ const ChatConversation: React.FC<{
     if (conversation.extra?.companionSession) {
       return <CompanionChatPanel key={conversation.id} conversation={conversation} />;
     }
-    return <NomiConversationPanel key={conversation.id} conversation={conversation} sliderTitle={sliderTitle} />;
+    return <OpenHubConversationPanel key={conversation.id} conversation={conversation} sliderTitle={sliderTitle} />;
   }
 
   // 如果有预设助手信息，使用预设助手的 logo 和名称；加载中时不进入 fallback；否则使用 backend 的 logo

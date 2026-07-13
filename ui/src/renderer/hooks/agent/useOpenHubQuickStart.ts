@@ -21,11 +21,11 @@ export interface OpenHubQuickStartOptions {
 }
 
 /**
- * Spin up a fresh Nomi conversation seeded with an initial prompt, then jump to
- * it. Mirrors the Nomi branch of `useGuidSend`: create → refresh history →
+ * Spin up a fresh OpenHub conversation seeded with an initial prompt, then jump to
+ * it. Mirrors the OpenHub branch of `useGuidSend`: create → refresh history →
  * stash the initial message in sessionStorage (consumed by `OpenHubSendBox`) →
- * navigate. Used by the "one-click install" / "set up with Nomi" buttons so a
- * single click hands the task to the built-in Nomi agent.
+ * navigate. Used by the "one-click install" / "set up with OpenHub" buttons so a
+ * single click hands the task to the built-in OpenHub agent.
  */
 export const useOpenHubQuickStart = () => {
   const { t } = useTranslation();
@@ -55,7 +55,7 @@ export const useOpenHubQuickStart = () => {
         await navigate(`/conversation/${conversation.id}`);
         return true;
       } catch (error) {
-        console.error('Nomi quick start failed:', error);
+        console.error('OpenHub quick start failed:', error);
         Message.error(t('conversation.createFailed'));
         return false;
       }

@@ -621,7 +621,7 @@ mod tests {
     async fn codex_yolo_id_maps_to_full_access() {
         let reg = registry().await;
         let codex = reg.find_builtin_by_backend("codex").await.unwrap();
-        // Legacy Nomi yolo aliases resolve to Codex's native
+        // Legacy OpenHub yolo aliases resolve to Codex's native
         // `full-access` mode via the catalog row.
         assert_eq!(codex.yolo_id.as_deref(), Some("full-access"));
     }
@@ -635,7 +635,7 @@ mod tests {
 
     /// On a host that has *none* of the seeded CLIs installed, the
     /// public listing collapses to the rows that don't need one
-    /// (Nomi is `agent_source = internal` with no `command`).
+    /// (OpenHub is `agent_source = internal` with no `command`).
     /// This guards the pill-bar contract: never show an unusable
     /// vendor.
     #[tokio::test]
@@ -650,9 +650,9 @@ mod tests {
                 .map(|m| (&m.id, m.enabled, m.available))
                 .collect::<Vec<_>>()
         );
-        // Nomi (internal, no spawn command) is always available.
+        // OpenHub (internal, no spawn command) is always available.
         assert!(
-            visible.iter().any(|m| m.agent_type == AgentType::Nomi),
+            visible.iter().any(|m| m.agent_type == AgentType::OpenHub),
             "internal openhub row should survive the filter"
         );
     }
@@ -668,14 +668,14 @@ mod tests {
         assert_eq!(count(AgentType::Acp), 17);
         assert_eq!(count(AgentType::Nanobot), 1);
         assert_eq!(count(AgentType::OpenclawGateway), 1);
-        assert_eq!(count(AgentType::Nomi), 1);
+        assert_eq!(count(AgentType::OpenHub), 1);
     }
 
     #[tokio::test]
     async fn openhub_internal_row_is_available_without_command() {
         let reg = registry().await;
         let openhub = reg
-            .list_by_agent_type(AgentType::Nomi)
+            .list_by_agent_type(AgentType::OpenHub)
             .await
             .into_iter()
             .next()
@@ -795,7 +795,7 @@ mod tests {
         // accidentally co-occur with a reason).
         let openhub = snapshot
             .iter()
-            .find(|(m, _)| m.agent_type == AgentType::Nomi)
+            .find(|(m, _)| m.agent_type == AgentType::OpenHub)
             .expect("openhub seed row");
         assert!(openhub.0.available);
         assert!(openhub.1.is_none());

@@ -12,7 +12,7 @@ use openhub_types::message::{ContentBlock, Message, Role};
 use openhub_common::AppError;
 use openhub_db::IProviderRepository;
 
-use crate::types::NomiCompatOverrides;
+use crate::types::OpenHubCompatOverrides;
 
 use super::openhub::{map_openhub_provider, resolve_bedrock_config, resolve_openhub_url_and_compat};
 
@@ -37,7 +37,7 @@ pub(crate) struct ResolvedProviderFields {
     pub api_key: String,
     pub model: String,
     pub base_url: Option<String>,
-    pub compat_overrides: NomiCompatOverrides,
+    pub compat_overrides: OpenHubCompatOverrides,
     pub bedrock_config: Option<openhub_config::config::BedrockConfig>,
     pub context_limit: Option<i64>,
 }
@@ -47,7 +47,7 @@ pub(crate) struct ResolvedProviderFields {
 ///
 /// This is the shared extraction used by both the full `resolve_provider_config`
 /// (which also calls `Config::resolve`) and the openhub factory `build()` (which
-/// passes the pieces into `NomiResolvedConfig`).
+/// passes the pieces into `OpenHubResolvedConfig`).
 pub(crate) async fn resolve_provider_fields(
     provider_repo: &Arc<dyn IProviderRepository>,
     encryption_key: &[u8; 32],

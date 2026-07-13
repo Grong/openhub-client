@@ -128,7 +128,7 @@ pub async fn build_companion_system_prompt(
         ));
     } else {
         system.push_str(
-            "\n\n你还是整台 Nomi 桌面的总管家：用 openhub_* 工具可以查看/操作所有会话、定时任务、长期记忆和需求平台。\
+            "\n\n你还是整台 OpenHub 桌面的总管家：用 openhub_* 工具可以查看/操作所有会话、定时任务、长期记忆和需求平台。\
              删除类操作先向主人复述目标确认后再执行。",
         );
     }
@@ -581,7 +581,7 @@ impl CompanionThreads {
         let workspace = workspace_dir.to_string_lossy().into_owned();
 
         let req = CreateConversationRequest {
-            r#type: openhub_common::AgentType::Nomi,
+            r#type: openhub_common::AgentType::OpenHub,
             name: Some(title.clone()),
             model: Some(ProviderWithModel {
                 provider_id: profile.model.provider_id.clone(),
@@ -602,7 +602,7 @@ impl CompanionThreads {
                 // sidebar). Marks the conversation as a custom (non-temp) workspace, so
                 // no skill symlinks are wired — the companion uses gateway tools, not skills.
                 "workspace": workspace,
-                // No explicit session_mode here: the Nomi factory defaults every
+                // No explicit session_mode here: the OpenHub factory defaults every
                 // desktopGateway (companion-owned) session to "yolo" auto-approval
                 // (see factory/openhub.rs) — the companion chat has no interactive
                 // approval UI, so a tool call under Default mode would park forever
@@ -640,7 +640,7 @@ impl CompanionThreads {
             match self.conversations.get(COMPANION_USER_ID, &t.conversation_id).await {
                 // A companion session is valid only when it's a `openhub` conversation — the
                 // companion chat UI (ChatTab/CompanionConversation) renders openhub only.
-                Ok(resp) if resp.r#type == openhub_common::AgentType::Nomi => pruned.push(t),
+                Ok(resp) if resp.r#type == openhub_common::AgentType::OpenHub => pruned.push(t),
                 // Missing (deleted out-of-band) OR type-incompatible (e.g. a stale `acp`
                 // conversation left by a different build's ACP-companion feature, which this
                 // openhub-only build can't render → "走神" with no chat). Drop the registry

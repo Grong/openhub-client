@@ -279,7 +279,7 @@ mod tests {
             rows.iter()
                 .any(|r| r.name == "Claude Code" && r.agent_source == "builtin")
         );
-        assert!(rows.iter().any(|r| r.name == "Nomi" && r.agent_source == "internal"));
+        assert!(rows.iter().any(|r| r.name == "OpenHub" && r.agent_source == "internal"));
         // Nanobot and OpenClaw are builtin (not internal).
         assert!(rows.iter().any(|r| r.name == "Nanobot" && r.agent_source == "builtin"));
         assert!(rows.iter().any(|r| r.name == "OpenClaw" && r.agent_source == "builtin"));

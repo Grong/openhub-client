@@ -3844,7 +3844,7 @@ mod tests {
         assert_eq!(run.autonomy, DEFAULT_AUTONOMY);
         assert_eq!(run.max_parallel, Some(2));
 
-        // The fleet snapshot must decode to two members, each Nomi-runnable
+        // The fleet snapshot must decode to two members, each OpenHub-runnable
         // (provider_id + model both Some — worker.rs:116-120 requires it).
         let detail = svc.get_detail(&run.id).await.expect("detail");
         assert_eq!(detail.fleet_members.len(), 2, "two synthetic members snapshotted");

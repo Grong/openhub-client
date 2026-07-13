@@ -1,7 +1,7 @@
 //! One-shot relocation of the legacy temp-rooted data dir to the per-user
 //! application-data location.
 //!
-//! Historic builds defaulted the data dir to `<system temp>/openhub-data/Nomi`
+//! Historic builds defaulted the data dir to `<system temp>/openhub-data/OpenHub`
 //! — anything that cleans the temp dir (OS cleanup, reboot on some distros,
 //! disk-cleanup tools) silently destroyed all user data. The default now
 //! resolves through `dirs::data_local_dir()` (see `main.rs`); this module
@@ -134,7 +134,7 @@ pub enum RelocateOutcome {
 /// Whether legacy-temp relocation should run at all. Skipped when the data dir
 /// is explicitly overridden (`OPENHUB_DATA_DIR`) OR when this is a non-stable
 /// channel: dev/beta/canary run from an isolated sibling dir
-/// (`…/OpenHub/Nomi-dev`) and must NOT adopt the legacy temp-rooted *stable*
+/// (`…/OpenHub/OpenHub-dev`) and must NOT adopt the legacy temp-rooted *stable*
 /// install, which would cross-contaminate the very state we isolated. Pure, for
 /// unit testing (the live channel is compile-time, so the predicate is tested
 /// directly rather than through `effective_data_dir`).
@@ -155,7 +155,7 @@ pub fn effective_data_dir(default_dir: PathBuf) -> PathBuf {
         return default_dir;
     }
 
-    let legacy_root = std::env::temp_dir().join("openhub-data").join("Nomi");
+    let legacy_root = std::env::temp_dir().join("openhub-data").join("OpenHub");
     match relocate(&legacy_root, &default_dir) {
         Ok(RelocateOutcome::Relocated) => {
             boot_note(
@@ -1038,7 +1038,7 @@ mod tests {
         // reads it — safe under the parallel test runner.
         // SAFETY: no other thread in this test binary mutates the env.
         unsafe { std::env::set_var("OPENHUB_DATA_DIR", r"X:\custom-root") };
-        let dir = PathBuf::from(r"X:\custom-root\Nomi");
+        let dir = PathBuf::from(r"X:\custom-root\OpenHub");
         let resolved = effective_data_dir(dir.clone());
         unsafe { std::env::remove_var("OPENHUB_DATA_DIR") };
         assert_eq!(resolved, dir);

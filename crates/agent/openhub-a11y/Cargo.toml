@@ -1,6 +1,6 @@
 [package]
 name = "openhub-a11y"
-description = "Cross-platform accessibility-tree + Set-of-Marks engine for Nomi computer-use (macOS AX / Windows UIA / Linux AT-SPI)"
+description = "Cross-platform accessibility-tree + Set-of-Marks engine for OpenHub computer-use (macOS AX / Windows UIA / Linux AT-SPI)"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

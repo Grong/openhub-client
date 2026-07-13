@@ -5,13 +5,13 @@
 //! - Agent factory can build all agent types
 //! - Idle scanner finds eligible tasks
 //! - Workspace browsing works with real filesystem
-//! - Nomi stub returns appropriate errors
+//! - OpenHub stub returns appropriate errors
 
 use std::sync::Arc;
 
-use openhub_ai_agent::manager::openhub::NomiAgentManager;
+use openhub_ai_agent::manager::openhub::OpenHubAgentManager;
 use openhub_ai_agent::task_manager::AgentFactory;
-use openhub_ai_agent::types::{BuildTaskOptions, NomiResolvedConfig, SendMessageData};
+use openhub_ai_agent::types::{BuildTaskOptions, OpenHubResolvedConfig, SendMessageData};
 use openhub_ai_agent::*;
 use openhub_ai_agent::{SkillIndex, build_system_instructions_with_skills_index};
 use openhub_common::{AgentKillReason, AgentType, ConversationStatus, ProviderWithModel, TimestampMs, now_ms};
@@ -85,11 +85,11 @@ impl IAgentTask for TypedMockAgent {
 impl IMockAgent for TypedMockAgent {}
 
 // ---------------------------------------------------------------------------
-// Nomi agent tests (real implementation with AgentEngine)
+// OpenHub agent tests (real implementation with AgentEngine)
 // ---------------------------------------------------------------------------
 
-fn make_openhub_config() -> NomiResolvedConfig {
-    NomiResolvedConfig {
+fn make_openhub_config() -> OpenHubResolvedConfig {
+    OpenHubResolvedConfig {
         provider: "anthropic".into(),
         api_key: "sk-test-key".into(),
         model: "claude-sonnet-4-20250514".into(),
@@ -124,7 +124,7 @@ fn make_openhub_config() -> NomiResolvedConfig {
 
 #[tokio::test]
 async fn openhub_agent_kill_succeeds() {
-    let agent = NomiAgentManager::new("conv-1".into(), "/proj".into(), make_openhub_config(), None, None, None, None, Vec::new(), None, None, Vec::new(), false, None)
+    let agent = OpenHubAgentManager::new("conv-1".into(), "/proj".into(), make_openhub_config(), None, None, None, None, Vec::new(), None, None, Vec::new(), false, None)
         .await
         .unwrap();
     assert!(agent.kill(None).is_ok());
@@ -133,11 +133,11 @@ async fn openhub_agent_kill_succeeds() {
 
 #[tokio::test]
 async fn openhub_agent_confirm_succeeds() {
-    let agent = NomiAgentManager::new("conv-1".into(), "/proj".into(), make_openhub_config(), None, None, None, None, Vec::new(), None, None, Vec::new(), false, None)
+    let agent = OpenHubAgentManager::new("conv-1".into(), "/proj".into(), make_openhub_config(), None, None, None, None, Vec::new(), None, None, Vec::new(), false, None)
         .await
         .unwrap();
-    // `confirm` is an inherent method on `NomiAgentManager` (reached via
-    // `AgentInstance::Nomi(..)` in production); the test calls it
+    // `confirm` is an inherent method on `OpenHubAgentManager` (reached via
+    // `AgentInstance::OpenHub(..)` in production); the test calls it
     // directly on the concrete manager.
     let result = agent.confirm("msg", "call", json!({}), false);
     assert!(result.is_ok());
@@ -145,10 +145,10 @@ async fn openhub_agent_confirm_succeeds() {
 
 #[tokio::test]
 async fn openhub_agent_metadata() {
-    let agent = NomiAgentManager::new("conv-abc".into(), "/work".into(), make_openhub_config(), None, None, None, None, Vec::new(), None, None, Vec::new(), false, None)
+    let agent = OpenHubAgentManager::new("conv-abc".into(), "/work".into(), make_openhub_config(), None, None, None, None, Vec::new(), None, None, Vec::new(), false, None)
         .await
         .unwrap();
-    assert_eq!(agent.agent_type(), AgentType::Nomi);
+    assert_eq!(agent.agent_type(), AgentType::OpenHub);
     assert_eq!(agent.workspace(), "/work");
     assert_eq!(agent.conversation_id(), "conv-abc");
     assert_eq!(agent.status(), Some(ConversationStatus::Pending));
@@ -301,7 +301,7 @@ fn agent_type_serde_all_variants() {
         (AgentType::OpenclawGateway, "\"openclaw-gateway\""),
         (AgentType::Nanobot, "\"nanobot\""),
         (AgentType::Remote, "\"remote\""),
-        (AgentType::Nomi, "\"openhub\""),
+        (AgentType::OpenHub, "\"openhub\""),
     ] {
         let json = serde_json::to_string(&variant).unwrap();
         assert_eq!(json, expected_json, "Failed for {:?}", variant);

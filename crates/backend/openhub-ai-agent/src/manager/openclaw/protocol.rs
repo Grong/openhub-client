@@ -8,7 +8,7 @@ pub const OPENCLAW_MIN_PROTOCOL_VERSION: u32 = 3;
 pub const OPENCLAW_MAX_PROTOCOL_VERSION: u32 = 4;
 
 pub const CLIENT_ID: &str = "gateway-client";
-pub const CLIENT_DISPLAY_NAME: &str = "Nomi-Backend";
+pub const CLIENT_DISPLAY_NAME: &str = "OpenHub-Backend";
 pub const CLIENT_MODE: &str = "backend";
 pub const CLIENT_VERSION: &str = "1.0.0";
 

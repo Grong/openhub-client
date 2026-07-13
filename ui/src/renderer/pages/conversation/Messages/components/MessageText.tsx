@@ -214,7 +214,7 @@ const MessageText: React.FC<{ message: IMessageText; hideActions?: boolean }> = 
     [conversationContext?.workspace, files]
   );
 
-  // 仅 Nomi、且为最近一条用户文本消息时可编辑（与后端"仅最近一条"对齐）。
+  // 仅 OpenHub、且为最近一条用户文本消息时可编辑（与后端"仅最近一条"对齐）。
   const messageList = useMessageList();
   const isLatestUserMessage = useMemo(() => {
     if (!isUserMessage) return false;
@@ -255,7 +255,7 @@ const MessageText: React.FC<{ message: IMessageText; hideActions?: boolean }> = 
     </Tooltip>
   );
 
-  // 编辑（仅 Nomi 原生、且为最近一条用户文本消息）：把原文回填输入框并截断本地后续消息。
+  // 编辑（仅 OpenHub 原生、且为最近一条用户文本消息）：把原文回填输入框并截断本地后续消息。
   const canEdit = conversationContext?.type === 'openhub' && isUserMessage && message.type === 'text' && isLatestUserMessage;
 
   const handleEdit = () => {

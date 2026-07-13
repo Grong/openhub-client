@@ -480,19 +480,19 @@ fn missing_command_runtime(command: &str) -> &'static str {
 fn command_not_found_message(command: &str) -> String {
     match missing_command_runtime(command) {
         "node" => format!(
-            "Command not found: {command}. Install Node.js (which includes npm/npx), then restart Nomi or configure this MCP server to use an absolute command path."
+            "Command not found: {command}. Install Node.js (which includes npm/npx), then restart OpenHub or configure this MCP server to use an absolute command path."
         ),
         "bun" => format!(
-            "Command not found: {command}. Install Bun (which includes bun/bunx), then restart Nomi or configure this MCP server to use an absolute command path."
+            "Command not found: {command}. Install Bun (which includes bun/bunx), then restart OpenHub or configure this MCP server to use an absolute command path."
         ),
         "uv" => format!(
-            "Command not found: {command}. Install uv, then restart Nomi or configure this MCP server to use an absolute command path."
+            "Command not found: {command}. Install uv, then restart OpenHub or configure this MCP server to use an absolute command path."
         ),
         "python" => format!(
-            "Command not found: {command}. Install Python, then restart Nomi or configure this MCP server to use an absolute command path."
+            "Command not found: {command}. Install Python, then restart OpenHub or configure this MCP server to use an absolute command path."
         ),
         "deno" => format!(
-            "Command not found: {command}. Install Deno, then restart Nomi or configure this MCP server to use an absolute command path."
+            "Command not found: {command}. Install Deno, then restart OpenHub or configure this MCP server to use an absolute command path."
         ),
         _ => format!(
             "Command not found: {command}. Install the command or configure this MCP server to use an absolute command path."

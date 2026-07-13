@@ -7,12 +7,12 @@
 import { describe, expect, test } from 'bun:test';
 import enCommon from './locales/en-US/common.json';
 import enConversation from './locales/en-US/conversation.json';
-import enNomi from './locales/en-US/openhub.json';
+import enOpenHub from './locales/en-US/openhub.json';
 import enPublicCompanion from './locales/en-US/publicCompanion.json';
 import enSettings from './locales/en-US/settings.json';
 import zhCommon from './locales/zh-CN/common.json';
 import zhConversation from './locales/zh-CN/conversation.json';
-import zhNomi from './locales/zh-CN/openhub.json';
+import zhOpenHub from './locales/zh-CN/openhub.json';
 import zhPublicCompanion from './locales/zh-CN/publicCompanion.json';
 import zhSettings from './locales/zh-CN/settings.json';
 
@@ -213,7 +213,7 @@ const CHANNEL_SETTINGS_KEYS = [
   'wecom.waitingConnection',
 ] as const;
 
-const NOMI_REMOTE_KEYS = [
+const OPENHUB_REMOTE_KEYS = [
   'settings.remoteStatusNotConfigured',
   'settings.remoteStatusDisabled',
   'settings.remoteStatusEnabled',
@@ -313,8 +313,8 @@ describe('channel configuration locale coverage', () => {
   test('public companion channel surfaces have complete locale copy', () => {
     assertStringKeys('en-US publicCompanion', enPublicCompanion, PUBLIC_COMPANION_CHANNEL_KEYS);
     assertStringKeys('zh-CN publicCompanion', zhPublicCompanion, PUBLIC_COMPANION_CHANNEL_KEYS);
-    assertStringKeys('en-US openhub', enNomi, NOMI_REMOTE_KEYS);
-    assertStringKeys('zh-CN openhub', zhNomi, NOMI_REMOTE_KEYS);
+    assertStringKeys('en-US openhub', enOpenHub, OPENHUB_REMOTE_KEYS);
+    assertStringKeys('zh-CN openhub', zhOpenHub, OPENHUB_REMOTE_KEYS);
     assertStringKeys('en-US common', enCommon, COMMON_KEYS);
     assertStringKeys('zh-CN common', zhCommon, COMMON_KEYS);
     assertStringKeys('en-US conversation', enConversation, CONVERSATION_KEYS);

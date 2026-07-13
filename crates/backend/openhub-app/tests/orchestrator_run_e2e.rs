@@ -259,7 +259,7 @@ async fn run_create_plan_execute_completes_through_routes() {
                 max_parallel: None,
                 members: vec![FleetMemberInput {
                     agent_id: "agent_a".to_string(),
-                    // Nomi-engine member: provider+model required by the real
+                    // OpenHub-engine member: provider+model required by the real
                     // worker, harmless for the mock worker (ignored).
                     provider_id: Some("prov_x".to_string()),
                     model: Some("claude-opus-4-8".to_string()),
@@ -837,7 +837,7 @@ async fn adhoc_run_from_model_range_completes_through_engine() {
         .await
         .expect("create_adhoc from range");
 
-    // The fleet snapshot must hold two Nomi-runnable synthetic members (this is the
+    // The fleet snapshot must hold two OpenHub-runnable synthetic members (this is the
     // create_adhoc → snapshot half of the seam; the engine half is asserted below).
     let detail = run_service.get_detail(&run.id).await.expect("detail after create");
     assert!(detail.run.workspace_id.is_none(), "ad-hoc run has no workspace");
@@ -887,7 +887,7 @@ async fn adhoc_run_from_model_range_completes_through_engine() {
             "the ad-hoc run's own work_dir must reach the worker (no workspace dir exists)"
         );
     }
-    // The synthetic member reached the worker as a Nomi-runnable member. Both tasks
+    // The synthetic member reached the worker as a OpenHub-runnable member. Both tasks
     // are pre-assigned to member 0 ⇒ provider_a/model-a on both calls.
     let members = worker.seen_member.lock().unwrap().clone();
     for (provider, model) in &members {

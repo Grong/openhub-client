@@ -46,10 +46,10 @@ import { Message, Tag } from '@arco-design/web-react';
 import { Brain, MagicHat, Shield } from '@icon-park/react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { NomiMessageRuntime } from './useOpenHubMessage';
+import type { OpenHubMessageRuntime } from './useOpenHubMessage';
 import OpenHubModelSelector from './OpenHubModelSelector';
 import { ContextUsageRing } from './ContextUsageRing';
-import type { NomiModelSelection } from './useOpenHubModelSelection';
+import type { OpenHubModelSelection } from './useOpenHubModelSelection';
 
 const useOpenHubSendBoxDraft = getSendBoxDraftHook('openhub', {
   _type: 'openhub',
@@ -96,11 +96,11 @@ const useSendBoxDraft = (conversation_id: number) => {
 
 const OpenHubSendBox: React.FC<{
   conversation_id: number;
-  modelSelection: NomiModelSelection;
+  modelSelection: OpenHubModelSelection;
   session_mode?: string;
   agent_name?: string;
   dynamicModes: AgentModeOption[];
-  turnActivity: NomiMessageRuntime;
+  turnActivity: OpenHubMessageRuntime;
   /**
    * Hide the permission/agent-mode selector (and the mobile action-sheet
    * model + permission entries). Used by locked surfaces like the desktop
@@ -450,7 +450,7 @@ const OpenHubSendBox: React.FC<{
         }
       } catch (error) {
         if (msg_id) removeMessageByMsgId(msg_id);
-        // Engine can't steer (non-Nomi) or the turn just ended → fall back to the
+        // Engine can't steer (non-OpenHub) or the turn just ended → fall back to the
         // pending queue so the interjection is never lost.
         if (isSteerUnsupportedError(error)) {
           enqueue({ input, files });
@@ -744,7 +744,7 @@ const OpenHubSendBox: React.FC<{
         placeholder={
           current_model?.use_model
             ? t('acp.sendbox.placeholder', {
-                backend: agent_name || 'Nomi',
+                backend: agent_name || 'OpenHub',
                 defaultValue: `Send message to {{backend}}...`,
               })
             : t('conversation.chat.noModelSelected')

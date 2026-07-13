@@ -1,8 +1,8 @@
 //! `nomicore terminal-hook --event <kind>`: one-shot shim invoked by a native
 //! CLI hook (claude --settings hooks / codex hooks). Reads the CLI's hook event
 //! JSON from stdin, POSTs {terminal_id, kind, payload} to the in-process
-//! TerminalLifecycleServer at 127.0.0.1:{NOMI_TERM_HOOK_PORT}/hook (bearer
-//! NOMI_TERM_HOOK_TOKEN), then exits 0 WITHOUT emitting any blocking outcome —
+//! TerminalLifecycleServer at 127.0.0.1:{OPENHUB_TERM_HOOK_PORT}/hook (bearer
+//! OPENHUB_TERM_HOOK_TOKEN), then exits 0 WITHOUT emitting any blocking outcome —
 //! observe-only, never alters the agent's turn.
 
 use std::process::ExitCode;
@@ -26,7 +26,7 @@ pub(crate) fn build_hook_post(
 
 /// Entry point for `nomicore terminal-hook --event <kind>`.
 ///
-/// Reads env `NOMI_TERM_HOOK_{PORT,TOKEN,ID}` (baked at PTY spawn time by the
+/// Reads env `OPENHUB_TERM_HOOK_{PORT,TOKEN,ID}` (baked at PTY spawn time by the
 /// enhance layer), reads the CLI's hook event JSON from stdin, and fires a POST
 /// to the in-process `TerminalLifecycleServer`. Always exits 0 — observe-only,
 /// never blocks the agent's turn even on failure.
@@ -34,9 +34,9 @@ pub async fn run_terminal_hook(event: &str) -> ExitCode {
     // Identify the terminal + server from env baked at spawn. Missing → no-op
     // exit 0 (never break the agent's turn just because wiring is absent).
     let (Ok(port), Ok(token), Ok(id)) = (
-        std::env::var("NOMI_TERM_HOOK_PORT"),
-        std::env::var("NOMI_TERM_HOOK_TOKEN"),
-        std::env::var("NOMI_TERM_HOOK_ID"),
+        std::env::var("OPENHUB_TERM_HOOK_PORT"),
+        std::env::var("OPENHUB_TERM_HOOK_TOKEN"),
+        std::env::var("OPENHUB_TERM_HOOK_ID"),
     ) else {
         return ExitCode::SUCCESS;
     };

@@ -7,9 +7,9 @@ use crate::attachments::PromptAttachment;
 /// `requirement_update_status` tools registered into its tool bus at session
 /// build time.
 ///
-/// This must mirror the runtime registration logic: only the Nomi factory
+/// This must mirror the runtime registration logic: only the OpenHub factory
 /// (`crates/backend/openhub-ai-agent/src/factory/openhub.rs`) consumes the
-/// `requirement_sink`, and only `NomiAgentManager` registers
+/// `requirement_sink`, and only `OpenHubAgentManager` registers
 /// `RequirementCompleteTool` / `RequirementUpdateStatusTool` on the engine.
 /// Every other engine (ACP, Openclaw, Nanobot, Remote, Gemini) ships without
 /// them *in-process* — though ACP gains an equivalent declaration channel via
@@ -17,7 +17,7 @@ use crate::attachments::PromptAttachment;
 ///
 /// Keep this in lock-step with the registration site if engines ever change.
 pub fn has_native_requirement_tools(agent_type: AgentType) -> bool {
-    matches!(agent_type, AgentType::Nomi)
+    matches!(agent_type, AgentType::OpenHub)
 }
 
 /// Whether *this session* exposes the requirement declaration tools
@@ -26,7 +26,7 @@ pub fn has_native_requirement_tools(agent_type: AgentType) -> bool {
 /// means success.
 ///
 /// True when either:
-/// - the engine registers them natively in-process (Nomi), or
+/// - the engine registers them natively in-process (OpenHub), or
 /// - the requirement MCP server is injected for this ACP session
 ///   (`requirement_mcp_enabled`), giving claude/codex/gemini the same tools over
 ///   the stdio bridge.
@@ -84,7 +84,7 @@ fn render_attachments_section(attachments: &[PromptAttachment]) -> String {
 /// must NOT pick the next requirement — the platform hands it the next one.
 ///
 /// The instruction text is session-aware: only sessions that actually expose
-/// the `requirement_complete` / `requirement_update_status` tools (Nomi
+/// the `requirement_complete` / `requirement_update_status` tools (OpenHub
 /// natively, or ACP with the requirement MCP injected) are told to call those
 /// tools. Every other session is given a tool-free contract — it just does the
 /// work and ends the turn, and the platform records completion automatically
@@ -250,7 +250,7 @@ mod tests {
 
     #[test]
     fn attachments_section_lists_paths_and_missing_marker() {
-        for at in [AgentType::Nomi, AgentType::Acp] {
+        for at in [AgentType::OpenHub, AgentType::Acp] {
             let p = build_requirement_prompt("t", &req(), at, false, &atts());
             assert!(p.contains("Requirement attachments"));
             assert!(p.contains("./.openhub/requirement-attachments/req_1/设计稿.png"));
@@ -265,7 +265,7 @@ mod tests {
 
     #[test]
     fn no_attachments_means_no_section() {
-        let p = build_requirement_prompt("t", &req(), AgentType::Nomi, false, &[]);
+        let p = build_requirement_prompt("t", &req(), AgentType::OpenHub, false, &[]);
         assert!(!p.contains("Requirement attachments"));
         let p = build_terminal_requirement_prompt("t", &req(), &[]);
         assert!(!p.contains("Requirement attachments"));
@@ -273,22 +273,22 @@ mod tests {
 
     #[test]
     fn openhub_prompt_contains_id_and_native_tool_instructions() {
-        let p = build_requirement_prompt("t", &req(), AgentType::Nomi, false, &[]);
+        let p = build_requirement_prompt("t", &req(), AgentType::OpenHub, false, &[]);
         assert!(p.contains("7777"));
         assert!(p.contains("Detailed body"));
         assert!(
             p.contains("requirement_complete"),
-            "Nomi prompt MUST instruct calling requirement_complete (tool is registered for Nomi)"
+            "OpenHub prompt MUST instruct calling requirement_complete (tool is registered for OpenHub)"
         );
         assert!(
             p.contains("requirement_update_status"),
-            "Nomi prompt MUST instruct calling requirement_update_status on failure"
+            "OpenHub prompt MUST instruct calling requirement_update_status on failure"
         );
     }
 
     #[test]
     fn non_native_prompt_does_not_mention_requirement_complete_tool() {
-        // Every non-Nomi engine WITHOUT the requirement MCP injected: no tool bus
+        // Every non-OpenHub engine WITHOUT the requirement MCP injected: no tool bus
         // entry for the native requirement tools, so the prompt must NOT tell the
         // model to call them.
         for at in [
@@ -326,7 +326,7 @@ mod tests {
     fn acp_with_requirement_mcp_uses_native_prompt() {
         // Once the requirement MCP is injected, an ACP session DOES expose the
         // declaration tools, so it must be told to call them (same contract as
-        // Nomi). This is the soft-failure fix for ACP backends.
+        // OpenHub). This is the soft-failure fix for ACP backends.
         let p = build_requirement_prompt("t", &req(), AgentType::Acp, true, &[]);
         assert!(p.contains("7777"));
         assert!(
@@ -350,9 +350,9 @@ mod tests {
 
     #[test]
     fn session_has_requirement_tools_reflects_mcp_for_acp() {
-        // Nomi always has them in-process, regardless of the MCP flag.
-        assert!(session_has_requirement_tools(AgentType::Nomi, false));
-        assert!(session_has_requirement_tools(AgentType::Nomi, true));
+        // OpenHub always has them in-process, regardless of the MCP flag.
+        assert!(session_has_requirement_tools(AgentType::OpenHub, false));
+        assert!(session_has_requirement_tools(AgentType::OpenHub, true));
         // ACP only when the requirement MCP is enabled.
         assert!(!session_has_requirement_tools(AgentType::Acp, false));
         assert!(session_has_requirement_tools(AgentType::Acp, true));
@@ -369,7 +369,7 @@ mod tests {
 
     #[test]
     fn has_native_requirement_tools_only_for_openhub() {
-        assert!(has_native_requirement_tools(AgentType::Nomi));
+        assert!(has_native_requirement_tools(AgentType::OpenHub));
         for at in [
             AgentType::Acp,
             AgentType::OpenclawGateway,
@@ -405,7 +405,7 @@ mod tests {
             "terminal prompt must NOT contain the old TERMINAL_KNOWLEDGE_HINT"
         );
         // The old printed-marker protocol is gone.
-        assert!(!p.contains("NOMI_AUTOWORK_END"), "terminal prompt must not ask for a marker");
+        assert!(!p.contains("OPENHUB_AUTOWORK_END"), "terminal prompt must not ask for a marker");
     }
 
     #[test]

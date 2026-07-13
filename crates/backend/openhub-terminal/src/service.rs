@@ -123,7 +123,7 @@ pub struct TerminalService {
     /// NEVER the user's cwd. Defaults to a temp subdir until wired.
     mcp_config_dir: Arc<std::sync::RwLock<std::path::PathBuf>>,
     /// Absolute path to the MCP endpoint beacon file written by the backend on
-    /// boot. Passed to spawned PTYs as `NOMI_MCP_ENDPOINTS_FILE` so the knowledge
+    /// boot. Passed to spawned PTYs as `OPENHUB_MCP_ENDPOINTS_FILE` so the knowledge
     /// stdio bridge can discover the endpoint precisely (no data-dir resolution
     /// needed). Wired by `with_mcp_endpoints_path`. `None` → env not set (bridge
     /// falls back to its own data-dir resolution or legacy env vars).
@@ -231,7 +231,7 @@ impl TerminalService {
     }
 
     /// Wire the absolute path to the MCP endpoint beacon so spawned PTYs receive
-    /// `NOMI_MCP_ENDPOINTS_FILE` in their env. This lets the knowledge stdio bridge
+    /// `OPENHUB_MCP_ENDPOINTS_FILE` in their env. This lets the knowledge stdio bridge
     /// discover the endpoint precisely without computing the data-dir path itself.
     pub fn with_mcp_endpoints_path(&self, path: String) {
         if let Ok(mut g) = self.mcp_endpoints_path.write() {
@@ -518,7 +518,7 @@ impl TerminalService {
         // as priority-1 in `read_beacon_for_bridge`.
         if let Ok(guard) = self.mcp_endpoints_path.read() {
             if let Some(path) = guard.as_ref() {
-                env.insert("NOMI_MCP_ENDPOINTS_FILE".to_owned(), path.clone());
+                env.insert("OPENHUB_MCP_ENDPOINTS_FILE".to_owned(), path.clone());
             }
         }
 

@@ -9,9 +9,9 @@ import { describe, expect, test } from 'bun:test';
 
 const readSource = (url: URL) => readFileSync(url, 'utf8');
 
-describe('Nomi session metrics panel notice', () => {
+describe('OpenHub session metrics panel notice', () => {
   test('renders a data reliability notice in the metrics panel', () => {
-    const source = readSource(new URL('./NomiSessionMetricsPanel.tsx', import.meta.url));
+    const source = readSource(new URL('./OpenHubSessionMetricsPanel.tsx', import.meta.url));
 
     expect(source.includes('conversation.sessionMetrics.notice')).toBe(true);
   });

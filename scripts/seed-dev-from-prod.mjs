@@ -1,9 +1,9 @@
 #!/usr/bin/env bun
 /**
- * Seed the dev-channel data dir (…/OpenHub/Nomi-dev) from production
- * (…/OpenHub/Nomi), so an auto-isolated dev build can reproduce prod state.
+ * Seed the dev-channel data dir (…/OpenHub/OpenHub-dev) from production
+ * (…/OpenHub/OpenHub), so an auto-isolated dev build can reproduce prod state.
  *
- * Auto-isolation (NOMI_CHANNEL=dev → `Nomi-dev`) gives a dev build its own empty
+ * Auto-isolation (OPENHUB_CHANNEL=dev → `OpenHub-dev`) gives a dev build its own empty
  * DB. This is the escape hatch for when you need prod's conversations /
  * providers / login in dev to reproduce a bug — it restores the "troubleshoot
  * one place" convenience that channel isolation otherwise trades away.
@@ -13,7 +13,7 @@
  * database yields a torn snapshot. Lock and runtime files are never copied.
  *
  * Usage: bun scripts/seed-dev-from-prod.mjs [--force]
- *   --force  overwrite an existing non-empty Nomi-dev (its state is discarded)
+ *   --force  overwrite an existing non-empty OpenHub-dev (its state is discarded)
  */
 import { cpSync, existsSync, readdirSync, rmSync } from 'node:fs';
 import { homedir, platform } from 'node:os';
@@ -38,8 +38,8 @@ const EXCLUDED = new Set(['server.lock', 'server.lock.info', 'port.json', '.relo
 
 const force = process.argv.includes('--force');
 const base =openhubase();
-const prod = join(base, 'Nomi');
-const dev = join(base, 'Nomi-dev');
+const prod = join(base, 'OpenHub');
+const dev = join(base, 'OpenHub-dev');
 
 if (!existsSync(prod)) {
   console.error(`✗ prod data dir not found: ${prod}`);

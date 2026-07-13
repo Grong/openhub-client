@@ -1,4 +1,4 @@
-// Long-term memory system for Nomi.
+// Long-term memory system for OpenHub.
 //
 // Provides cross-session storage of user preferences, feedback,
 // project context, and external references.

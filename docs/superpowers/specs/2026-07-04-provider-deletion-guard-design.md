@@ -19,7 +19,7 @@
   - 软引用（会自愈）：`openhub.defaultModel`（前端配置）、`knowledge.autogenModel`、`agent.model_failover`、`assistant.{platform}.defaultModel`（渠道默认模型，后端 client_preferences）
 - **删除无任何 in-use 检查**：`ProviderService::delete`（`openhub-system/src/provider.rs:110`）直接 `DELETE FROM providers WHERE id=?`（`sqlite_provider.rs:143`）。唯一守卫是 id 不存在返回 404。
 - **报错来源**：字符串 `Provider '{id}' not found` 由 `factory/provider_config.rs:61`（`resolve_provider_fields`）产生 → `AppError::BadRequest`，Display 自动加 `Bad request:` 前缀（`openhub-common/src/error.rs:14`）。另一处 `services/provider_health.rs:68` 只在设置页手动健康检查触达，非首页来源。
-- **两条 toast**：`NomiSendBox` 打开会话时并发触发 (1) mount warmup（`.catch` 弹 toast）+ (2) 自动发送首条消息（`catch` 弹 toast），各 build 一次 Nomi agent → 同一错误 → 弹两次。前端 `getConversationRuntimeWorkspaceErrorMessage`（`conversationCreateError.ts`）把 `backendMessage` 原样返回，无 i18n 映射。
+- **两条 toast**：`OpenHubSendBox` 打开会话时并发触发 (1) mount warmup（`.catch` 弹 toast）+ (2) 自动发送首条消息（`catch` 弹 toast），各 build 一次 OpenHub agent → 同一错误 → 弹两次。前端 `getConversationRuntimeWorkspaceErrorMessage`（`conversationCreateError.ts`）把 `backendMessage` 原样返回，无 i18n 映射。
 - **无回退**：`resolve_provider_fields` 找不到 provider 直接硬报错，没有 fallback。
 - **可复用先例**：
   - `AppError` 已有 `Conflict`（409）+ 每变体 `error_details() -> Option<Value>`（`WorkspacePathEdgeWhitespace` 携带结构化 `details`）；前端 `BackendHttpError` 已解析 `code`/`backendMessage`/`details`。
@@ -125,7 +125,7 @@ AppError::ProviderInUse(ProviderInUseDetails)   // { usages: Vec<ProviderUsage> 
 2. 否则（provider_id 为空 **或** 行不存在）→ `resolve_default_model(&deps.provider_repo)`（首个已启用 provider+model）→ 用它 `resolve_provider_fields`；标记 `substituted = true`。
 3. 若 `resolve_default_model` 也返回 None（无任何可用模型）→ 返回组件 C 的友好 coded 错误。
 
-用 `find_by_id().is_none()` 判定，不依赖错误字符串。该兜底在**工厂唯一收口处**，覆盖普通会话/伙伴/渠道等所有 Nomi 调用方。工厂 build 结果新增 `Option<ProviderWithModel> substituted_model` 供上层感知（读路径不写库）。
+用 `find_by_id().is_none()` 判定，不依赖错误字符串。该兜底在**工厂唯一收口处**，覆盖普通会话/伙伴/渠道等所有 OpenHub 调用方。工厂 build 结果新增 `Option<ProviderWithModel> substituted_model` 供上层感知（读路径不写库）。
 
 ### B.2 前端自愈 + 轻提示（honoring 用户默认）
 
@@ -133,14 +133,14 @@ AppError::ProviderInUse(ProviderInUseDetails)   // { usages: Vec<ProviderUsage> 
 
 - `useOpenHubModelSelection` / 会话加载路径：当会话 `conversations.model.provider_id` 不在当前 provider 列表中（选择器已过滤缺失 provider）时：
   1. 计算目标模型 = `openhub.defaultModel` 指向的可用模型；无效则第一个可用模型。
-  2. 通过既有会话模型持久化路径（NomiModelSelector `onChange` / updateConversation）写回 `conversations.model`。
+  2. 通过既有会话模型持久化路径（OpenHubModelSelector `onChange` / updateConversation）写回 `conversations.model`。
   3. 轻提示 toast「已回退到默认模型 {name}」。
 - 这样既兑现"默认模型→首个可用"，又清掉悬空、下次不再 stale。后端 B.1 是覆盖前端未走到路径（渠道/伙伴绑定/其他客户端）的安全网。
 
 ## 5. 组件 C — 友好文案兜底
 
 - 后端：`resolve_default_model` 无可用模型的终态错误，改为带专用 code（新增 `PROVIDER_UNAVAILABLE`，或复用前端已有的 `USER_LLM_PROVIDER_MODEL_NOT_FOUND` 语义）+ 清晰消息。确保该 code 随 warmup / send 的 `AppError` 传到前端。
-- 前端：两条 toast 链路（`conversationCreateError.ts` 的 `getConversationRuntimeWorkspaceErrorMessage`；`NomiSendBox` warmup/send 的 `catch`）按 code→i18n 映射为「当前没有可用的模型供应商，请到『模型&Agent』添加并启用后重试」+ 跳转链接，**不再出现 `prov_xxx`**。
+- 前端：两条 toast 链路（`conversationCreateError.ts` 的 `getConversationRuntimeWorkspaceErrorMessage`；`OpenHubSendBox` warmup/send 的 `catch`）按 code→i18n 映射为「当前没有可用的模型供应商，请到『模型&Agent』添加并启用后重试」+ 跳转链接，**不再出现 `prov_xxx`**。
 - 兜底：凡仍直接弹 `backendMessage` 的 provider 报错点，加 code→i18n 回退，裸 id 永不触达用户。
 
 ## 6. 测试策略

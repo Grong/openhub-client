@@ -50,7 +50,7 @@ All flags below are read by `apps/web/src/main.rs`. Each has an environment-vari
 |---|---|---|---|
 | `--host` | `OPENHUB_WEB_HOST` | `127.0.0.1` | IP to bind on. `0.0.0.0` accepts LAN/VPN/public traffic; pre-seed the admin or complete first-run setup before broad exposure. |
 | `--port` | `OPENHUB_WEB_PORT` | `8787` | TCP port. Serves the API, the WebSocket at `/ws`, and the SPA. |
-| `--data-dir` | `OPENHUB_DATA_DIR` | per-user dir | Backend data dir (SQLite database, agent state, logs, Bun cache). Defaults to the per-user location shared with the desktop app (`%LOCALAPPDATA%\OpenHub\Nomi`, `~/Library/Application Support/OpenHub/Nomi`, `$XDG_DATA_HOME/OpenHub/Nomi`). **Still set an explicit absolute path in production.** |
+| `--data-dir` | `OPENHUB_DATA_DIR` | per-user dir | Backend data dir (SQLite database, agent state, logs, Bun cache). Defaults to the per-user location shared with the desktop app (`%LOCALAPPDATA%\OpenHub\OpenHub`, `~/Library/Application Support/OpenHub/OpenHub`, `$XDG_DATA_HOME/OpenHub/OpenHub`). **Still set an explicit absolute path in production.** |
 | `--dist` | `OPENHUB_WEB_DIST` | `../../ui/dist` | Directory containing the built SPA. **Set this explicitly when deploying.** |
 | `--admin-user` | `OPENHUB_ADMIN_USERNAME` | `admin` | Username used when pre-seeding the first admin. Ignored once an admin exists. |
 | `--admin-password` | `OPENHUB_ADMIN_PASSWORD` | — | Pre-seed the first admin password at boot, skipping interactive setup. Ignored once an admin exists. |
@@ -228,7 +228,7 @@ The shipped unit:
 - Binds `127.0.0.1:8787` by default. Change `OPENHUB_WEB_HOST` to
   `0.0.0.0` only after first-run setup is complete or
   `OPENHUB_ADMIN_PASSWORD` is configured.
-- Sets `OPENHUB_DATA_DIR=/var/libopenhub to match the systemd-managed `StateDirectoryopenhub. **Keep these two in sync** — if you drop the env line, the data dir silently falls back to the service user's per-user directory (`$XDG_DATA_HOME/OpenHub/Nomi`, typically `~openhub/.local/share/OpenHub/Nomi`), decoupled from systemd state.
+- Sets `OPENHUB_DATA_DIR=/var/libopenhub to match the systemd-managed `StateDirectoryopenhub. **Keep these two in sync** — if you drop the env line, the data dir silently falls back to the service user's per-user directory (`$XDG_DATA_HOME/OpenHub/OpenHub`, typically `~openhub/.local/share/OpenHub/OpenHub`), decoupled from systemd state.
 - Runs as a dedicated openhub user (`Useropenhub, `Groupopenhub).
 - Restarts on failure with a 3 s backoff.
 - Applies moderate hardening (`NoNewPrivileges=yes`, `PrivateTmp=yes`). **Do not add** `ProtectHome=yes` or strict `ProtectSystem` — the agent engine reads/writes operator-directed files and over-sandboxing breaks core features.

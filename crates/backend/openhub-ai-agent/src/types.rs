@@ -49,16 +49,16 @@ pub struct BuildTaskOptions {
 
 /// Provider-specific compat overrides resolved in the factory.
 #[derive(Debug, Clone, Default)]
-pub struct NomiCompatOverrides {
+pub struct OpenHubCompatOverrides {
     pub max_tokens_field: Option<String>,
     pub api_path: Option<String>,
     /// None = 默认支持图片;Some(false) = registry 已标记不支持,发送时剔图。
     pub supports_image: Option<bool>,
 }
 
-/// Fully resolved Nomi configuration passed to the agent manager.
+/// Fully resolved OpenHub configuration passed to the agent manager.
 #[derive(Debug, Clone)]
-pub struct NomiResolvedConfig {
+pub struct OpenHubResolvedConfig {
     /// LLM provider name (anthropic, openai, bedrock, vertex).
     pub provider: String,
     /// Decrypted API key.
@@ -77,7 +77,7 @@ pub struct NomiResolvedConfig {
     /// engine's compaction window and the context-usage gauge denominator.
     pub context_limit: Option<u64>,
     /// Provider-specific compat overrides.
-    pub compat_overrides: NomiCompatOverrides,
+    pub compat_overrides: OpenHubCompatOverrides,
     /// Directory for openhub session persistence files.
     pub session_directory: PathBuf,
     /// Session mode (default, auto_edit, yolo).
@@ -147,7 +147,7 @@ pub struct NomiResolvedConfig {
     /// 是否注册进程内 Spawn 工具（工厂按 `engine_spawn_enabled` 计算：本地桌面
     /// 网关会话 false —— 改走可视化的 openhub_spawn 编排扇出；其余 true）。
     pub in_process_spawn: bool,
-    /// Per-session 工具白名单（空 = 不限制），源自 `NomiBuildExtra.allowed_tools`，
+    /// Per-session 工具白名单（空 = 不限制），源自 `OpenHubBuildExtra.allowed_tools`，
     /// 由 manager 灌进 `config.tools.builtin_allowlist`。
     pub allowed_tools: Vec<String>,
     /// 原生文件工具（Write/Edit/ApplyPatch）的写根钳制，按会话**信任面**解析：
@@ -160,7 +160,7 @@ pub struct NomiResolvedConfig {
 
 /// **P3-X2**: the shared browser secret vault location + its machine-bound key
 /// (去 per-pet 键化: browser identity globally shared — one vault for all companions).
-/// Debug redacts the key so it never lands in a `NomiResolvedConfig` log line.
+/// Debug redacts the key so it never lands in a `OpenHubResolvedConfig` log line.
 #[derive(Clone)]
 pub struct BrowserSecretVault {
     /// The shared secret vault file path
@@ -182,7 +182,7 @@ impl std::fmt::Debug for BrowserSecretVault {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use openhub_api_types::{AcpBuildExtra, AcpModelInfo, NomiBuildExtra, OpenClawGatewayConfig, SlashCommandItem};
+    use openhub_api_types::{AcpBuildExtra, AcpModelInfo, OpenHubBuildExtra, OpenClawGatewayConfig, SlashCommandItem};
     use serde_json::json;
 
     #[test]
@@ -289,7 +289,7 @@ mod tests {
     #[test]
     fn openhub_build_extra_serde_defaults() {
         let json = json!({});
-        let extra: NomiBuildExtra = serde_json::from_value(json).unwrap();
+        let extra: OpenHubBuildExtra = serde_json::from_value(json).unwrap();
         assert!(extra.system_prompt.is_none());
         assert!(extra.preset_rules.is_none());
         assert_eq!(extra.max_tokens, 8192);
@@ -303,7 +303,7 @@ mod tests {
             "max_tokens": 4096,
             "max_turns": 10
         });
-        let extra: NomiBuildExtra = serde_json::from_value(json).unwrap();
+        let extra: OpenHubBuildExtra = serde_json::from_value(json).unwrap();
         assert_eq!(extra.system_prompt.unwrap(), "You are a helpful assistant.");
         assert_eq!(extra.max_tokens, 4096);
         assert_eq!(extra.max_turns.unwrap(), 10);
@@ -315,7 +315,7 @@ mod tests {
             "preset_rules": "You are a data analyst.",
             "max_tokens": 8192
         });
-        let extra: NomiBuildExtra = serde_json::from_value(json).unwrap();
+        let extra: OpenHubBuildExtra = serde_json::from_value(json).unwrap();
         assert!(extra.system_prompt.is_none());
         assert_eq!(extra.preset_rules.unwrap(), "You are a data analyst.");
     }

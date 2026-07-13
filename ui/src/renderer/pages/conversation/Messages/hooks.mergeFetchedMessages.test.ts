@@ -95,7 +95,7 @@ describe('composeMessageForTest', () => {
       msg_id: 'assistant-turn-1',
       type: 'agent_status',
       position: 'left',
-      content: { backend: 'openhub', status: 'preparing', agent_name: 'Nomi' },
+      content: { backend: 'openhub', status: 'preparing', agent_name: 'OpenHub' },
     });
 
     const merged = composeMessageForTest(status, [text]);
@@ -111,12 +111,12 @@ describe('composeMessageForTest', () => {
       msg_id: 'assistant-turn-1',
       type: 'agent_status',
       position: 'left',
-      content: { backend: 'openhub', status: 'preparing', agent_name: 'Nomi' },
+      content: { backend: 'openhub', status: 'preparing', agent_name: 'OpenHub' },
     });
     const updated = {
       ...status,
       created_at: 2000,
-      content: { backend: 'openhub', status: 'prepared', agent_name: 'Nomi' },
+      content: { backend: 'openhub', status: 'prepared', agent_name: 'OpenHub' },
     } as TMessage;
 
     const merged = composeMessageForTest(updated, [status]);

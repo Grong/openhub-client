@@ -61,7 +61,7 @@ pub use knowledge_retrieval::LiveKnowledgeRetrievalSink;
 pub use knowledge_writeback::LiveKnowledgeWritebackSink;
 pub use terminal_title_completer::LiveTerminalTitleCompleter;
 pub use openhub_api_types::{
-    AcpBuildExtra, AcpModelInfo, NomiBuildExtra, OpenClawBuildExtra, OpenClawGatewayConfig, RemoteBuildExtra,
+    AcpBuildExtra, AcpModelInfo, OpenHubBuildExtra, OpenClawBuildExtra, OpenClawGatewayConfig, RemoteBuildExtra,
     SlashCommandItem,
 };
 pub use persistence::AcpSessionSyncService;

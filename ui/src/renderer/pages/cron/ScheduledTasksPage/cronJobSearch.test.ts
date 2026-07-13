@@ -58,7 +58,7 @@ describe('filterCronJobsByQuery', () => {
         created_by: 'user',
         created_at: 2,
         updated_at: 2,
-        agent_config: { backend: 'openhub-provider', name: 'Nomi' },
+        agent_config: { backend: 'openhub-provider', name: 'OpenHub' },
       },
     }),
   ];

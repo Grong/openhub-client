@@ -1,10 +1,10 @@
-//! Integration tests for file-based MCP Agent adapters (Opencode, Nomi, Nomi).
+//! Integration tests for file-based MCP Agent adapters (Opencode, OpenHub, OpenHub).
 //!
 //! These tests exercise the real filesystem read/write logic using temp
 //! directories. CLI detection (`is_installed`, `which`) is NOT tested here
 //! because it depends on the host environment.
 //!
-//! For Nomi, we use a mock repository since it reads from the DB.
+//! For OpenHub, we use a mock repository since it reads from the DB.
 
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -13,7 +13,7 @@ use openhub_common::McpSource;
 use openhub_mcp::{McpAgentAdapter, McpServerTransport, OpenhubAdapter};
 
 // ===========================================================================
-// Nomi adapter (DB-backed)
+// OpenHub adapter (DB-backed)
 // ===========================================================================
 
 modopenhub{
@@ -205,10 +205,10 @@ mod opencode {
 }
 
 // ===========================================================================
-// Nomi adapter (CLI + TOML-backed)
+// OpenHub adapter (CLI + TOML-backed)
 // ===========================================================================
 
-// Note: Full lifecycle tests for Nomi require the `openhub` CLI to be
+// Note: Full lifecycle tests for OpenHub require the `openhub` CLI to be
 // installed (for `--config-path`). The unit tests in openhub.rs thoroughly
 // cover TOML parsing, serialization, and roundtrip behavior. Here we
 // verify the public API surface.

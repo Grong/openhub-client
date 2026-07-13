@@ -108,7 +108,7 @@ async fn openhub_factory_returns_unavailable_when_no_providers_configured() {
     let factory = make_factory(provider_repo, remote_agent_repo, agent_registry, acp_agent_service);
 
     let options = BuildTaskOptions {
-        agent_type: AgentType::Nomi,
+        agent_type: AgentType::OpenHub,
         workspace: String::new(),
         model: ProviderWithModel {
             provider_id: "nonexistent-provider".into(),
@@ -143,7 +143,7 @@ async fn openhub_factory_falls_back_to_first_enabled_when_bound_provider_missing
     let factory = make_factory(provider_repo, remote_agent_repo, agent_registry, acp_agent_service);
 
     let options = BuildTaskOptions {
-        agent_type: AgentType::Nomi,
+        agent_type: AgentType::OpenHub,
         workspace: "/tmp/test-workspace".into(),
         model: ProviderWithModel {
             provider_id: "deleted-provider".into(),
@@ -166,7 +166,7 @@ async fn openhub_factory_resolves_provider_from_db() {
     let factory = make_factory(provider_repo, remote_agent_repo, agent_registry, acp_agent_service);
 
     let options = BuildTaskOptions {
-        agent_type: AgentType::Nomi,
+        agent_type: AgentType::OpenHub,
         workspace: "/tmp/test-workspace".into(),
         model: ProviderWithModel {
             provider_id: "prov-001".into(),
@@ -189,7 +189,7 @@ async fn openhub_factory_respects_use_model_override() {
     let factory = make_factory(provider_repo, remote_agent_repo, agent_registry, acp_agent_service);
 
     let options = BuildTaskOptions {
-        agent_type: AgentType::Nomi,
+        agent_type: AgentType::OpenHub,
         workspace: "/tmp/test-workspace".into(),
         model: ProviderWithModel {
             provider_id: "prov-002".into(),

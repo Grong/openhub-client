@@ -123,7 +123,7 @@ The configured data directory must be writable by the process. Common cases:
 - A read-only mount (`RootDirectory=`, `ProtectHome=yes`, …) covering the data path. Drop the over-broad sandbox; keep the moderate hardening from the shipped unit (`NoNewPrivileges=yes`, `PrivateTmp=yes`).
 - On Docker, mounting a host directory whose UID does not match the container's. Use a named volume instead, or `chown` the host directory to the right UID.
 
-The desktop shell's default data dir is the **per-user application-data location** (`%LOCALAPPDATA%\OpenHub\Nomi` on Windows, `~/Library/Application Support/OpenHub/Nomi` on macOS, `$XDG_DATA_HOME/OpenHub/Nomi` on Linux), which is writable by the launching user by construction. Set `OPENHUB_DATA_DIR=<absolute path>` and the dir becomes `$OPENHUB_DATA_DIR/Nomi`. Legacy installs under `<system temp>/openhub-data/Nomi` are relocated to the new default automatically on launch (the old dir is kept as a backup); if the relocation cannot complete, the app keeps starting from the legacy dir and retries next launch.
+The desktop shell's default data dir is the **per-user application-data location** (`%LOCALAPPDATA%\OpenHub\OpenHub` on Windows, `~/Library/Application Support/OpenHub/OpenHub` on macOS, `$XDG_DATA_HOME/OpenHub/OpenHub` on Linux), which is writable by the launching user by construction. Set `OPENHUB_DATA_DIR=<absolute path>` and the dir becomes `$OPENHUB_DATA_DIR/OpenHub`. Legacy installs under `<system temp>/openhub-data/OpenHub` are relocated to the new default automatically on launch (the old dir is kept as a backup); if the relocation cannot complete, the app keeps starting from the legacy dir and retries next launch.
 
 ### `data directory ... is already in use by another running OpenHub backend`
 

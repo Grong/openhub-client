@@ -26,15 +26,15 @@
 ### Task 1: 集群模式提示（agent_cluster_mode → CLUSTER_MODE_HINT）
 
 **Files:**
-- Modify: `crates/backend/openhub-api-types/src/agent_build_extra.rs`（NomiBuildExtra，~line 342 后加字段）
+- Modify: `crates/backend/openhub-api-types/src/agent_build_extra.rs`（OpenHubBuildExtra，~line 342 后加字段）
 - Modify: `crates/backend/openhub-ai-agent/src/factory/openhub.rs`（~line 190 注入点 + ~line 777 纯函数区 + tests mod）
 
 **Interfaces:**
-- Produces: `NomiBuildExtra.agent_cluster_mode: bool`（serde default，alias `agentClusterMode`）；
+- Produces: `OpenHubBuildExtra.agent_cluster_mode: bool`（serde default，alias `agentClusterMode`）；
   `pub(crate) const CLUSTER_MODE_HINT: &str`；
   `compose_subagent_hint(base, inject, cluster: bool)` 第三参（cluster=true 时在 SUBAGENT_STANDARD_HINT 之后再追加 CLUSTER_MODE_HINT；cluster 只在 inject=true 时生效）。
 
-- [ ] Step 1: NomiBuildExtra 加字段：
+- [ ] Step 1: OpenHubBuildExtra 加字段：
 ```rust
 /// 「agent 集群」意图标记（需求1）。用户在 composer 显式点选后写到会话 extra；
 /// 工厂据此在常驻 subagent 提示之上追加更强的 CLUSTER_MODE_HINT（必须刻意评估

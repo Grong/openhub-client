@@ -41,7 +41,7 @@ impl RunService {
 ```
 - **autonomy gate**:`openhub_run_create`/POST runs 现做 create→plan→engine.start。改为:create→plan;若 run.autonomy=='interactive' 且 plan 成功 → 状态='awaiting_plan_approval',**不** engine.start(等 approve);否则 status='running' + engine.start。`approve_plan`:awaiting_plan_approval→running + engine.start。
 - **pause/resume**:RunEngine run_loop 每轮(fill 前)读 run.status;若 'paused' → 不 fill(跳过派新),若有在飞则 await 在飞完成处理 outcome,若无在飞则 idle-await(sleep/notify)直到 resume 或 cancel(不 busy-spin、不判 completed)。resume 设 running(engine 若已停则重 start;若 loop 仍在则它下轮恢复 fill)。**注意**:engine 持久 loop 仍在跑(只是 paused 时不 fill),所以 pause 不需停 loop;但若 loop 在 paused+无在飞 idle,要能被 resume 唤醒(用 run 的 wake notify 或周期 re-check status)。
-- **steer**:steer_task 找 task.conversation_id → `conv_service.steer_message(SYSTEM_USER_ID, conv_id.to_string(), SendMessageRequest{...text...}, &task_manager)`（读 steer_message 签名;它中途注入运行中回合,Nomi-only;失败→fallback/BadRequest）。RunService 需持 conv_service + task_manager（engine 已持;steer 可走 engine 或 service——放能拿到 conv_service 的层）。
+- **steer**:steer_task 找 task.conversation_id → `conv_service.steer_message(SYSTEM_USER_ID, conv_id.to_string(), SendMessageRequest{...text...}, &task_manager)`（读 steer_message 签名;它中途注入运行中回合,OpenHub-only;失败→fallback/BadRequest）。RunService 需持 conv_service + task_manager（engine 已持;steer 可走 engine 或 service——放能拿到 conv_service 的层）。
 - 路由:POST `/api/orchestrator/runs/{id}/approve`、`/pause`、`/resume`;POST `/api/orchestrator/runs/{id}/tasks/{task_id}/steer`(body {text})。薄 handler。
 
 参照模板：`ConversationService::steer_message`/`cancel`(service.rs);P2 engine run_loop(paused 检查插在 fill 前);P0 routes handler。

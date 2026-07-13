@@ -18,7 +18,7 @@
 - **一个伙伴 = 恰好一条会话**：通过 `ensureCompanionSession`（幂等，缺失则创建）解析，称"单会话契约"。
 - **`/openhub` 已是侧边栏中标注「桌面伙伴」的入口**（i18n `openhub.siderTitle`），目前是配置中心 + 一个聊天 Tab。
 - **会话列表已有"工作空间(workpath) → 类型(交互/终端)"分组**（`SessionList/`），新增一个专属「桌面伙伴」分组顺理成章。
-- **会话视图的 openhub 分发点**在 `ChatConversation.tsx:357`：`type==='openhub'` → `NomiConversationPanel`（全功能面板）。
+- **会话视图的 openhub 分发点**在 `ChatConversation.tsx:357`：`type==='openhub'` → `OpenHubConversationPanel`（全功能面板）。
 - **浮窗桌宠**（`/companion` 窗口）与伙伴共享同一会话与 `extra` 标记；其"去聊天"深链 `pages/companion/index.tsx:1317` 现指向 `/openhub?...&tab=chat`，聊天 Tab 移除后会失效，需要改向会话。
 
 ## 用户已确认的决策
@@ -44,7 +44,7 @@
 - `buildWorkpathTree` **保持不动**；伙伴会话仍被过滤出项目分组，避免重复列出。
 
 ### 2. 在会话视图打开伙伴聊天（`pages/conversation/components/ChatConversation.tsx`）
-- 在第 357 行处分支：`extra.companionSession === true` → 渲染新的轻量 `CompanionChatPanel`（由 `extra.companionId` 推导 companionId，取 `useCompanion(companionId)`，再渲染**现有** `CompanionConversation` 及其当前受限 props + 当前 `ChatTab` 的"模型未配置"引导门禁）。否则 → 现有 `NomiConversationPanel`。
+- 在第 357 行处分支：`extra.companionSession === true` → 渲染新的轻量 `CompanionChatPanel`（由 `extra.companionId` 推导 companionId，取 `useCompanion(companionId)`，再渲染**现有** `CompanionConversation` 及其当前受限 props + 当前 `ChatTab` 的"模型未配置"引导门禁）。否则 → 现有 `OpenHubConversationPanel`。
 - 保留全部限制，仅把入口搬进会话。
 
 ### 3. `/openhub` 变为纯管理中心（`pages/openhub/index.tsx`、`tabs/ChatTab.tsx`）

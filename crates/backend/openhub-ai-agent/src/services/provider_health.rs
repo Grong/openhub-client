@@ -20,7 +20,7 @@ use tracing::{info, warn};
 use crate::factory::openhub::{
     map_openhub_provider, resolve_bedrock_config, resolve_openhub_url_and_compat,
 };
-use crate::types::NomiResolvedConfig;
+use crate::types::OpenHubResolvedConfig;
 
 const HEALTH_CHECK_TIMEOUT: Duration = Duration::from_secs(30);
 const MODALITY_PROBE_TIMEOUT: Duration = Duration::from_secs(60);
@@ -130,7 +130,7 @@ impl ProviderHealthCheckService {
         &self,
         row: &Provider,
         model_id: &str,
-    ) -> Result<NomiResolvedConfig, AppError> {
+    ) -> Result<OpenHubResolvedConfig, AppError> {
         let api_key = openhub_common::decrypt_string(&row.api_key_encrypted, &self.encryption_key)?;
         let provider = map_openhub_provider(&row.platform, model_id, row.model_protocols.as_deref());
         let (base_url, compat_overrides) =
@@ -141,7 +141,7 @@ impl ProviderHealthCheckService {
             None
         };
 
-        Ok(NomiResolvedConfig {
+        Ok(OpenHubResolvedConfig {
             provider,
             api_key,
             model: model_id.to_owned(),
@@ -179,7 +179,7 @@ impl ProviderHealthCheckService {
     }
 }
 
-fn should_use_openai_model_probe(_platform: &str, config: &NomiResolvedConfig) -> bool {
+fn should_use_openai_model_probe(_platform: &str, config: &OpenHubResolvedConfig) -> bool {
     config.provider == "openai"
         && config
             .base_url
@@ -294,7 +294,7 @@ fn openai_model_probe_url(base_url: Option<&str>, model: &str) -> String {
 async fn run_probe(
     provider_id: String,
     platform: String,
-    config_extra: NomiResolvedConfig,
+    config_extra: OpenHubResolvedConfig,
 ) -> Result<ProviderHealthCheckResponse, AppError> {
     let started = Instant::now();
     let model = config_extra.model.clone();
@@ -309,7 +309,7 @@ async fn run_probe(
     let mut engine = match build_probe_engine(config_extra).await {
         Ok(engine) => engine,
         Err(error) => {
-            let message = format!("Nomi probe bootstrap failed: {error}");
+            let message = format!("OpenHub probe bootstrap failed: {error}");
             let response = unhealthy_response(
                 provider_id,
                 platform,
@@ -547,7 +547,7 @@ fn log_health_check_result(response: &ProviderHealthCheckResponse) {
     }
 }
 
-async fn build_probe_engine(config_extra: NomiResolvedConfig) -> Result<AgentEngine, AppError> {
+async fn build_probe_engine(config_extra: OpenHubResolvedConfig) -> Result<AgentEngine, AppError> {
     let workspace = config_extra
         .session_directory
         .parent()
@@ -729,7 +729,7 @@ mod tests {
 
     #[test]
     fn openai_model_probe_is_used_for_custom_openai_compatible_configs() {
-        let config = NomiResolvedConfig {
+        let config = OpenHubResolvedConfig {
             provider: "openai".to_owned(),
             api_key: "sk-test".to_owned(),
             model: "gpt-test".to_owned(),
@@ -738,7 +738,7 @@ mod tests {
             max_tokens: 16,
             max_turns: Some(1),
             context_limit: None,
-            compat_overrides: crate::types::NomiCompatOverrides::default(),
+            compat_overrides: crate::types::OpenHubCompatOverrides::default(),
             session_directory: PathBuf::from("/tmp/openhub-health"),
             session_mode: None,
             extra_mcp_servers: HashMap::new(),

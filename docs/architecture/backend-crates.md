@@ -36,7 +36,7 @@ go through the normal seam or one of those bridge surfaces.
 | Crate | Responsibility |
 | --- | --- |
 | [`openhub-common`](../../crates/backend/openhub-common/) | `AppError`, error chain, enums (`AgentType`, `ConversationStatus`, `MessageType`, `McpServerStatus`, ...), id generation (`generate_prefixed_id` for entity IDs, `generate_id` for tokens), AES-GCM `encrypt_string` / `decrypt_string`, `TimestampMs`, pagination helpers, `constants::DEFAULT_HOST/DEFAULT_PORT/BODY_LIMIT/CSRF_*`. |
-| [`openhub-api-types`](../../crates/backend/openhub-api-types/) | Every HTTP request / response DTO, the `WebSocketMessage` envelope, ACP / Nomi / OpenClaw / Remote build-extras. The frontend's TypeScript types mirror this crate. |
+| [`openhub-api-types`](../../crates/backend/openhub-api-types/) | Every HTTP request / response DTO, the `WebSocketMessage` envelope, ACP / OpenHub / OpenClaw / Remote build-extras. The frontend's TypeScript types mirror this crate. |
 | [`openhub-db`](../../crates/backend/openhub-db/) | SQLite via `sqlx`, embedded migrations, repository traits and Sqlite implementations for users, conversations, MCP, requirements, cron, ACP sessions, assistants, terminal sessions, companion tokens, webhooks, and more. Owns the `Database` handle and `init_database`. |
 | [`openhub-realtime`](../../crates/backend/openhub-realtime/) | `WebSocketManager`, `BroadcastEventBus`, `/ws` upgrade handler with token validation, message router trait, heartbeat timing, per-connection buffer constants. |
 | [`openhub-runtime`](../../crates/backend/openhub-runtime/) | Bundled runtime support for Bun, PATH enhancement for child processes, cross-platform process-tree kill, and a spawn `Builder` with the merged PATH. |
@@ -52,14 +52,14 @@ go through the normal seam or one of those bridge surfaces.
 
 | Crate | Responsibility |
 | --- | --- |
-| [`openhub-ai-agent`](../../crates/backend/openhub-ai-agent/) | **The single bridge to `crates/agent/`.** Builds the agent factory (ACP / Nomi / OpenClaw / Nanobot / Remote variants), holds the `AgentRegistry` and `WorkerTaskManagerImpl`, persists ACP sessions, broadcasts `AgentStreamEvent`, exposes `agent_routes` (model info, capabilities, slash commands, ...) and `remote_agent_routes`. Re-exports `openhub_config`, `openhub_types`, and `RequirementSink` for the rest of the backend. |
+| [`openhub-ai-agent`](../../crates/backend/openhub-ai-agent/) | **The single bridge to `crates/agent/`.** Builds the agent factory (ACP / OpenHub / OpenClaw / Nanobot / Remote variants), holds the `AgentRegistry` and `WorkerTaskManagerImpl`, persists ACP sessions, broadcasts `AgentStreamEvent`, exposes `agent_routes` (model info, capabilities, slash commands, ...) and `remote_agent_routes`. Re-exports `openhub_config`, `openhub_types`, and `RequirementSink` for the rest of the backend. |
 
 ## Feature crates (the bulk of the product)
 
 | Crate | Responsibility |
 | --- | --- |
 | [`openhub-conversation`](../../crates/backend/openhub-conversation/) | Conversation and message CRUD, send-message route, **streaming relay** that fans backend agent tokens onto `/ws`, ACP error recovery, response middleware (e.g. `/cron` slash-command detection, `<think>` stripping), skill resolver / snapshot, runtime-state persistence. |
-| [`openhub-mcp`](../../crates/backend/openhub-mcp/) | MCP server CRUD, **OAuth flow**, multi-CLI sync (`Claude`, `Codex`, `CodeBuddy`, `Gemini`, `Qwen`, `OpenCode`, `Nomi`, `Openhub` adapters under `adapters/`), connection test, session injection of MCP capabilities (incl. built-in image-gen). |
+| [`openhub-mcp`](../../crates/backend/openhub-mcp/) | MCP server CRUD, **OAuth flow**, multi-CLI sync (`Claude`, `Codex`, `CodeBuddy`, `Gemini`, `Qwen`, `OpenCode`, `OpenHub`, `Openhub` adapters under `adapters/`), connection test, session injection of MCP capabilities (incl. built-in image-gen). |
 | [`openhub-extension`](../../crates/backend/openhub-extension/) | Extension and skill hub: manifests, dependency graph, classifier, install / enable / disable, packs that bundle skills + MCP servers + assistants. |
 | [`openhub-team`](../../crates/backend/openhub-team/) | Multi-agent teams: scheduler, mailbox, task board, crash detection, event loop, the team-MCP server (`mcp/`), the Guide MCP `openhub_create_team` tool, prompts. |
 | [`openhub-channel`](../../crates/backend/openhub-channel/) | External chat-channel adapters (Telegram, Lark, DingTalk, WeChat) — feature-gated. New conversations default to **master-agent mode**: companion persona + the Desktop Gateway tools (opt-out per platform via `assistant.{platform}.masterAgent`). |

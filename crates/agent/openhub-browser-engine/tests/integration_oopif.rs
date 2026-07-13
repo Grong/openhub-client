@@ -73,18 +73,18 @@ async fn cross_origin_oopif_child_session_armed() {
     };
     // headless Chrome 默认不对 localhost/127.0.0.1 做站点隔离 → 用 --host-resolver-rules 把两个
     // **不同 registrable site**（a.nomitest / b.nomitest）映射到 127.0.0.1,再 --site-per-process 强制
-    // 站点隔离 → 跨站 iframe 真成 OOPIF。经 launch.rs 的 NOMI_CHROME_EXTRA_ARGS escape hatch（每行一参）注入。
+    // 站点隔离 → 跨站 iframe 真成 OOPIF。经 launch.rs 的 OPENHUB_CHROME_EXTRA_ARGS escape hatch（每行一参）注入。
     // SAFETY: nextest 进程级隔离每个测试,env 仅影响本测试进程;launch 前设、launch 后清。
     unsafe {
         std::env::set_var(
-            "NOMI_CHROME_EXTRA_ARGS",
+            "OPENHUB_CHROME_EXTRA_ARGS",
             "--host-resolver-rules=MAP *.nomitest 127.0.0.1\n--site-per-process",
         );
     }
     let backend = common::build_backend_for_fixture_headful_with_firewall("oopif", fw).await;
     // chrome 已带 flag 启动;清掉 env（卫生）。
     unsafe {
-        std::env::remove_var("NOMI_CHROME_EXTRA_ARGS");
+        std::env::remove_var("OPENHUB_CHROME_EXTRA_ARGS");
     }
 
     backend

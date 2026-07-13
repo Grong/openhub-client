@@ -49,7 +49,7 @@ reliability settings such as IDMM and model failover.
 
 ![Model settings](../images/gs-06-quickstart-model-settings.png)
 
-For the simplest first run, use the built-in Nomi engine with an API provider
+For the simplest first run, use the built-in OpenHub engine with an API provider
 you have credentials for. External CLIs such as Claude Code, Codex, Gemini CLI,
 Qwen, and OpenCode must also be installed on the host before OpenHub can use
 them.

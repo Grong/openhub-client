@@ -28,7 +28,7 @@ const CompanionStep: React.FC<CompanionStepProps> = ({ onNext }) => {
       </div>
       <Typography.Title heading={4}>
         {t('onboarding.companion.title', {
-          defaultValue: '你好，我是 Nomi（诺米）',
+          defaultValue: '你好，我是 OpenHub（诺米）',
         })}
       </Typography.Title>
       <Typography.Text type='secondary'>

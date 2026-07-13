@@ -1,6 +1,6 @@
 # Companions
 
-Nomi's virtual companion has grown from "a single openhub" into a **multi-companion
+OpenHub's virtual companion has grown from "a single openhub" into a **multi-companion
 family**: you can create several companions, use them side by side, raise
 them separately, and give each its own name, character, persona, and
 chat model. Each companion can also be bound to its own **dedicated knowledge
@@ -201,7 +201,7 @@ Migration steps:
 After upgrading from the single-companion version, the first boot detects the
 legacy layout `{data_dir}/companion/openhub/`: if it exists and `companion/shared/`
 does not, it is automatically migrated into the shared memory hub plus
-a first companion (default name **"Nomi"**, inheriting the existing XP /
+a first companion (default name **"OpenHub"**, inheriting the existing XP /
 persona / character / model / desktop-companion position / companion
 threads). The migration is idempotent and re-entrant; on completion a
 `.migrated` marker is written into the legacy directory, which is kept

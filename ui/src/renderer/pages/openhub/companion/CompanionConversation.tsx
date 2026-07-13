@@ -31,7 +31,7 @@ interface Props {
  *
  *  1) 隐藏高级功能：AutoWork / IDMM / 知识库
  *     —— ChatLayout 的 `hideAdvancedControls`（连带头部高级控件）。
- *  2) 锁定模型：不渲染会话页的 NomiModelSelector；`modelSelection` 锁定到会话行的模型
+ *  2) 锁定模型：不渲染会话页的 OpenHubModelSelector；`modelSelection` 锁定到会话行的模型
  *     —— 后端 `patch_companion` 已把会话行模型同步成 `profile.model`（唯一事实源），
  *     `onSelectModel` 空操作禁止 per-conversation 改写。模型配置入口仅保留头部
  *     CompanionModelControl（写 profile.model，全局跟随）。

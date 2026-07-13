@@ -8,7 +8,7 @@ import type { IProvider, TProviderWithModel } from '@/common/config/storage';
 import { useModelProviderList } from '@/renderer/hooks/agent/useModelProviderList';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-export type NomiModelSelection = {
+export type OpenHubModelSelection = {
   current_model?: TProviderWithModel;
   providers: IProvider[];
   getAvailableModels: (provider: IProvider) => string[];
@@ -16,7 +16,7 @@ export type NomiModelSelection = {
   getDisplayModelName: (modelName?: string) => string;
 };
 
-export type UseNomiModelSelectionOptions = {
+export type UseOpenHubModelSelectionOptions = {
   initialModel: TProviderWithModel | undefined;
   onSelectModel: (provider: IProvider, modelName: string) => Promise<boolean>;
 };
@@ -24,7 +24,7 @@ export type UseNomiModelSelectionOptions = {
 export const useOpenHubModelSelection = ({
   initialModel,
   onSelectModel,
-}: UseNomiModelSelectionOptions): NomiModelSelection => {
+}: UseOpenHubModelSelectionOptions): OpenHubModelSelection => {
   const [current_model, setCurrentModel] = useState<TProviderWithModel | undefined>(initialModel);
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export const useOpenHubModelSelection = ({
 
   const { providers: allProviders, getAvailableModels, formatModelLabel } = useModelProviderList();
 
-  // Nomicore does not support Google Auth — filter it out
+  // OpenHubcore does not support Google Auth — filter it out
   const providers = useMemo(
     () => allProviders.filter((p) => !p.platform?.toLowerCase().includes('gemini-with-google-auth')),
     [allProviders]

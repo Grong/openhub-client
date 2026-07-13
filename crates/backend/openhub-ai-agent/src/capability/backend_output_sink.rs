@@ -226,7 +226,7 @@ impl OutputSink for BackendOutputSink {
             .send(AgentStreamEvent::AgentStatus(AgentStatusEventData {
                 backend: "openhub".to_owned(),
                 status: status.to_owned(),
-                agent_name: Some("Nomi".to_owned()),
+                agent_name: Some("OpenHub".to_owned()),
                 session_id: None,
             }));
     }
@@ -502,7 +502,7 @@ mod tests {
             AgentStreamEvent::AgentStatus(data) => {
                 assert_eq!(data.backend, "openhub");
                 assert_eq!(data.status, "preparing");
-                assert_eq!(data.agent_name.as_deref(), Some("Nomi"));
+                assert_eq!(data.agent_name.as_deref(), Some("OpenHub"));
             }
             other => panic!("Expected AgentStatus, got {:?}", other),
         }

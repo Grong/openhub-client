@@ -65,9 +65,9 @@ struct ExposurePolicy {
 
 ### 2.1 六个强制点（全部 execution-time、后端权威，不信客户端）
 
-1. **原生工具**：`PublicService` 把 `NomiBuildExtra.allowed_tools` 设为安全集 → `retain_named`（`bootstrap.rs:767`）。**必修 C3**：把 build-后注册的 knowledge/memory/companion 工具改为经同一白名单过滤（或改为按 policy 条件注册）。
+1. **原生工具**：`PublicService` 把 `OpenHubBuildExtra.allowed_tools` 设为安全集 → `retain_named`（`bootstrap.rs:767`）。**必修 C3**：把 build-后注册的 knowledge/memory/companion 工具改为经同一白名单过滤（或改为按 policy 条件注册）。
 2. **网关**：新增 `PublicService` 的**默认拒绝白名单模式**（不再"按 tier 放行所有 Write"），并在**权威 in-process server dispatch** 处强制（消除 C7 的广告/权威不一致），非仅 bridge 广告层。
-3. **数据隔离**：`KnowledgeSearch` 复用**已存在的"kb_ids 烘进环境、模型不能加宽"模式**（`NOMI_KB_MCP_KB_IDS`，ACP 已在用，见 `agent_build_extra.rs:77-85`）限定到 `public_kb_ids`；记忆按 `memory_access` 只读且限对外人格自身库。
+3. **数据隔离**：`KnowledgeSearch` 复用**已存在的"kb_ids 烘进环境、模型不能加宽"模式**（`OPENHUB_KB_MCP_KB_IDS`，ACP 已在用，见 `agent_build_extra.rs:77-85`）限定到 `public_kb_ids`；记忆按 `memory_access` 只读且限对外人格自身库。
 4. **身份/资产隔离**：对外服务用**专门的对外伙伴**为隔离单元——独立记忆库、只绑公开库、独立工作区/数据目录，**永不复用私人伙伴会话**（详见 §3）。
 5. **入口盖章**：新增"公开"配对/令牌模式把 `ExposurePolicy` 盖进 turn；`desktopGateway` 继续后端专设 + HTTP 剥离（防自授权，已有 `conversation/routes.rs:56`）。
 6. **不依赖 yolo/提示词**：`PublicService` 下无危险工具，"有无审批"不再是安全依赖——边界在**工具集与数据可达性本身**。
@@ -113,7 +113,7 @@ struct ExposurePolicy {
 
 ## 7. 复用 / 必新建 / 必修
 
-- **直接复用**：`retain_named`/`allowed_tools`（`registry.rs:73`、`agent_build_extra.rs:330`）、`tool_specs_for`/域档（`registry/mod.rs:136`）、烘环境 scoped KB bridge（`NOMI_KB_MCP_KB_IDS`）、companion 令牌（`openhub-auth/companion_token.rs`）、per-surface 写策略（`factory/openhub.rs:95-123`）、配对门、`desktopGateway` 剥离。
+- **直接复用**：`retain_named`/`allowed_tools`（`registry.rs:73`、`agent_build_extra.rs:330`）、`tool_specs_for`/域档（`registry/mod.rs:136`）、烘环境 scoped KB bridge（`OPENHUB_KB_MCP_KB_IDS`）、companion 令牌（`openhub-auth/companion_token.rs`）、per-surface 写策略（`factory/openhub.rs:95-123`）、配对门、`desktopGateway` 剥离。
 - **必新建**：`ExposurePolicy` 抽象与全链路穿线、网关默认拒绝白名单模式（权威层强制）、由对外伙伴驱动原生白名单、安全网搜工具、对外隔离伙伴 + 独立记忆/数据目录、"外呼员工" Tab + 审计。
 - **必修 bug**：C3（build-后工具绕过白名单）、C7（网关档权威/广告不一致）。
 - **旧分支**：`feat/per-companion-capabilities` / `feat/external-capability-exposure` 取其令牌/管线，**换掉"全有或全无"取舍**，不原样合并。

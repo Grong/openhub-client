@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { NomiModelSelection } from './useOpenHubModelSelection';
+import type { OpenHubModelSelection } from './useOpenHubModelSelection';
 import { usePreviewContext } from '@/renderer/pages/conversation/Preview';
 import { useLayoutContext } from '@/renderer/hooks/context/LayoutContext';
 import { getModelDisplayLabel } from '@/renderer/utils/model/agentLogo';
@@ -15,8 +15,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 
-const NomiModelSelector: React.FC<{
-  selection?: NomiModelSelection;
+const OpenHubModelSelector: React.FC<{
+  selection?: OpenHubModelSelection;
   disabled?: boolean;
   compact?: boolean;
   className?: string;
@@ -117,4 +117,4 @@ const NomiModelSelector: React.FC<{
   );
 };
 
-export default NomiModelSelector;
+export default OpenHubModelSelector;

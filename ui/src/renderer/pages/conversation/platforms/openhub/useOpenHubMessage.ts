@@ -17,16 +17,16 @@ import { emitter } from '@/renderer/utils/emitter';
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import type { ThoughtData } from '../thoughtTypes';
 import { processLocalCronResponse } from './localCronCommands';
-import { initialNomiTurnState, isTurnRunning, nomiTurnReducer } from './openhubTurnState';
+import { initialOpenHubTurnState, isTurnRunning, nomiTurnReducer } from './openhubTurnState';
 
-type NomiToolGroupRuntimeTool = {
+type OpenHubToolGroupRuntimeTool = {
   status: string;
   name?: string;
   description?: string;
 };
 
-export const getNomiToolGroupRuntimeState = (data: unknown): {
-  tools: NomiToolGroupRuntimeTool[];
+export const getOpenHubToolGroupRuntimeState = (data: unknown): {
+  tools: OpenHubToolGroupRuntimeTool[];
   hasActive: boolean;
   hasAny: boolean;
   confirmingDescription?: string;
@@ -83,7 +83,7 @@ export const useOpenHubMessage = (
   const addOrUpdateMessage = useAddOrUpdateMessage();
   // Single source of truth for the turn's activity state (design §3.2): a pure
   // reducer over lifecycle events replaces three hand-synced booleans.
-  const [turnState, dispatchTurn] = useReducer(nomiTurnReducer, initialNomiTurnState);
+  const [turnState, dispatchTurn] = useReducer(nomiTurnReducer, initialOpenHubTurnState);
   const [hasHydratedRunningState, setHasHydratedRunningState] = useState(false);
   const [thought, setThought] = useState<ThoughtData>({
     description: '',
@@ -306,7 +306,7 @@ export const useOpenHubMessage = (
         case 'tool_group':
           {
             // Check if any tools are executing or awaiting confirmation
-            const toolState = getNomiToolGroupRuntimeState(message.data);
+            const toolState = getOpenHubToolGroupRuntimeState(message.data);
             dispatchTurn({ type: 'toolGroup', hasActive: toolState.hasActive, hasAny: toolState.hasAny });
 
             // If tools are awaiting confirmation, update thought hint
@@ -437,4 +437,4 @@ export const useOpenHubMessage = (
   };
 };
 
-export type NomiMessageRuntime = ReturnType<typeof useOpenHubMessage>;
+export type OpenHubMessageRuntime = ReturnType<typeof useOpenHubMessage>;

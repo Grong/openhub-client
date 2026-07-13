@@ -780,7 +780,7 @@ async fn inject_and_wait(
 
     let outcome = wait_for_terminal_with_renewal(deps, conversation_id, conv_id_i64, req.id, rx).await;
     // The session has a declaration channel when it exposes the requirement
-    // tools: Nomi natively, or ACP once the requirement MCP is injected
+    // tools: OpenHub natively, or ACP once the requirement MCP is injected
     // (`requirement_mcp_enabled`). Driven by the same bootstrap flag that gates
     // the prompt above, so we never expect a verdict the session can't give.
     let expects_verdict = crate::prompt::session_has_requirement_tools(agent_type, deps.requirement_mcp_enabled);

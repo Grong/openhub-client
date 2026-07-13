@@ -5,11 +5,11 @@
  */
 
 import { describe, expect, test } from 'bun:test';
-import { getNomiToolGroupRuntimeState } from './useOpenHubMessage';
+import { getOpenHubToolGroupRuntimeState } from './useOpenHubMessage';
 
-describe('getNomiToolGroupRuntimeState', () => {
+describe('getOpenHubToolGroupRuntimeState', () => {
   test('treats malformed tool_group data as inactive instead of calling array methods on it', () => {
-    expect(getNomiToolGroupRuntimeState({ status: 'Executing' })).toEqual({
+    expect(getOpenHubToolGroupRuntimeState({ status: 'Executing' })).toEqual({
       tools: [],
       hasActive: false,
       hasAny: false,
@@ -20,7 +20,7 @@ describe('getNomiToolGroupRuntimeState', () => {
 
   test('stringifies structured tool descriptions used in thought hints', () => {
     expect(
-      getNomiToolGroupRuntimeState([
+      getOpenHubToolGroupRuntimeState([
         {
           status: 'Confirming',
           name: { label: 'Edit' },

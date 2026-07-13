@@ -132,7 +132,7 @@ mod tests {
     fn confirm_data_carries_option_under_both_keys_so_openhub_does_not_read_cancel() {
         // REGRESSION: the gateway previously sent ConfirmRequest.data as a bare
         // Value::String(option). The openhub agent's confirm reads data.get("value")
-        // and defaults to "cancel" when absent → every relayed approval on a Nomi
+        // and defaults to "cancel" when absent → every relayed approval on a OpenHub
         // worker was silently DENIED. The payload must carry the option under
         // BOTH keys (openhub reads `value`; ACP's confirm_option_id reads
         // `option_id`, falling back to `value`).

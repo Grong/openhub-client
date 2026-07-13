@@ -1176,7 +1176,7 @@ const CanvasInner: React.FC<CanvasEditorProps> = ({ canvasId, initialDoc, onSave
     updateNodeData,
     deleteNode: removeNode,
     onApplied: (count) =>
-      message.info(t('workshopAssistant.applied.ops', { count, defaultValue: 'Nomi 更新了画布（{{count}} 项操作）' })),
+      message.info(t('workshopAssistant.applied.ops', { count, defaultValue: 'OpenHub 更新了画布（{{count}} 项操作）' })),
   });
 
   // ── Render ──────────────────────────────────────────────────────────────────

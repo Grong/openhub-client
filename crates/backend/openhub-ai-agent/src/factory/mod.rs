@@ -252,7 +252,7 @@ async fn build_agent(
         AgentType::OpenclawGateway => openclaw::build(deps, options, ctx).await,
         AgentType::Nanobot => nanobot::build(deps, options, ctx).await,
         AgentType::Remote => remote::build(deps, options, ctx).await,
-        AgentType::Nomi => openhub::build(deps, options, ctx).await,
+        AgentType::OpenHub => openhub::build(deps, options, ctx).await,
     }
 }
 

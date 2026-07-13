@@ -31,9 +31,9 @@ use crate::capability::backend_output_sink::BackendOutputSink;
 use crate::capability::backend_protocol_sink::BackendProtocolSink;
 use crate::protocol::events::{AgentStreamEvent, TurnCompletedEventData, TurnStopReason};
 use crate::protocol::send_error::AgentSendError;
-use crate::types::{NomiResolvedConfig, SendMessageData};
+use crate::types::{OpenHubResolvedConfig, SendMessageData};
 
-pub struct NomiAgentManager {
+pub struct OpenHubAgentManager {
     runtime: AgentRuntime,
     backend_output_sink: Arc<BackendOutputSink>,
     engine: Mutex<AgentEngine>,
@@ -74,7 +74,7 @@ pub struct NomiAgentManager {
     knowledge_auto_rag: Option<(Arc<dyn openhub_agent::knowledge_tools::KnowledgeRetrievalSink>, Vec<String>)>,
 }
 
-impl Drop for NomiAgentManager {
+impl Drop for OpenHubAgentManager {
     fn drop(&mut self) {
         // McpManagers are held alive by the `mcp_managers` field specifically
         // so they outlive the agent's event loop. No explicit cleanup is needed
@@ -176,11 +176,11 @@ pub(crate) fn map_engine_stop_reason(
     }
 }
 
-impl NomiAgentManager {
+impl OpenHubAgentManager {
     pub async fn new(
         conversation_id: String,
         workspace: String,
-        config_extra: NomiResolvedConfig,
+        config_extra: OpenHubResolvedConfig,
         resume_session: Option<Session>,
         requirement_sink: Option<Arc<dyn RequirementSink>>,
         companion_sink: Option<Arc<dyn CompanionMemorySink>>,
@@ -358,7 +358,7 @@ impl NomiAgentManager {
             info!(
                 conversation_id = %conversation_id,
                 session_mode = mode_str,
-                "Nomi initial session mode applied"
+                "OpenHub initial session mode applied"
             );
         }
 
@@ -576,15 +576,15 @@ impl NomiAgentManager {
             ?reason,
             was_running,
             operation,
-            "Nomi stop signal requested"
+            "OpenHub stop signal requested"
         );
     }
 }
 
 #[async_trait::async_trait]
-impl crate::agent_task::IAgentTask for NomiAgentManager {
+impl crate::agent_task::IAgentTask for OpenHubAgentManager {
     fn agent_type(&self) -> AgentType {
-        AgentType::Nomi
+        AgentType::OpenHub
     }
 
     fn conversation_id(&self) -> &str {
@@ -612,7 +612,7 @@ impl crate::agent_task::IAgentTask for NomiAgentManager {
         info!(
             conversation_id = %self.runtime.conversation_id(),
             msg_id = %data.msg_id,
-            "Nomi send_message started"
+            "OpenHub send_message started"
         );
         self.runtime.bump_activity();
         self.runtime.reset_for_new_turn(ConversationStatus::Running);
@@ -676,7 +676,7 @@ impl crate::agent_task::IAgentTask for NomiAgentManager {
                 if cancel.is_cancelled() {
                     info!(
                         conversation_id = %self.runtime.conversation_id(),
-                        "Nomi engine.run() cooperatively cancelled by stop signal"
+                        "OpenHub engine.run() cooperatively cancelled by stop signal"
                     );
                     None
                 } else {
@@ -688,7 +688,7 @@ impl crate::agent_task::IAgentTask for NomiAgentManager {
                     _ = self.cancel_notify.notified() => {
                         info!(
                             conversation_id = %self.runtime.conversation_id(),
-                            "Nomi engine.run() cancelled by stop signal"
+                            "OpenHub engine.run() cancelled by stop signal"
                         );
                         engine.abort_current_turn("Tool execution canceled by user");
                         None
@@ -711,7 +711,7 @@ impl crate::agent_task::IAgentTask for NomiAgentManager {
                         info!(
                             conversation_id = %self.runtime.conversation_id(),
                             count = leftover.len(),
-                            "Nomi steering race-tail: re-running with leftover interjection(s)"
+                            "OpenHub steering race-tail: re-running with leftover interjection(s)"
                         );
                         // NOTE: the re-run reuses `data.msg_id`, so the engine emits a
                         // second StreamStart under the same id for this logical turn.
@@ -723,7 +723,7 @@ impl crate::agent_task::IAgentTask for NomiAgentManager {
                 } else {
                     tracing::warn!(
                         conversation_id = %self.runtime.conversation_id(),
-                        "Nomi steering race-tail cap reached; any leftover deferred to next turn"
+                        "OpenHub steering race-tail cap reached; any leftover deferred to next turn"
                     );
                 }
             }
@@ -741,7 +741,7 @@ impl crate::agent_task::IAgentTask for NomiAgentManager {
                             attempt = truncation_auto_continues,
                             max_attempts = MAX_TRUNCATION_AUTO_CONTINUES,
                             stop_reason = ?agent_result.stop_reason,
-                            "Nomi turn truncated; auto-continuing before Finish"
+                            "OpenHub turn truncated; auto-continuing before Finish"
                         );
                         self.backend_output_sink
                             .complete_active_tool_calls_for_auto_continue(reason);
@@ -756,7 +756,7 @@ impl crate::agent_task::IAgentTask for NomiAgentManager {
                         conversation_id = %self.runtime.conversation_id(),
                         attempts = truncation_auto_continues,
                         stop_reason = ?agent_result.stop_reason,
-                        "Nomi truncation auto-continue cap reached; emitting final Finish"
+                        "OpenHub truncation auto-continue cap reached; emitting final Finish"
                     );
                 }
             }
@@ -778,7 +778,7 @@ impl crate::agent_task::IAgentTask for NomiAgentManager {
                     input_tokens = agent_result.usage.input_tokens,
                     output_tokens = agent_result.usage.output_tokens,
                     ?stop_reason,
-                    "Nomi engine.run() completed, emitting Finish"
+                    "OpenHub engine.run() completed, emitting Finish"
                 );
 
                 // Phase 3 observability: a per-turn metrics event the UI shows as
@@ -830,12 +830,12 @@ impl crate::agent_task::IAgentTask for NomiAgentManager {
                 Ok(())
             }
             Some(Err(e)) => {
-                let error_msg = format!("Nomi agent error: {e}");
+                let error_msg = format!("OpenHub agent error: {e}");
                 error!(
                     conversation_id = %self.runtime.conversation_id(),
                     elapsed_ms,
                     error = %ErrorChain(&e),
-                    "Nomi engine.run() failed, emitting Error+Finish"
+                    "OpenHub engine.run() failed, emitting Error+Finish"
                 );
                 let send_error = openhub_engine_error_to_send_error(error_msg);
                 self.runtime.emit_error_data(send_error.stream_error().clone());
@@ -899,7 +899,7 @@ impl Drop for TurnTerminationGuard {
     }
 }
 
-impl NomiAgentManager {
+impl OpenHubAgentManager {
     pub fn kill_and_wait(
         &self,
         reason: Option<AgentKillReason>,
@@ -921,9 +921,9 @@ impl NomiAgentManager {
     }
 }
 
-/// Nomi-specific operations reached through `AgentInstance::Nomi(..)`
+/// OpenHub-specific operations reached through `AgentInstance::OpenHub(..)`
 /// matches in the routes + services.
-impl NomiAgentManager {
+impl OpenHubAgentManager {
     /// Push a user interjection into the running turn's steering inbox.
     /// Returns `Ok(true)` if a turn is live and the message was queued for
     /// mid-turn injection; `Ok(false)` if no turn is running (caller should
@@ -961,7 +961,7 @@ impl NomiAgentManager {
             call_id,
             value,
             always_allow,
-            "Nomi confirm"
+            "OpenHub confirm"
         );
 
         if is_cancel {
@@ -1004,7 +1004,7 @@ impl NomiAgentManager {
             conversation_id = %self.runtime.conversation_id(),
             from = prev,
             to = mode,
-            "Nomi session mode switched"
+            "OpenHub session mode switched"
         );
         Ok(())
     }
@@ -1020,7 +1020,7 @@ impl NomiAgentManager {
     pub async fn clear_context(&self) -> Result<(), AppError> {
         info!(
             conversation_id = %self.runtime.conversation_id(),
-            "Clearing Nomi context"
+            "Clearing OpenHub context"
         );
         // Signal any in-flight engine.run() to abort so we don't clear
         // mid-turn; the engine lock below then waits for it to release.
@@ -1038,7 +1038,7 @@ impl NomiAgentManager {
     pub async fn rewind_last_turn(&self) -> Result<(), AppError> {
         info!(
             conversation_id = %self.runtime.conversation_id(),
-            "Rewinding last Nomi turn"
+            "Rewinding last OpenHub turn"
         );
         self.request_stop(None, "rewind_last_turn");
         let mut engine = self.engine.lock().await;
@@ -1094,7 +1094,7 @@ mod tests {
     use openhub_types::message::{ContentBlock, Role, StopReason};
     use std::sync::atomic::{AtomicUsize, Ordering};
 
-    async fn assert_no_stop_signal(agent: &NomiAgentManager) {
+    async fn assert_no_stop_signal(agent: &OpenHubAgentManager) {
         let notified = agent.cancel_notify.notified();
         tokio::pin!(notified);
 
@@ -1106,8 +1106,8 @@ mod tests {
         );
     }
 
-    fn make_test_config() -> NomiResolvedConfig {
-        NomiResolvedConfig {
+    fn make_test_config() -> OpenHubResolvedConfig {
+        OpenHubResolvedConfig {
             provider: "anthropic".into(),
             api_key: "sk-test-key".into(),
             model: "claude-sonnet-4-20250514".into(),
@@ -1211,7 +1211,7 @@ mod tests {
         config
     }
 
-    fn make_agent_with_provider(provider: Arc<dyn LlmProvider>) -> NomiAgentManager {
+    fn make_agent_with_provider(provider: Arc<dyn LlmProvider>) -> OpenHubAgentManager {
         let runtime = AgentRuntime::new("conv-auto-continue", "/project", 128);
         let backend_output_sink = Arc::new(BackendOutputSink::new(runtime.event_sender()));
         let output: Arc<dyn OutputSink> = backend_output_sink.clone();
@@ -1226,7 +1226,7 @@ mod tests {
         let approval_manager = Arc::new(ToolApprovalManager::new());
         engine.set_approval_manager(approval_manager.clone());
 
-        NomiAgentManager {
+        OpenHubAgentManager {
             runtime,
             backend_output_sink,
             engine: Mutex::new(engine),
@@ -1387,10 +1387,10 @@ mod tests {
 
     #[tokio::test]
     async fn openhub_agent_returns_correct_type() {
-        let agent = NomiAgentManager::new("conv-1".into(), "/project".into(), make_test_config(), None, None, None, None, Vec::new(), None, None, Vec::new(), false, None)
+        let agent = OpenHubAgentManager::new("conv-1".into(), "/project".into(), make_test_config(), None, None, None, None, Vec::new(), None, None, Vec::new(), false, None)
             .await
             .unwrap();
-        assert_eq!(agent.agent_type(), AgentType::Nomi);
+        assert_eq!(agent.agent_type(), AgentType::OpenHub);
         assert_eq!(agent.workspace(), "/project");
         assert_eq!(agent.conversation_id(), "conv-1");
     }
@@ -1417,7 +1417,7 @@ mod tests {
         // Companion red line: a session with a companion sink must have NO
         // distill target, so the background task never spawns.
         let sink: Arc<dyn openhub_agent::companion_tools::CompanionMemorySink> = Arc::new(StubCompanionSink);
-        let agent = NomiAgentManager::new(
+        let agent = OpenHubAgentManager::new(
             "conv-companion".into(),
             "/project".into(),
             make_test_config(),
@@ -1445,7 +1445,7 @@ mod tests {
         // A normal work session (no companion sink) gets a project-level
         // memory dir as its distill target. The runtime origin gate and the
         // enable flag are checked separately at send time.
-        let agent = NomiAgentManager::new(
+        let agent = OpenHubAgentManager::new(
             "conv-normal".into(),
             "/project".into(),
             make_test_config(),
@@ -1472,7 +1472,7 @@ mod tests {
 
     #[tokio::test]
     async fn openhub_agent_initial_status_is_pending() {
-        let agent = NomiAgentManager::new("conv-1".into(), "/project".into(), make_test_config(), None, None, None, None, Vec::new(), None, None, Vec::new(), false, None)
+        let agent = OpenHubAgentManager::new("conv-1".into(), "/project".into(), make_test_config(), None, None, None, None, Vec::new(), None, None, Vec::new(), false, None)
             .await
             .unwrap();
         assert_eq!(agent.status(), Some(ConversationStatus::Pending));
@@ -1480,7 +1480,7 @@ mod tests {
 
     #[tokio::test]
     async fn openhub_agent_subscribe_returns_receiver() {
-        let agent = NomiAgentManager::new("conv-1".into(), "/project".into(), make_test_config(), None, None, None, None, Vec::new(), None, None, Vec::new(), false, None)
+        let agent = OpenHubAgentManager::new("conv-1".into(), "/project".into(), make_test_config(), None, None, None, None, Vec::new(), None, None, Vec::new(), false, None)
             .await
             .unwrap();
         let _rx = agent.subscribe();
@@ -1488,7 +1488,7 @@ mod tests {
 
     #[tokio::test]
     async fn openhub_agent_kill_succeeds() {
-        let agent = NomiAgentManager::new("conv-1".into(), "/project".into(), make_test_config(), None, None, None, None, Vec::new(), None, None, Vec::new(), false, None)
+        let agent = OpenHubAgentManager::new("conv-1".into(), "/project".into(), make_test_config(), None, None, None, None, Vec::new(), None, None, Vec::new(), false, None)
             .await
             .unwrap();
         assert!(agent.kill(None).is_ok());
@@ -1500,7 +1500,7 @@ mod tests {
 
     #[tokio::test]
     async fn openhub_agent_kill_with_reason_succeeds() {
-        let agent = NomiAgentManager::new("conv-1".into(), "/project".into(), make_test_config(), None, None, None, None, Vec::new(), None, None, Vec::new(), false, None)
+        let agent = OpenHubAgentManager::new("conv-1".into(), "/project".into(), make_test_config(), None, None, None, None, Vec::new(), None, None, Vec::new(), false, None)
             .await
             .unwrap();
         assert!(agent.kill(Some(AgentKillReason::IdleTimeout)).is_ok());
@@ -1508,7 +1508,7 @@ mod tests {
 
     #[tokio::test]
     async fn openhub_agent_kill_running_turn_sends_stop_signal() {
-        let agent = NomiAgentManager::new("conv-1".into(), "/project".into(), make_test_config(), None, None, None, None, Vec::new(), None, None, Vec::new(), false, None)
+        let agent = OpenHubAgentManager::new("conv-1".into(), "/project".into(), make_test_config(), None, None, None, None, Vec::new(), None, None, Vec::new(), false, None)
             .await
             .unwrap();
         agent.runtime.reset_for_new_turn(ConversationStatus::Running);
@@ -1532,7 +1532,7 @@ mod tests {
 
     #[tokio::test]
     async fn openhub_agent_kill_idle_turn_does_not_leave_stale_stop_signal() {
-        let agent = NomiAgentManager::new("conv-1".into(), "/project".into(), make_test_config(), None, None, None, None, Vec::new(), None, None, Vec::new(), false, None)
+        let agent = OpenHubAgentManager::new("conv-1".into(), "/project".into(), make_test_config(), None, None, None, None, Vec::new(), None, None, Vec::new(), false, None)
             .await
             .unwrap();
 
@@ -1545,7 +1545,7 @@ mod tests {
 
     #[tokio::test]
     async fn openhub_agent_confirmations_initially_empty() {
-        let agent = NomiAgentManager::new("conv-1".into(), "/project".into(), make_test_config(), None, None, None, None, Vec::new(), None, None, Vec::new(), false, None)
+        let agent = OpenHubAgentManager::new("conv-1".into(), "/project".into(), make_test_config(), None, None, None, None, Vec::new(), None, None, Vec::new(), false, None)
             .await
             .unwrap();
         assert!(agent.get_confirmations().is_empty());
@@ -1553,7 +1553,7 @@ mod tests {
 
     #[tokio::test]
     async fn openhub_agent_get_slash_commands_does_not_wait_for_engine_lock() {
-        let agent = NomiAgentManager::new("conv-1".into(), "/project".into(), make_test_config(), None, None, None, None, Vec::new(), None, None, Vec::new(), false, None)
+        let agent = OpenHubAgentManager::new("conv-1".into(), "/project".into(), make_test_config(), None, None, None, None, Vec::new(), None, None, Vec::new(), false, None)
             .await
             .unwrap();
 
@@ -1568,7 +1568,7 @@ mod tests {
 
     #[tokio::test]
     async fn openhub_agent_check_approval_returns_false_by_default() {
-        let agent = NomiAgentManager::new("conv-1".into(), "/project".into(), make_test_config(), None, None, None, None, Vec::new(), None, None, Vec::new(), false, None)
+        let agent = OpenHubAgentManager::new("conv-1".into(), "/project".into(), make_test_config(), None, None, None, None, Vec::new(), None, None, Vec::new(), false, None)
             .await
             .unwrap();
         assert!(!agent.check_approval("any_action", None));
@@ -1580,7 +1580,7 @@ mod tests {
         // event and transition to Finished — otherwise a subscribed relay hangs
         // forever in a 'running' spinner because no Finish/Error ever arrives.
         // (Phase 0 F0.2)
-        let agent = NomiAgentManager::new("conv-stop".into(), "/project".into(), make_test_config(), None, None, None, None, Vec::new(), None, None, Vec::new(), false, None)
+        let agent = OpenHubAgentManager::new("conv-stop".into(), "/project".into(), make_test_config(), None, None, None, None, Vec::new(), None, None, Vec::new(), false, None)
             .await
             .unwrap();
         let mut rx = agent.subscribe();
@@ -1637,7 +1637,7 @@ mod tests {
 
     #[tokio::test]
     async fn runtime_can_emit_error_and_finish() {
-        let agent = NomiAgentManager::new("conv-err".into(), "/project".into(), make_test_config(), None, None, None, None, Vec::new(), None, None, Vec::new(), false, None)
+        let agent = OpenHubAgentManager::new("conv-err".into(), "/project".into(), make_test_config(), None, None, None, None, Vec::new(), None, None, Vec::new(), false, None)
             .await
             .unwrap();
         let mut rx = agent.subscribe();
@@ -1665,7 +1665,7 @@ mod tests {
     #[test]
     fn openhub_provider_connection_error_is_user_llm_provider_error() {
         let send_error = openhub_engine_error_to_send_error(
-            "Nomi agent error: Provider error: Connection error: Signable request error: failed to create canonical request"
+            "OpenHub agent error: Provider error: Connection error: Signable request error: failed to create canonical request"
                 .to_owned(),
         );
 
@@ -1683,7 +1683,7 @@ mod tests {
     #[test]
     fn openhub_api_connection_error_is_user_llm_provider_network_error() {
         let send_error = openhub_engine_error_to_send_error(
-            "Nomi agent error: API error: Connection error: error decoding response body".to_owned(),
+            "OpenHub agent error: API error: Connection error: error decoding response body".to_owned(),
         );
 
         assert_eq!(

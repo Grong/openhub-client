@@ -285,9 +285,9 @@ fn codex_lifecycle_argv(lc: &LifecycleHookWiring) -> (Vec<String>, Vec<(String, 
 /// in-process TerminalLifecycleServer.
 fn lifecycle_env(lc: &LifecycleHookWiring) -> Vec<(String, String)> {
     vec![
-        ("NOMI_TERM_HOOK_PORT".to_owned(), lc.port.to_string()),
-        ("NOMI_TERM_HOOK_TOKEN".to_owned(), lc.token.clone()),
-        ("NOMI_TERM_HOOK_ID".to_owned(), lc.terminal_id.to_string()),
+        ("OPENHUB_TERM_HOOK_PORT".to_owned(), lc.port.to_string()),
+        ("OPENHUB_TERM_HOOK_TOKEN".to_owned(), lc.token.clone()),
+        ("OPENHUB_TERM_HOOK_ID".to_owned(), lc.terminal_id.to_string()),
     ]
 }
 
@@ -368,8 +368,8 @@ mod tests {
             command: "/opt/openhub/nomicore".into(),
             args: vec!["mcp-knowledge-stdio".into()],
             env: HashMap::from([
-                ("NOMI_KB_MCP_PORT".into(), "51123".into()),
-                ("NOMI_KB_MCP_TOKEN".into(), "tok-abc".into()),
+                ("OPENHUB_KB_MCP_PORT".into(), "51123".into()),
+                ("OPENHUB_KB_MCP_TOKEN".into(), "tok-abc".into()),
             ]),
         }
     }
@@ -417,7 +417,7 @@ mod tests {
         let srv = &doc["mcpServers"]["openhub-knowledge"];
         assert_eq!(srv["command"], "/opt/openhub/nomicore");
         assert_eq!(srv["args"][0], "mcp-knowledge-stdio");
-        assert_eq!(srv["env"]["NOMI_KB_MCP_TOKEN"], "tok-abc");
+        assert_eq!(srv["env"]["OPENHUB_KB_MCP_TOKEN"], "tok-abc");
     }
 
     #[test]
@@ -428,7 +428,7 @@ mod tests {
         let joined = argv.join(" ");
         assert!(joined.contains(r#"-c mcp_servers.openhub-knowledge.command="/opt/openhub/nomicore""#));
         assert!(joined.contains(r#"mcp_servers.openhub-knowledge.args=["mcp-knowledge-stdio"]"#));
-        assert!(joined.contains(r#"mcp_servers.openhub-knowledge.env.NOMI_KB_MCP_TOKEN="tok-abc""#));
+        assert!(joined.contains(r#"mcp_servers.openhub-knowledge.env.OPENHUB_KB_MCP_TOKEN="tok-abc""#));
         // 每个 override 前都有独立的 -c (command + args + 2 env = 4)
         assert_eq!(argv.iter().filter(|a| *a == "-c").count(), 4);
         // 不含 CODEX_HOME（那会丢用户 auth.json）
@@ -532,9 +532,9 @@ mod tests {
         let (args, env) = apply_enhancement("claude", vec![], &enh, dir.path(), None);
         assert!(args.iter().any(|a| a == "--settings"));
         let env_map: HashMap<String, String> = env.into_iter().collect();
-        assert_eq!(env_map.get("NOMI_TERM_HOOK_PORT").map(String::as_str), Some("5151"));
-        assert_eq!(env_map.get("NOMI_TERM_HOOK_TOKEN").map(String::as_str), Some("htok"));
-        assert_eq!(env_map.get("NOMI_TERM_HOOK_ID").map(String::as_str), Some("42"));
+        assert_eq!(env_map.get("OPENHUB_TERM_HOOK_PORT").map(String::as_str), Some("5151"));
+        assert_eq!(env_map.get("OPENHUB_TERM_HOOK_TOKEN").map(String::as_str), Some("htok"));
+        assert_eq!(env_map.get("OPENHUB_TERM_HOOK_ID").map(String::as_str), Some("42"));
         // settings file contains Stop/PostToolUse/Notification hooks calling `terminal-hook`
         let settings_path = args.iter().position(|a| a == "--settings").map(|i| args[i + 1].clone()).unwrap();
         let doc: serde_json::Value = serde_json::from_slice(&std::fs::read(&settings_path).unwrap()).unwrap();
@@ -546,9 +546,9 @@ mod tests {
         let (cargs, cenv) = apply_enhancement("codex", vec![], &enh, dir.path(), None);
         assert!(cargs.iter().any(|a| a == "--dangerously-bypass-hook-trust"));
         let cenv_map: HashMap<String, String> = cenv.into_iter().collect();
-        assert_eq!(cenv_map.get("NOMI_TERM_HOOK_PORT").map(String::as_str), Some("5151"));
-        assert_eq!(cenv_map.get("NOMI_TERM_HOOK_TOKEN").map(String::as_str), Some("htok"));
-        assert_eq!(cenv_map.get("NOMI_TERM_HOOK_ID").map(String::as_str), Some("42"));
+        assert_eq!(cenv_map.get("OPENHUB_TERM_HOOK_PORT").map(String::as_str), Some("5151"));
+        assert_eq!(cenv_map.get("OPENHUB_TERM_HOOK_TOKEN").map(String::as_str), Some("htok"));
+        assert_eq!(cenv_map.get("OPENHUB_TERM_HOOK_ID").map(String::as_str), Some("42"));
         // codex hooks: Stop, PostToolUse, SessionStart (no Notification)
         let joined = cargs.join(" ");
         assert!(joined.contains("hooks.Stop="));

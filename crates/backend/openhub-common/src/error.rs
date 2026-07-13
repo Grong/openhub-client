@@ -368,7 +368,7 @@ mod tests {
         // Interior whitespace is allowed — the macOS per-user data dir
         // ("Application Support") and ordinary project names depend on it.
         assert!(!workspace_path_has_edge_whitespace_segment(Path::new(
-            "/Users/u/Library/Application Support/OpenHub/Nomi/conversations/openhub-temp-1"
+            "/Users/u/Library/Application Support/OpenHub/OpenHub/conversations/openhub-temp-1"
         )));
         assert!(!workspace_path_has_edge_whitespace_segment(Path::new("/tmp/my project")));
         assert!(!workspace_path_has_edge_whitespace_segment(Path::new("/tmp/my-project")));

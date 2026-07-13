@@ -31,7 +31,7 @@ exact requirements:
 | **Git** | any recent | Clone, plus skill discovery and some built-in tools. | |
 | **C/C++ build tools** | platform-specific | `rusqlite` (bundled), `aws-lc-rs`, `libgit2-sys`. | Windows: MSVC + WebView2 runtime. macOS: Xcode CLT. Linux: `build-essential cmake clang pkg-config perl`. |
 
-Optional but recommended on the host that runs Nomi (not for building):
+Optional but recommended on the host that runs OpenHub (not for building):
 
 - **`ripgrep`** — code-search backend; falls back to `grep` if missing.
 - **`node` / `npm` / `npx`** — many user-installed MCP stdio servers launch
@@ -109,18 +109,18 @@ To test the updater scaffold, use `bun run build:updater`, which sets
 ### Where data lives (desktop)
 
 The desktop app stores its database and runtime files under the per-user
-application-data directory, joined with `Nomi`:
+application-data directory, joined with `OpenHub`:
 
 | OS | Default path |
 | --- | --- |
-| Windows | `%LOCALAPPDATA%\OpenHub\Nomi` (e.g. `C:\Users\<you>\AppData\Local\OpenHub\Nomi`) |
-| macOS | `~/Library/Application Support/OpenHub/Nomi` |
-| Linux | `$XDG_DATA_HOME/OpenHub/Nomi` (usually `~/.local/share/OpenHub/Nomi`) |
+| Windows | `%LOCALAPPDATA%\OpenHub\OpenHub` (e.g. `C:\Users\<you>\AppData\Local\OpenHub\OpenHub`) |
+| macOS | `~/Library/Application Support/OpenHub/OpenHub` |
+| Linux | `$XDG_DATA_HOME/OpenHub/OpenHub` (usually `~/.local/share/OpenHub/OpenHub`) |
 
 Override with `OPENHUB_DATA_DIR=<absolute path>` before launching — the
-shell appends `/Nomi`, so the dir becomes `$OPENHUB_DATA_DIR/Nomi`.
+shell appends `/OpenHub`, so the dir becomes `$OPENHUB_DATA_DIR/OpenHub`.
 
-> Older builds defaulted to `<system temp>/openhub-data/Nomi`, where OS temp
+> Older builds defaulted to `<system temp>/openhub-data/OpenHub`, where OS temp
 > cleanup could destroy user data. On first launch the app now relocates such
 > a legacy install to the per-user location automatically (one-shot): data is
 > copied, absolute paths inside the database are rewritten, and the old
@@ -129,7 +129,7 @@ shell appends `/Nomi`, so the dir becomes `$OPENHUB_DATA_DIR/Nomi`.
 
 > Note: the app's user-facing name is `OpenHub` everywhere — the bundle
 > product name (`apps/desktop/tauri.conf.json`), the runtime window title,
-> and release artifacts. The data folder keeps its existing `/Nomi`
+> and release artifacts. The data folder keeps its existing `/OpenHub`
 > suffix for compatibility with current installs. Internal identifiers keep the legacy openhub
 > name by design (crates, `OPENHUB_*` env vars, the `com.openhub.*`
 > bundle identifier).
@@ -176,7 +176,7 @@ environment variables:
 | --- | --- | --- | --- |
 | `--host` | `OPENHUB_WEB_HOST` | `127.0.0.1` | Bind address. Use `0.0.0.0` only when you intend LAN/VPN/public access; pre-seed or complete admin setup first. |
 | `--port` | `OPENHUB_WEB_PORT` | `8787` | Port for both `/api` and the SPA. |
-| `--data-dir` | `OPENHUB_DATA_DIR` | _per-user app-data dir, same as the [desktop default](#where-data-lives-desktop)_ | Backend data dir (db / logs / bun cache / agent state). The env value is taken literally (no `/Nomi` suffix). Use an absolute path in production. |
+| `--data-dir` | `OPENHUB_DATA_DIR` | _per-user app-data dir, same as the [desktop default](#where-data-lives-desktop)_ | Backend data dir (db / logs / bun cache / agent state). The env value is taken literally (no `/OpenHub` suffix). Use an absolute path in production. |
 | `--dist` | `OPENHUB_WEB_DIST` | `../../ui/dist` | SPA static directory. **Set this explicitly when running outside the repo root.** |
 | `--admin-user` | `OPENHUB_ADMIN_USERNAME` | `admin` | Username for pre-seeded admin (only honoured before the admin exists). |
 | `--admin-password` | `OPENHUB_ADMIN_PASSWORD` | _(none — interactive first-run setup)_ | Pre-seed the admin password and skip interactive first-run. |
@@ -288,7 +288,7 @@ served from the same port.
 
 ## What's next
 
-- [Quick Start](quick-start.md) — your first conversation in Nomi.
+- [Quick Start](quick-start.md) — your first conversation in OpenHub.
 - [`../guides/web-server-deployment.md`](../guides/web-server-deployment.md)
   — production hardening for the web host.
 - [`../contributing/development.md`](../contributing/development.md)

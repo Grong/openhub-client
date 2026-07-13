@@ -47,7 +47,7 @@ struct BlockedOnConfirmationAgent {
 #[async_trait::async_trait]
 impl IAgentTask for BlockedOnConfirmationAgent {
     fn agent_type(&self) -> AgentType {
-        AgentType::Nomi
+        AgentType::OpenHub
     }
     fn conversation_id(&self) -> &str {
         &self.conversation_id

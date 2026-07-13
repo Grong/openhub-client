@@ -48,7 +48,7 @@ pub use acp::{
 };
 pub use acp_prompt_hook::AcpPromptHookWarningPayload;
 pub use agent_build_extra::{
-    AcpBuildExtra, AcpModelInfo, NomiBuildExtra, NomiGoalSpec, OpenClawBuildExtra,
+    AcpBuildExtra, AcpModelInfo, OpenHubBuildExtra, OpenHubGoalSpec, OpenClawBuildExtra,
     OpenClawGatewayConfig, RemoteBuildExtra, SessionMcpServer, SessionMcpTransport,
     SlashCommandItem,
 };

@@ -513,7 +513,7 @@ mod tests {
     #[test]
     fn test_reserved_prefix_case_insensitive() {
         let manifest = ExtensionManifest {
-            name: "NOMI-upper".into(),
+            name: "OPENHUB-upper".into(),
             version: "1.0.0".into(),
             display_name: None,
             description: None,

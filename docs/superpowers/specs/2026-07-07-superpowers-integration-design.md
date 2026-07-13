@@ -64,7 +64,7 @@
 - 平台适配：仅内联方法论所需的 md；上游的 `scripts/`（visual companion server、sdd 脚本等）对 openhub 引擎无意义且 fork 不可用，物化时可保留但不激活（不注册为可执行）。`using-superpowers` 的平台 `references/` 保留（ACP=Claude Code 时有用）。
 
 ### 4.2 openhub 引擎喂入
-- `NomiAgentManager::new`（`manager/openhub/agent.rs`）构建 `AgentBootstrap` 时，若判定编码场景，调用 `.extra_skill_dirs(vec![effective_superpowers_dir])`，使 `load_all_skills` 纳入 superpowers，技能清单经 `build_system_prompt`（`context.rs:247`）自动进入 `<system-reminder>`。
+- `OpenHubAgentManager::new`（`manager/openhub/agent.rs`）构建 `AgentBootstrap` 时，若判定编码场景，调用 `.extra_skill_dirs(vec![effective_superpowers_dir])`，使 `load_all_skills` 纳入 superpowers，技能清单经 `build_system_prompt`（`context.rs:247`）自动进入 `<system-reminder>`。
 - 引导注入：在 `factory/openhub.rs` 的 system_prompt 组装链（`compose_subagent_hint` 同款位置）追加 `using-superpowers` 引导文本（按平台改写为 openhub 语气：说明"编码前先检查并使用匹配技能；用 Skill 工具加载"）。仅编码场景注入。
 - 约束：superpowers 技能一律 **inline**（openhub 后端无 spawner）。
 

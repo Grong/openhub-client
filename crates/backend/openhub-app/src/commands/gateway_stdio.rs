@@ -10,7 +10,7 @@
 //! struct or `#[tool]` method. `tools/list` is projected from the capability
 //! registry (`openhub_gateway::Registry`) filtered by this session's permission
 //! surface, and `tools/call` forwards the raw arguments to the in-process
-//! `GatewayMcpServer` (`http://127.0.0.1:{NOMI_GW_MCP_PORT}/tool`), which
+//! `GatewayMcpServer` (`http://127.0.0.1:{OPENHUB_GW_MCP_PORT}/tool`), which
 //! deserializes them into the capability's single typed request and enforces the
 //! danger-tier × surface gate. Adding/renaming a capability in `openhub-gateway`
 //! updates this bridge automatically — there is nothing to keep in sync here.
@@ -106,11 +106,11 @@ struct GatewayStdioServer {
     token: String,
     conversation_id: String,
     user_id: String,
-    /// The companion the calling session is bound to (from `NOMI_GW_MCP_COMPANION_ID`);
+    /// The companion the calling session is bound to (from `OPENHUB_GW_MCP_COMPANION_ID`);
     /// `None` when the session has no companion binding.
     companion_id: Option<String>,
     /// IM platform when this is a channel master-agent session (from
-    /// `NOMI_GW_MCP_CHANNEL_PLATFORM`); `None` for plain companion/desktop.
+    /// `OPENHUB_GW_MCP_CHANNEL_PLATFORM`); `None` for plain companion/desktop.
     channel_platform: Option<String>,
     /// Resolved approval mode for the calling session.
     session_mode: Option<String>,

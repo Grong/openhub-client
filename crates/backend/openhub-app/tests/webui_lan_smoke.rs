@@ -25,7 +25,7 @@ async fn webui_lan_start_smoke() {
     std::fs::create_dir_all(&spa_dir).unwrap();
     std::fs::write(
         spa_dir.join("index.html"),
-        "<!doctype html><title>Nomi</title>",
+        "<!doctype html><title>OpenHub</title>",
     )
     .unwrap();
 
@@ -62,7 +62,7 @@ async fn webui_lan_spa_deep_link_serves_app_shell() {
     std::fs::create_dir_all(&spa_dir).unwrap();
     std::fs::write(
         spa_dir.join("index.html"),
-        "<!doctype html><title>Nomi deep link</title>",
+        "<!doctype html><title>OpenHub deep link</title>",
     )
     .unwrap();
 
@@ -92,7 +92,7 @@ async fn webui_lan_spa_deep_link_serves_app_shell() {
 
     assert_eq!(response_status, reqwest::StatusCode::OK);
     assert!(
-        body.contains("Nomi deep link"),
+        body.contains("OpenHub deep link"),
         "SPA deep link should serve index.html, got status={response_status}; body={body}"
     );
 }
@@ -259,7 +259,7 @@ async fn webui_enable_preserves_user_set_username_and_reports_persisted_state() 
     let data_dir = tmp.path().to_string_lossy().into_owned();
     let spa_dir = tmp.path().join("spa");
     std::fs::create_dir_all(&spa_dir).unwrap();
-    std::fs::write(spa_dir.join("index.html"), "<!doctype html><title>Nomi</title>").unwrap();
+    std::fs::write(spa_dir.join("index.html"), "<!doctype html><title>OpenHub</title>").unwrap();
 
     let cli = openhub_app::cli::Cli::parse_from(["openhub-desktop-test", "--data-dir", &data_dir]);
     let merged_path = std::env::var("PATH").unwrap_or_default();

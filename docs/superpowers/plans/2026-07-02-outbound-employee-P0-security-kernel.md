@@ -4,7 +4,7 @@
 
 **Goal:** 落地"对外服务档"的**原生工具安全内核**——让一个标记为 `PublicService` 的伙伴会话在引擎层被**硬性收窄**到只剩安全工具（问答 + 知识库检索），并修复使白名单失效的 C3 绕过 bug。
 
-**Architecture:** 新增正交于 `Surface` 的 `ExposureMode` 枚举（`openhub-api-types`），穿过 `NomiBuildExtra` 进入 openhub 工厂；工厂对 `PublicService` 施加**钳制**（安全白名单 + 关网关/computer/browser/spawn）。引擎侧修复 C3：post-build 注册的 knowledge/memory 工具此前绕过 `retain_named`，改为在全部注册完成后再收口一次。
+**Architecture:** 新增正交于 `Surface` 的 `ExposureMode` 枚举（`openhub-api-types`），穿过 `OpenHubBuildExtra` 进入 openhub 工厂；工厂对 `PublicService` 施加**钳制**（安全白名单 + 关网关/computer/browser/spawn）。引擎侧修复 C3：post-build 注册的 knowledge/memory 工具此前绕过 `retain_named`，改为在全部注册完成后再收口一次。
 
 **Tech Stack:** Rust 2024、`serde`/`schemars`、`nextest`。
 
@@ -188,18 +188,18 @@ fn public_allowlist_strips_postbuild_memory_tools() {
 
 ---
 
-### Task 3: exposure 穿过 NomiBuildExtra + 工厂施加钳制
+### Task 3: exposure 穿过 OpenHubBuildExtra + 工厂施加钳制
 
 **Files:**
-- Modify: `crates/backend/openhub-api-types/src/agent_build_extra.rs`（`NomiBuildExtra` 加字段）
+- Modify: `crates/backend/openhub-api-types/src/agent_build_extra.rs`（`OpenHubBuildExtra` 加字段）
 - Modify: `crates/backend/openhub-ai-agent/src/factory/openhub.rs`（应用 `exposure_clamp`）
 - Test: `crates/backend/openhub-ai-agent/tests/agent_types_integration.rs`
 
 **Interfaces:**
 - Consumes: `ExposureMode` / `exposure_clamp`（Task 1）。
-- Produces: `NomiBuildExtra.exposure: ExposureMode`。
+- Produces: `OpenHubBuildExtra.exposure: ExposureMode`。
 
-- [ ] **Step 1: 加字段** — 在 `NomiBuildExtra`（`agent_build_extra.rs`，`allowed_tools` 字段附近）追加：
+- [ ] **Step 1: 加字段** — 在 `OpenHubBuildExtra`（`agent_build_extra.rs`，`allowed_tools` 字段附近）追加：
 
 ```rust
     /// 对外服务信任档（正交于 Surface）。后端设定；`PublicService` 令工厂把会话
@@ -208,7 +208,7 @@ fn public_allowlist_strips_postbuild_memory_tools() {
     pub exposure: openhub_api_types_self_ref_ExposureMode,
 ```
 
-> 注：`NomiBuildExtra` 就在 `openhub-api-types` crate 内，直接用 `crate::ExposureMode`（Task 1 已 `pub use`）。字段写作：
+> 注：`OpenHubBuildExtra` 就在 `openhub-api-types` crate 内，直接用 `crate::ExposureMode`（Task 1 已 `pub use`）。字段写作：
 
 ```rust
     #[serde(default)]
@@ -220,11 +220,11 @@ fn public_allowlist_strips_postbuild_memory_tools() {
 ```rust
 #[test]
 fn openhub_build_extra_deserializes_public_service_exposure() {
-    let extra: openhub_api_types::NomiBuildExtra =
+    let extra: openhub_api_types::OpenHubBuildExtra =
         serde_json::from_value(serde_json::json!({ "exposure": "public_service" })).unwrap();
     assert_eq!(extra.exposure, openhub_api_types::ExposureMode::PublicService);
     // 缺省不回归
-    let d: openhub_api_types::NomiBuildExtra = serde_json::from_value(serde_json::json!({})).unwrap();
+    let d: openhub_api_types::OpenHubBuildExtra = serde_json::from_value(serde_json::json!({})).unwrap();
     assert_eq!(d.exposure, openhub_api_types::ExposureMode::Private);
 }
 ```
@@ -265,7 +265,7 @@ let (eff_allowed_tools, eff_desktop_gateway, eff_computer_use, eff_browser_use, 
 ```rust
 #[test]
 fn factory_clamps_public_service_session() {
-    let mut ov = openhub_api_types::NomiBuildExtra::default();
+    let mut ov = openhub_api_types::OpenHubBuildExtra::default();
     ov.exposure = openhub_api_types::ExposureMode::PublicService;
     ov.desktop_gateway = true;              // 上游即便要网关…
     ov.allowed_tools = vec!["Bash".into()]; // …或塞危险工具
@@ -288,7 +288,7 @@ fn factory_clamps_public_service_session() {
 
 ## 后续计划（独立子系统，各自成 plan）
 
-- **P1 数据模型 + 入口盖章**：`CompanionProfileConfig` 加对外服务字段（迁移）+ 专门"对外伙伴"隔离单元（独立记忆/只绑公开库/独立数据目录）；渠道公开模式与 Remote 令牌把 `ExposureMode::PublicService` 盖进 `NomiBuildExtra`/`CallerCtx`；`recall_memories` 对 PublicService 关闭或改公司自身作用域。
+- **P1 数据模型 + 入口盖章**：`CompanionProfileConfig` 加对外服务字段（迁移）+ 专门"对外伙伴"隔离单元（独立记忆/只绑公开库/独立数据目录）；渠道公开模式与 Remote 令牌把 `ExposureMode::PublicService` 盖进 `OpenHubBuildExtra`/`CallerCtx`；`recall_memories` 对 PublicService 关闭或改公司自身作用域。
 - **P1-hardening 网关 C7**：把域/档白名单从"仅广告"提升为 `dispatch_opt` 权威强制（防知道名字即越权调用）。
 - **P2 安全网搜**：出口防火墙 fetch 工具 + 加入 `SAFE_PUBLIC_SERVICE_TOOLS`。
 - **P3 沙箱编程**：独立安全域（容器/WSL2/独立用户 + 资源/出口管控）。

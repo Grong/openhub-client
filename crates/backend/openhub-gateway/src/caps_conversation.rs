@@ -271,7 +271,7 @@ async fn create(deps: Arc<GatewayDeps>, ctx: CallerCtx, p: CreateConversationPar
     }
     let mut model = None;
     let mut model_source = None;
-    if agent_type == AgentType::Nomi {
+    if agent_type == AgentType::OpenHub {
         match tools_provider::resolve_openhub_model(&deps, &ctx, p.provider_id.as_deref(), p.model.as_deref()).await {
             Ok((m, source)) => {
                 model = Some(m);
@@ -445,7 +445,7 @@ async fn agent_run(deps: Arc<GatewayDeps>, ctx: CallerCtx, p: AgentRunParams, pr
         extra["workspace"] = json!(ws);
     }
     let create_req = CreateConversationRequest {
-        r#type: AgentType::Nomi,
+        r#type: AgentType::OpenHub,
         name: Some("Remote agent run".to_owned()),
         model,
         source: None,

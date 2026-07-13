@@ -31,7 +31,7 @@ pub struct AgentMetadataRow {
     pub native_skills_dirs: Option<String>,
 
     pub behavior_policy: Option<String>,
-    /// Native mode id that Nomi's legacy `yolo` / `yoloNoSandbox`
+    /// Native mode id that OpenHub's legacy `yolo` / `yoloNoSandbox`
     /// aliases resolve to before calling `session/set_mode`. `None`
     /// means the backend has no yolo equivalent and the alias should
     /// pass through unchanged.

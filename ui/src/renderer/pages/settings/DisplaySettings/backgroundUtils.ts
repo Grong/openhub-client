@@ -8,9 +8,9 @@
  * Helpers for injecting user-selected background images into theme CSS.
  */
 
-export const BACKGROUND_BLOCK_START = '/* Nomi Theme Background Start */';
-export const BACKGROUND_BLOCK_END = '/* Nomi Theme Background End */';
-export const BACKGROUND_MASK_VERSION = '/* Nomi Theme Background Mask v2 */';
+export const BACKGROUND_BLOCK_START = '/* OpenHub Theme Background Start */';
+export const BACKGROUND_BLOCK_END = '/* OpenHub Theme Background End */';
+export const BACKGROUND_MASK_VERSION = '/* OpenHub Theme Background Mask v2 */';
 
 const LIGHT_IMAGE_MASK = 'rgba(255, 255, 255, 0.66)';
 const DARK_IMAGE_MASK = 'rgba(0, 0, 0, 0.34)';

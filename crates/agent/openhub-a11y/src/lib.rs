@@ -1,4 +1,4 @@
-//! Cross-platform accessibility-tree + Set-of-Marks engine for Nomi computer-use.
+//! Cross-platform accessibility-tree + Set-of-Marks engine for OpenHub computer-use.
 //!
 //! The platform-neutral layer (engine trait/types, selector grammar, tree
 //! model + filtering, Set-of-Marks overlay) compiles on every target. Per-OS

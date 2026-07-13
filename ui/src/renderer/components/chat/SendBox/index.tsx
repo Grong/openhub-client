@@ -171,9 +171,9 @@ const SendBox: React.FC<{
   /** When provided AND a turn is running AND there is a draft, a secondary
    *  "steer now" action is offered alongside the (enqueue) send button. */
   onSteer?: (message: string) => Promise<void>;
-  /** Gate the steer affordance (e.g. only for the Nomi native engine). */
+  /** Gate the steer affordance (e.g. only for the OpenHub native engine). */
   steerAvailable?: boolean;
-  /** When provided (Nomi only), enables "edit a sent message" mode: the message text is
+  /** When provided (OpenHub only), enables "edit a sent message" mode: the message text is
    *  recalled into the composer via the `sendbox.edit` event and submitting calls this
    *  instead of onSend, which truncates the conversation and re-runs from that message. */
   onEditResubmit?: (msgId: string, createdAt: number, message: string) => Promise<void>;
@@ -292,7 +292,7 @@ const SendBox: React.FC<{
   useAddEventListener('sendbox.reply', (quote) => setReplyQuote(quote), []);
   useAddEventListener('sendbox.reply.clear', () => setReplyQuote(null), []);
 
-  // 编辑已发送消息：把原文回填输入框，进入"编辑模式"，提交即截断重跑（仅 Nomi 提供 onEditResubmit）
+  // 编辑已发送消息：把原文回填输入框，进入"编辑模式"，提交即截断重跑（仅 OpenHub 提供 onEditResubmit）
   useAddEventListener(
     'sendbox.edit',
     (payload) => {

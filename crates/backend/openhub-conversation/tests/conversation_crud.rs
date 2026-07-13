@@ -239,7 +239,7 @@ async fn t1_2_create_each_agent_type() {
         ("openclaw-gateway", AgentType::OpenclawGateway),
         ("nanobot", AgentType::Nanobot),
         ("remote", AgentType::Remote),
-        ("openhub", AgentType::Nomi),
+        ("openhub", AgentType::OpenHub),
     ];
 
     for (type_str, expected_type) in types {
@@ -756,7 +756,7 @@ async fn create_accepts_top_level_model_for_openhub() {
     .unwrap();
 
     let resp = svc.create(USER_ID, req).await.unwrap();
-    assert_eq!(resp.r#type, AgentType::Nomi);
+    assert_eq!(resp.r#type, AgentType::OpenHub);
     let model = resp.model.expect("openhub response should carry top-level model");
     assert_eq!(model.provider_id, "p1");
     assert_eq!(model.model, "gpt-4o");

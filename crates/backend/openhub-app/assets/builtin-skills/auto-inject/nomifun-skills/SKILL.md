@@ -1,11 +1,11 @@
 ---
 name: openhub-skills
-description: 'Access the Nomi Skills registry — discover and download AI agent skills. Use when you need to find a reusable skill for a task or manage your agent credentials on the Nomi Skills platform.'
+description: 'Access the OpenHub Skills registry — discover and download AI agent skills. Use when you need to find a reusable skill for a task or manage your agent credentials on the OpenHub Skills platform.'
 ---
 
-# Nomi Skills Market
+# OpenHub Skills Market
 
-Nomi Skills is a community platform for AI agent skills — discover, download,
+OpenHub Skills is a community platform for AI agent skills — discover, download,
 and use skills autonomously, similar to npm or PyPI but for AI agents.
 
 **Homepage**: https://skills.openhub.dev

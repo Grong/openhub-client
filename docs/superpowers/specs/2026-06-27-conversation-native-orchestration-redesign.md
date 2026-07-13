@@ -34,7 +34,7 @@
 | 概念 | 定义 | 实现承载 |
 |---|---|---|
 | **Run** | 一次有目标的多 agent 执行，宿主在一个**主管会话**里 | `orch_runs`（复用）；新增 `lead_conv_id` 关联 + `work_dir` |
-| **主管会话（Lead）** | 用户直接对话的 Nomi 会话，武装了 `caps_orchestrator` 工具 + 主管提示词；它创建/规划/驱动 Run，可被用户 steer | 一个 `type='openhub'` 会话，`extra` 带 `orchestrator_role='lead'` + `model_range` + （创建 Run 后）`orchestrator_run_id` |
+| **主管会话（Lead）** | 用户直接对话的 OpenHub 会话，武装了 `caps_orchestrator` 工具 + 主管提示词；它创建/规划/驱动 Run，可被用户 steer | 一个 `type='openhub'` 会话，`extra` 带 `orchestrator_role='lead'` + `model_range` + （创建 Run 后）`orchestrator_run_id` |
 | **Worker（节点）** | DAG 的一个任务节点 = 一个真实子会话（openhub yolo + desktopGateway） | `orch_run_tasks`（复用）；worker conversation `extra.orchestrator_run_id/task_id`（复用，已从主侧栏过滤） |
 | **角色资产 = 助手** | 可复用的命名角色（规划/前端/后端/测试/设计…）= 一个 `assistants` 记录：name + description + 系统提示 + 技能 + 标签 + 偏好模型 | `assistants`（复用 + 补字段）；管理面复用助手页 |
 | **模型范围** | 本次 Run 允许使用的模型集合：`单一` / `自动`（全部启用） / `范围`（勾选若干） | 会话 `extra.model_range`；可存为可选预设 |
@@ -160,7 +160,7 @@ pub struct CreateAdhocRunRequest {
 ## 7. DAG 右栏（点 #4）
 
 ### 7.1 复用右栏抽象
-复用 `WorkspaceSource.extraTabs`（Nomi 已用它挂"会话指标"tab）。在主管会话的右栏 `ChatSlider` 中新增一个 **"编排/DAG" extraTab**（仅当会话 `extra.orchestrator_role==='lead'` 且已有 `orchestrator_run_id` 时出现）。
+复用 `WorkspaceSource.extraTabs`（OpenHub 已用它挂"会话指标"tab）。在主管会话的右栏 `ChatSlider` 中新增一个 **"编排/DAG" extraTab**（仅当会话 `extra.orchestrator_role==='lead'` 且已有 `orchestrator_run_id` 时出现）。
 
 ### 7.2 面板内容
 DAG tab 渲染该 Run 的 react-flow 节点图（复用既有 `DagCanvas`/`TaskNode`/`layoutDag`）：节点 = 任务，边 = 依赖，颜色 = 状态。点节点 → 复用 `ReadOnlyConversationView`（已修好 PreviewProvider）展示该节点的会话历史 + 工作状态 + （运行中）steer 输入。WS 实时更新复用 `useRunLive`/`orchestratorEvents`。

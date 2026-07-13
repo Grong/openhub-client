@@ -617,7 +617,7 @@ export default function OrchestratorPage() {
 ```
 - [ ] **Step 2: SiderOrchestratorEntry.tsx** — 复制 `SiderModelHubEntry.tsx`，改 icon（`@icon-park/react` 选一个语义贴切的，如 `Workbench` / `Connection`，**不起别名**），i18n key 换 `common.siderNav.orchestrator`，target `/orchestrator`。
 - [ ] **Step 3: 接 SiderNav/index.ts** — `export { default as SiderOrchestratorEntry } from './SiderOrchestratorEntry';`
-- [ ] **Step 4: 插入 Sider/index.tsx 常用组** — 在 `SiderConversationEntry` 之后、`SiderNomiEntry` 之前渲染 `<SiderOrchestratorEntry .../>`；加 navTo `/orchestrator` 与 isActive（`pathname.startsWith('/orchestrator')`）。
+- [ ] **Step 4: 插入 Sider/index.tsx 常用组** — 在 `SiderConversationEntry` 之后、`SiderOpenHubEntry` 之前渲染 `<SiderOrchestratorEntry .../>`；加 navTo `/orchestrator` 与 isActive（`pathname.startsWith('/orchestrator')`）。
 - [ ] **Step 5: Router.tsx 路由** — `const OrchestratorPage = React.lazy(() => import('@/renderer/pages/orchestrator'));` + 在 ProtectedLayout 下加 `<Route path="/orchestrator" element={withRouteFallback(OrchestratorPage)} />`。
 - [ ] **Step 6: i18n** — `common.json` 双语加 `siderNav.orchestrator`（中「智能编排」/英「Orchestration」）；建 `orchestrator.json` 双语（先放页面用到的 key 占位）；`bun run gen:i18n`（仓库根）；同步 `i18n-keys.d.ts`。
 - [ ] **Step 7: typecheck** — `cd ui && npm run typecheck` → 0。
@@ -640,7 +640,7 @@ export default function OrchestratorPage() {
 参照模板：`ui/src/renderer/pages/modelHub/index.tsx`（ContentSider + `?section=` 模式）；`ContentSider/index.tsx`；`useResizableSplit.ts`。
 
 - [ ] **Step 1: useOrchestratorData.ts** — `useFleets`/`useWorkspaces`（SWR key `'orchestrator.fleets'`/`'orchestrator.workspaces'`，fetcher = ipcBridge）。
-- [ ] **Step 2: WorkspaceList.tsx** — 列出工作间（卡/行）+ 「新建工作间」按钮（弹 NomiModal，name + 默认编队选择 → `ipcBridge.orchestrator.workspaces.create` → `mutate`）。
+- [ ] **Step 2: WorkspaceList.tsx** — 列出工作间（卡/行）+ 「新建工作间」按钮（弹 OpenHubModal，name + 默认编队选择 → `ipcBridge.orchestrator.workspaces.create` → `mutate`）。
 - [ ] **Step 3: RunHistory.tsx** — 空态卡：「Run 执行即将上线（P1）」。
 - [ ] **Step 4: index.tsx 页壳** — ContentSider 三段（icon+label，`?section=` 内联态，移动端 SegmentedTabs）；主区 switch；FleetManager 由 Task 12 提供（先 import 占位）。
 - [ ] **Step 5: typecheck** → 0。
@@ -656,10 +656,10 @@ export default function OrchestratorPage() {
 - Test: typecheck + 真机（创建/编辑/删除编队）
 
 **Interfaces:**
-- Consumes: `useFleets`（Task 11）、`ipcBridge.orchestrator.fleets`、`ipcBridge.acpConversation.getAvailableAgents`（`/api/agents`，选 agent）、模型/provider 列表（对照模型管理页取 providers + models 的现有 hook/ipc）、`NomiModal`/Arco `Drawer`、`AssistantTagFilterBar`（chip 筛选风格）、`useArcoMessage`。
+- Consumes: `useFleets`（Task 11）、`ipcBridge.orchestrator.fleets`、`ipcBridge.acpConversation.getAvailableAgents`（`/api/agents`，选 agent）、模型/provider 列表（对照模型管理页取 providers + models 的现有 hook/ipc）、`OpenHubModal`/Arco `Drawer`、`AssistantTagFilterBar`（chip 筛选风格）、`useArcoMessage`。
 - Produces: 编队卡片网格（每卡显示编队名 + 成员头像/模型 chip + 成员数 + max_parallel）；新建/编辑抽屉（编队名、描述、并发上限 + 成员编辑器：每行 = 选 agent + provider+model + 角色提示 + 强项标签 + 约束）。删除二次确认。
 
-参照模板：`pages/settings/AgentSettings/AgentCard.tsx` / `LocalAgents`（卡片网格 + agent 选择）；`AssistantTagFilterBar.tsx`（chip）；`AssistantEditDrawer`（编辑抽屉范式）；模型选择对照 `NomiModelSelector` / 模型管理页取 providers。
+参照模板：`pages/settings/AgentSettings/AgentCard.tsx` / `LocalAgents`（卡片网格 + agent 选择）；`AssistantTagFilterBar.tsx`（chip）；`AssistantEditDrawer`（编辑抽屉范式）；模型选择对照 `OpenHubModelSelector` / 模型管理页取 providers。
 
 - [ ] **Step 1: FleetMemberRow.tsx** — 单成员编辑行（agent 下拉来自 `/api/agents` 已启用项；provider+model 下拉来自 providers；role_hint 输入；强项标签多选；约束 max_concurrency/cost_tier）。用 `<div onClick>` 不用裸 `<button>`。
 - [ ] **Step 2: FleetEditDrawer.tsx** — Arco Drawer：编队名/描述/max_parallel + 成员列表（增删行，复用 FleetMemberRow）；保存 → `create`/`update` → `mutate('orchestrator.fleets')` + `useArcoMessage` 成功提示；校验 name 非空、至少 1 成员。

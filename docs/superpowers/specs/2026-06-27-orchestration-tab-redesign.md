@@ -83,7 +83,7 @@
 **移除/回退会话融合胶水**：
 - 删 `OrchestrationStatusStrip.tsx`、`DagRailTab.tsx`、`useOrchestrationStatus.ts`、`GuidOrchestrationMode.tsx`。
 - `ChatSlider.tsx`：去掉「编排」extraTab(orchestration-dag)。
-- `ChatConversation.tsx`(NomiConversationPanel)：去掉状态条挂载。
+- `ChatConversation.tsx`(OpenHubConversationPanel)：去掉状态条挂载。
 - `useGuidSend.ts`：去掉 lead 标记 + model_range 注入(会话创建回到普通 openhub)。
 - `GuidModelSelector.tsx` + `useGuidModelSelection.ts`：**回退为单选**(去三态/主管模型/leadLabel/leadHint);`GuidPage.tsx`：去 orchestrationModeNode + 隐藏/主管模型逻辑。
 - `workspaceEvents.ts`：去 `WORKSPACE_SELECT_TAB_EVENT`(仅右栏 DAG 用过) + `WorkspaceRailBody` 对应监听。

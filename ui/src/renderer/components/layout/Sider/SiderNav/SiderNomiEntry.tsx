@@ -11,7 +11,7 @@ import { Peoples } from '@icon-park/react';
 import classNames from 'classnames';
 import type { SiderTooltipProps } from '@renderer/utils/ui/siderTooltip';
 
-interface SiderNomiEntryProps {
+interface SiderOpenHubEntryProps {
   isMobile: boolean;
   isActive: boolean;
   collapsed: boolean;
@@ -19,7 +19,7 @@ interface SiderNomiEntryProps {
   onClick: () => void;
 }
 
-const SiderNomiEntry: React.FC<SiderNomiEntryProps> = ({
+const SiderOpenHubEntry: React.FC<SiderOpenHubEntryProps> = ({
   isMobile,
   isActive,
   collapsed,
@@ -69,4 +69,4 @@ const SiderNomiEntry: React.FC<SiderNomiEntryProps> = ({
   );
 };
 
-export default SiderNomiEntry;
+export default SiderOpenHubEntry;

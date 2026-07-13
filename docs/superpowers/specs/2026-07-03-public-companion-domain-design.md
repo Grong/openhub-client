@@ -60,13 +60,13 @@ struct PublicAgentConfig {
 
 ## 4. 运行时解析
 
-- `NomiBuildExtra.public_agent_id: Option<String>`（新）。设置时：工厂经 `PublicAgentProvider` 解析 → 注入 persona(greeting/tone)+service_policy+grounded 指令+首轮语言指令；隐式 `exposure=PublicService` 钳制（安全白名单 + 无网关/computer/browser/spawn）；KB 烘死为 `knowledge_base_ids`。
+- `OpenHubBuildExtra.public_agent_id: Option<String>`（新）。设置时：工厂经 `PublicAgentProvider` 解析 → 注入 persona(greeting/tone)+service_policy+grounded 指令+首轮语言指令；隐式 `exposure=PublicService` 钳制（安全白名单 + 无网关/computer/browser/spawn）；KB 烘死为 `knowledge_base_ids`。
 - **grounded 指令**：grounded_mode=true 时系统提示强约束"只依据下方知识库作答；库中无据则礼貌说明无法回答或建议转人工，严禁编造"。
 - 隐式 exposure：public_agent 会话 = PublicService（不再依赖 companion.exposure；companion.exposure 字段可退役或仅保留兼容）。
 
 ## 5. 渠道部署
 
-渠道绑定从"绑 companion"扩展为"绑 companion 或 public_agent"。channel 绑定新增可选 `public_agent_id`；置位时 `message_service` 入站消息路由到 public-agent 会话（`NomiBuildExtra.public_agent_id` + surface=Channel + 隐式 PublicService）。一个渠道 bot 二选一（私人伙伴 or 对外伙伴）。
+渠道绑定从"绑 companion"扩展为"绑 companion 或 public_agent"。channel 绑定新增可选 `public_agent_id`；置位时 `message_service` 入站消息路由到 public-agent 会话（`OpenHubBuildExtra.public_agent_id` + surface=Channel + 隐式 PublicService）。一个渠道 bot 二选一（私人伙伴 or 对外伙伴）。
 
 ## 6. 审计（独立位置 + 搜索 + 天级保留）
 

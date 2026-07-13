@@ -310,7 +310,7 @@ export const useGuidSend = (deps: GuidSendDeps): GuidSendResult => {
       return;
     }
 
-    // Nomi path (direct selection or preset assistant with openhub as main agent)
+    // OpenHub path (direct selection or preset assistant with openhub as main agent)
     if (selectedAgent === 'openhub' || (is_preset && finalEffectiveAgentType === 'openhub')) {
       if (!current_model) {
         Message.warning(t('conversation.noModelConfigured'));
@@ -367,7 +367,7 @@ export const useGuidSend = (deps: GuidSendDeps): GuidSendResult => {
         seedConversationCache(conversation);
         await navigate(`/conversation/${conversation.id}`);
       } catch (error: unknown) {
-        console.error('Failed to create Nomi conversation:', error);
+        console.error('Failed to create OpenHub conversation:', error);
         throw error;
       }
       return;

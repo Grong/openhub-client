@@ -6,7 +6,7 @@ pub(super) fn normalize_requested_mode(metadata: &AgentMetadata, mode: &str) -> 
         return String::new();
     }
 
-    // Nomi persists the legacy aliases `yolo` / `yoloNoSandbox` while
+    // OpenHub persists the legacy aliases `yolo` / `yoloNoSandbox` while
     // ACP backends expect their native mode id (e.g. `full-access` for
     // Codex). Resolution is data-driven: the mapping lives on each
     // catalog row's top-level `yolo_id` column. Backends without a

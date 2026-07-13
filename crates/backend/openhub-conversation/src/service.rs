@@ -61,7 +61,7 @@ struct McpSupportPolicy {
 }
 
 impl McpSupportPolicy {
-    const NOMI: Self = Self {
+    const OPENHUB: Self = Self {
         stdio: true,
         http: true,
         sse: true,
@@ -396,7 +396,7 @@ impl ConversationService {
         // carry model/mode via `extra` (see spec 2026-05-12). Reject early so
         // clients that still ship the legacy shape get a loud 400 instead of
         // a silent write to a column nobody reads.
-        if req.r#type != AgentType::Nomi && req.model.is_some() {
+        if req.r#type != AgentType::OpenHub && req.model.is_some() {
             return Err(AppError::BadRequest(format!(
                 "top-level `model` is only accepted for openhub conversations; pass model via `extra` for {}",
                 req.r#type.serde_name()
@@ -408,7 +408,7 @@ impl ConversationService {
         // openhub source-of-truth rule: top-level `model` wins. If an older client
         // still packs `extra.model`, strip it before persist so the stored row
         // has a single canonical model representation.
-        if req.r#type == AgentType::Nomi
+        if req.r#type == AgentType::OpenHub
             && let Some(obj) = extra.as_object_mut()
             && obj.remove("model").is_some()
         {
@@ -927,7 +927,7 @@ impl ConversationService {
         // conversations, model/mode must be updated via `extra` (see spec
         // 2026-05-12).
         let existing_type: AgentType = string_to_enum(&existing.r#type)?;
-        if existing_type != AgentType::Nomi && req.model.is_some() {
+        if existing_type != AgentType::OpenHub && req.model.is_some() {
             return Err(AppError::BadRequest(format!(
                 "top-level `model` is only accepted for openhub conversations; pass model via `extra` for {}",
                 existing.r#type
@@ -942,7 +942,7 @@ impl ConversationService {
             let mut existing_extra: serde_json::Value =
                 serde_json::from_str(&existing.extra).unwrap_or_else(|_| serde_json::json!({}));
             merge_json(&mut existing_extra, new_extra);
-            if existing_type == AgentType::Nomi
+            if existing_type == AgentType::OpenHub
                 && let Some(obj) = existing_extra.as_object_mut()
                 && obj.remove("model").is_some()
             {
@@ -1860,7 +1860,7 @@ impl ConversationService {
             // is swallowed at source (no WS error, no error tips row) — the user
             // sees only the backup model's turn. `enabled == false` / no deps →
             // `None` → relay never suppresses (current behaviour preserved).
-            let failover_config = if agent.agent_type() == AgentType::Nomi {
+            let failover_config = if agent.agent_type() == AgentType::OpenHub {
                 service.resolve_failover_config(&failover_extra_json).await.filter(|c| c.enabled)
             } else {
                 None
@@ -1901,7 +1901,7 @@ impl ConversationService {
                 // provider fault(在切换上限内),也隐藏"将被同模型剔图重试"的
                 // image-unsupported 400(每轮一次)。被吞的错误进 outcome.suppressed_error,
                 // 若两种重试都未触发,则下方原样 re-surface。
-                if agent.agent_type() == AgentType::Nomi {
+                if agent.agent_type() == AgentType::OpenHub {
                     let failover_within_bound = failover_config.as_ref().is_some_and(|c| {
                         failover_switches_done < c.max_switches.min(c.queue.len() as u32)
                     });
@@ -1984,7 +1984,7 @@ impl ConversationService {
                 // 未触发(已重跑过 / 非 openhub / 有响应 / 码不符 / 重建失败)则落到下方
                 // re-surface,把原始错误显示给用户。
                 if image_strip_retries_done == 0
-                    && agent.agent_type() == AgentType::Nomi
+                    && agent.agent_type() == AgentType::OpenHub
                     && outcome.terminal.is_error()
                     && !outcome.emitted_response
                     && outcome.terminal.code()
@@ -2104,7 +2104,7 @@ impl ConversationService {
 
     /// Inject a user interjection into a RUNNING turn (mid-turn steering). If no
     /// turn is live, falls back to a normal [`Self::send_message`] (new turn). If
-    /// the live agent cannot be steered (non-Nomi engine), returns a BadRequest the
+    /// the live agent cannot be steered (non-OpenHub engine), returns a BadRequest the
     /// route maps to `steer_unsupported` so the client falls back to the queue.
     #[tracing::instrument(skip_all, fields(user_id = %user_id, conversation_id = %conversation_id))]
     pub async fn steer_message(
@@ -2140,7 +2140,7 @@ impl ConversationService {
         //  - Ok(false): the turn ended between the status check and here → fall
         //    back to a fresh send (which persists its own user row). Persisting
         //    here too would double-write the interjection.
-        //  - Err: non-Nomi engine (`steer_unsupported`) → propagate. The client
+        //  - Err: non-OpenHub engine (`steer_unsupported`) → propagate. The client
         //    falls back to the pending queue, which sends (and persists) later.
         //    Persisting here would duplicate that.
         match instance.steer(req.content.clone()) {
@@ -2248,10 +2248,10 @@ impl ConversationService {
         Ok(())
     }
 
-    /// Edit the most recent user message and re-run from there (Nomi only).
+    /// Edit the most recent user message and re-run from there (OpenHub only).
     /// Rewinds the engine's last turn, truncates the DB transcript at the
     /// target message (inclusive), then re-sends the edited content as a fresh
-    /// turn. Rejects non-Nomi conversations and any target that is not the
+    /// turn. Rejects non-OpenHub conversations and any target that is not the
     /// latest user message (so the engine rewind and DB truncation stay aligned).
     #[tracing::instrument(skip_all, fields(user_id = %user_id, conversation_id = %conversation_id, message_id = %message_id))]
     pub async fn edit_and_resubmit(
@@ -2275,10 +2275,10 @@ impl ConversationService {
             .filter(|r| r.user_id == user_id)
             .ok_or_else(|| AppError::NotFound(format!("Conversation {conversation_id} not found")))?;
 
-        // 2. 仅 Nomi
+        // 2. 仅 OpenHub
         if row.r#type != "openhub" {
             return Err(AppError::BadRequest(
-                "Edit & resubmit is only supported for Nomi conversations".into(),
+                "Edit & resubmit is only supported for OpenHub conversations".into(),
             ));
         }
 
@@ -2370,7 +2370,7 @@ impl ConversationService {
     /// Unlike [`Self::reset`] (which deletes DB messages but leaves the live
     /// CLI session intact, so the model still remembers everything), this:
     ///  1. resets the live agent's in-memory/session context if one is running
-    ///     (ACP rotates to a fresh `session/new`, Nomi empties its engine,
+    ///     (ACP rotates to a fresh `session/new`, OpenHub empties its engine,
     ///     OpenClaw/Remote forget their gateway session) — see
     ///     [`AgentInstance::clear_context`]; and
     ///  2. clears the persisted `acp_session` row (NULL session_id + drop
@@ -2441,7 +2441,7 @@ impl ConversationService {
         self.conversation_repo.delete_artifacts_by_conversation(conv_id).await?;
 
         // 2. Reset the live agent's context, if one is running (same as
-        //    clear_context: ACP rotates to a fresh session, Nomi empties its
+        //    clear_context: ACP rotates to a fresh session, OpenHub empties its
         //    engine, etc.).
         if let Some(agent) = task_manager.get_task(conversation_id) {
             agent.clear_context().await?;
@@ -3106,8 +3106,8 @@ impl ConversationService {
     ) -> Result<McpSupportPolicy, AppError> {
         match agent_type {
             AgentType::Acp => resolve_acp_mcp_support_policy(&self.agent_metadata_repo, extra).await,
-            AgentType::Nomi => Ok(McpSupportPolicy::NOMI),
-            _ => Ok(McpSupportPolicy::NOMI),
+            AgentType::OpenHub => Ok(McpSupportPolicy::OPENHUB),
+            _ => Ok(McpSupportPolicy::OPENHUB),
         }
     }
 }
@@ -3742,7 +3742,7 @@ mod tests {
     #[test]
     fn assistant_lineage_extracts_openhub_preset_id() {
         use openhub_common::AgentType;
-        let response = response_with_type(AgentType::Nomi);
+        let response = response_with_type(AgentType::OpenHub);
         let extra = json!({ "preset_assistant_id": "preset-xyz" });
         let lineage = AssistantLineage::from_response_and_extra(&response, &extra);
         assert_eq!(lineage.agent_type, "openhub");
@@ -3823,7 +3823,7 @@ mod tests {
                     env: HashMap::new(),
                 },
             },
-            McpSupportPolicy::NOMI,
+            McpSupportPolicy::OPENHUB,
         );
 
         assert_eq!(status.status, ConversationMcpStatusKind::Failed);

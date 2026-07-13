@@ -378,10 +378,10 @@
         "en-US": "Star Office Helper",
         "zh-CN": "Star Office 助手"
       },
-      "description": "Install, connect, and troubleshoot Star-Office-UI visualization for Nomi preview.",
+      "description": "Install, connect, and troubleshoot Star-Office-UI visualization for OpenHub preview.",
       "description_i18n": {
-        "en-US": "Install, connect, and troubleshoot Star-Office-UI visualization for Nomi preview.",
-        "zh-CN": "用于在 Nomi 预览中安装、连接并排查 Star-Office-UI 可视化问题。"
+        "en-US": "Install, connect, and troubleshoot Star-Office-UI visualization for OpenHub preview.",
+        "zh-CN": "用于在 OpenHub 预览中安装、连接并排查 Star-Office-UI 可视化问题。"
       },
       "avatar": "📺",
       "preset_agent_type": "openhub",
@@ -394,18 +394,18 @@
       "prompts": [
         "Set up Star Office on my machine",
         "Fix Unauthorized on Star Office page",
-        "Connect Nomi preview to http://127.0.0.1:19000"
+        "Connect OpenHub preview to http://127.0.0.1:19000"
       ],
       "prompts_i18n": {
         "en-US": [
           "Set up Star Office on my machine",
           "Fix Unauthorized on Star Office page",
-          "Connect Nomi preview to http://127.0.0.1:19000"
+          "Connect OpenHub preview to http://127.0.0.1:19000"
         ],
         "zh-CN": [
           "帮我安装 Star Office",
           "排查 Star Office Unauthorized",
-          "把 Nomi 预览连接到 http://127.0.0.1:19000"
+          "把 OpenHub 预览连接到 http://127.0.0.1:19000"
         ]
       },
       "models": [],

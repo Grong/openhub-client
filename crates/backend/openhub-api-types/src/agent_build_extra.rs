@@ -77,7 +77,7 @@ pub struct AcpBuildExtra {
     /// Knowledge-search MCP stdio bridge config. When `Some`, the ACP assembler
     /// injects `nomicore mcp-knowledge-stdio` so the agent gets a scoped
     /// knowledge-search tool over the session's bound knowledge bases. The bound
-    /// `kb_ids` ride the bridge env (`NOMI_KB_MCP_KB_IDS`), not this struct, so
+    /// `kb_ids` ride the bridge env (`OPENHUB_KB_MCP_KB_IDS`), not this struct, so
     /// the agent tool takes only a query and cannot widen the bound base set.
     /// Injected at build time; the openhub engine has `knowledge_search` natively
     /// and so carries no equivalent field.
@@ -122,15 +122,15 @@ pub struct AcpBuildExtra {
     pub browser_mcp_config: Option<BrowserMcpConfig>,
     /// The companion this session is bound to (multi-companion upgrade). Set by the
     /// channel layer on master-agent sessions (platform binding > default
-    /// companion); rides the gateway MCP env (`NOMI_GW_MCP_COMPANION_ID`) so desktop
+    /// companion); rides the gateway MCP env (`OPENHUB_GW_MCP_COMPANION_ID`) so desktop
     /// tools can attribute the caller. Accepts both camelCase (`companionId`, the
     /// extra-JSON spelling) and snake_case.
     #[serde(default, alias = "companionId")]
     pub companion_id: Option<String>,
     /// IM platform this session serves (e.g. "lark") when it is a channel
     /// master-agent. Set by the channel layer; rides the gateway MCP env
-    /// (`NOMI_GW_MCP_CHANNEL_PLATFORM`) so the gateway resolves the write surface
-    /// (channel → write-disabled unless re-enabled). Mirrors `NomiBuildExtra`.
+    /// (`OPENHUB_GW_MCP_CHANNEL_PLATFORM`) so the gateway resolves the write surface
+    /// (channel → write-disabled unless re-enabled). Mirrors `OpenHubBuildExtra`.
     #[serde(default, alias = "channelPlatform")]
     pub channel_platform: Option<String>,
     #[serde(default)]
@@ -208,16 +208,16 @@ pub struct RemoteBuildExtra {
 /// until the model proves completion, hits `max_auto_continuations`, or
 /// `max_turns`. Absent (the default) = normal one-shot turn behavior.
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
-pub struct NomiGoalSpec {
+pub struct OpenHubGoalSpec {
     pub objective: String,
     /// Cap on automatic continuations (anti-runaway). Defaults to 8 when unset.
     #[serde(default)]
     pub max_auto_continuations: Option<usize>,
 }
 
-/// Nomi-specific fields extracted from `extra` in build task options.
+/// OpenHub-specific fields extracted from `extra` in build task options.
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
-pub struct NomiBuildExtra {
+pub struct OpenHubBuildExtra {
     #[serde(default)]
     pub system_prompt: Option<String>,
     #[serde(default)]
@@ -226,9 +226,9 @@ pub struct NomiBuildExtra {
     pub max_tokens: u32,
     #[serde(default)]
     pub max_turns: Option<usize>,
-    /// Opt-in goal-driven continuation (see [`NomiGoalSpec`]).
+    /// Opt-in goal-driven continuation (see [`OpenHubGoalSpec`]).
     #[serde(default)]
-    pub goal: Option<NomiGoalSpec>,
+    pub goal: Option<OpenHubGoalSpec>,
     #[serde(default)]
     pub session_mode: Option<String>,
     #[serde(default)]
@@ -272,7 +272,7 @@ pub struct NomiBuildExtra {
     /// The companion this session is bound to (multi-companion upgrade). Set by the
     /// channel layer on master-agent sessions (platform binding > default
     /// companion) and consumed by the companion prompt provider to pick the
-    /// persona; also rides the gateway MCP env (`NOMI_GW_MCP_COMPANION_ID`).
+    /// persona; also rides the gateway MCP env (`OPENHUB_GW_MCP_COMPANION_ID`).
     /// `None` resolves to the host's default companion. Accepts both camelCase
     /// (`companionId`, the extra-JSON spelling) and snake_case.
     #[serde(default, alias = "companionId")]
@@ -408,10 +408,10 @@ mod tests {
 
     /// Task 4: a conversation marked as the orchestration lead carries
     /// `extra.orchestrator_role = "lead"`, which must deserialize onto
-    /// `NomiBuildExtra` so the openhub factory can inject the 主管 system prompt.
+    /// `OpenHubBuildExtra` so the openhub factory can inject the 主管 system prompt.
     #[test]
     fn openhub_build_extra_deserializes_orchestrator_role_lead() {
-        let extra: NomiBuildExtra =
+        let extra: OpenHubBuildExtra =
             serde_json::from_value(serde_json::json!({ "orchestrator_role": "lead" })).unwrap();
         assert_eq!(extra.orchestrator_role.as_deref(), Some("lead"));
     }
@@ -420,8 +420,8 @@ mod tests {
     /// `None`, so no 主管 prompt is injected — the field is purely additive.
     #[test]
     fn openhub_build_extra_orchestrator_role_defaults_none() {
-        let extra: NomiBuildExtra = serde_json::from_value(serde_json::json!({})).unwrap();
+        let extra: OpenHubBuildExtra = serde_json::from_value(serde_json::json!({})).unwrap();
         assert!(extra.orchestrator_role.is_none());
-        assert!(NomiBuildExtra::default().orchestrator_role.is_none());
+        assert!(OpenHubBuildExtra::default().orchestrator_role.is_none());
     }
 }

@@ -24,7 +24,7 @@ interface Props {
  *
  * 取代旧的 /openhub 配置中心「聊天」Tab（ChatTab）：迁移后伙伴聊天统一从会话列表的
  * 「桌面伙伴」分组进入标准 `/conversation/:id`。ChatConversation 见到
- * `type==='openhub' && extra.companionSession` 即渲染本面板（而非全功能 NomiConversationPanel），
+ * `type==='openhub' && extra.companionSession` 即渲染本面板（而非全功能 OpenHubConversationPanel），
  * 从而保留伙伴专属约束（锁定模型 / 隐藏高级控制 / 强制 yolo / 固定工作区，详见
  * CompanionConversation）。
  *

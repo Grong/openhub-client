@@ -227,7 +227,7 @@ fn finish(body: Value) -> axum::response::Response {
 /// data access; refuse to operate without one.
 pub(crate) fn require_user(ctx: &CallerCtx) -> Result<&str, Value> {
     if ctx.user_id.is_empty() {
-        Err(json!({"error": "missing caller user identity (NOMI_GW_MCP_USER_ID)"}))
+        Err(json!({"error": "missing caller user identity (OPENHUB_GW_MCP_USER_ID)"}))
     } else {
         Ok(&ctx.user_id)
     }

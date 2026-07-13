@@ -6,7 +6,7 @@
 //! session's confirmation store + broadcasts it on the agent event stream (so the desktop
 //! `MessagePermission` UI renders it — **the same path tool-approvals use, no new event,
 //! no frontend change**), then awaits the shared [`ToolApprovalManager`] keyed by the same
-//! `call_id` the frontend resolves through [`super::agent::NomiAgentManager::confirm`].
+//! `call_id` the frontend resolves through [`super::agent::OpenHubAgentManager::confirm`].
 //!
 //! **Fail-closed keystone**: a timeout, a dropped channel, or an explicit deny all map to
 //! [`ApprovalDecision::Deny`] — only an explicit user approval returns `Approve`.
@@ -116,7 +116,7 @@ impl BrowserApprovalGate for DesktopApprovalGate {
 
         // Raise the confirmation: push into the shared store + broadcast on the event
         // stream. The desktop `MessagePermission` UI renders it; the user resolves it via
-        // `NomiAgentManager::confirm`, which fires our oneshot through `approval_manager`.
+        // `OpenHubAgentManager::confirm`, which fires our oneshot through `approval_manager`.
         let conf = Self::build_confirmation(&call_id, &ask);
         if let Ok(mut confs) = self.confirmations.write() {
             confs.push(conf.clone());
@@ -160,7 +160,7 @@ mod tests {
 
     /// Drive the full round-trip: the gate raises a `Confirmation` into the store +
     /// registers a oneshot; resolving that call_id through `approval_manager` (exactly what
-    /// `NomiAgentManager::confirm` does) returns the decision and clears the confirmation.
+    /// `OpenHubAgentManager::confirm` does) returns the decision and clears the confirmation.
     async fn drive(resolve_approved: bool) -> (ApprovalDecision, bool) {
         let (tx, _rx) = broadcast::channel(16);
         let confirmations = Arc::new(RwLock::new(Vec::new()));

@@ -1,6 +1,6 @@
 # Intelligent Decision (IDMM)
 
-**IDMM** — Intelligent Decision-Making Mode — is Nomi's reliability layer for
+**IDMM** — Intelligent Decision-Making Mode — is OpenHub's reliability layer for
 unattended work. It is a **session supervisor** that watches each turn and
 intervenes the moment it stalls, so a long, automated run reaches a terminal
 state instead of hanging on a provider hiccup or a model that has stopped
@@ -62,7 +62,7 @@ agent and steps in only when needed.
 
 Together, the rule tier and the sidecar form the **session guard**: IDMM keeps
 the target alive through faults and decision stalls and shepherds the turn to a
-terminal state. This is what "session keep-alive" means in Nomi — not a dumb
+terminal state. This is what "session keep-alive" means in OpenHub — not a dumb
 heartbeat, but an active supervisor that resolves the thing that would otherwise
 have stalled the turn.
 

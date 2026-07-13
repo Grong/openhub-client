@@ -52,7 +52,7 @@ const MAX_SOM_LABELS: usize = 50;
 /// resolved by `openhub_secret::pet_vault_path` which — 去 per-pet 键化, browser identity
 /// globally shared — ignores its key and routes to the one shared vault) + the
 /// machine-bound 32-byte key (the app's `encryption_key`, the same one the registration
-/// endpoint used to encrypt the values). `Clone` so it can ride through `NomiResolvedConfig`
+/// endpoint used to encrypt the values). `Clone` so it can ride through `OpenHubResolvedConfig`
 /// → bootstrap (the `SecretStore` itself is intentionally NOT carried — it is
 /// non-`Clone`/non-`Debug` and is loaded lazily at engine-build time so a freshly-registered
 /// secret is picked up).
