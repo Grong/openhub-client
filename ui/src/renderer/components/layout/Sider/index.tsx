@@ -186,82 +186,86 @@ const Sider: React.FC<SiderProps> = ({ onSessionClick, collapsed = false }) => {
   return (
     <div className='size-full flex flex-col'>
       <div className='flex-1 min-h-0 overflow-hidden'>
-        {isSettings ? (
-          <Suspense fallback={<div className='size-full' />}>
-            <SettingsSider collapsed={collapsed} tooltipEnabled={tooltipEnabled} />
-          </Suspense>
-        ) : (
-          <div className='size-full flex flex-col min-h-0'>
-            {/* Create actions — always visible */}
-            <div className='shrink-0 flex flex-col'>
-              <SessionCreateBar
-                batchMode={batchMode}
-                onToggleBatchMode={() => setBatchMode((prev) => !prev)}
-                onNewChat={handleNewChat}
-                onNewTerminal={handleNewTerminal}
-                onCreateProject={handleCreateProject}
-                displayPreferences={displayPreferences}
-                onDisplayPresetChange={applyDisplayPreset}
-                onDisplayPreferenceChange={updateDisplayPreference}
-                onSessionClick={isMobile ? handleSessionClick : undefined}
-                onConversationSelect={handleConversationSelect}
-              />
-            </div>
-
-            {/* Session list — scrollable, on conversation routes */}
-            {isSessionRoute && (
-              <div className='flex-1 min-h-0 overflow-y-auto px-8px'>
-                <WorkpathSessionList
-                  collapsed={collapsed}
-                  tooltipEnabled={!isMobile && collapsed}
-                  batchMode={batchMode}
-                  displayPreferences={displayPreferences}
-                  onBatchModeChange={setBatchMode}
-                  onSessionClick={isMobile ? handleSessionClick : undefined}
-                />
-              </div>
-            )}
-
-            {/* Divider between sessions and nav */}
-            {isSessionRoute && (
-              <div className='shrink-0 px-12px pt-4px pb-4px'>
+        <div className='size-full flex flex-col min-h-0'>
+          {/* Settings sub-navigation — only on settings routes */}
+          {isSettings && (
+            <div className='shrink-0 max-h-45p overflow-y-auto'>
+              <Suspense fallback={<div className='size-full' />}>
+                <SettingsSider collapsed={collapsed} tooltipEnabled={tooltipEnabled} />
+              </Suspense>
+              <div className='px-12px pt-4px pb-4px'>
                 <div className='border-t border-solid border-[var(--color-border-2)]' />
               </div>
-            )}
+            </div>
+          )}
 
-            {/* Navigation links section */}
-            <div className={isSessionRoute ? 'shrink-0' : 'flex-1'} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-              {!isSessionRoute && (
-                <>
-                  <SiderSectionHeader label={t('common.siderSection.common')} collapsed={collapsed} />
-                </>
-              )}
-              {/* Knowledge */}
-              <SiderKnowledgeEntry
-                isMobile={isMobile}
-                isActive={pathname.startsWith('/knowledge')}
+          {/* Create actions — always visible */}
+          <div className='shrink-0 flex flex-col'>
+            <SessionCreateBar
+              batchMode={batchMode}
+              onToggleBatchMode={() => setBatchMode((prev) => !prev)}
+              onNewChat={handleNewChat}
+              onNewTerminal={handleNewTerminal}
+              onCreateProject={handleCreateProject}
+              displayPreferences={displayPreferences}
+              onDisplayPresetChange={applyDisplayPreset}
+              onDisplayPreferenceChange={updateDisplayPreference}
+              onSessionClick={isMobile ? handleSessionClick : undefined}
+              onConversationSelect={handleConversationSelect}
+            />
+          </div>
+
+          {/* Session list — scrollable, on conversation routes */}
+          {isSessionRoute && (
+            <div className='flex-1 min-h-0 overflow-y-auto px-8px'>
+              <WorkpathSessionList
                 collapsed={collapsed}
-                siderTooltipProps={siderTooltipProps}
-                onClick={handleKnowledgeClick}
-                dot={pendingInboxCount > 0}
-              />
-              {/* Plugins */}
-              <SiderPluginEntry
-                isMobile={isMobile}
-                isActive={pathname.startsWith('/plugins')}
-                collapsed={collapsed}
-                siderTooltipProps={siderTooltipProps}
-                onClick={handlePluginsClick}
-              />
-              {/* Projects */}
-              <ProjectGroup
-                isMobile={isMobile}
-                collapsed={collapsed}
-                siderTooltipProps={siderTooltipProps}
+                tooltipEnabled={!isMobile && collapsed}
+                batchMode={batchMode}
+                displayPreferences={displayPreferences}
+                onBatchModeChange={setBatchMode}
+                onSessionClick={isMobile ? handleSessionClick : undefined}
               />
             </div>
+          )}
+
+          {/* Divider between sessions and nav */}
+          {isSessionRoute && (
+            <div className='shrink-0 px-12px pt-4px pb-4px'>
+              <div className='border-t border-solid border-[var(--color-border-2)]' />
+            </div>
+          )}
+
+          {/* Navigation links section */}
+          <div className={isSessionRoute || isSettings ? 'shrink-0' : 'flex-1'} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            {!isSessionRoute && !isSettings && (
+              <SiderSectionHeader label={t('common.siderSection.common')} collapsed={collapsed} />
+            )}
+            {/* Knowledge */}
+            <SiderKnowledgeEntry
+              isMobile={isMobile}
+              isActive={pathname.startsWith('/knowledge')}
+              collapsed={collapsed}
+              siderTooltipProps={siderTooltipProps}
+              onClick={handleKnowledgeClick}
+              dot={pendingInboxCount > 0}
+            />
+            {/* Plugins */}
+            <SiderPluginEntry
+              isMobile={isMobile}
+              isActive={pathname.startsWith('/plugins')}
+              collapsed={collapsed}
+              siderTooltipProps={siderTooltipProps}
+              onClick={handlePluginsClick}
+            />
+            {/* Projects */}
+            <ProjectGroup
+              isMobile={isMobile}
+              collapsed={collapsed}
+              siderTooltipProps={siderTooltipProps}
+            />
           </div>
-        )}
+        </div>
       </div>
       {/* Bottom pinned group — ModelHub + Settings footer */}
       <div className='shrink-0 mt-auto pt-8px flex flex-col gap-2px border-t border-solid border-[var(--color-border-2)] border-l-0 border-r-0 border-b-0'>
