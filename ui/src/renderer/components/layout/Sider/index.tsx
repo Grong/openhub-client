@@ -192,23 +192,21 @@ const Sider: React.FC<SiderProps> = ({ onSessionClick, collapsed = false }) => {
           </Suspense>
         ) : (
           <div className='size-full flex flex-col min-h-0'>
-            {/* Session section — only on conversation routes */}
-            {isSessionRoute && (
-              <div className='shrink-0 flex flex-col'>
-                <SessionCreateBar
-                  batchMode={batchMode}
-                  onToggleBatchMode={() => setBatchMode((prev) => !prev)}
-                  onNewChat={handleNewChat}
-                  onNewTerminal={handleNewTerminal}
-                  onCreateProject={handleCreateProject}
-                  displayPreferences={displayPreferences}
-                  onDisplayPresetChange={applyDisplayPreset}
-                  onDisplayPreferenceChange={updateDisplayPreference}
-                  onSessionClick={isMobile ? handleSessionClick : undefined}
-                  onConversationSelect={handleConversationSelect}
-                />
-              </div>
-            )}
+            {/* Create actions — always visible */}
+            <div className='shrink-0 flex flex-col'>
+              <SessionCreateBar
+                batchMode={batchMode}
+                onToggleBatchMode={() => setBatchMode((prev) => !prev)}
+                onNewChat={handleNewChat}
+                onNewTerminal={handleNewTerminal}
+                onCreateProject={handleCreateProject}
+                displayPreferences={displayPreferences}
+                onDisplayPresetChange={applyDisplayPreset}
+                onDisplayPreferenceChange={updateDisplayPreference}
+                onSessionClick={isMobile ? handleSessionClick : undefined}
+                onConversationSelect={handleConversationSelect}
+              />
+            </div>
 
             {/* Session list — scrollable, on conversation routes */}
             {isSessionRoute && (
