@@ -30,7 +30,10 @@ describe('Guid agent cluster controls', () => {
     expect(configGroup.indexOf('{clusterApprovalSelectorNode}')).toBeGreaterThan(
       configGroup.indexOf('{collaboratorSelectorNode}')
     );
-    expect(configGroup.indexOf('<AgentModeSelector')).toBeGreaterThan(configGroup.indexOf('{clusterApprovalSelectorNode}'));
+    // 权限模式选择器已收进高级配置区，不再占用 composer 操作区
+    expect(configGroup.indexOf('<AgentModeSelector')).toBe(-1);
+    expect(pageSource.indexOf("guid.advanced.permissionMode")).toBeGreaterThan(-1);
+    expect(pageSource.indexOf('<AgentModeSelector')).toBeGreaterThan(-1);
   });
 
   test('stores the homepage cluster model range and approval mode on the created OpenHub conversation', () => {

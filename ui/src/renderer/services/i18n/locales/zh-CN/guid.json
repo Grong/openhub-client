@@ -47,6 +47,7 @@
   },
   "advanced": {
     "applyNote": "将在会话创建后自动应用。",
+    "permissionMode": "权限模式",
     "applyFailed": "「{{feature}}」设置应用失败，可进入会话后重新开启",
     "draftOn": "已预设 · 创建后启用",
     "draftOff": "未预设",

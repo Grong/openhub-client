@@ -47,6 +47,7 @@
   },
   "advanced": {
     "applyNote": "Applied automatically once the conversation is created.",
+    "permissionMode": "Permission mode",
     "applyFailed": "Failed to apply {{feature}} — you can re-enable it inside the conversation.",
     "draftOn": "Preset · enabled after creation",
     "draftOff": "Not preset",

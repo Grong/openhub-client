@@ -28,12 +28,14 @@ import GuidCollaboratorSelector from './components/GuidCollaboratorSelector';
 import GuidModelSelector from './components/GuidModelSelector';
 import GuidResourceCards from './components/GuidResourceCards';
 import MentionDropdown, { MentionSelectorBadge } from './components/MentionDropdown';
-import QuickActionButtons from './components/QuickActionButtons';
 import SummonDrawer from './components/SummonDrawer';
-import FeedbackReportModal from '@/renderer/components/settings/SettingsModal/contents/FeedbackReportModal';
 import AutoWorkControl from '@/renderer/pages/conversation/components/AutoWorkControl';
 import IdmmControl from '@/renderer/pages/conversation/components/IdmmControl';
 import KnowledgeControl from '@/renderer/pages/conversation/components/KnowledgeControl';
+import AgentModeSelector from '@/renderer/components/agent/AgentModeSelector';
+import { supportsModeSwitch, type AgentModeOption } from '@/renderer/utils/model/agentModes';
+import { iconColors } from '@/renderer/styles/colors';
+import { Shield } from '@icon-park/react';
 import { useGuidAgentSelection } from './hooks/useGuidAgentSelection';
 import { useGuidAdvancedConfig } from './hooks/useGuidAdvancedConfig';
 import { autoWorkStartDisabled, isAutoWorkEntry } from './hooks/autoWorkEntry';
@@ -70,7 +72,6 @@ const GuidPage: React.FC = () => {
   const { activeBorderColor, inactiveBorderColor, activeShadow } = useInputFocusRing();
 
   const localeKey = resolveLocaleKey(i18n.language);
-  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
   // --- Drawer state ---
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -600,6 +601,11 @@ const GuidPage: React.FC = () => {
   // Keyed by location.key so same-route navigations (which reset the drafts in
   // the layout effect above) also remount the controls and re-run their
   // mount-time seeding (e.g. IDMM's global default steering prompt).
+  // 权限模式选择器（收进高级配置）：仅当后端支持模式切换时展示
+  const modeBackend = agentSelection.currentEffectiveAgentInfo.agent_type || agentSelection.selectedAgent;
+  const getModeDisplayLabel = (mode: AgentModeOption): string =>
+    t(`agentMode.${mode.value}`, { defaultValue: mode.label });
+
   const advancedControlsNode = (
     <>
       <AutoWorkControl
@@ -617,6 +623,22 @@ const GuidPage: React.FC = () => {
         draft={{ value: advancedConfig.knowledge, onChange: advancedConfig.setKnowledge }}
         applyNote={t('guid.advanced.applyNote')}
       />
+      {/* 权限模式：安全策略而非逐消息配置，收进高级配置，composer 只留模型选择 */}
+      {supportsModeSwitch(modeBackend) && (
+        <div className='flex items-center justify-between gap-12px py-4px'>
+          <span className='text-13px text-t-secondary'>
+            {t('guid.advanced.permissionMode', { defaultValue: '权限模式' })}
+          </span>
+          <AgentModeSelector
+            backend={modeBackend}
+            compact
+            initialMode={agentSelection.selectedMode}
+            onModeSelect={agentSelection.setSelectedMode}
+            compactLeadingIcon={<Shield theme='outline' size='14' fill={iconColors.secondary} />}
+            modeLabelFormatter={getModeDisplayLabel}
+          />
+        </div>
+      )}
     </>
   );
 
@@ -625,6 +647,19 @@ const GuidPage: React.FC = () => {
   // "Start AutoWork" action: clickable without typed input, and it creates the
   // session + starts AutoWork without sending a first message (see planGuidEntry).
   const isAutoWorkMode = isAutoWorkEntry(advancedConfig.autoWork);
+  // --- Active skills (count shown on the [+] menu entry) ---
+  const activeSkills = useMemo<GuidActiveSkill[]>(() => {
+    const disabled = guidDisabledBuiltinSkills ?? [];
+    const enabled = guidEnabledSkills ?? [];
+    return allSkills.filter((s) => (s.isAuto ? !disabled.includes(s.name) : enabled.includes(s.name)));
+  }, [allSkills, guidDisabledBuiltinSkills, guidEnabledSkills]);
+  const activeSkillCount = activeSkills.length;
+
+  const handleOpenSkillsDrawer = useCallback(() => {
+    setDrawerMode('skills');
+    setDrawerOpen(true);
+  }, []);
+
   const actionRowNode = (
     <GuidActionRow
       files={guidInput.files}
@@ -632,10 +667,6 @@ const GuidPage: React.FC = () => {
       modelSelectorNode={modelSelectorNode}
       collaboratorSelectorNode={clusterMode ? collaboratorSelectorNode : undefined}
       clusterApprovalSelectorNode={clusterMode ? clusterApprovalSelectorNode : undefined}
-      selectedAgent={agentSelection.selectedAgent}
-      effectiveModeAgent={agentSelection.currentEffectiveAgentInfo.agent_type}
-      selectedMode={agentSelection.selectedMode}
-      onModeSelect={agentSelection.setSelectedMode}
       is_presetAgent={agentSelection.is_presetAgent}
       selectedAgentInfo={agentSelection.selectedAgentInfo}
       assistants={agentSelection.assistants}
@@ -649,6 +680,11 @@ const GuidPage: React.FC = () => {
       mcpServers={availableMcpServers}
       selectedMcpServerIds={guidSelectedMcpServerIds ?? []}
       onToggleMcpServer={handleToggleMcpServer}
+      onSummon={() => { setDrawerMode('assistant'); setDrawerOpen(true); }}
+      onAdjustSkills={handleOpenSkillsDrawer}
+      activeSkillCount={activeSkillCount}
+      clusterActive={clusterMode}
+      onToggleCluster={() => setClusterMode((v) => !v)}
       hidePresetTag
       loading={guidInput.loading}
       autoWorkMode={isAutoWorkMode}
@@ -660,19 +696,6 @@ const GuidPage: React.FC = () => {
       onSend={send.sendMessageHandler}
     />
   );
-
-  // --- Active skills (for ComposerEntryStrip badge + summary popover) ---
-  const activeSkills = useMemo<GuidActiveSkill[]>(() => {
-    const disabled = guidDisabledBuiltinSkills ?? [];
-    const enabled = guidEnabledSkills ?? [];
-    return allSkills.filter((s) => (s.isAuto ? !disabled.includes(s.name) : enabled.includes(s.name)));
-  }, [allSkills, guidDisabledBuiltinSkills, guidEnabledSkills]);
-  const activeSkillCount = activeSkills.length;
-
-  const handleOpenSkillsDrawer = useCallback(() => {
-    setDrawerMode('skills');
-    setDrawerOpen(true);
-  }, []);
 
   const handleRegisterOpenDetails = useCallback((openDetails: (() => void) | null) => {
     openAssistantDetailsRef.current = openDetails;
@@ -753,11 +776,7 @@ const GuidPage: React.FC = () => {
                   isPresetAgent={agentSelection.is_presetAgent}
                   assistantLabel={heroTitle !== t('conversation.welcome.title') ? heroTitle : undefined}
                   assistantAvatar={selectedAssistantAvatar ?? undefined}
-                  onSummon={() => { setDrawerMode('assistant'); setDrawerOpen(true); }}
-                  onAdjustSkills={handleOpenSkillsDrawer}
                   onFree={() => { agentSelection.setSelectedAgentKey(agentSelection.defaultAgentKey); }}
-                  activeSkillCount={activeSkillCount}
-                  activeSkills={activeSkills}
                   clusterActive={clusterMode}
                   onToggleCluster={() => setClusterMode((v) => !v)}
                 />
@@ -799,13 +818,6 @@ const GuidPage: React.FC = () => {
           disabledBuiltinSkills={guidDisabledBuiltinSkills ?? []}
           onToggleSkill={handleToggleSkill}
         />
-
-        <QuickActionButtons
-          onOpenBugReport={() => setShowFeedbackModal(true)}
-          inactiveBorderColor={inactiveBorderColor}
-          activeShadow={activeShadow}
-        />
-        <FeedbackReportModal visible={showFeedbackModal} onCancel={() => setShowFeedbackModal(false)} />
       </div>
     </ConfigProvider>
   );
