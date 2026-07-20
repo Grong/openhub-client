@@ -92,7 +92,8 @@
     "videoAction": "Watch video",
     "feedbackTitle": "Feedback & Community",
     "feedbackDescription": "Report issues, suggest improvements, or help build OpenHub through the official contact page.",
-    "feedbackAction": "Contact us"
+    "feedbackAction": "Contact us",
+    "dismiss": "Hide guide cards"
   },
   "companionPoster": {
     "eyebrow": "Desktop companions",

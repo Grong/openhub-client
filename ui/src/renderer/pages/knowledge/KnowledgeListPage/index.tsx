@@ -22,10 +22,10 @@ import {
   Input,
   Message,
   Modal,
-  Result,
   Typography,
 } from '@arco-design/web-react';
 import { Search } from '@icon-park/react';
+import LoadErrorResult from '@renderer/components/base/LoadErrorResult';
 import { useLayoutContext } from '@renderer/hooks/context/LayoutContext';
 import { isDesktopShell } from '@renderer/utils/platform';
 import { ipcBridge } from '@/common';
@@ -335,11 +335,10 @@ const KnowledgeListPage: React.FC = () => {
 
         {/* Error state */}
         {error ? (
-          <Result
-            status='error'
+          <LoadErrorResult
             title={t('knowledge.loadError', { defaultValue: '加载失败' })}
-            subTitle={error}
-            extra={<Button onClick={() => void refresh()}>{t('knowledge.retry', { defaultValue: '重试' })}</Button>}
+            error={error}
+            onRetry={() => void refresh()}
           />
         ) : bases.length === 0 && !loading ? (
           <KnowledgeEmptyState onCreate={openStudio} onImport={() => void handleImport()} />

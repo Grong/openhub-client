@@ -142,7 +142,7 @@
   max-width: 760px;
   min-height: 40px;
   padding: 0 14px;
-  border-radius: 20px;
+  border-radius: var(--radius-lg);
   color: var(--color-text-2);
   background: var(--assistant-surface-bg);
   border: none;
@@ -163,7 +163,7 @@
 .heroSubtitleExpanded {
   align-items: flex-start;
   padding: 10px 14px;
-  border-radius: 16px;
+  border-radius: var(--radius-md);
   cursor: default;
 }
 
@@ -236,7 +236,7 @@
   height: 22px !important;
   min-height: 22px !important;
   padding: 0 6px !important;
-  border-radius: 10px !important;
+  border-radius: var(--radius-sm) !important;
   border: 0 !important;
   outline: 0 !important;
   box-shadow: none !important;
@@ -279,7 +279,7 @@
   gap: 6px;
   height: 24px;
   padding: 0 8px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   background: var(--color-fill-1);
   border: 1px solid var(--color-border-2);
   color: var(--color-text-2);
@@ -335,19 +335,52 @@
 .guidInputCardWrap {
   width: 100%;
   box-sizing: border-box;
+  border-radius: var(--radius-lg);
   background: var(--bg-2);
 }
 
 .guidInputInner {
   background: var(--bg-base, #fff);
   border: 1px solid var(--color-border-3);
-  border-radius: 24px;
+  border-radius: var(--radius-lg);
   box-sizing: border-box;
 }
 
 :global([data-theme='dark']) .guidInputInner {
   background: #262626;
   border-color: #3a3a3a;
+}
+
+.guidResourceCardsWrap {
+  position: relative;
+}
+
+/* 收起按钮：贴在卡片行右上角，常驻可见但低存在感 */
+.guidResourceCardsDismiss {
+  position: absolute;
+  top: -9px;
+  right: -9px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid var(--border-base);
+  border-radius: 999px;
+  background: var(--bg-base);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition:
+    color 0.15s,
+    border-color 0.15s,
+    background-color 0.15s;
+}
+
+.guidResourceCardsDismiss:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
 }
 
 .guidResourceCards {
@@ -365,7 +398,7 @@
   gap: 10px;
   padding: 14px;
   border: 1px solid var(--color-border-2);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   color: var(--color-text-1);
   background: color-mix(in srgb, var(--bg-2) 76%, transparent);
   box-sizing: border-box;
@@ -405,7 +438,7 @@ button.guidResourceCard:focus-visible {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   color: rgb(var(--primary-6));
   background: rgba(var(--primary-6), 0.08);
 }
@@ -445,7 +478,7 @@ button.guidResourceCard:focus-visible {
   gap: 18px;
   padding: 22px 24px 18px;
   border: 1px solid color-mix(in srgb, rgba(var(--primary-6), 0.2) 38%, var(--color-border-2));
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   color: var(--color-text-1);
   background:
     linear-gradient(135deg, rgba(255, 239, 244, 0.92), rgba(244, 249, 255, 0.88) 52%, rgba(255, 250, 239, 0.76)),
@@ -666,7 +699,7 @@ button.guidResourceCard:focus-visible {
   align-items: center;
   gap: 7px;
   border: 1px solid transparent;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   padding: 0 11px;
   color: var(--color-text-2);
   background: transparent;
@@ -713,7 +746,7 @@ button.guidResourceCard:focus-visible {
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  border-radius: 9px;
+  border-radius: var(--radius-sm);
   background: var(--color-fill-2);
   color: var(--color-text-2);
   overflow: hidden;
@@ -773,7 +806,7 @@ button.guidResourceCard:focus-visible {
   width: min(320px, calc(100vw - 32px));
   overflow: hidden;
   border: 1px solid rgba(var(--primary-6), 0.16);
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   padding: 12px;
   color: var(--color-text-1);
   background: var(--color-bg-2);
@@ -843,7 +876,7 @@ button.guidResourceCard:focus-visible {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 9px;
+  border-radius: var(--radius-sm);
   color: rgb(var(--primary-6));
   background: rgba(var(--primary-6), 0.08);
 }
@@ -955,7 +988,7 @@ button.guidResourceCard:focus-visible {
   gap: 5px;
   margin-left: auto;
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   padding: 0 9px;
   color: var(--color-text-3);
   background: transparent;
@@ -1018,7 +1051,7 @@ button.guidResourceCard:focus-visible {
   gap: 4px;
   min-height: 40px;
   border: 1px solid var(--drawer-hairline);
-  border-radius: 15px;
+  border-radius: var(--radius-md);
   padding: 4px;
   background: var(--drawer-panel-bg);
   box-shadow:
@@ -1031,7 +1064,7 @@ button.guidResourceCard:focus-visible {
   min-width: 74px;
   height: 32px;
   border: 0;
-  border-radius: 11px;
+  border-radius: var(--radius-md);
   padding: 0 14px;
   color: var(--color-text-2);
   background: transparent;
@@ -1070,7 +1103,7 @@ button.guidResourceCard:focus-visible {
   justify-content: center;
   margin-left: auto;
   border: 1px solid var(--drawer-hairline);
-  border-radius: 13px;
+  border-radius: var(--radius-md);
   color: var(--color-text-3);
   background: var(--drawer-control-bg);
   cursor: pointer;
@@ -1098,7 +1131,7 @@ button.guidResourceCard:focus-visible {
   width: 100%;
   height: 42px;
   border: 1px solid var(--drawer-hairline) !important;
-  border-radius: 14px !important;
+  border-radius: var(--radius-md) !important;
   background: var(--drawer-panel-bg) !important;
   box-shadow: inset 0 1px 0 var(--drawer-inner-highlight) !important;
   overflow: hidden;
@@ -1170,7 +1203,7 @@ button.guidResourceCard:focus-visible {
   gap: 14px;
   align-items: start;
   border: 1px solid var(--drawer-hairline);
-  border-radius: 16px;
+  border-radius: var(--radius-md);
   padding: 14px;
   color: var(--color-text-1);
   background: var(--drawer-panel-bg);
@@ -1231,7 +1264,7 @@ button.guidResourceCard:focus-visible {
   align-items: center;
   justify-content: center;
   border: 1px solid var(--drawer-hairline-strong);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   color: transparent;
   background: var(--drawer-control-bg);
 }
@@ -1250,7 +1283,7 @@ button.guidResourceCard:focus-visible {
   align-items: center;
   justify-content: center;
   border: 1px solid var(--drawer-hairline);
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   color: rgb(var(--primary-6));
   background:
     linear-gradient(135deg, color-mix(in srgb, rgb(var(--primary-6)) 14%, var(--color-bg-2)), transparent 64%),
@@ -1425,7 +1458,7 @@ button.guidResourceCard:focus-visible {
   justify-content: center;
   flex: 0 0 auto;
   border: 1px solid transparent;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   padding: 0 14px;
   cursor: pointer;
   font-family: inherit;
@@ -1671,7 +1704,7 @@ button.guidResourceCard:focus-visible {
 .wsDropdown {
   background: var(--bg-base, #fff);
   border: 1px solid var(--color-border-2);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   padding: 6px;
   box-shadow:
     0 10px 32px rgba(0, 0, 0, 0.1),
@@ -1688,7 +1721,7 @@ button.guidResourceCard:focus-visible {
   padding: 6px 10px;
   margin-bottom: 4px;
   background: var(--color-fill-2);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
 }
 
 .wsDropdownSearchInput {
@@ -1710,7 +1743,7 @@ button.guidResourceCard:focus-visible {
   align-items: center;
   gap: 8px;
   padding: 7px 10px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   font-size: 13px;
   color: var(--color-text-1);
@@ -1997,7 +2030,7 @@ button.guidResourceCard:focus-visible {
   padding: 12px 14px;
   background: var(--bg-base, #fff);
   border: 1px solid color-mix(in srgb, var(--color-border-2) 70%, transparent);
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   transition:
     border-color 0.15s,
@@ -2073,7 +2106,7 @@ button.guidResourceCard:focus-visible {
   padding: 12px 14px;
   background: var(--color-fill-1);
   border: 1px dashed color-mix(in srgb, var(--color-border-2) 70%, transparent);
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   transition: background-color 0.15s;
   color: var(--color-text-3);
@@ -2098,7 +2131,7 @@ button.guidResourceCard:focus-visible {
   background: var(--color-fill-2);
   border: 1px solid var(--color-border-2);
   padding: 0;
-  border-radius: 16px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   user-select: none;
   transition: background-color 0.2s;
@@ -2131,7 +2164,7 @@ button.guidResourceCard:focus-visible {
 
 .presetAgentTagMain:hover {
   background: var(--color-fill-3);
-  border-radius: 16px 0 0 16px;
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
 }
 
 .presetAgentTagAgentLogo {

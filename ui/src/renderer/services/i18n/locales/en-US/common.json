@@ -40,6 +40,7 @@
   "download": "Download",
   "close": "Close",
   "retry": "Retry",
+  "loadFailedHint": "Couldn't load this. Try again — if it keeps failing, check that the backend service is running.",
   "reload": "Reload",
   "technical_details": "Technical Details",
   "error_details": "Error Details",

@@ -17,8 +17,9 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import { Alert, Button, Form, Input, Modal, Result, Spin } from '@arco-design/web-react';
+import { Alert, Button, Form, Input, Modal, Spin } from '@arco-design/web-react';
 import { Delete, EditTwo, LinkOne, Platte, Plus, Search } from '@icon-park/react';
+import LoadErrorResult from '@renderer/components/base/LoadErrorResult';
 import { useLayoutContext } from '@renderer/hooks/context/LayoutContext';
 import { useArcoMessage } from '@renderer/utils/ui/useArcoMessage';
 import { createCanvas, deleteCanvas, listCanvases, patchCanvas, resolveWorkshopUrl } from './api';
@@ -343,13 +344,10 @@ const WorkshopListPage: React.FC = () => {
 
         {/* Body states */}
         {error ? (
-          <Result
-            status='error'
+          <LoadErrorResult
             title={t('workshop.list.loadError', { defaultValue: '加载失败' })}
-            subTitle={error}
-            extra={
-              <Button onClick={() => void refresh()}>{t('workshop.list.retry', { defaultValue: '重试' })}</Button>
-            }
+            error={error}
+            onRetry={() => void refresh()}
           />
         ) : loading ? (
           <div className='flex justify-center py-56px'>

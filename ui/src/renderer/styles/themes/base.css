@@ -3,6 +3,13 @@
 :root {
   --app-min-width: 360px;
   --titlebar-height: 36px;
+
+  /* 圆角语言：三档 token。
+     sm = 控件（按钮/输入框/小徽章），md = 卡片/面板，lg = hero 容器（composer 等）。
+     全圆角药丸继续用 999px，不占 token。 */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
 }
 
 .app-shell {
