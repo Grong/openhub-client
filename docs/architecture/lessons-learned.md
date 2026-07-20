@@ -2,7 +2,7 @@
 
 ## What Happened
 
-审查了 nomifun-tauri UI 简化计划（任务 1-8）的代码实现。发现 2 个真正的 bug，修复了 2 个真正的 bug。然后生成了 10+ 个 noise 发现，浪费了数小时来回，自评总分 2.5/10。
+审查了 openhub-client UI 简化计划（任务 1-8）的代码实现。发现 2 个真正的 bug，修复了 2 个真正的 bug。然后生成了 10+ 个 noise 发现，浪费了数小时来回，自评总分 2.5/10。
 
 ## What I Found That Mattered
 

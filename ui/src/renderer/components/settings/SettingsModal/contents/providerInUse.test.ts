@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,7 +9,7 @@ import { featureRoute, groupUsagesByFeature, parseProviderInUseDetails, type Pro
 
 describe('providerInUse helpers', () => {
   test('featureRoute maps each feature', () => {
-    expect(featureRoute('desktopCompanion')).toBe('/nomi');
+    expect(featureRoute('desktopCompanion')).toBe('/openhub');
     expect(featureRoute('publicCompanion', 'pa_1')).toBe('/public-companions/pa_1');
     expect(featureRoute('publicCompanion')).toBe('/public-companions');
     expect(featureRoute('smartDecision')).toBe('/models?section=global');

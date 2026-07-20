@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -18,11 +18,11 @@ describe('manual theme background CSS', () => {
   test('keeps the image in one shared background rule and switches masks with theme variables', () => {
     const css = injectBackgroundCssBlock('', IMAGE_DATA_URL);
 
-    expect(css.includes('/* Nomi Theme Background Mask v2 */')).toBe(true);
-    expect(css.includes('--nomi-manual-bg-mask: rgba(255, 255, 255, 0.34);')).toBe(true);
+    expect(css.includes('/* OpenHub Theme Background Mask v2 */')).toBe(true);
+    expect(css.includes('--openhub-manual-bg-mask: rgba(255, 255, 255, 0.34);')).toBe(true);
     expect(css.includes("html[data-theme='dark']")).toBe(true);
-    expect(css.includes('--nomi-manual-bg-mask: rgba(0, 0, 0, 0.34);')).toBe(true);
-    expect(css.includes('linear-gradient(var(--nomi-manual-bg-mask), var(--nomi-manual-bg-mask))')).toBe(true);
+    expect(css.includes('--openhub-manual-bg-mask: rgba(0, 0, 0, 0.34);')).toBe(true);
+    expect(css.includes('linear-gradient(var(--openhub-manual-bg-mask), var(--openhub-manual-bg-mask))')).toBe(true);
     expect(css.match(/url\("data:image\/png;base64,AAAA"\)/g)).toHaveLength(1);
   });
 

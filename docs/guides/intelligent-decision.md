@@ -1,6 +1,6 @@
 # Intelligent Decision (IDMM)
 
-**IDMM** — Intelligent Decision-Making Mode — is Nomi's reliability layer for
+**IDMM** — Intelligent Decision-Making Mode — is OpenHub's reliability layer for
 unattended work. It is a **session supervisor** that watches each turn and
 intervenes the moment it stalls, so a long, automated run reaches a terminal
 state instead of hanging on a provider hiccup or a model that has stopped
@@ -11,7 +11,7 @@ If [AutoWork](autowork-requirements.md) is the engine that drives work
 to compose: AutoWork claims and executes requirements; IDMM makes sure every
 turn it starts actually finishes.
 
-> IDMM is an **optional** supervisor (the `nomifun-idmm` crate). You turn it on
+> IDMM is an **optional** supervisor (the `openhub-idmm` crate). You turn it on
 > per session, from the same place you toggle AutoWork — the session header.
 
 ## Why it exists
@@ -62,7 +62,7 @@ agent and steps in only when needed.
 
 Together, the rule tier and the sidecar form the **session guard**: IDMM keeps
 the target alive through faults and decision stalls and shepherds the turn to a
-terminal state. This is what "session keep-alive" means in Nomi — not a dumb
+terminal state. This is what "session keep-alive" means in OpenHub — not a dumb
 heartbeat, but an active supervisor that resolves the thing that would otherwise
 have stalled the turn.
 
@@ -88,7 +88,7 @@ AutoWork: claim ─▶ inject ─▶ [ turn runs ] ─▶ finalize (done/failed)
                               IDMM guard ──▶ rule tier ──▶ (escalate) ──▶ sidecar model
 ```
 
-See `crates/backend/nomifun-idmm/` for the per-tier policy detail and the
+See `crates/backend/openhub-idmm/` for the per-tier policy detail and the
 intervention log API.
 
 ## Enabling it

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -15,7 +15,7 @@
 import type { WorkshopAssetKind } from '../types';
 
 /** DataTransfer MIME type for workshop asset drags. */
-export const WORKSHOP_ASSET_DND = 'application/x-nomifun-workshop-asset';
+export const WORKSHOP_ASSET_DND = 'application/x-openhub-workshop-asset';
 
 export interface WorkshopAssetDragPayload {
   asset_id: string;

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -8,18 +8,18 @@ import { ipcBridge } from '@/common';
 import type { IProvider, TChatConversation, TProviderWithModel } from '@/common/config/storage';
 import { Spin } from '@arco-design/web-react';
 import React, { Suspense, useCallback } from 'react';
-import { useNomiModelSelection } from '@/renderer/pages/conversation/platforms/nomi/useNomiModelSelection';
-import { saveNomiDefaultModel } from '@/renderer/pages/guid/hooks/agentSelectionUtils';
+import { useOpenHubModelSelection } from '@/renderer/pages/conversation/platforms/openhub/useOpenHubModelSelection';
+import { saveOpenHubDefaultModel } from '@/renderer/pages/guid/hooks/agentSelectionUtils';
 import { PreviewProvider } from '@/renderer/pages/conversation/Preview';
 
 const AcpChat = React.lazy(() => import('@/renderer/pages/conversation/platforms/acp/AcpChat'));
-const NomiChat = React.lazy(() => import('@/renderer/pages/conversation/platforms/nomi/NomiChat'));
+const OpenHubChat = React.lazy(() => import('@/renderer/pages/conversation/platforms/openhub/OpenHubChat'));
 const OpenClawChat = React.lazy(() => import('@/renderer/pages/conversation/platforms/openclaw/OpenClawChat'));
 const NanobotChat = React.lazy(() => import('@/renderer/pages/conversation/platforms/nanobot/NanobotChat'));
 const RemoteChat = React.lazy(() => import('@/renderer/pages/conversation/platforms/remote/RemoteChat'));
 
-// Narrow to Nomi conversations so model field is always available
-type NomiConversation = Extract<TChatConversation, { type: 'nomi' }>;
+// Narrow to OpenHub conversations so model field is always available
+type OpenHubConversation = Extract<TChatConversation, { type: 'openhub' }>;
 
 /**
  * OrchestratorNodeBinding — supplied by {@link ProjectedWorkerView} for a DAG worker
@@ -36,9 +36,9 @@ export type OrchestratorNodeBinding = {
   applyModelOverride: (providerId: string, model: string) => Promise<void>;
 };
 
-/** Nomi sub-component manages model selection state without adding a ChatLayout wrapper */
-const NomiReadOnlyChat: React.FC<{
-  conversation: NomiConversation;
+/** OpenHub sub-component manages model selection state without adding a ChatLayout wrapper */
+const OpenHubReadOnlyChat: React.FC<{
+  conversation: OpenHubConversation;
   agent_name?: string;
   hideSendBox?: boolean;
   nodeBinding?: OrchestratorNodeBinding;
@@ -49,7 +49,7 @@ const NomiReadOnlyChat: React.FC<{
       const selected = { ..._provider, use_model: modelName } as TProviderWithModel;
       const ok = await ipcBridge.conversation.update.invoke({ id: conversation.id, updates: { model: selected } });
       if (ok) {
-        void saveNomiDefaultModel(_provider.id, modelName);
+        void saveOpenHubDefaultModel(_provider.id, modelName);
         // Write the model pick THROUGH as this node's override — one pick pins both the
         // live chat model and the node's next-重跑 model. Best-effort: a failure here
         // must not break the live model switch (which already succeeded above).
@@ -57,7 +57,7 @@ const NomiReadOnlyChat: React.FC<{
           try {
             await nodeBinding.applyModelOverride(_provider.id, modelName);
           } catch (e) {
-            console.error('[NomiReadOnlyChat] write-through node override failed:', e);
+            console.error('[OpenHubReadOnlyChat] write-through node override failed:', e);
           }
         }
       }
@@ -66,10 +66,10 @@ const NomiReadOnlyChat: React.FC<{
     [conversation.id, nodeBinding]
   );
 
-  const modelSelection = useNomiModelSelection({ initialModel: conversation.model, onSelectModel });
+  const modelSelection = useOpenHubModelSelection({ initialModel: conversation.model, onSelectModel });
 
   return (
-    <NomiChat
+    <OpenHubChat
       conversation_id={conversation.id}
       workspace={conversation.extra.workspace}
       modelSelection={modelSelection}
@@ -84,10 +84,10 @@ type ReadOnlyConversationViewProps = {
   conversation: TChatConversation;
   hideSendBox?: boolean;
   agent_name?: string;
-  /** When set, the reused nomi composer also drives this DAG node's config
-   * (model write-through). Only the `nomi` branch consumes it. */
+  /** When set, the reused openhub composer also drives this DAG node's config
+   * (model write-through). Only the `openhub` branch consumes it. */
   nodeBinding?: OrchestratorNodeBinding;
-  /** Extra right-tools node injected into the nomi composer (e.g. a 预置要求 pill). */
+  /** Extra right-tools node injected into the openhub composer (e.g. a 预置要求 pill). */
   extraRightTools?: React.ReactNode;
 };
 
@@ -140,11 +140,11 @@ const ReadOnlyConversationView: React.FC<ReadOnlyConversationViewProps> = ({
             hideSendBox={hideSendBox}
           />
         );
-      case 'nomi':
+      case 'openhub':
         return (
-          <NomiReadOnlyChat
+          <OpenHubReadOnlyChat
             key={conversation.id}
-            conversation={conversation as NomiConversation}
+            conversation={conversation as OpenHubConversation}
             agent_name={agent_name}
             hideSendBox={hideSendBox}
             nodeBinding={nodeBinding}

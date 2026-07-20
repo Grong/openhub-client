@@ -14,7 +14,7 @@ system prompt 和技能选择。
 
 | 来源 | 来自哪里 | 是否可编辑 |
 | --- | --- | --- |
-| Builtin | 嵌入在 `crates/backend/nomifun-app/assets/builtin-assistants/` 的 manifest，由 `BuiltinAssistantRegistry` 加载。 | 内容只读；启用、排序、最近使用和 builtin `preset_agent_type` 覆盖单独存储。 |
+| Builtin | 嵌入在 `crates/backend/openhub-app/assets/builtin-assistants/` 的 manifest，由 `BuiltinAssistantRegistry` 加载。 | 内容只读；启用、排序、最近使用和 builtin `preset_agent_type` 覆盖单独存储。 |
 | Custom | 用户创建的 `assistants` 表记录和数据目录中的文件。 | 可完整编辑和删除。 |
 | Extension | 已安装扩展通过 `resolvers::assistant` 提供。 | 此页只读；生命周期由扩展管理。 |
 
@@ -25,7 +25,7 @@ system prompt 和技能选择。
 关键字段：
 
 - `id`、`source`、`name`、`description`、`avatar`
-- `preset_agent_type`：默认后端，例如 `nomi`、`claude`、`codex`、`gemini`
+- `preset_agent_type`：默认后端，例如 `openhub`、`claude`、`codex`、`gemini`
 - `models`：可选模型偏好
 - `prompts` / `prompts_i18n`：助手指令
 - `enabled_skills`：启动会话时附加的技能
@@ -84,7 +84,7 @@ builtin、extension 或 user source。
 
 ## 注意
 
-- 创建助手但未指定 `preset_agent_type` 时，需要至少有一个已配置 provider；能推断时默认使用 `nomi`。
+- 创建助手但未指定 `preset_agent_type` 时，需要至少有一个已配置 provider；能推断时默认使用 `openhub`。
 - CLI 型 agent 仍需要宿主机安装对应 CLI。选择 `claude`、`codex`、`gemini`
   不会自动安装这些工具。
 - 旧 JSON 导入是 insert-only 且幂等的：已有 id 会跳过，错误按行报告。

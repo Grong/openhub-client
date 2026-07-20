@@ -18,12 +18,12 @@ const ModalWrapper: React.FC<ModalWrapperProps> = ({
   ...props
 }) => {
   return (
-    <Modal {...props} title={null} closable={false} onCancel={onCancel} className={`nomifun-modal ${className}`}>
+    <Modal {...props} title={null} closable={false} onCancel={onCancel} className={`openhub-modal ${className}`}>
       <div>
         {showCustomClose && title && (
-          <div className='nomifun-modal-header'>
-            <h3 className='nomifun-modal-title'>{title}</h3>
-            <button onClick={onCancel} className='nomifun-modal-close-btn'>
+          <div className='openhub-modal-header'>
+            <h3 className='openhub-modal-title'>{title}</h3>
+            <button onClick={onCancel} className='openhub-modal-close-btn'>
               <Close size={20} fill='#86909c' />
             </button>
           </div>

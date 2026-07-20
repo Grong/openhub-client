@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -118,7 +118,7 @@ const refreshConversations = () => {
           // (companionSession / companionId / channelPlatform). The previous
           // carve-out that KEPT channel-sourced companion sessions visible here
           // is exactly what leaked IM chats into the work space — it is removed,
-          // which also fixes Slack/Discord (source==='nomifun') being mis-bucketed.
+          // which also fixes Slack/Discord (source==='openhub') being mis-bucketed.
           const extra = conv.extra as
             | {
                 is_health_check?: boolean;
@@ -137,7 +137,7 @@ const refreshConversations = () => {
           // 智能编排 (orchestrator) WORKER conversations are spawned by the Run
           // engine to execute fleet-member tasks; build_worker_extra stamps them
           // with BOTH `orchestrator_run_id` AND `orchestrator_task_id`. The LEAD
-          // conversation (nomi_run_create write-back) carries only
+          // conversation (openhub_run_create write-back) carries only
           // `orchestrator_run_id` (no task_id) and must stay visible — it hosts
           // the DAG rail. So key the hide filter on the worker-only marker
           // `orchestrator_task_id`. Workers live under the orchestrator Run view,

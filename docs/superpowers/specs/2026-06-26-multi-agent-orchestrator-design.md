@@ -3,8 +3,8 @@
 - **状态**：设计已与用户对齐，待用户审阅本文档后转 writing-plans。
 - **日期**：2026-06-26
 - **用户可见名**：「智能编排」（Smart Orchestration）
-- **内部 crate / 标识**：`nomifun-orchestrator`
-- **取代对象**：遗留 `nomifun-team` 子系统（交付时移除，见 §11）
+- **内部 crate / 标识**：`openhub-orchestrator`
+- **取代对象**：遗留 `openhub-team` 子系统（交付时移除，见 §11）
 
 ---
 
@@ -14,7 +14,7 @@
 用户希望「同时使用多个 agent 与多个模型」，由一个**主管 Agent** 依据**任务特征**与各**模型 & agent 的能力特征**，**自动智能地分配并执行**任务；同时允许用户**预先设定可用的 agent & 模型范围**以控制成本与效果。该功能在侧边栏单开一个 tab，UI 必须美观、有格调，并对「用户配置/编排/生命周期管理」与「逐 agent 信息/生命周期展示」两个视角都清晰、易用、健全。**必须完整可用，交付后做全链路测试**。
 
 ### 1.2 现状与「为什么不复用 team」
-代码库已存在 `nomifun-team` 子系统（Lead + N Teammates，每个 agent 是一条完整会话），但它被明确视为遗留设计：
+代码库已存在 `openhub-team` 子系统（Lead + N Teammates，每个 agent 是一条完整会话），但它被明确视为遗留设计：
 
 - 编排是**纯散文转述**：协调全靠一个 SQLite mailbox + 顾问性质（advisory，状态/owner 是自由文本，不强制）的 TaskBoard + 每 agent 的「唤醒提示」事件循环。没有一等公民的 plan/DAG、没有把任务分派给 agent 的调度器、没有 run 记录。
 - **拓扑写死**为单 Lead + 扁平 teammates（星形），Lead 是贯穿各处的特例。
@@ -22,18 +22,18 @@
 - **通信是一次性 mailbox 行 + LLM 回合**：agent 间无流式、无结构化结果回流、无中途取消（只有一个可被拒绝的 shutdown_request）。
 - **并发封顶 4**，且受 mailbox/notify 竞态制约（双 finalize 去重窗口、wake 锁回退、self-trigger 过滤等多处打补丁）。
 - **前端从未成型**：无 `/team` 路由/页面，只有一个 per-conversation 开关 + 只读子 agent 抽屉。
-- README、归档的阶段文档、`agents_version='1.0.1'`、过时命令、gateway 显式禁止 `nomi_team_*` 出现在任何 surface——都标志它早于本引擎的意图。
+- README、归档的阶段文档、`agents_version='1.0.1'`、过时命令、gateway 显式禁止 `openhub_team_*` 出现在任何 surface——都标志它早于本引擎的意图。
 
 ### 1.3 可复用的现有资产（站在巨人肩上）
-- **5 个可插拔 agent 引擎**：`AgentType` 枚举（Acp / Nomi / OpenclawGateway / Nanobot / Remote）→ 单一工厂 `build_agent` → `AgentInstance` 枚举。新增引擎 = 新枚举分支 + 新工厂分支。
+- **5 个可插拔 agent 引擎**：`AgentType` 枚举（Acp / OpenHub / OpenclawGateway / Nanobot / Remote）→ 单一工厂 `build_agent` → `AgentInstance` 枚举。新增引擎 = 新枚举分支 + 新工厂分支。
 - **`AgentRegistry`**：`agent_metadata` 表水化成内存目录，是「哪个 agent 能做什么」的现成查询（`team_capable`、`BehaviorPolicy`、handshake `agent_capabilities` 含 image/audio/mcp）。
 - **`ProviderWithModel { provider_id, model, use_model }`**：解耦引擎与凭证/模型——任意子 agent 可被赋予任意 provider/model。
 - **`AgentStreamEvent` 广播 + `StreamRelay`**：与 agent 类型无关的通用事件扇出（WS + DB 持久化 + 续写/failover）。
-- **IDMM**（`nomifun-idmm`）：通用监督层。一个 agent 只要实现 `SessionProbe` 就能获得「规则→模型→halt」自动决策；三个 seam trait（`IdmmHandle` / `ConversationSupervisionHook` / `TerminalSupervisionHook`）展示了单向依赖倒置的接入范式。
-- **Gateway 能力内核**（`nomifun-gateway`）：单一能力 Registry（~132 工具，DangerTier×Surface 权限矩阵），`nomi_agent_run`/`nomi_agent_result` **已实现** fire-and-poll 委派（生成一个自主 nomi 子会话、流式回传进度）；`nomi_create_conversation`+`nomi_send_to_conversation`+`nomi_conversation_status` 让「主管」可创建/驱动/观察子会话。Remote 前门 + per-companion 令牌已就位。
-- **会话引擎**（`nomifun-conversation`）：`ConversationService`（串行 TurnClaim，每会话至多一个活回合）、`IWorkerTaskManager`（每会话一个 `AgentInstance`，`Arc<OnceCell>` 语义）、steering inbox、协作式取消。
-- **DB/接线规范**：仓库模式（`I*Repository`+`Sqlite*Repository`）、迁移 append-only（最新 017）、设备边界 ID 规则、ts-rs `#[ts(type="number")]` 防 bigint、realtime（`EventBroadcaster`+`WebSocketManager`+域 `*EventEmitter`）。模板 = `nomifun-webhook` / `nomifun-cron`。
-- **前端**：`ChatLayout`（三栏壳）、`ContentSider`、`MessageList`+流式 store、`useNomiMessage` 订阅、`MessageToolGroupSummary`/`MessageText`/`MermaidBlock`、`NomiModal`、`AssistantTagFilterBar`（chip 筛选）、`ContextUsagePill`、CSS 变量主题、`react-flow`（无限画布调研选型）。
+- **IDMM**（`openhub-idmm`）：通用监督层。一个 agent 只要实现 `SessionProbe` 就能获得「规则→模型→halt」自动决策；三个 seam trait（`IdmmHandle` / `ConversationSupervisionHook` / `TerminalSupervisionHook`）展示了单向依赖倒置的接入范式。
+- **Gateway 能力内核**（`openhub-gateway`）：单一能力 Registry（~132 工具，DangerTier×Surface 权限矩阵），`openhub_agent_run`/`openhub_agent_result` **已实现** fire-and-poll 委派（生成一个自主 openhub 子会话、流式回传进度）；`openhub_create_conversation`+`openhub_send_to_conversation`+`openhub_conversation_status` 让「主管」可创建/驱动/观察子会话。Remote 前门 + per-companion 令牌已就位。
+- **会话引擎**（`openhub-conversation`）：`ConversationService`（串行 TurnClaim，每会话至多一个活回合）、`IWorkerTaskManager`（每会话一个 `AgentInstance`，`Arc<OnceCell>` 语义）、steering inbox、协作式取消。
+- **DB/接线规范**：仓库模式（`I*Repository`+`Sqlite*Repository`）、迁移 append-only（最新 017）、设备边界 ID 规则、ts-rs `#[ts(type="number")]` 防 bigint、realtime（`EventBroadcaster`+`WebSocketManager`+域 `*EventEmitter`）。模板 = `openhub-webhook` / `openhub-cron`。
+- **前端**：`ChatLayout`（三栏壳）、`ContentSider`、`MessageList`+流式 store、`useOpenHubMessage` 订阅、`MessageToolGroupSummary`/`MessageText`/`MermaidBlock`、`OpenHubModal`、`AssistantTagFilterBar`（chip 筛选）、`ContextUsagePill`、CSS 变量主题、`react-flow`（无限画布调研选型）。
 
 ### 1.4 核心缺口（本引擎要新建的东西）
 - **没有任何任务路由层**：能力元数据只描述 agent「能做什么」，没有把任务对 agent/模型能力打分并自动选择的机制。当前引擎+backend+模型由人在建会话时手选。
@@ -50,7 +50,7 @@
 3. **成本/效果可控**：编队即「可用范围」控制面；Run 级可选并发上限与（可选）预算上限。
 4. **人在环**：Run 级三档自主（自主/守护/协同）；随时 steer、暂停/恢复/取消、编辑/改派任务。
 5. **美观且双视角清晰**的前端：DAG 编排画布为 hero，点节点展开该 agent 实时对话；编队管理视图同时服务「用户配置」与「逐 agent 信息/生命周期」。
-6. **统一暴露**：经 gateway `caps_orchestrator` 域对内对外（Remote）可调用，并收编遗留 `nomi_agent_run`。
+6. **统一暴露**：经 gateway `caps_orchestrator` 域对内对外（Remote）可调用，并收编遗留 `openhub_agent_run`。
 7. **完整、健全、可用**：交付时移除 team，并完成全链路真机测试。
 
 ### 2.2 非目标（YAGNI）
@@ -101,7 +101,7 @@ draft ─▶ planning ─▶ awaiting_plan_approval(协同) ─▶ running ⇄ p
 ## 4. 架构
 
 ### 4.1 分层与定位
-新 crate `nomifun-orchestrator` 位于 `nomifun-conversation` / `nomifun-ai-agent` 之上，镜像 `nomifun-requirement`（AutoWork——现存最接近的「多目标循环 runner」）的分层。它**拥有计划 + 调度 + 路由**；**不**重新实现 agent 运行时。
+新 crate `openhub-orchestrator` 位于 `openhub-conversation` / `openhub-ai-agent` 之上，镜像 `openhub-requirement`（AutoWork——现存最接近的「多目标循环 runner」）的分层。它**拥有计划 + 调度 + 路由**；**不**重新实现 agent 运行时。
 
 ### 4.2 worker 实体：每个 worker 任务 = 一条真实会话（关键抉择）
 - 任务就绪时，调度器按分派成员**确保**一条对应 `agent_type + backend + model` 的会话存在（带任务工作目录 + 「worker 简报」系统提示 + 上游产物作为输入），把任务规格作为一个 turn 发出（`ConversationService::send_message`），消费其 `AgentStreamEvent` 流（`StreamRelay`）。
@@ -113,8 +113,8 @@ draft ─▶ planning ─▶ awaiting_plan_approval(协同) ─▶ running ⇄ p
 orchestrator **直接驱动会话并消费其事件流**，而非 team 的散文转述 mailbox 唤醒。任务间通过**结构化产物传递**（上游 task 的 `output_summary` + 产物文件路径注入下游 task 的输入），而非自由文本广播。
 
 ### 4.4 主管 Agent 与执行哲学
-主管是一个 **Nomi 引擎 agent**，被授予一套**编排工具集**（gateway 新域 `caps_orchestrator`，见 §8）。回合流程：
-1. **规划**：拆目标为 RunTask DAG（结构化计划，工具 `nomi_run_plan` 写入 tasks+deps）。
+主管是一个 **OpenHub 引擎 agent**，被授予一套**编排工具集**（gateway 新域 `caps_orchestrator`，见 §8）。回合流程：
+1. **规划**：拆目标为 RunTask DAG（结构化计划，工具 `openhub_run_plan` 写入 tasks+deps）。
 2. **分派**：每任务由 Router（§6）提名成员；主管可接受或调整。
 3. **调度**：调度器把就绪任务**真并行**跑在 worker 上（受编队/Run 并发上限约束）。
 4. **再规划**：worker 完成后产物喂下游；主管可动态增删任务（DAG 动态生长）。
@@ -232,7 +232,7 @@ CREATE TABLE orch_assignments (
 
 - 删除 Run 依赖 FK ON DELETE CASCADE 一次清掉 tasks/deps/assignments；删 task 前应用层负责处理其 worker 会话。
 - 实时事件：新 `OrchestratorEventEmitter`（`run.planUpdated` / `task.statusChanged` / `task.assigned` / `task.output` / `run.statusChanged` / `run.completed`）走现有 WebSocket，ts-rs 导出（i64 字段 `#[ts(type="number")]`）。
-- 仓库：每表 `I*Repository`+`Sqlite*Repository`（模板 `nomifun-webhook`）。
+- 仓库：每表 `I*Repository`+`Sqlite*Repository`（模板 `openhub-webhook`）。
 
 ---
 
@@ -292,18 +292,18 @@ CREATE TABLE orch_assignments (
 
 ## 8. Gateway / 对外暴露
 
-新增 `caps_orchestrator` 域（`crates/backend/nomifun-gateway/src/caps_orchestrator.rs`，3 步契约：register fn + lib.rs mod + build() 调用）：
+新增 `caps_orchestrator` 域（`crates/backend/openhub-gateway/src/caps_orchestrator.rs`，3 步契约：register fn + lib.rs mod + build() 调用）：
 
-- `nomi_fleet_list` / `nomi_fleet_get`（读）
-- `nomi_run_create`（写）/ `nomi_run_status`（读）/ `nomi_run_result`（读）
-- `nomi_run_plan`（写：主管写入 tasks+deps）/ `nomi_run_add_task` / `nomi_run_assign`（写：分派）
-- `nomi_run_cancel`（Destructive→Confirm/Deny 按 surface）
+- `openhub_fleet_list` / `openhub_fleet_get`（读）
+- `openhub_run_create`（写）/ `openhub_run_status`（读）/ `openhub_run_result`（读）
+- `openhub_run_plan`（写：主管写入 tasks+deps）/ `openhub_run_add_task` / `openhub_run_assign`（写：分派）
+- `openhub_run_cancel`（Destructive→Confirm/Deny 按 surface）
 
-权限：读 Read，规划/分派 Write，取消 Destructive，按 DangerTier×Surface 矩阵自动 gate。命名 `nomi_` 前缀、≤42 字符、wire 名 ≤64。
+权限：读 Read，规划/分派 Write，取消 Destructive，按 DangerTier×Surface 矩阵自动 gate。命名 `openhub_` 前缀、≤42 字符、wire 名 ≤64。
 
-**收编遗留 `nomi_agent_run`**：把单发委派语义并入 Run 模型（一个单任务 Run 即等价于旧 `nomi_agent_run`），逐步弃用旧工具（与 team 移除同期）。
+**收编遗留 `openhub_agent_run`**：把单发委派语义并入 Run 模型（一个单任务 Run 即等价于旧 `openhub_agent_run`），逐步弃用旧工具（与 team 移除同期）。
 
-主管的规划/分派工具即住此域——主管作为一个挂了 `caps_orchestrator` + desktopGateway 的 Nomi 会话，通过这些工具操作 Run 状态，调度器观察状态变化并执行。
+主管的规划/分派工具即住此域——主管作为一个挂了 `caps_orchestrator` + desktopGateway 的 OpenHub 会话，通过这些工具操作 Run 状态，调度器观察状态变化并执行。
 
 ---
 
@@ -322,7 +322,7 @@ ContentSider（二级侧栏）+ 主区 hero：
   - 任务节点：状态色（CSS 变量）、分派 agent 头像 + 模型 chip、进度、重试/改派动作。
   - 依赖边、顶部主管节点。WS 实时刷新（`task.statusChanged` 等）。
   - 节点可拖（落 `graph_x/graph_y`）。
-  - **点节点 → 右侧滑出该 worker 实时对话**：复用 `ChatLayout`/`NomiChat`/`MessageList`，只读 + 可 steer 模式（`hideAdvancedControls`、`hideSendBox` 视模式；参照 SubagentDrawer 但升级为可交互）。
+  - **点节点 → 右侧滑出该 worker 实时对话**：复用 `ChatLayout`/`OpenHubChat`/`MessageList`，只读 + 可 steer 模式（`hideAdvancedControls`、`hideSendBox` 视模式；参照 SubagentDrawer 但升级为可交互）。
   - 顶栏：目标、自主级别选择、编队选择、Run 控制（暂停/恢复/取消/fork）、聚合进度 + 成本/token 表（复用 `ContextUsagePill` 风格）。
 - **编队管理视图**：组建编队（从已配 providers 选 agent+model、填角色/标签/约束），看每成员能力画像。卡片网格 + `AssistantTagFilterBar` 风格。**同时满足**「对用户清晰配置」+「对 agent 清晰展示信息/编排/生命周期」两个视角。
 
@@ -339,9 +339,9 @@ ContentSider（二级侧栏）+ 主区 hero：
 ## 10. 与现有引擎/服务的接线
 
 新域服务 + 路由典型触及 ~6–8 点：
-1. 迁移 `018_orchestrator.sql` + `nomifun-db` 内 Row 模型 + `I*Repository`/`Sqlite*Repository`。
-2. `nomifun-api-types` DTO。
-3. 新 crate `nomifun-orchestrator`（lib/routes/state/service/events，镜像 `nomifun-webhook`+`nomifun-requirement`）。
+1. 迁移 `018_orchestrator.sql` + `openhub-db` 内 Row 模型 + `I*Repository`/`Sqlite*Repository`。
+2. `openhub-api-types` DTO。
+3. 新 crate `openhub-orchestrator`（lib/routes/state/service/events，镜像 `openhub-webhook`+`openhub-requirement`）。
 4. `AppServices::from_config` 加单例（OrchestratorService 需与 agent 工厂/会话服务共享）。
 5. `router/state.rs` 加 `ModuleStates` 字段 + `build_orchestrator_state`。
 6. `router/routes.rs` merge `orchestrator_routes(state)`（auth 中间件下）。
@@ -358,9 +358,9 @@ ContentSider（二级侧栏）+ 主区 hero：
 1. 实现期：搬运可复用零件到新 crate——任务依赖边表模式、崩溃/不活跃检测、agent==会话——但**不**依赖 team crate。
 2. 交付期：
    - 新增迁移（如 `0XX_drop_team.sql`，append-only，DROP `teams`/`team_agents`/`mailbox`/`team_tasks`/`team_task_deps`）。
-   - 删 `nomifun-team` crate + 工作区 Cargo 成员 + `build_team_state` + 路由挂载。
+   - 删 `openhub-team` crate + 工作区 Cargo 成员 + `build_team_state` + 路由挂载。
    - 删前端 `ui/src/.../multiAgent/*`、`team/teamTypes.ts`、`teamMapper.ts`、`ipcBridge.team`、`ChatLayout` 内 `AgentStatusStrip` 挂载。
-   - 删 Guide MCP（`nomifun-team/src/guide/*`）与相关 `nomi_create_team`。
+   - 删 Guide MCP（`openhub-team/src/guide/*`）与相关 `openhub_create_team`。
    - 全工作区编译 + 测试回归确认无残引用。
 
 ---
@@ -380,10 +380,10 @@ ContentSider（二级侧栏）+ 主区 hero：
 | 期 | 内容 |
 |---|---|
 | **P0** | 域模型 + crate + 迁移 018 + repos + 编队/工作间 CRUD + 编队管理 UI + 侧栏 tab + 路由 |
-| **P1** | Run 生命周期 + 主管规划(`nomi_run_plan`) + DAG 持久化 + 调度器(先串行) + 静态画布(react-flow 渲染 DAG) |
+| **P1** | Run 生命周期 + 主管规划(`openhub_run_plan`) + DAG 持久化 + 调度器(先串行) + 静态画布(react-flow 渲染 DAG) |
 | **P2** | 并行 worker 执行(会话substrate) + 实时流式画布(WS) + 节点转录面板 |
 | **P3** | 能力 Router(自动分派 + 理由 + 覆盖/锁定) + 自主三级 + IDMM 接入 + steer/暂停/取消/重试 |
-| **P4** | `caps_orchestrator` + Remote 暴露 + 收编 `nomi_agent_run` |
+| **P4** | `caps_orchestrator` + Remote 暴露 + 收编 `openhub_agent_run` |
 | **P5** | 移除 team + 打磨 + 全链路真机测试 + 截图验收 |
 
 ---

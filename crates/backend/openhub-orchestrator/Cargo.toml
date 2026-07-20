@@ -1,0 +1,29 @@
+[package]
+name = "openhub-orchestrator"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+openhub-common.workspace = true
+openhub-db.workspace = true
+openhub-api-types.workspace = true
+openhub-auth.workspace = true
+openhub-file.workspace = true
+openhub-realtime.workspace = true
+openhub-ai-agent.workspace = true
+openhub-conversation.workspace = true
+axum.workspace = true
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+async-trait.workspace = true
+dashmap.workspace = true
+futures.workspace = true
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["test-util"] }
+sqlx = { workspace = true }
+tower = { workspace = true, features = ["util"] }
+tempfile = { workspace = true }

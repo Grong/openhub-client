@@ -2,8 +2,8 @@
 
 <div align="center">
 
-<a href="https://www.nomifun.com">
-  <img src="docs/images/readme-00-orchestration-hero.png" alt="NomiFun orchestration conversation, reusable roles, and DAG canvas" width="100%">
+<a href="https://www.openhub.dev">
+  <img src="docs/images/readme-00-orchestration-hero.png" alt="OpenHub orchestration conversation, reusable roles, and DAG canvas" width="100%">
 </a>
 
 <h3>A no-holds-barred, fully open-source, <em>local-first</em> super AI workstation.</h3>
@@ -17,14 +17,14 @@
   <a href="LICENSE"><img alt="License: Apache-2.0" src="https://img.shields.io/badge/License-Apache_2.0-FF6F91?style=for-the-badge"></a>
   <img alt="Platform" src="https://img.shields.io/badge/Platform-macOS%20%7C%20Windows%20%7C%20Linux-7583B2?style=for-the-badge">
   <img alt="Status" src="https://img.shields.io/badge/Status-pre--1.0-FBBF24?style=for-the-badge">
-  <a href="https://www.nomifun.com"><img alt="Website" src="https://img.shields.io/badge/Website-nomifun.com-FF6F91?style=for-the-badge"></a>
+  <a href="https://www.openhub.dev"><img alt="Website" src="https://img.shields.io/badge/Website-openhub.dev-FF6F91?style=for-the-badge"></a>
 </p>
 
 <p>
   <img alt="Built with Tauri 2" src="https://img.shields.io/badge/Tauri-2-24C8DB?style=flat-square&logo=tauri&logoColor=white">
   <img alt="Rust 2024" src="https://img.shields.io/badge/Rust-edition_2024-CE412B?style=flat-square&logo=rust&logoColor=white">
   <img alt="React 19" src="https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=white">
-  <a href="https://github.com/nomifun/nomifun-tauri/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/nomifun/nomifun-tauri?style=flat-square&color=FF6F91"></a>
+  <a href="https://github.com/Grong/openhub-client/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/openhub/openhub-client?style=flat-square&color=FF6F91"></a>
 </p>
 
 <p>
@@ -32,10 +32,10 @@
 </p>
 
 <p>
-  <a href="https://www.nomifun.com">🌐 Website</a>&nbsp;·&nbsp;
+  <a href="https://www.openhub.dev">🌐 Website</a>&nbsp;·&nbsp;
   <a href="docs/README.md">📖 Docs</a>&nbsp;·&nbsp;
   <a href="#-getting-started">🚀 Get started</a>&nbsp;·&nbsp;
-  <a href="https://github.com/nomifun/nomifun-tauri/releases">📦 Releases</a>&nbsp;·&nbsp;
+  <a href="https://github.com/Grong/openhub-client/releases">📦 Releases</a>&nbsp;·&nbsp;
   <a href="https://pan.baidu.com/s/5GPonoJNrwJ7GciBSDgXLaA">China mirror</a>&nbsp;·&nbsp;
   <a href="./RELEASING.zh-CN.md">发版手册</a>&nbsp;·&nbsp;
   <a href="#-contact--community">💬 Community</a>
@@ -46,24 +46,24 @@
 ---
 
 > [!IMPORTANT]
-> **Public-interest open-source and data-risk notice**: NomiFun is a public-interest open-source project. The maintainers do not assume responsibility for user data loss, corruption, or unrecoverable damage during iteration. Back up your data before upgrades, migrations, experimental features, or real production use.
+> **Public-interest open-source and data-risk notice**: OpenHub is a public-interest open-source project. The maintainers do not assume responsibility for user data loss, corruption, or unrecoverable damage during iteration. Back up your data before upgrades, migrations, experimental features, or real production use.
 
 ---
 
-**NomiFun** is everything you imagine an AI workstation to be — and it runs on your terms. One React frontend and one Rust backend give you an evolving desktop companion, an unattended automation platform, a unified knowledge base, native computer- and browser-use, and an open capability bus that any agent can drive. No cloud account. No telemetry. No subscription. Your data never leaves your machine except for the LLM calls **you** configure.
+**OpenHub** is everything you imagine an AI workstation to be — and it runs on your terms. One React frontend and one Rust backend give you an evolving desktop companion, an unattended automation platform, a unified knowledge base, native computer- and browser-use, and an open capability bus that any agent can drive. No cloud account. No telemetry. No subscription. Your data never leaves your machine except for the LLM calls **you** configure.
 
-> The product name is **NomiFun**. Lowercase `nomifun` is used only for code identifiers, crate names, environment variables, and repository paths.
+> The product name is **OpenHub**. Lowercase openhub is used only for code identifiers, crate names, environment variables, and repository paths.
 
 ---
 
-## ✨ Why NomiFun
+## ✨ Why OpenHub
 
 |  | |
 |---|---|
 | 🔓 **Open & local** | Source fully open, no reservations. Data lives on your machine and is never sent out on its own. Free for personal **and** commercial use. Open to audit. |
 | 🐾 **Evolving companions** | The most complete companion-growth system we know of — it learns how you work and gets better over time. Not just a buddy, a genuine productivity partner. |
 | 🤖 **Unattended automation** | Manage requirements, then just give the order. AutoWork + IDMM keep your sessions alive and working reliably while you're away. |
-| 🌐 **Open capability ecosystem** | Everything is here, everything connects, everything cooperates — and *any* agent can borrow NomiFun's powers over MCP / REST. |
+| 🌐 **Open capability ecosystem** | Everything is here, everything connects, everything cooperates — and *any* agent can borrow OpenHub's powers over MCP / REST. |
 | 🧩 **Config once, use anywhere** | Unified management of knowledge bases, skills, agents, MCP servers, and models — defined once, reused across every surface. |
 | 🖥️ **Truly native** | In-process, self-built **computer use** and **browser use** as native tools — more capable, faster, and cheaper on tokens. |
 | 🚀 **Built for productivity** | Designed from real needs, with a lot of inventive capabilities. And many delightful features are still on the way. |
@@ -72,9 +72,9 @@
 
 ## 🔒 Local-first, by design
 
-Data security is not a setting in NomiFun — it is the architecture.
+Data security is not a setting in OpenHub — it is the architecture.
 
-- **All data is local.** NomiFun never proactively sends your data anywhere. The **only** outbound network calls are the LLM requests you explicitly configure to your chosen model provider. There is no other third-party service integration phoning home.
+- **All data is local.** OpenHub never proactively sends your data anywhere. The **only** outbound network calls are the LLM requests you explicitly configure to your chosen model provider. There is no other third-party service integration phoning home.
 - **Safe for anyone who cares about data.** Individuals and enterprises with strict data-handling requirements can use it with confidence. The code is **fully open and open to audit**.
 - **We cut features to keep this promise.** To guarantee your data stays yours, we deliberately dropped several advanced, genuinely fun feature designs. Everything here is in service of letting users — and developers — relax.
 - **No ads. No commercialization. No membership tiers.** We promise to *never* charge for any feature of this project. The only thing that costs money is your LLM provider's tokens, which is outside our control. (If finding/serving models is painful, [reach out](#-contact--community) — we're happy to help build a unified model gateway.)
@@ -97,7 +97,7 @@ See [`SECURITY.md`](SECURITY.md) for the deployment threat model and responsible
 </p>
 
 <p>
-  <img src="docs/images/readme-01-workbench-overview.png" alt="NomiFun orchestration conversation and DAG canvas" width="100%">
+  <img src="docs/images/readme-01-workbench-overview.png" alt="OpenHub orchestration conversation and DAG canvas" width="100%">
   <br/><sub><b>Work orchestration: conversation, reusable roles, and DAG canvas</b></sub>
 </p>
 
@@ -116,7 +116,7 @@ See [`SECURITY.md`](SECURITY.md) for the deployment threat model and responsible
   </tr>
 </table>
 
-<sub>Captured from the live NomiFun desktop app on 2026-07-01 and kept at 2560px wide. See <a href="docs/images/SCREENSHOTS.md">the screenshot manifest</a> for the full set and capture method.</sub>
+<sub>Captured from the live OpenHub desktop app on 2026-07-01 and kept at 2560px wide. See <a href="docs/images/SCREENSHOTS.md">the screenshot manifest</a> for the full set and capture method.</sub>
 
 </div>
 
@@ -132,14 +132,14 @@ The companion you talk to every day quietly becomes the assistant who *gets* you
 
 - **Make it yours.** Upload a custom companion figure (DIY), or pick from an independent figure library decoupled from any single companion.
 - **One brain, many faces.** Run multiple companions that share a common memory hub, while each keeps its own **private** memory and can mount different domain knowledge bases. Teach *one* companion well, then have it teach the others.
-- **Chat with them where you already work.** Companion chats now live in the main **Sessions** UI under a dedicated desktop-companion group, while `/nomi` stays focused on companion management.
+- **Chat with them where you already work.** Companion chats now live in the main **Sessions** UI under a dedicated desktop-companion group, while `/openhub` stays focused on companion management.
 - **It learns you (opt-in, on by default after a one-time consent).** A background learner distills your usage into durable memories; a deterministic evolution engine mines your recurring multi-step tool sequences into **draft skills** it proposes for your review. Memory is fully **visible and editable**.
 - **Skills that spread.** Companions generate their own skills, discuss them with you, and can **gift** a skill to another companion (the recipient gets a copy) — opt-in shared learning across your roster.
 - **A super gateway, not just a buddy.** Each companion is a complete, independent individual that can connect to multiple IM channels. From anywhere with a network and a chat app, message your companion to drive your computer for you. Each companion can fully operate the desktop's capabilities.
 
 ### 🧠 Conversation-native orchestration
 
-Start from a normal conversation, then let NomiFun expand the job into a live DAG when the task deserves it.
+Start from a normal conversation, then let OpenHub expand the job into a live DAG when the task deserves it.
 
 - **Conversation first.** Launch multi-agent work from the same chat you are already using, then open the orchestration rail / floating canvas without leaving that conversation.
 - **Per-node preflight control.** Before a worker starts, override its model and add a preset brief; settled nodes can be rerun with the same pre-configuration.
@@ -150,7 +150,7 @@ Start from a normal conversation, then let NomiFun expand the job into a live DA
 
 > Guides: [`autowork-requirements.md`](docs/guides/autowork-requirements.md) · [`intelligent-decision.md`](docs/guides/intelligent-decision.md)
 
-You give the orders; NomiFun reliably does the work.
+You give the orders; OpenHub reliably does the work.
 
 - **Requirement platform** — a CRUD store with ordered rotation, a board/kanban, tags, and per-item claim.
 - **AutoWork** — claims pending requirements, drives a turn, rotates to the next, and renews leases while a turn is in flight. Targets can be **conversation agents *or* terminal PTYs**.
@@ -187,9 +187,9 @@ Self-built, **in-process Rust** — no Playwright, no Node, no third-party autom
 
 > Guides: [`remote-capability-api.md`](docs/guides/remote-capability-api.md) · [`remote-capability-api-examples.md`](docs/guides/remote-capability-api-examples.md)
 
-Every capability NomiFun has is exposed through a single, typed capability registry — **~20 domains and 150+ tools** — so you can wire NomiFun into anything.
+Every capability OpenHub has is exposed through a single, typed capability registry — **~20 domains and 150+ tools** — so you can wire OpenHub into anything.
 
-- **MCP front door** at `/mcp` (authenticated, Streamable-HTTP). Point **Claude Code, Cursor, or your own agent** at it and they operate NomiFun exactly as the desktop companion does.
+- **MCP front door** at `/mcp` (authenticated, Streamable-HTTP). Point **Claude Code, Cursor, or your own agent** at it and they operate OpenHub exactly as the desktop companion does.
 - **REST + OpenAPI** at `/v1/tools`, with streaming and an auto-generated `/v1/openapi.json`.
 - Adding a capability to the bus makes it appear on MCP **and** REST automatically — no drift.
 
@@ -197,15 +197,15 @@ Every capability NomiFun has is exposed through a single, typed capability regis
 
 > Guide: [`docs/guides/model-routing.md`](docs/guides/model-routing.md)
 
-- **Built-in `nomi` agent** — no extra install. Works with **26+ model providers/presets** (OpenAI, Anthropic, Gemini + Vertex AI, AWS Bedrock, DeepSeek, OpenRouter, Moonshot/Kimi, Qwen/Dashscope, Zhipu/GLM, MiniMax, SiliconFlow, xAI, Volcengine/Doubao, and more) across **4 wire protocols**, plus the **New API** aggregator gateway.
-- **~19 external agents over ACP** — connect Claude Code, Codex, Gemini, Qwen, Kimi, Cursor, Copilot, Goose, OpenCode, Droid, and more, and NomiFun feeds them models *and* its native capabilities (computer/browser/knowledge/gateway) over injected MCP bridges.
+- **Built-in `openhub` agent** — no extra install. Works with **26+ model providers/presets** (OpenAI, Anthropic, Gemini + Vertex AI, AWS Bedrock, DeepSeek, OpenRouter, Moonshot/Kimi, Qwen/Dashscope, Zhipu/GLM, MiniMax, SiliconFlow, xAI, Volcengine/Doubao, and more) across **4 wire protocols**, plus the **New API** aggregator gateway.
+- **~19 external agents over ACP** — connect Claude Code, Codex, Gemini, Qwen, Kimi, Cursor, Copilot, Goose, OpenCode, Droid, and more, and OpenHub feeds them models *and* its native capabilities (computer/browser/knowledge/gateway) over injected MCP bridges.
 - **Everywhere** — the native capabilities are available to the built-in agent, to ACP agents, in the chat UI, **and** in the terminal.
-- **Graceful multimodal fallback** — if a selected provider/model rejects image input, NomiFun strips the images, retries in the same conversation, and leaves an inline notice instead of killing the session.
+- **Graceful multimodal fallback** — if a selected provider/model rejects image input, OpenHub strips the images, retries in the same conversation, and leaves an inline notice instead of killing the session.
 - **Per-model context tuning** — override context-window limits per model when an upstream platform reports bad defaults or hides them, improving routing and long-context budgeting.
 
 ### 🔌 Model providers: quick setup links
 
-NomiFun does not lock you into a single model vendor. Pick providers by region, price, quota, model capability, and data policy, then paste the API key into NomiFun's **Models & Agents** page. These are third-party services; pricing, regional availability, rate limits, and data-handling terms are controlled by each provider.
+OpenHub does not lock you into a single model vendor. Pick providers by region, price, quota, model capability, and data policy, then paste the API key into OpenHub's **Models & Agents** page. These are third-party services; pricing, regional availability, rate limits, and data-handling terms are controlled by each provider.
 
 | Provider | Start here | Good to evaluate |
 |---|---|---|
@@ -226,7 +226,7 @@ NomiFun does not lock you into a single model vendor. Pick providers by region, 
 
 > Guide: [`docs/guides/terminal.md`](docs/guides/terminal.md)
 
-Run agent CLIs inside in-app PTY sessions (or the standalone `nomi` CLI). NomiFun injects native capabilities — knowledge search, requirement completion, and lifecycle hooks — into known CLIs through their *own* native config, so you keep full fidelity and OAuth.
+Run agent CLIs inside in-app PTY sessions (or the standalone `openhub` CLI). OpenHub injects native capabilities — knowledge search, requirement completion, and lifecycle hooks — into known CLIs through their *own* native config, so you keep full fidelity and OAuth.
 
 ### 📱 WebUI remote control — scan, and you're in
 
@@ -252,7 +252,7 @@ Bind a companion to any of these and drive it from where you already chat:
 
 One React frontend, one Rust backend, **two host modes** — and the same backend runs in-process in both.
 
-| | `nomifun-desktop` | `nomifun-web` |
+| | `openhub-desktop` | `openhub-web` |
 |---|---|---|
 | **Shell** | Tauri 2 desktop app | Standalone axum server |
 | **Backend** | Embedded in-process, private loopback port | Same backend, in-process |
@@ -270,11 +270,11 @@ apps/
   desktop/      Tauri 2 shell and desktop-only commands
   web/          standalone web host for API + SPA
 crates/
-  agent/        15 nomi-* crates: engine, providers, tools, MCP, skills, memory,
-                browser/computer use, and the standalone nomi CLI
-  backend/      29 nomifun-* crates: app composition, auth, database, sessions,
+  agent/        15 openhub-* crates: engine, providers, tools, MCP, skills, memory,
+                browser/computer use, and the standalone openhub CLI
+  backend/      29 openhub-* crates: app composition, auth, database, sessions,
                 MCP, knowledge, requirements, terminal, companion, gateway, etc.
-  shared/       2 cross-layer crates: nomifun-net and nomi-redact
+  shared/       2 cross-layer crates: openhub-net and openhub-redact
 ui/             React 19 + Vite SPA shared by desktop and web
 docs/           technical docs, user/operator guides, architecture notes
 packaging/      Linux deployment support for the web host
@@ -288,7 +288,7 @@ Start with [`docs/architecture/overview.md`](docs/architecture/overview.md) for 
 
 ## 🚀 Getting started
 
-> 📦 **Installers**: use [GitHub Releases](https://github.com/nomifun/nomifun-tauri/releases) first. Mainland China users can use the [Baidu Netdisk mirror](https://pan.baidu.com/s/5GPonoJNrwJ7GciBSDgXLaA) (shared as `nomifun`). You can also install from source or run the server with Docker.
+> 📦 **Installers**: use [GitHub Releases](https://github.com/Grong/openhub-client/releases) first. Mainland China users can use the [Baidu Netdisk mirror](https://pan.baidu.com/s/5GPonoJNrwJ7GciBSDgXLaA) (shared as openhub). You can also install from source or run the server with Docker.
 
 **Prerequisites**
 
@@ -299,8 +299,8 @@ Start with [`docs/architecture/overview.md`](docs/architecture/overview.md) for 
 **Desktop app (from source)**
 
 ```bash
-git clone https://github.com/nomifun/nomifun-tauri.git
-cd nomifun-tauri
+git clone https://github.com/Grong/openhub-client.git
+cd openhub-client
 bun install
 
 bun run dev      # develop with hot reload
@@ -467,18 +467,18 @@ Docs are bilingual: every page has an English `*.md` and a Simplified-Chinese `*
 
 ## 🗺️ Coming soon
 
-NomiFun is **pre-1.0** and built part-time, so there's a lot still in flight. On the horizon: prebuilt installers, inbound issue-tracker / requirement sources, more knowledge connectors (Feishu, and beyond), official desktop binaries — plus a few surprises we're genuinely excited about. **Stay tuned.** ✨
+OpenHub is **pre-1.0** and built part-time, so there's a lot still in flight. On the horizon: prebuilt installers, inbound issue-tracker / requirement sources, more knowledge connectors (Feishu, and beyond), official desktop binaries — plus a few surprises we're genuinely excited about. **Stay tuned.** ✨
 
 ---
 
 ## 🤝 Contributing & community
 
-NomiFun very much needs your help to grow — code contributions, community building, and evangelism are all hugely welcome. If you have passion for this project, please [reach out](#-contact--community) and build the NomiFun ecosystem with us.
+OpenHub very much needs your help to grow — code contributions, community building, and evangelism are all hugely welcome. If you have passion for this project, please [reach out](#-contact--community) and build the OpenHub ecosystem with us.
 
 - Read [`CONTRIBUTING.md`](CONTRIBUTING.md) to get set up and learn the check ladder. Simplified Chinese: [`CONTRIBUTING.zh-CN.md`](CONTRIBUTING.zh-CN.md).
 - Be excellent to each other — see [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md).
 - Found a vulnerability? Follow [`SECURITY.md`](SECURITY.md).
-- Browse [open issues](https://github.com/nomifun/nomifun-tauri/issues) for a place to start.
+- Browse [open issues](https://github.com/Grong/openhub-client/issues) for a place to start.
 
 ---
 
@@ -486,10 +486,10 @@ NomiFun very much needs your help to grow — code contributions, community buil
 
 > This is a part-time effort with limited bandwidth, and many delightful features are still on the way. If this resonates with you, join in any way you like — a line of code, a suggestion, a reshare all mean a lot.
 
-NomiFun is **completely open source, with nothing held back**. Individuals and enterprises are free to build on it and use it commercially.
+OpenHub is **completely open source, with nothing held back**. Individuals and enterprises are free to build on it and use it commercially.
 
 - **Forks & commercial use are welcome.** They're also at your own risk — the author and contributors assume no liability for downstream use. Apache-2.0 requires no permission from us.
-- **A friendly heads-up is appreciated, not required.** If you fork or commercialize NomiFun, we'd love a note — *not* as a license condition, simply because knowing the project is valued is the kind of recognition that keeps it going.
+- **A friendly heads-up is appreciated, not required.** If you fork or commercialize OpenHub, we'd love a note — *not* as a license condition, simply because knowing the project is valued is the kind of recognition that keeps it going.
 - **Some features were intentionally left out of the open-source release** to keep the local-data promise airtight — without the people and funding to guarantee everyone's data security, removing them was the responsible choice. As time and resources allow, we hope to bring more of them to you.
 
 Thank you for being here. 🙏
@@ -514,13 +514,13 @@ We'd love to hear from you. The fastest way to reach us is GitHub; the social ch
 
 | Channel | Where |
 |---|---|
-| 🌐 **Website** | [www.nomifun.com](https://www.nomifun.com) |
-| 🐙 **GitHub** | [nomifun/nomifun-tauri](https://github.com/nomifun/nomifun-tauri) · [Issues](https://github.com/nomifun/nomifun-tauri/issues) · [Releases](https://github.com/nomifun/nomifun-tauri/releases) |
-| ✉️ **Email** | `hello@nomifun.com` <sub>(provisional — being finalized)</sub> |
-| 📕 **小红书 / RED** | [NomiFun](https://xhslink.com/m/4x6ti8n6cA1) |
-| 📺 **Bilibili** | [NomiFun](https://b23.tv/0UhgKDh) · [demo video](https://www.bilibili.com/video/BV1kwKZ6UE5X/) |
-| 🎵 **抖音 / Douyin** | [NomiFun](https://v.douyin.com/MDT5QVdYaJk/) |
-| ▶️ **YouTube** | [@NomiFun-o2y](https://www.youtube.com/@NomiFun-o2y) · [demo video](https://youtu.be/AsEToBDFR9s) |
+| 🌐 **Website** | [www.openhub.dev](https://www.openhub.dev) |
+| 🐙 **GitHub** | [openhub/openhub-client](https://github.com/Grong/openhub-client) · [Issues](https://github.com/Grong/openhub-client/issues) · [Releases](https://github.com/Grong/openhub-client/releases) |
+| ✉️ **Email** | `hello@openhub.dev` <sub>(provisional — being finalized)</sub> |
+| 📕 **小红书 / RED** | [OpenHub](https://xhslink.com/m/4x6ti8n6cA1) |
+| 📺 **Bilibili** | [OpenHub](https://b23.tv/0UhgKDh) · [demo video](https://www.bilibili.com/video/BV1kwKZ6UE5X/) |
+| 🎵 **抖音 / Douyin** | [OpenHub](https://v.douyin.com/MDT5QVdYaJk/) |
+| ▶️ **YouTube** | [@OpenHub-o2y](https://www.youtube.com/@OpenHub-o2y) · [demo video](https://youtu.be/AsEToBDFR9s) |
 | 𝕏 **X (Twitter)** | [@colir0](https://x.com/colir0) |
 | 🎬 **TikTok** | [@colir0luo](https://www.tiktok.com/@colir0luo) |
 
@@ -539,7 +539,7 @@ We'd love to hear from you. The fastest way to reach us is GitHub; the social ch
 
 ## ⚖️ License
 
-[Apache-2.0](LICENSE) © 2025–2026 NomiFun.
+[Apache-2.0](LICENSE) © 2025–2026 OpenHub.
 
 See [`NOTICE`](NOTICE) for third-party attributions.
 

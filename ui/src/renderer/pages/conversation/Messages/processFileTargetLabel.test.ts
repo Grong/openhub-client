@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -11,7 +11,7 @@ import {
   splitToolReceiptTargets,
 } from './processFileTargetLabel';
 
-const workspaceRoot = '/Users/muri/Library/Application Support/NomiFun/Nomi-dev/conversations/nomi-temp-39';
+const workspaceRoot = '/Users/muri/Library/Application Support/OpenHub/OpenHub-dev/conversations/openhub-temp-39';
 
 describe('process file target labels', () => {
   test('shows only the file name for absolute targets inside the current workspace', () => {

@@ -38,17 +38,17 @@ const src = resolve(__dirname, 'src');
 export default defineConfig(({ mode }) => {
   // WebUI dev mode (`vite --mode webdev`, driven by the UI `dev:web` script and
   // the root `dev:webui` one-click). The SPA is served by Vite (with HMR) but the
-  // auth backend + API + WebSocket live in the separate `nomifun-web` host. The
+  // auth backend + API + WebSocket live in the separate `openhub-web` host. The
   // browser SPA makes *same-origin relative* calls in WebUI mode (`/api/*`,
   // `/login`, `/logout`, `/ws` — see ui/src/common/adapter/httpBridge.ts), so we
-  // proxy that backend surface to nomifun-web. Without this, those calls hit the
+  // proxy that backend surface to openhub-web. Without this, those calls hit the
   // static dev server and fail at the network layer ("连接失败").
   //
   // Gated on `mode === 'webdev'` so plain `ui:dev` and the Tauri desktop dev
   // server (mode 'development', which talks to the embedded backend via an
   // absolute `window.__backendPort` URL) are completely unaffected.
   const webdev = mode === 'webdev';
-  const apiPort = process.env.NOMIFUN_WEB_PORT ?? '8787';
+  const apiPort = process.env.OPENHUB_WEB_PORT ?? '8787';
   const apiTarget = `http://127.0.0.1:${apiPort}`;
   const wsTarget = `ws://127.0.0.1:${apiPort}`;
   // Same loopback host on both sides — keep the original Host header so the

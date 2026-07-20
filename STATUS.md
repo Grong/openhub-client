@@ -9,8 +9,8 @@ transition plan, not the product shape in this repository now.
 ## Current Architecture
 
 - One Cargo workspace:
-  - `crates/agent/*`: 15 `nomi-*` crates.
-  - `crates/backend/*`: 29 `nomifun-*` crates.
+  - `crates/agent/*`: 15 `openhub-*` crates.
+  - `crates/backend/*`: 29 `openhub-*` crates.
   - `crates/shared/*`: 2 cross-layer crates.
   - `apps/web` and `apps/desktop`.
 - One frontend: `ui/`, a React 19 + Vite SPA.
@@ -19,7 +19,7 @@ transition plan, not the product shape in this repository now.
     local-trust header injected into `fetch` and `XMLHttpRequest`.
   - Web: `apps/web`, standalone server, authenticated by default, serves API,
     `/ws`, and `ui/dist` on one port.
-- One backend composition root: `nomifun-app`, assembled through
+- One backend composition root: `openhub-app`, assembled through
   `AppServices`, `build_module_states`, and `create_router`.
 
 ## Active Product Surfaces
@@ -35,7 +35,7 @@ The current frontend route map lives in
 - `/open-capabilities`
 - `/requirements`, `/requirements/extensions`, `/requirements/sources`
 - `/scheduled` and `/scheduled/:job_id`
-- `/nomi`
+- `/openhub`
 - `/knowledge` and `/knowledge/:id`
 - `/settings/system` plus system sub-sections routed through that page
 

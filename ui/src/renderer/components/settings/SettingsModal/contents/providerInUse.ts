@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -17,8 +17,8 @@ export function featureRoute(feature: ProviderUsageFeature, targetId?: string): 
   switch (feature) {
     case 'desktopCompanion':
       // Desktop-companion model control (CompanionModelControl → profile.model)
-      // lives on the Nomi config page; /companion is the transparent pet overlay.
-      return '/nomi';
+      // lives on the OpenHub config page; /companion is the transparent pet overlay.
+      return '/openhub';
     case 'publicCompanion':
       return targetId ? `/public-companions/${targetId}` : '/public-companions';
     case 'smartDecision':

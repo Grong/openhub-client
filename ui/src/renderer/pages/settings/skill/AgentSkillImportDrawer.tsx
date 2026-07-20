@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -216,7 +216,7 @@ const AgentSkillImportDrawer: React.FC<AgentSkillImportDrawerProps> = ({
           <div className='text-13px leading-20px text-t-secondary'>
             {t('settings.agentSkillImport.description', {
               defaultValue:
-                'Bring reusable skills from Claude, Gemini, Codex-compatible Agent Skills, or custom external folders into Nomi.',
+                'Bring reusable skills from Claude, Gemini, Codex-compatible Agent Skills, or custom external folders into OpenHub.',
             })}
           </div>
         </div>

@@ -1,6 +1,6 @@
 # 智能决策（IDMM）
 
-**IDMM**——Intelligent Decision-Making Mode，智能决策模式——是 Nomi 面向
+**IDMM**——Intelligent Decision-Making Mode，智能决策模式——是 OpenHub 面向
 无人值守任务的稳定性层。它是一个**会话监督器**，盯守每一轮对话，一旦停滞
 立即介入，让长时间自动化任务跑到终态，而不是卡在一次提供商抖动、或一个
 不再向前推进的模型上。
@@ -9,7 +9,7 @@
 IDMM 就是让每一轮持续**运转**的守卫。两者天生互补：AutoWork 负责认领并执行
 需求，IDMM 则确保它启动的每一轮都真的能跑完。
 
-> IDMM 是一个**可选**的监督器（`nomifun-idmm` crate）。在会话头部——与开启
+> IDMM 是一个**可选**的监督器（`openhub-idmm` crate）。在会话头部——与开启
 > AutoWork 相同的位置——按会话开启。
 
 ## 为什么需要它
@@ -52,7 +52,7 @@ IDMM 就是让每一轮持续**运转**的守卫。两者天生互补：AutoWork
 ## 会话守卫与会话保活
 
 规则层与旁路模型合在一起，构成了**会话守卫（Session guard）**：IDMM 在故障与
-决策停滞中保活目标，并把这一轮护送到终态。这正是 Nomi 所说的「会话保活」
+决策停滞中保活目标，并把这一轮护送到终态。这正是 OpenHub 所说的「会话保活」
 ——不是一个傻乎乎的心跳，而是一个主动的监督器，去解决那个本会让对话卡死的
 根因。
 
@@ -75,7 +75,7 @@ AutoWork: 认领 ─▶ 注入 ─▶ [ 对话运行 ] ─▶ 完成（done/fail
                           IDMM 守卫 ──▶ 规则层 ──▶ （升级）──▶ 旁路模型
 ```
 
-每层策略的细节和介入日志 API 见 `crates/backend/nomifun-idmm/`。
+每层策略的细节和介入日志 API 见 `crates/backend/openhub-idmm/`。
 
 ## 开启方式
 

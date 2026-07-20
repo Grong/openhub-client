@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -12,7 +12,7 @@ import classNames from 'classnames';
 import { useSettingsViewMode } from '../settingsViewContext';
 import { isDesktopShell, openExternalUrl } from '@/renderer/utils/platform';
 import { httpGet } from '@/common/adapter/httpBridge';
-import { NOMIFUN_PUBLIC_LINKS } from './FeedbackReportModal';
+import { OPENHUB_PUBLIC_LINKS } from './FeedbackReportModal';
 
 // Real app version from the backend `/health` endpoint (public, no auth). The
 // version there is `CARGO_PKG_VERSION`, which follows the single-source
@@ -58,44 +58,44 @@ const AboutModalContent: React.FC = () => {
   const checkUpdate = () => {
     // 使用 window 自定义事件在渲染进程内部通信（buildEmitter 只支持主进程->渲染进程）
     // Use window custom event for renderer-side communication (buildEmitter only works main->renderer)
-    window.dispatchEvent(new CustomEvent('nomifun-open-update-modal', { detail: { source: 'about' } }));
+    window.dispatchEvent(new CustomEvent('openhub-open-update-modal', { detail: { source: 'about' } }));
   };
 
   const linkItems: LinkItem[] = [
     {
       title: t('settings.helpDocumentation'),
-      detail: NOMIFUN_PUBLIC_LINKS.officialWebsite,
-      url: NOMIFUN_PUBLIC_LINKS.officialWebsite,
+      detail: OPENHUB_PUBLIC_LINKS.officialWebsite,
+      url: OPENHUB_PUBLIC_LINKS.officialWebsite,
       icon: <Right theme='outline' size='16' />,
     },
     {
       title: t('settings.updateLog'),
-      detail: NOMIFUN_PUBLIC_LINKS.releases,
-      url: NOMIFUN_PUBLIC_LINKS.releases,
+      detail: OPENHUB_PUBLIC_LINKS.releases,
+      url: OPENHUB_PUBLIC_LINKS.releases,
       icon: <Right theme='outline' size='16' />,
     },
     {
       title: t('settings.bugReport'),
-      detail: NOMIFUN_PUBLIC_LINKS.issues,
-      url: NOMIFUN_PUBLIC_LINKS.issues,
+      detail: OPENHUB_PUBLIC_LINKS.issues,
+      url: OPENHUB_PUBLIC_LINKS.issues,
       icon: <Right theme='outline' size='16' />,
     },
     {
       title: t('settings.contactMe'),
-      detail: NOMIFUN_PUBLIC_LINKS.contact,
-      url: NOMIFUN_PUBLIC_LINKS.contact,
+      detail: OPENHUB_PUBLIC_LINKS.contact,
+      url: OPENHUB_PUBLIC_LINKS.contact,
       icon: <Right theme='outline' size='16' />,
     },
     {
       title: t('settings.officialWebsite'),
-      detail: NOMIFUN_PUBLIC_LINKS.officialWebsite,
-      url: NOMIFUN_PUBLIC_LINKS.officialWebsite,
+      detail: OPENHUB_PUBLIC_LINKS.officialWebsite,
+      url: OPENHUB_PUBLIC_LINKS.officialWebsite,
       icon: <Right theme='outline' size='16' />,
     },
     {
       title: t('settings.contactEmail'),
-      detail: `${NOMIFUN_PUBLIC_LINKS.email}${t('settings.contactEmailPending')}`,
-      url: NOMIFUN_PUBLIC_LINKS.emailHref,
+      detail: `${OPENHUB_PUBLIC_LINKS.email}${t('settings.contactEmailPending')}`,
+      url: OPENHUB_PUBLIC_LINKS.emailHref,
       icon: <Right theme='outline' size='16' />,
     },
   ];
@@ -113,7 +113,7 @@ const AboutModalContent: React.FC = () => {
           {/* App Info Section */}
           <div className='flex flex-col items-center pb-24px'>
             <Typography.Title heading={3} className='text-24px font-bold text-t-primary mb-8px'>
-              NomiFun
+              OpenHub
             </Typography.Title>
             <Typography.Text className='text-14px text-t-secondary mb-12px text-center'>
               {t('settings.appDescription')}
@@ -125,7 +125,7 @@ const AboutModalContent: React.FC = () => {
               <div
                 className='text-t-primary cursor-pointer hover:text-t-secondary transition-colors p-4px'
                 onClick={() =>
-                  openLink(NOMIFUN_PUBLIC_LINKS.repository).catch((error) => console.error('Failed to open link:', error))
+                  openLink(OPENHUB_PUBLIC_LINKS.repository).catch((error) => console.error('Failed to open link:', error))
                 }
               >
                 <Github theme='outline' size='20' />
@@ -145,7 +145,7 @@ const AboutModalContent: React.FC = () => {
                 </Button>
                 <Button
                   onClick={() =>
-                    openLink(NOMIFUN_PUBLIC_LINKS.baiduPan).catch((error) =>
+                    openLink(OPENHUB_PUBLIC_LINKS.baiduPan).catch((error) =>
                       console.error('Failed to open Baidu manual download:', error)
                     )
                   }

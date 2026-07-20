@@ -10,7 +10,7 @@
 
 ## Global Constraints
 
-- **无 ts-rs**:provider/模型类型手工镜像。任何 schema 改动须同步:`crates/backend/nomifun-api-types/src/provider.rs`(或新 `model_task.rs`)+ `ui/src/common/config/storage.ts` + `ui/src/common/types/provider/providerApi.ts`。
+- **无 ts-rs**:provider/模型类型手工镜像。任何 schema 改动须同步:`crates/backend/openhub-api-types/src/provider.rs`(或新 `model_task.rs`)+ `ui/src/common/config/storage.ts` + `ui/src/common/types/provider/providerApi.ts`。
 - **迁移**:下一个编号 `033`;仅追加;绝不改 `001_baseline` 校验和。`sqlx::migrate!()` 自动发现(`database.rs:28`)。
 - **前端**:Arco Design;`@icon-park/react` 具名导入**禁起别名**;toast 用 `useArcoMessage`(遵循所在文件既有模式);真 `<button>` 露 WebView2 黑框——用 Arco `<Button>` 或 `<div onClick>`;Arco Popover 外壳内边距清零;locale 改动后跑根 `bun run gen:i18n`;`bun run typecheck` 必 exit 0 零新错;`bun run check:icons` 门禁。**UI 必须漂亮**。
 - **测试**:nextest 只跑触碰 crate,全量收尾;前端无 vitest,靠 typecheck。
@@ -20,7 +20,7 @@
 
 ## 契约(所有任务共享,务必一致)
 
-### Rust — `crates/backend/nomifun-api-types/src/model_task.rs`(新)
+### Rust — `crates/backend/openhub-api-types/src/model_task.rs`(新)
 ```rust
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -54,7 +54,7 @@ pub struct ModelProfile {
 pub fn derive_tasks_and_traits(model: &str) -> (Vec<ModelTask>, Vec<ModelTrait>);
 ```
 
-### Rust — `crates/backend/nomifun-api-types/src/dispatch_target.rs`(新)
+### Rust — `crates/backend/openhub-api-types/src/dispatch_target.rs`(新)
 ```rust
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -71,7 +71,7 @@ pub fn resolve_dispatch_target(
 ```
 约定路径:Chat`/chat/completions`、ImageGeneration`/images/generations`、ImageEdit`/images/edits`(multipart)、VideoGeneration`/videos`、SpeechSynthesis`/audio/speech`、SpeechRecognition`/audio/transcriptions`(multipart)、Embedding`/embeddings`、Rerank`/rerank`。规则:`is_full_url` → base 原样;`params.endpoint`(字符串)存在 → 覆盖整个 path;否则 `{base 去尾/}{约定 path}`。StepFun base 已含 `/step_plan/v1`,ImageGeneration → `https://api.stepfun.com/step_plan/v1/images/generations`(实测正确)。
 
-### Rust — `crates/backend/nomifun-api-types/src/model_catalog.rs`(新)
+### Rust — `crates/backend/openhub-api-types/src/model_catalog.rs`(新)
 ```rust
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct ModelRef { pub provider_id: String, pub model: String }
@@ -113,7 +113,7 @@ export interface ModelProfile { provider_id: string; model: string; tasks: Model
 **并发切面**:Phase A 串行(主工作区,锁契约)→ 契约提交后:**Phase C 前端(worktree 并行 agent,只碰 ui/)** 与 **后端 B/D/E(主工作区,按 crate 顺序)** 同时进行。FE/BE 路径零重叠,合并无冲突。
 
 ### Phase A — 地基(串行,阻塞后续)
-- **A1** 词表 + 派生:`model_task.rs`(枚举 + `derive_tasks_and_traits`);`nomifun-api-types/src/lib.rs` 导出。测试:派生映射(gpt-4o→[Chat]+[VisionInput];dall-e→[ImageGeneration];whisper→[SpeechRecognition];tts→[SpeechSynthesis];embed→[Embedding];text-only→[Chat])。
+- **A1** 词表 + 派生:`model_task.rs`(枚举 + `derive_tasks_and_traits`);`openhub-api-types/src/lib.rs` 导出。测试:派生映射(gpt-4o→[Chat]+[VisionInput];dall-e→[ImageGeneration];whisper→[SpeechRecognition];tts→[SpeechSynthesis];embed→[Embedding];text-only→[Chat])。
 - **A2** 解析器:`dispatch_target.rs` + 测试(StepFun-plan ImageGeneration 得 `/step_plan/v1/images/generations`;is_full_url 原样;params.endpoint 覆盖;Chat 得 `/chat/completions`)。
 - **A3** 迁移 `033_model_profiles.sql` + 模型 `models/model_profile.rs`(`ModelProfileRow` + `UpsertModelProfileParams<'a>`)。
 - **A4** repo:`repository/model_profile.rs`(trait `IModelProfileRepository`)+ `sqlite_model_profile.rs`(仿 `sqlite_skill_tag.rs` upsert + `conversation_mcp_servers` 复合键);`repository/mod.rs`/`models/mod.rs`/`lib.rs` 导出。测试:upsert/get/list/delete round-trip。
@@ -136,7 +136,7 @@ export interface ModelProfile { provider_id: string; model: string; tasks: Model
 - **C7** i18n keys + 根 `gen:i18n`;typecheck 0;check:icons。
 
 ### Phase D — 图像端到端(主工作区)
-- **D1** `nomifun-creation`:`route_adapter_id`/`select_adapter` 改为优先按档案 task(而非名字启发式)路由;端点用解析器(替换 `openai_versioned_base` 硬拼)。
+- **D1** `openhub-creation`:`route_adapter_id`/`select_adapter` 改为优先按档案 task(而非名字启发式)路由;端点用解析器(替换 `openai_versioned_base` 硬拼)。
 - **D2** `params` 注入:档案 params(size/steps/cfg_scale/text_mode/response_format)作为生成默认。
 - **D3** 实测:创意工坊用 StepFun `step-image-edit-2` 生成一张图成功。
 

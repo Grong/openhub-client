@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -28,7 +28,7 @@ const CompanionStep: React.FC<CompanionStepProps> = ({ onNext }) => {
       </div>
       <Typography.Title heading={4}>
         {t('onboarding.companion.title', {
-          defaultValue: '你好，我是 Nomi（诺米）',
+          defaultValue: '你好，我是 OpenHub（诺米）',
         })}
       </Typography.Title>
       <Typography.Text type='secondary'>

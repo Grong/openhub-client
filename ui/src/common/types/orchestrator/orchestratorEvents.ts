@@ -1,7 +1,7 @@
 // src/common/types/orchestrator/orchestratorEvents.ts
 // 「智能编排」(orchestration) Run-engine realtime event payloads — hand-written
 // mirrors of the WebSocket events emitted by the backend
-// `OrchestratorRunEventEmitter` (crates/backend/nomifun-orchestrator/src/events.rs).
+// `OrchestratorRunEventEmitter` (crates/backend/openhub-orchestrator/src/events.rs).
 //
 // These mirror the JSON `data` shape of each `WebSocketMessage`, NOT the full
 // envelope. Field names are kept snake_case to match the wire exactly,

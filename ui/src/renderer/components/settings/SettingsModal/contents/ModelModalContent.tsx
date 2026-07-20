@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -40,7 +40,7 @@ import AddModelModal from '@/renderer/pages/settings/components/AddModelModal';
 import AddPlatformModal from '@/renderer/pages/settings/components/AddPlatformModal';
 import { isNewApiPlatform, NEW_API_PROTOCOL_OPTIONS } from '@/renderer/utils/model/modelPlatforms';
 import EditModeModal from '@/renderer/pages/settings/components/EditModeModal';
-import NomiScrollArea from '@/renderer/components/base/NomiScrollArea';
+import OpenHubScrollArea from '@/renderer/components/base/OpenHubScrollArea';
 import { useProvidersQuery } from '@/renderer/hooks/agent/useModelProviderList';
 import { useModelProfiles } from '@/renderer/hooks/agent/useModelProfiles';
 import { useContainerWidth } from '@/renderer/hooks/ui/useContainerWidth';
@@ -865,7 +865,7 @@ const ModelModalContent: React.FC = () => {
       </div>
 
       {/* Content Area */}
-      <NomiScrollArea className='flex-1 min-h-0' disableOverflow={isPageMode}>
+      <OpenHubScrollArea className='flex-1 min-h-0' disableOverflow={isPageMode}>
         {!data || data.length === 0 ? (
           <div className='flex flex-col items-center justify-center py-40px'>
             <Info theme='outline' size='48' className='text-t-secondary mb-16px' />
@@ -873,7 +873,7 @@ const ModelModalContent: React.FC = () => {
             <p className='text-14px text-t-secondary text-center max-w-400px'>
               {t('settings.needHelpConfigGuide')}
               <a
-                href='https://github.com/nomifun/nomifun-app/wiki/LLM-Configuration'
+                href='https://github.com/openhub/openhub-app/wiki/LLM-Configuration'
                 target='_blank'
                 rel='noopener noreferrer'
                 className='text-[rgb(var(--primary-6))] hover:text-[rgb(var(--primary-5))] underline ml-4px'
@@ -1244,7 +1244,7 @@ const ModelModalContent: React.FC = () => {
             </SortableContext>
           </DndContext>
         )}
-      </NomiScrollArea>
+      </OpenHubScrollArea>
     </div>
   );
 };

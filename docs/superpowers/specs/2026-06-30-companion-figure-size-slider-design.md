@@ -28,7 +28,7 @@
 
 ## 3. 数据模型
 
-### 3.1 后端 `CustomFigureMeta`（`crates/backend/nomifun-companion/src/profile.rs`）
+### 3.1 后端 `CustomFigureMeta`（`crates/backend/openhub-companion/src/profile.rs`）
 
 新增**可选**字段：
 
@@ -122,10 +122,10 @@ return { windowWidth, windowHeight: figureHeight + CHROME_HEIGHT, figureHeight }
 
 ## 8. i18n
 
-复用：`nomi.customFigure.sizeLabel`（"桌面形象尺寸"）、`sizeS`（"小"）、`sizeL`（"大"）、`adjustFigure`。
+复用：`openhub.customFigure.sizeLabel`（"桌面形象尺寸"）、`sizeS`（"小"）、`sizeL`（"大"）、`adjustFigure`。
 新增（zh-CN + en-US 各一）：
-- `nomi.customFigure.sizeReset` — "复位" / "Reset"
-- （可选）`nomi.customFigure.sizePxValue` 若需带单位文案；px 纯数字可不走 i18n。
+- `openhub.customFigure.sizeReset` — "复位" / "Reset"
+- （可选）`openhub.customFigure.sizePxValue` 若需带单位文案；px 纯数字可不走 i18n。
 新增 key 后跑 `bun run gen:i18n` 重新生成 `i18n-keys.d.ts`。
 
 ## 9. 测试
@@ -142,16 +142,16 @@ return { windowWidth, windowHeight: figureHeight + CHROME_HEIGHT, figureHeight }
 ## 10. 改动文件清单（≈9）
 
 后端：
-1. `crates/backend/nomifun-companion/src/profile.rs` — `CustomFigureMeta.size_px` + 往返测试。
-2. `crates/backend/nomifun-companion/src/service.rs` — **仅加回归测试**（同步保留 `size_px`）；无生产代码改动。
+1. `crates/backend/openhub-companion/src/profile.rs` — `CustomFigureMeta.size_px` + 往返测试。
+2. `crates/backend/openhub-companion/src/service.rs` — **仅加回归测试**（同步保留 `size_px`）；无生产代码改动。
 
 前端：
 3. `ui/src/common/adapter/ipcBridge.ts` — wire 类型加 `size_px?`。
 4. `ui/src/renderer/pages/companion/characters/types.ts` — `CustomFigureMeta.sizePx?`。
 5. `ui/src/renderer/pages/companion/characters/customMeta.ts` — 读 `size_px`。
 6. `ui/src/renderer/pages/companion/characters/customDesk.ts` — `SIZE_MIN/SIZE_MAX`、`MAX_WINDOW_WIDTH=400`、`customDeskSpec` 用 `sizePx`。
-7. `ui/src/renderer/pages/nomi/tabs/OverviewTab.tsx` — 内联滑块 + 预览 + 防抖落库。
-8. i18n：`zh-CN/nomi.json` + `en-US/nomi.json` 加 `sizeReset` 等；`bun run gen:i18n`。
+7. `ui/src/renderer/pages/openhub/tabs/OverviewTab.tsx` — 内联滑块 + 预览 + 防抖落库。
+8. i18n：`zh-CN/openhub.json` + `en-US/openhub.json` 加 `sizeReset` 等；`bun run gen:i18n`。
 9. 单测：`customDesk.test.ts`（+ 后端两处测试）。
 
 ## 11. 向后兼容 / 风险

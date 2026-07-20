@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { ipcBridge } from '@/common';
 import type { IMcpRegisterTemplate } from '@/common/adapter/ipcBridge';
 import CopyIconButton from '@/renderer/components/base/CopyIconButton';
-import NomiCollapse from '@/renderer/components/base/NomiCollapse';
+import OpenHubCollapse from '@/renderer/components/base/OpenHubCollapse';
 
 /**
  * Collapsible panel showing copyable MCP registration templates for
@@ -39,8 +39,8 @@ const PlatformMcpRegisterPanel: React.FC = () => {
 
   return (
     <div>
-      <NomiCollapse onChange={handleCollapseChange} bordered={false}>
-        <NomiCollapse.Item
+      <OpenHubCollapse onChange={handleCollapseChange} bordered={false}>
+        <OpenHubCollapse.Item
           name='mcp-register'
           header={
             <span className='text-13px text-t-tertiary'>
@@ -52,7 +52,7 @@ const PlatformMcpRegisterPanel: React.FC = () => {
           <p className='mb-12px text-12px text-t-secondary'>
             {t('terminal.create.mcpPanel.description', {
               defaultValue:
-                '使用自定义或外置终端时，将下方配置注册到你的 CLI，即可使用平台知识库。凭据由桥在运行时安全获取，不会写入你的配置文件。需要 NomiFun 桌面应用正在运行。',
+                '使用自定义或外置终端时，将下方配置注册到你的 CLI，即可使用平台知识库。凭据由桥在运行时安全获取，不会写入你的配置文件。需要 OpenHub 桌面应用正在运行。',
             })}
           </p>
 
@@ -90,8 +90,8 @@ const PlatformMcpRegisterPanel: React.FC = () => {
               {t('terminal.create.mcpPanel.loading', { defaultValue: '加载中...' })}
             </p>
           )}
-        </NomiCollapse.Item>
-      </NomiCollapse>
+        </OpenHubCollapse.Item>
+      </OpenHubCollapse>
     </div>
   );
 };

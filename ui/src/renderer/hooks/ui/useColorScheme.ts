@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -12,7 +12,7 @@ import { useCallback, useEffect, useState } from 'react';
 export type ColorScheme = 'default';
 
 const DEFAULT_COLOR_SCHEME: ColorScheme = 'default';
-const COLOR_SCHEME_CACHE_KEY = '__nomifun_colorScheme';
+const COLOR_SCHEME_CACHE_KEY = '__openhub_colorScheme';
 
 const applyColorSchemeToDom = (value: ColorScheme) => {
   document.documentElement.setAttribute('data-color-scheme', value);

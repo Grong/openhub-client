@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -171,9 +171,9 @@ const SendBox: React.FC<{
   /** When provided AND a turn is running AND there is a draft, a secondary
    *  "steer now" action is offered alongside the (enqueue) send button. */
   onSteer?: (message: string) => Promise<void>;
-  /** Gate the steer affordance (e.g. only for the Nomi native engine). */
+  /** Gate the steer affordance (e.g. only for the OpenHub native engine). */
   steerAvailable?: boolean;
-  /** When provided (Nomi only), enables "edit a sent message" mode: the message text is
+  /** When provided (OpenHub only), enables "edit a sent message" mode: the message text is
    *  recalled into the composer via the `sendbox.edit` event and submitting calls this
    *  instead of onSend, which truncates the conversation and re-runs from that message. */
   onEditResubmit?: (msgId: string, createdAt: number, message: string) => Promise<void>;
@@ -292,7 +292,7 @@ const SendBox: React.FC<{
   useAddEventListener('sendbox.reply', (quote) => setReplyQuote(quote), []);
   useAddEventListener('sendbox.reply.clear', () => setReplyQuote(null), []);
 
-  // 编辑已发送消息：把原文回填输入框，进入"编辑模式"，提交即截断重跑（仅 Nomi 提供 onEditResubmit）
+  // 编辑已发送消息：把原文回填输入框，进入"编辑模式"，提交即截断重跑（仅 OpenHub 提供 onEditResubmit）
   useAddEventListener(
     'sendbox.edit',
     (payload) => {
@@ -888,9 +888,9 @@ const SendBox: React.FC<{
   }, []);
 
   useAddEventListener(
-    'nomi.selected.file.append',
+    'openhub.selected.file.append',
     (items: FileSelectionItem[]) => {
-      if (conversationContext?.type === 'nomi') {
+      if (conversationContext?.type === 'openhub') {
         handleExternalSelectionAppend(items);
       }
     },
@@ -945,8 +945,8 @@ const SendBox: React.FC<{
   const emitSelectedFileAppend = useCallback(
     (item: FileOrFolderItem) => {
       switch (conversationContext?.type) {
-        case 'nomi':
-          emitter.emit('nomi.selected.file.append', [item]);
+        case 'openhub':
+          emitter.emit('openhub.selected.file.append', [item]);
           break;
         case 'acp':
           emitter.emit('acp.selected.file.append', [item]);

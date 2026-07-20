@@ -5,16 +5,16 @@
  *
  * Why: agent sessions spawn CLI trees (e.g. `bunx → codex-acp → MCP stdio
  * bridges`), and the stdio bridges are the desktop binary itself
- * (`nomifun-desktop.exe mcp-*-stdio`). If the dev app dies without cleanup
+ * (`openhub-desktop.exe mcp-*-stdio`). If the dev app dies without cleanup
  * (tauri dev rebuild, Ctrl+C, crash), the orphaned tree survives — and on
  * Windows a running image locks its exe, so the next `cargo build` fails
  * with `failed to remove file ... os error 5`. The in-process fix is the
- * Job Object in nomifun-runtime (src/job.rs); this script is the preflight
+ * Job Object in openhub-runtime (src/job.rs); this script is the preflight
  * safety net that also clears stale processes left by builds that predate
  * the fix, or by any path the job cannot cover.
  *
  * Cross-platform; never fails the dev command (always exits 0).
- * Usage: bun scripts/kill-stale-dev.mjs [binary-name ...]   (default: nomifun-desktop)
+ * Usage: bun scripts/kill-stale-dev.mjs [binary-name ...]   (default: openhub-desktop)
  */
 import { execSync } from 'node:child_process';
 import { dirname, resolve } from 'node:path';
@@ -24,7 +24,7 @@ const isWin = process.platform === 'win32';
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 // Binary names come from package.json — keep them shell/WQL/regex-inert.
 const names = process.argv.slice(2).filter((n) => /^[\w.-]+$/.test(n));
-if (names.length === 0) names.push('nomifun-desktop');
+if (names.length === 0) names.push('openhub-desktop');
 
 /** Escape a literal string for use inside an extended regex (pgrep -f). */
 const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -12,77 +12,77 @@ const Ink: React.FC<CharacterProps> = ({ mood, activity, size = 150 }) => {
   // activity: 'idle' | 'thinking'
   const sleeping = mood === 'sleepy';
   return (
-    <div className={`nomi-ch nomi-ink nomi-ink--${mood} nomi-ink--${activity}`} style={{ width: size, height: size }}>
+    <div className={`openhub-ch openhub-ink openhub-ink--${mood} openhub-ink--${activity}`} style={{ width: size, height: size }}>
       <style>{`
-.nomi-ink{position:relative;line-height:0}
-.nomi-ink svg{display:block;overflow:visible}
-.nomi-ink *{transform-box:view-box}
+.openhub-ink{position:relative;line-height:0}
+.openhub-ink svg{display:block;overflow:visible}
+.openhub-ink *{transform-box:view-box}
 
 /* ground shadow — inverse-scales with the body lift */
-.nomi-ink__shadow{transform-origin:80px 147px;animation:nomi-ink-shadow 3.4s ease-in-out infinite}
-@keyframes nomi-ink-shadow{0%,100%{transform:scale(1);opacity:.13}50%{transform:scale(.9);opacity:.09}}
+.openhub-ink__shadow{transform-origin:80px 147px;animation:openhub-ink-shadow 3.4s ease-in-out infinite}
+@keyframes openhub-ink-shadow{0%,100%{transform:scale(1);opacity:.13}50%{transform:scale(.9);opacity:.09}}
 
 /* whole body: calm breathing + gentle lift */
-.nomi-ink__body-g{transform-origin:80px 142px;animation:nomi-ink-breathe 3.4s ease-in-out infinite}
-@keyframes nomi-ink-breathe{0%,100%{transform:translateY(0) scaleY(1)}50%{transform:translateY(-1.5px) scaleY(1.03)}}
+.openhub-ink__body-g{transform-origin:80px 142px;animation:openhub-ink-breathe 3.4s ease-in-out infinite}
+@keyframes openhub-ink-breathe{0%,100%{transform:translateY(0) scaleY(1)}50%{transform:translateY(-1.5px) scaleY(1.03)}}
 
 /* tail — elegant slow sway from the root */
-.nomi-ink__tail{transform-origin:104px 134px;animation:nomi-ink-tail 4.6s ease-in-out infinite}
-@keyframes nomi-ink-tail{0%,100%{transform:rotate(-2.5deg)}50%{transform:rotate(2.5deg)}}
+.openhub-ink__tail{transform-origin:104px 134px;animation:openhub-ink-tail 4.6s ease-in-out infinite}
+@keyframes openhub-ink-tail{0%,100%{transform:rotate(-2.5deg)}50%{transform:rotate(2.5deg)}}
 
 /* ears — occasional quick flick */
-.nomi-ink__ear-l{transform-origin:60px 44px;animation:nomi-ink-ear 5.2s ease-in-out infinite}
-.nomi-ink__ear-r{transform-origin:100px 44px;animation:nomi-ink-ear 5.2s ease-in-out infinite .4s}
-@keyframes nomi-ink-ear{0%,86%,100%{transform:rotate(0)}90%{transform:rotate(-7deg)}94%{transform:rotate(4deg)}}
+.openhub-ink__ear-l{transform-origin:60px 44px;animation:openhub-ink-ear 5.2s ease-in-out infinite}
+.openhub-ink__ear-r{transform-origin:100px 44px;animation:openhub-ink-ear 5.2s ease-in-out infinite .4s}
+@keyframes openhub-ink-ear{0%,86%,100%{transform:rotate(0)}90%{transform:rotate(-7deg)}94%{transform:rotate(4deg)}}
 
 /* auto blink */
-.nomi-ink__eyes{transform-origin:80px 80px;animation:nomi-ink-blink 5s ease-in-out infinite}
-@keyframes nomi-ink-blink{0%,92%,100%{transform:scaleY(1)}96%{transform:scaleY(.08)}}
+.openhub-ink__eyes{transform-origin:80px 80px;animation:openhub-ink-blink 5s ease-in-out infinite}
+@keyframes openhub-ink-blink{0%,92%,100%{transform:scaleY(1)}96%{transform:scaleY(.08)}}
 
-.nomi-ink__blush{opacity:0;animation:nomi-ink-blush 3.4s ease-in-out infinite}
-@keyframes nomi-ink-blush{0%,100%{opacity:.32}50%{opacity:.5}}
+.openhub-ink__blush{opacity:0;animation:openhub-ink-blush 3.4s ease-in-out infinite}
+@keyframes openhub-ink-blush{0%,100%{opacity:.32}50%{opacity:.5}}
 
 /* === mood overrides === */
-.nomi-ink--happy .nomi-ink__body-g{animation:nomi-ink-hop 1.7s ease-in-out infinite}
-@keyframes nomi-ink-hop{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.openhub-ink--happy .openhub-ink__body-g{animation:openhub-ink-hop 1.7s ease-in-out infinite}
+@keyframes openhub-ink-hop{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 
-.nomi-ink--excited .nomi-ink__body-g{animation:nomi-ink-bounce 1s ease-in-out infinite}
-@keyframes nomi-ink-bounce{0%,100%{transform:translateY(0) scaleY(1)}45%{transform:translateY(-9px) scaleY(1.05)}70%{transform:translateY(1px) scaleY(.96)}}
-.nomi-ink--excited .nomi-ink__shadow{animation:nomi-ink-shadow 1s ease-in-out infinite}
-.nomi-ink--excited .nomi-ink__eyes{animation:nomi-ink-blink 6s ease-in-out infinite}
+.openhub-ink--excited .openhub-ink__body-g{animation:openhub-ink-bounce 1s ease-in-out infinite}
+@keyframes openhub-ink-bounce{0%,100%{transform:translateY(0) scaleY(1)}45%{transform:translateY(-9px) scaleY(1.05)}70%{transform:translateY(1px) scaleY(.96)}}
+.openhub-ink--excited .openhub-ink__shadow{animation:openhub-ink-shadow 1s ease-in-out infinite}
+.openhub-ink--excited .openhub-ink__eyes{animation:openhub-ink-blink 6s ease-in-out infinite}
 
-.nomi-ink--sleepy .nomi-ink__body-g{animation:nomi-ink-sink 4.4s ease-in-out infinite}
-@keyframes nomi-ink-sink{0%,100%{transform:translateY(2px) scaleY(.99)}50%{transform:translateY(3.5px) scaleY(1.01)}}
-.nomi-ink--sleepy .nomi-ink__tail{animation:none;transform:rotate(0)}
-.nomi-ink--sleepy .nomi-ink__eyes{animation:none}
+.openhub-ink--sleepy .openhub-ink__body-g{animation:openhub-ink-sink 4.4s ease-in-out infinite}
+@keyframes openhub-ink-sink{0%,100%{transform:translateY(2px) scaleY(.99)}50%{transform:translateY(3.5px) scaleY(1.01)}}
+.openhub-ink--sleepy .openhub-ink__tail{animation:none;transform:rotate(0)}
+.openhub-ink--sleepy .openhub-ink__eyes{animation:none}
 
 /* z's drift up serially */
-.nomi-ink__z{opacity:0}
-.nomi-ink__z1{animation:nomi-ink-z 3.2s ease-in-out infinite}
-.nomi-ink__z2{animation:nomi-ink-z 3.2s ease-in-out infinite 1.6s}
-@keyframes nomi-ink-z{0%{opacity:0;transform:translate(0,0) scale(.7)}25%{opacity:.85}100%{opacity:0;transform:translate(7px,-20px) scale(1.1)}}
+.openhub-ink__z{opacity:0}
+.openhub-ink__z1{animation:openhub-ink-z 3.2s ease-in-out infinite}
+.openhub-ink__z2{animation:openhub-ink-z 3.2s ease-in-out infinite 1.6s}
+@keyframes openhub-ink-z{0%{opacity:0;transform:translate(0,0) scale(.7)}25%{opacity:.85}100%{opacity:0;transform:translate(7px,-20px) scale(1.1)}}
 
 /* worried sweat drop slides + ears droop */
-.nomi-ink__sweat{opacity:0;animation:nomi-ink-sweat 2.8s ease-in-out infinite}
-@keyframes nomi-ink-sweat{0%,18%{opacity:0;transform:translateY(0)}30%{opacity:.85}70%{opacity:.8}100%{opacity:0;transform:translateY(15px)}}
-.nomi-ink--worried .nomi-ink__ear-l{animation:none;transform:rotate(11deg)}
-.nomi-ink--worried .nomi-ink__ear-r{animation:none;transform:rotate(-11deg)}
+.openhub-ink__sweat{opacity:0;animation:openhub-ink-sweat 2.8s ease-in-out infinite}
+@keyframes openhub-ink-sweat{0%,18%{opacity:0;transform:translateY(0)}30%{opacity:.85}70%{opacity:.8}100%{opacity:0;transform:translateY(15px)}}
+.openhub-ink--worried .openhub-ink__ear-l{animation:none;transform:rotate(11deg)}
+.openhub-ink--worried .openhub-ink__ear-r{animation:none;transform:rotate(-11deg)}
 
 /* excited sparkles */
-.nomi-ink__spark{opacity:0;transform-origin:center}
-.nomi-ink__spark1{animation:nomi-ink-spark 1.3s ease-in-out infinite}
-.nomi-ink__spark2{animation:nomi-ink-spark 1.3s ease-in-out infinite .45s}
-.nomi-ink__spark3{animation:nomi-ink-spark 1.3s ease-in-out infinite .85s}
-@keyframes nomi-ink-spark{0%,100%{opacity:0;transform:scale(.3)}50%{opacity:1;transform:scale(1)}}
+.openhub-ink__spark{opacity:0;transform-origin:center}
+.openhub-ink__spark1{animation:openhub-ink-spark 1.3s ease-in-out infinite}
+.openhub-ink__spark2{animation:openhub-ink-spark 1.3s ease-in-out infinite .45s}
+.openhub-ink__spark3{animation:openhub-ink-spark 1.3s ease-in-out infinite .85s}
+@keyframes openhub-ink-spark{0%,100%{opacity:0;transform:scale(.3)}50%{opacity:1;transform:scale(1)}}
 
 /* thinking: ink droplets rise and bloom away */
-.nomi-ink__drop{opacity:0}
-.nomi-ink--thinking .nomi-ink__drop1{animation:nomi-ink-drop 2.6s ease-in-out infinite}
-.nomi-ink--thinking .nomi-ink__drop2{animation:nomi-ink-drop 2.6s ease-in-out infinite .85s}
-.nomi-ink--thinking .nomi-ink__drop3{animation:nomi-ink-drop 2.6s ease-in-out infinite 1.7s}
-@keyframes nomi-ink-drop{0%{opacity:0;transform:translateY(0) scale(.5)}20%{opacity:.9;transform:translateY(-4px) scale(1)}70%{opacity:.55;transform:translateY(-16px) scale(1.15)}100%{opacity:0;transform:translateY(-24px) scale(2.1)}}
+.openhub-ink__drop{opacity:0}
+.openhub-ink--thinking .openhub-ink__drop1{animation:openhub-ink-drop 2.6s ease-in-out infinite}
+.openhub-ink--thinking .openhub-ink__drop2{animation:openhub-ink-drop 2.6s ease-in-out infinite .85s}
+.openhub-ink--thinking .openhub-ink__drop3{animation:openhub-ink-drop 2.6s ease-in-out infinite 1.7s}
+@keyframes openhub-ink-drop{0%{opacity:0;transform:translateY(0) scale(.5)}20%{opacity:.9;transform:translateY(-4px) scale(1)}70%{opacity:.55;transform:translateY(-16px) scale(1.15)}100%{opacity:0;transform:translateY(-24px) scale(2.1)}}
 
-@media(prefers-reduced-motion:reduce){.nomi-ink *{animation-duration:6s!important}}
+@media(prefers-reduced-motion:reduce){.openhub-ink *{animation-duration:6s!important}}
       `}</style>
       <svg viewBox='0 0 160 160' width={size} height={size}>
         <defs>
@@ -111,11 +111,11 @@ const Ink: React.FC<CharacterProps> = ({ mood, activity, size = 150 }) => {
         </defs>
 
         {/* contact shadow */}
-        <ellipse className='nomi-ink__shadow' cx='80' cy='147' rx='34' ry='7' fill='#000' opacity='.13' />
+        <ellipse className='openhub-ink__shadow' cx='80' cy='147' rx='34' ry='7' fill='#000' opacity='.13' />
 
-        <g className='nomi-ink__body-g'>
+        <g className='openhub-ink__body-g'>
           {/* tail — wraps around the front paws, white tip resting in front */}
-          <g className='nomi-ink__tail'>
+          <g className='openhub-ink__tail'>
             <path
               d='M104 134 C122 132 128 122 124 112 C120 124 108 130 92 132 C70 142 48 142 42 134 C44 144 70 148 92 142'
               fill='none'
@@ -151,11 +151,11 @@ const Ink: React.FC<CharacterProps> = ({ mood, activity, size = 150 }) => {
           {/* head */}
           <g>
             {/* ears */}
-            <g className='nomi-ink__ear-l'>
+            <g className='openhub-ink__ear-l'>
               <path d='M52 52 L58 26 L74 46 Z' fill='url(#inkBody)' stroke='#15151b' strokeWidth='2.3' strokeLinejoin='round' />
               <path d='M58 46 L61 33 L69 45 Z' fill='url(#inkEarIn)' />
             </g>
-            <g className='nomi-ink__ear-r'>
+            <g className='openhub-ink__ear-r'>
               <path d='M108 52 L102 26 L86 46 Z' fill='url(#inkBody)' stroke='#15151b' strokeWidth='2.3' strokeLinejoin='round' />
               <path d='M102 46 L99 33 L91 45 Z' fill='url(#inkEarIn)' />
             </g>
@@ -173,13 +173,13 @@ const Ink: React.FC<CharacterProps> = ({ mood, activity, size = 150 }) => {
             <ellipse cx='72' cy='50' rx='15' ry='8' fill='#fff' opacity='.08' />
 
             {/* blush */}
-            <g className='nomi-ink__blush'>
+            <g className='openhub-ink__blush'>
               <ellipse cx='56' cy='80' rx='8' ry='5' fill='url(#inkBlush)' />
               <ellipse cx='104' cy='80' rx='8' ry='5' fill='url(#inkBlush)' />
             </g>
 
             {/* eyes */}
-            <g className='nomi-ink__eyes'>
+            <g className='openhub-ink__eyes'>
               {sleeping ? (
                 <>
                   <path d='M55 74 C60 80 70 80 75 74' fill='none' stroke='#f0b346' strokeWidth='3' strokeLinecap='round' />
@@ -252,31 +252,31 @@ const Ink: React.FC<CharacterProps> = ({ mood, activity, size = 150 }) => {
         {/* sleepy z's */}
         {sleeping && (
           <g fill='#cfcfdc' fontFamily='Georgia, serif' fontStyle='italic' fontWeight='700'>
-            <text className='nomi-ink__z nomi-ink__z1' x='108' y='40' fontSize='13'>z</text>
-            <text className='nomi-ink__z nomi-ink__z2' x='116' y='30' fontSize='17'>z</text>
+            <text className='openhub-ink__z openhub-ink__z1' x='108' y='40' fontSize='13'>z</text>
+            <text className='openhub-ink__z openhub-ink__z2' x='116' y='30' fontSize='17'>z</text>
           </g>
         )}
 
         {/* worried cold sweat */}
         {mood === 'worried' && (
-          <path className='nomi-ink__sweat' d='M112 56 C112 52 116 50 116 50 C116 50 120 52 120 56 C120 59 118 61 116 61 C114 61 112 59 112 56 Z' fill='#9fdcf5' stroke='#6bb8df' strokeWidth='1' />
+          <path className='openhub-ink__sweat' d='M112 56 C112 52 116 50 116 50 C116 50 120 52 120 56 C120 59 118 61 116 61 C114 61 112 59 112 56 Z' fill='#9fdcf5' stroke='#6bb8df' strokeWidth='1' />
         )}
 
         {/* excited sparkles */}
         {mood === 'excited' && (
           <g fill='#ffe39a'>
-            <path className='nomi-ink__spark nomi-ink__spark1' d='M118 44 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 Z' />
-            <path className='nomi-ink__spark nomi-ink__spark2' d='M36 50 l1.5 4 4 1.5 -4 1.5 -1.5 4 -1.5 -4 -4 -1.5 4 -1.5 Z' />
-            <path className='nomi-ink__spark nomi-ink__spark3' d='M126 70 l1.2 3 3 1.2 -3 1.2 -1.2 3 -1.2 -3 -3 -1.2 3 -1.2 Z' />
+            <path className='openhub-ink__spark openhub-ink__spark1' d='M118 44 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 Z' />
+            <path className='openhub-ink__spark openhub-ink__spark2' d='M36 50 l1.5 4 4 1.5 -4 1.5 -1.5 4 -1.5 -4 -4 -1.5 4 -1.5 Z' />
+            <path className='openhub-ink__spark openhub-ink__spark3' d='M126 70 l1.2 3 3 1.2 -3 1.2 -1.2 3 -1.2 -3 -3 -1.2 3 -1.2 Z' />
           </g>
         )}
 
         {/* thinking ink droplets */}
         {activity === 'thinking' && (
           <g fill='#2b2b33' opacity='.78'>
-            <path className='nomi-ink__drop nomi-ink__drop1' d='M78 28 C78 24 80 20 80 20 C80 20 82 24 82 28 C82 31 80.5 33 80 33 C79.5 33 78 31 78 28 Z' />
-            <path className='nomi-ink__drop nomi-ink__drop2' d='M88 30 C88 27 89.5 24 89.5 24 C89.5 24 91 27 91 30 C91 32 90 33.5 89.5 33.5 C89 33.5 88 32 88 30 Z' />
-            <path className='nomi-ink__drop nomi-ink__drop3' d='M70 31 C70 28 71.5 25 71.5 25 C71.5 25 73 28 73 31 C73 33 72 34.5 71.5 34.5 C71 34.5 70 33 70 31 Z' />
+            <path className='openhub-ink__drop openhub-ink__drop1' d='M78 28 C78 24 80 20 80 20 C80 20 82 24 82 28 C82 31 80.5 33 80 33 C79.5 33 78 31 78 28 Z' />
+            <path className='openhub-ink__drop openhub-ink__drop2' d='M88 30 C88 27 89.5 24 89.5 24 C89.5 24 91 27 91 30 C91 32 90 33.5 89.5 33.5 C89 33.5 88 32 88 30 Z' />
+            <path className='openhub-ink__drop openhub-ink__drop3' d='M70 31 C70 28 71.5 25 71.5 25 C71.5 25 73 28 73 31 C73 33 72 34.5 71.5 34.5 C71 34.5 70 33 70 31 Z' />
           </g>
         )}
       </svg>

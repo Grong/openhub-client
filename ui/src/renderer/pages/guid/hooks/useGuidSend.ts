@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  * Based on AionUi (https://github.com/iOfficeAI/AionUi)
  */
@@ -75,7 +75,7 @@ export type GuidSendDeps = {
    * "conversation N is already running". */
   autoWork: AutoWorkDraftValue;
 
-  /** 「agent 集群」模式（需求1）：composer 顶部 toggle 选中时为 true。仅 nomi
+  /** 「agent 集群」模式（需求1）：composer 顶部 toggle 选中时为 true。仅 openhub
    * 路径消费——落到会话 extra.agent_cluster_mode，后端工厂据此在常驻 subagent
    * 提示之上追加 CLUSTER_MODE_HINT（必须刻意评估是否开集群、太简单先说明原因）。 */
   clusterMode?: boolean;
@@ -310,8 +310,8 @@ export const useGuidSend = (deps: GuidSendDeps): GuidSendResult => {
       return;
     }
 
-    // Nomi path (direct selection or preset assistant with nomi as main agent)
-    if (selectedAgent === 'nomi' || (is_preset && finalEffectiveAgentType === 'nomi')) {
+    // OpenHub path (direct selection or preset assistant with openhub as main agent)
+    if (selectedAgent === 'openhub' || (is_preset && finalEffectiveAgentType === 'openhub')) {
       if (!current_model) {
         Message.warning(t('conversation.noModelConfigured'));
         return;
@@ -319,7 +319,7 @@ export const useGuidSend = (deps: GuidSendDeps): GuidSendResult => {
 
       try {
         const conversation = await ipcBridge.conversation.create.invoke({
-          type: 'nomi',
+          type: 'openhub',
           name: entryPlan.conversationName,
           model: current_model,
           extra: {
@@ -330,7 +330,7 @@ export const useGuidSend = (deps: GuidSendDeps): GuidSendResult => {
             preset_enabled_skills: enabled_skills_to_send,
             exclude_auto_inject_skills: excludeBuiltinSkills,
             selected_mcp_server_ids: selectedUserMcpServerIds,
-            // nomi should consume the authoritative session snapshot, just
+            // openhub should consume the authoritative session snapshot, just
             // like team MCP does, instead of reloading only user servers from
             // the global MCP repository at runtime.
             selected_session_mcp_servers: selectedAllSessionMcpServers,
@@ -361,13 +361,13 @@ export const useGuidSend = (deps: GuidSendDeps): GuidSendResult => {
           files: files.length > 0 ? files : undefined,
         };
         if (entryPlan.sendInitialMessage) {
-          sessionStorage.setItem(`nomi_initial_message_${conversation.id}`, JSON.stringify(initialMessage));
+          sessionStorage.setItem(`openhub_initial_message_${conversation.id}`, JSON.stringify(initialMessage));
         }
 
         seedConversationCache(conversation);
         await navigate(`/conversation/${conversation.id}`);
       } catch (error: unknown) {
-        console.error('Failed to create Nomi conversation:', error);
+        console.error('Failed to create OpenHub conversation:', error);
         throw error;
       }
       return;

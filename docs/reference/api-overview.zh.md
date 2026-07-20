@@ -1,6 +1,6 @@
 # API 概览
 
-NomiFun 的后端（`nomifun-app`，二进制 `nomicore`）对外暴露的是单一的
+OpenHub 的后端（`openhub-app`，二进制 `nomicore`）对外暴露的是单一的
 axum HTTP 服务。SPA、桌面外壳，以及任何外部集成，与它沟通的方式都一样：
 HTTP 上的 JSON 用于命令/查询，WebSocket 用于流式事件。
 
@@ -12,8 +12,8 @@ HTTP 上的 JSON 用于命令/查询，WebSocket 用于流式事件。
 
 | 宿主 | 默认 base URL | 备注 |
 |---|---|---|
-| `nomifun-desktop` | `http://127.0.0.1:<picked-port>` | 启动时挑选一个空闲的 localhost 端口。渲染端通过 IPC 获知端口号，并以此向 `/api` 与 `/ws` 发起调用。 |
-| `nomifun-web` | `http://<host>:<port>`（默认 `http://127.0.0.1:8787`） | 同一个后端，与 SPA 一并在同一个端口上提供。 |
+| `openhub-desktop` | `http://127.0.0.1:<picked-port>` | 启动时挑选一个空闲的 localhost 端口。渲染端通过 IPC 获知端口号，并以此向 `/api` 与 `/ws` 发起调用。 |
+| `openhub-web` | `http://<host>:<port>`（默认 `http://127.0.0.1:8787`） | 同一个后端，与 SPA 一并在同一个端口上提供。 |
 | `nomicore` 独立运行 | `http://127.0.0.1:25808` | 单独运行后端——便于调试。 |
 
 SPA 使用**相对路径**（`/api/...`、`/ws`）。客户端不需要指向另一台 API
@@ -21,15 +21,15 @@ SPA 使用**相对路径**（`/api/...`、`/ws`）。客户端不需要指向另
 
 ## 鉴权模型
 
-NomiFun 启动时进入三种鉴权策略之一：
+OpenHub 启动时进入三种鉴权策略之一：
 
-### 已鉴权模式（`nomifun-web` 默认）
+### 已鉴权模式（`openhub-web` 默认）
 
 - 通过 `POST /login` 登录，返回一个会话 JWT，同时写入 cookie
-  （`nomifun-session`，`HttpOnly`）与 JSON body。后续请求依靠该 cookie
+  （`openhub-session`，`HttpOnly`）与 JSON body。后续请求依靠该 cookie
   或 `Authorization: Bearer …` 请求头进行鉴权。
 - 状态变更类请求还必须附带 CSRF 请求头 `x-csrf-token`，其值需与
-  `nomifun-csrf-token` cookie 匹配（Double Submit Cookie 模式）。安全
+  `openhub-csrf-token` cookie 匹配（Double Submit Cookie 模式）。安全
   方法（`GET`、`HEAD`、`OPTIONS`）跳过 CSRF；登录/设置/二维码登录端点
   因尚无会话被豁免。
 - WebSocket 升级携带同一份 JWT——通常通过 `Sec-WebSocket-Protocol`
@@ -38,7 +38,7 @@ NomiFun 启动时进入三种鉴权策略之一：
 - 限流器分别按客户端作用于登录尝试、一般 API 流量与已鉴权的状态变更
   动作。
 
-### 桌面本地信任模式（`nomifun-desktop`）
+### 桌面本地信任模式（`openhub-desktop`）
 
 - 嵌入式后端使用 `AuthPolicy::TrustLocalToken`。
 - 桌面 WebView 会得到每次启动生成的 secret（`window.__nomiLocalTrust`），并在 HTTP/WebSocket 请求中呈递它。
@@ -57,7 +57,7 @@ NomiFun 启动时进入三种鉴权策略之一：
 
 ## 请求体大小与上限
 
-- 请求体的默认大小上限是 **10 MiB**（`nomifun-common` 中的
+- 请求体的默认大小上限是 **10 MiB**（`openhub-common` 中的
   `BODY_LIMIT`）。确实需要更大的路由（文件上传、ZIP 创建等）会安装自己
   的更大限制——`/api/fs/upload` 接受最大 30 MiB。
 - 代用户下载的远程图片上限为 5 MiB，最多跟随 5 次重定向。
@@ -69,42 +69,42 @@ NomiFun 启动时进入三种鉴权策略之一：
 
 | 分组 | 基础路径 | 鉴权 | 归属 crate / 文件 |
 |---|---|---|---|
-| 健康检查 | `/health` | 公共 | [`router/health.rs`](../../crates/backend/nomifun-app/src/router/health.rs) |
-| 鉴权 —— 登录 / 设置 / 状态 / 刷新 | `/login`、`/logout`、`/api/auth/*`、`/api/ws-token`、`/qr-login` | 混合（登录/设置/qr-login：公共；其余：已鉴权） | [`nomifun-auth/src/routes.rs`](../../crates/backend/nomifun-auth/src/routes.rs) |
+| 健康检查 | `/health` | 公共 | [`router/health.rs`](../../crates/backend/openhub-app/src/router/health.rs) |
+| 鉴权 —— 登录 / 设置 / 状态 / 刷新 | `/login`、`/logout`、`/api/auth/*`、`/api/ws-token`、`/qr-login` | 混合（登录/设置/qr-login：公共；其余：已鉴权） | [`openhub-auth/src/routes.rs`](../../crates/backend/openhub-auth/src/routes.rs) |
 | 鉴权 —— 仅本地 admin/internal | `/api/webui/*`、`/api/auth/internal/*` | 仅本地模式 | 同上 |
-| 会话 | `/api/conversations/*`、`/api/messages/search` | 已鉴权 | [`nomifun-conversation/src/routes.rs`](../../crates/backend/nomifun-conversation/src/routes.rs)、[`routes_aux.rs`](../../crates/backend/nomifun-conversation/src/routes_aux.rs) |
-| 智能体（本地 CLI 智能体） | `/api/agents/*` | 已鉴权 | [`nomifun-ai-agent/src/routes/agent.rs`](../../crates/backend/nomifun-ai-agent/src/routes/agent.rs) |
-| 远程智能体 | `/api/remote-agents/*` | 已鉴权 | [`nomifun-ai-agent/src/routes/remote.rs`](../../crates/backend/nomifun-ai-agent/src/routes/remote.rs) |
-| 助手 | `/api/assistants/*` | 已鉴权 | [`nomifun-assistant/src/routes.rs`](../../crates/backend/nomifun-assistant/src/routes.rs) |
+| 会话 | `/api/conversations/*`、`/api/messages/search` | 已鉴权 | [`openhub-conversation/src/routes.rs`](../../crates/backend/openhub-conversation/src/routes.rs)、[`routes_aux.rs`](../../crates/backend/openhub-conversation/src/routes_aux.rs) |
+| 智能体（本地 CLI 智能体） | `/api/agents/*` | 已鉴权 | [`openhub-ai-agent/src/routes/agent.rs`](../../crates/backend/openhub-ai-agent/src/routes/agent.rs) |
+| 远程智能体 | `/api/remote-agents/*` | 已鉴权 | [`openhub-ai-agent/src/routes/remote.rs`](../../crates/backend/openhub-ai-agent/src/routes/remote.rs) |
+| 助手 | `/api/assistants/*` | 已鉴权 | [`openhub-assistant/src/routes.rs`](../../crates/backend/openhub-assistant/src/routes.rs) |
 | 助手标签 | `/api/assistant-tags/*` | 已鉴权 | 同上 |
-| MCP 服务 | `/api/mcp/*` | 已鉴权 | [`nomifun-mcp/src/routes.rs`](../../crates/backend/nomifun-mcp/src/routes.rs) |
-| 技能 | `/api/skills/*` | 已鉴权 | [`nomifun-extension/src/skill_routes.rs`](../../crates/backend/nomifun-extension/src/skill_routes.rs) |
-| 扩展 | `/api/extensions/*` | 已鉴权 | [`nomifun-extension/src/routes.rs`](../../crates/backend/nomifun-extension/src/routes.rs) |
-| Hub（扩展市场） | `/api/hub/*` | 已鉴权 | [`nomifun-extension/src/hub_routes.rs`](../../crates/backend/nomifun-extension/src/hub_routes.rs) |
-| 计划任务 | `/api/cron/*` | 已鉴权 | [`nomifun-cron/src/routes.rs`](../../crates/backend/nomifun-cron/src/routes.rs) |
-| 频道（IM 桥） | `/api/channel/*` | 已鉴权 | [`nomifun-channel/src/routes.rs`](../../crates/backend/nomifun-channel/src/routes.rs) |
-| Webhook + 标签设置 | `/api/webhooks/*`、`/api/tags/{tag}/settings` | 已鉴权 | [`nomifun-webhook/src/routes.rs`](../../crates/backend/nomifun-webhook/src/routes.rs) |
-| 需求（项目看板） | `/api/requirements/*` | 已鉴权 | [`nomifun-requirement/src/routes.rs`](../../crates/backend/nomifun-requirement/src/routes.rs) |
-| AutoWork / IDMM | `/api/idmm/*`、`/api/requirements/autowork*` | 已鉴权 | [`nomifun-idmm/src/routes.rs`](../../crates/backend/nomifun-idmm/src/routes.rs) |
-| 团队（后端实现面；当前没有对应用户指南路由） | `/api/teams/*` | 已鉴权 | [`nomifun-team/src/routes.rs`](../../crates/backend/nomifun-team/src/routes.rs) |
-| 终端 | `/api/terminals/*` | 已鉴权 | [`nomifun-terminal/src/routes.rs`](../../crates/backend/nomifun-terminal/src/routes.rs) |
-| 终端 knowledge 注册辅助 | `/api/terminals/mcp-register-template`、`/api/terminals/register-knowledge*`、`/api/terminals/knowledge-global-status` | 已鉴权 | [`router/health.rs`](../../crates/backend/nomifun-app/src/router/health.rs) |
-| 知识库 | `/api/knowledge/*` | 已鉴权 | [`nomifun-knowledge/src/routes.rs`](../../crates/backend/nomifun-knowledge/src/routes.rs) |
-| 伙伴 | `/api/companion/*` | 已鉴权 | [`nomifun-companion/src/routes.rs`](../../crates/backend/nomifun-companion/src/routes.rs) |
-| WebUI/public 能力 companion token | `/api/webui/companions/{id}/access-token` | 已鉴权 / 本地 WebUI admin 流 | [`router/companion_token_routes.rs`](../../crates/backend/nomifun-app/src/router/companion_token_routes.rs) |
-| Browser-use secrets | `/api/browser-secrets/*` | 已鉴权 | [`nomifun-secret/src/routes.rs`](../../crates/backend/nomifun-secret/src/routes.rs) |
-| 文件系统 | `/api/fs/*` | 已鉴权 | [`nomifun-file/src/routes.rs`](../../crates/backend/nomifun-file/src/routes.rs) |
-| Office 预览 | `/api/word-preview/*`、`/api/excel-preview/*`、`/api/ppt-preview/*`、`/api/document/convert`、`/api/preview-history/*`、`/api/star-office/detect` | 已鉴权 | [`nomifun-office/src/routes.rs`](../../crates/backend/nomifun-office/src/routes.rs) |
+| MCP 服务 | `/api/mcp/*` | 已鉴权 | [`openhub-mcp/src/routes.rs`](../../crates/backend/openhub-mcp/src/routes.rs) |
+| 技能 | `/api/skills/*` | 已鉴权 | [`openhub-extension/src/skill_routes.rs`](../../crates/backend/openhub-extension/src/skill_routes.rs) |
+| 扩展 | `/api/extensions/*` | 已鉴权 | [`openhub-extension/src/routes.rs`](../../crates/backend/openhub-extension/src/routes.rs) |
+| Hub（扩展市场） | `/api/hub/*` | 已鉴权 | [`openhub-extension/src/hub_routes.rs`](../../crates/backend/openhub-extension/src/hub_routes.rs) |
+| 计划任务 | `/api/cron/*` | 已鉴权 | [`openhub-cron/src/routes.rs`](../../crates/backend/openhub-cron/src/routes.rs) |
+| 频道（IM 桥） | `/api/channel/*` | 已鉴权 | [`openhub-channel/src/routes.rs`](../../crates/backend/openhub-channel/src/routes.rs) |
+| Webhook + 标签设置 | `/api/webhooks/*`、`/api/tags/{tag}/settings` | 已鉴权 | [`openhub-webhook/src/routes.rs`](../../crates/backend/openhub-webhook/src/routes.rs) |
+| 需求（项目看板） | `/api/requirements/*` | 已鉴权 | [`openhub-requirement/src/routes.rs`](../../crates/backend/openhub-requirement/src/routes.rs) |
+| AutoWork / IDMM | `/api/idmm/*`、`/api/requirements/autowork*` | 已鉴权 | [`openhub-idmm/src/routes.rs`](../../crates/backend/openhub-idmm/src/routes.rs) |
+| 团队（后端实现面；当前没有对应用户指南路由） | `/api/teams/*` | 已鉴权 | [`openhub-team/src/routes.rs`](../../crates/backend/openhub-team/src/routes.rs) |
+| 终端 | `/api/terminals/*` | 已鉴权 | [`openhub-terminal/src/routes.rs`](../../crates/backend/openhub-terminal/src/routes.rs) |
+| 终端 knowledge 注册辅助 | `/api/terminals/mcp-register-template`、`/api/terminals/register-knowledge*`、`/api/terminals/knowledge-global-status` | 已鉴权 | [`router/health.rs`](../../crates/backend/openhub-app/src/router/health.rs) |
+| 知识库 | `/api/knowledge/*` | 已鉴权 | [`openhub-knowledge/src/routes.rs`](../../crates/backend/openhub-knowledge/src/routes.rs) |
+| 伙伴 | `/api/companion/*` | 已鉴权 | [`openhub-companion/src/routes.rs`](../../crates/backend/openhub-companion/src/routes.rs) |
+| WebUI/public 能力 companion token | `/api/webui/companions/{id}/access-token` | 已鉴权 / 本地 WebUI admin 流 | [`router/companion_token_routes.rs`](../../crates/backend/openhub-app/src/router/companion_token_routes.rs) |
+| Browser-use secrets | `/api/browser-secrets/*` | 已鉴权 | [`openhub-secret/src/routes.rs`](../../crates/backend/openhub-secret/src/routes.rs) |
+| 文件系统 | `/api/fs/*` | 已鉴权 | [`openhub-file/src/routes.rs`](../../crates/backend/openhub-file/src/routes.rs) |
+| Office 预览 | `/api/word-preview/*`、`/api/excel-preview/*`、`/api/ppt-preview/*`、`/api/document/convert`、`/api/preview-history/*`、`/api/star-office/detect` | 已鉴权 | [`openhub-office/src/routes.rs`](../../crates/backend/openhub-office/src/routes.rs) |
 | Office iframe 代理 | `/api/ppt-proxy/*`、`/api/office-watch-proxy/*` | 公共（提供 iframe 内容；不鉴权） | 同上 |
-| 设置 + 提供商 + 系统信息 | `/api/settings`、`/api/providers/*`、`/api/system/*` | 已鉴权 | [`nomifun-system/src/routes.rs`](../../crates/backend/nomifun-system/src/routes.rs) |
-| 全局模型故障转移队列 | `/api/agent/model-failover` | 已鉴权 | [`router/model_failover.rs`](../../crates/backend/nomifun-app/src/router/model_failover.rs) |
-| 连接探测（Bedrock 等） | `/api/bedrock/test-connection` | 已鉴权 | [`nomifun-system/src/bedrock_probe/routes.rs`](../../crates/backend/nomifun-system/src/bedrock_probe/routes.rs) |
-| Shell 辅助 + STT | `/api/shell/*`、`/api/stt` | 已鉴权 | [`nomifun-shell/src/routes.rs`](../../crates/backend/nomifun-shell/src/routes.rs) |
-| 公共资源（logo） | `/api/assets/logos/*` | 公共 | [`nomifun-assets/src/routes.rs`](../../crates/backend/nomifun-assets/src/routes.rs) |
-| Public MCP front door | `/mcp/*` | companion-token / 已配置 public auth | [`nomifun-public/src/router.rs`](../../crates/backend/nomifun-public/src/router.rs) |
-| Public MCP agent front door | `/mcp-agent/*` | companion-token / 已配置 public auth | [`nomifun-public/src/router.rs`](../../crates/backend/nomifun-public/src/router.rs) |
-| Remote capability REST API | `/v1/*` | companion-token | [`nomifun-public/src/rest.rs`](../../crates/backend/nomifun-public/src/rest.rs) |
-| 实时 WebSocket | `/ws` | 已鉴权（token 通过 `Sec-WebSocket-Protocol` 或查询串传递） | [`nomifun-realtime/src/handler.rs`](../../crates/backend/nomifun-realtime/src/handler.rs) |
+| 设置 + 提供商 + 系统信息 | `/api/settings`、`/api/providers/*`、`/api/system/*` | 已鉴权 | [`openhub-system/src/routes.rs`](../../crates/backend/openhub-system/src/routes.rs) |
+| 全局模型故障转移队列 | `/api/agent/model-failover` | 已鉴权 | [`router/model_failover.rs`](../../crates/backend/openhub-app/src/router/model_failover.rs) |
+| 连接探测（Bedrock 等） | `/api/bedrock/test-connection` | 已鉴权 | [`openhub-system/src/bedrock_probe/routes.rs`](../../crates/backend/openhub-system/src/bedrock_probe/routes.rs) |
+| Shell 辅助 + STT | `/api/shell/*`、`/api/stt` | 已鉴权 | [`openhub-shell/src/routes.rs`](../../crates/backend/openhub-shell/src/routes.rs) |
+| 公共资源（logo） | `/api/assets/logos/*` | 公共 | [`openhub-assets/src/routes.rs`](../../crates/backend/openhub-assets/src/routes.rs) |
+| Public MCP front door | `/mcp/*` | companion-token / 已配置 public auth | [`openhub-public/src/router.rs`](../../crates/backend/openhub-public/src/router.rs) |
+| Public MCP agent front door | `/mcp-agent/*` | companion-token / 已配置 public auth | [`openhub-public/src/router.rs`](../../crates/backend/openhub-public/src/router.rs) |
+| Remote capability REST API | `/v1/*` | companion-token | [`openhub-public/src/rest.rs`](../../crates/backend/openhub-public/src/rest.rs) |
+| 实时 WebSocket | `/ws` | 已鉴权（token 通过 `Sec-WebSocket-Protocol` 或查询串传递） | [`openhub-realtime/src/handler.rs`](../../crates/backend/openhub-realtime/src/handler.rs) |
 
 如需各路由具体支持的方法，请阅读对应的 `routes.rs` 文件——每个 router
 都在源文件内联声明自身的路由。
@@ -149,7 +149,7 @@ NomiFun 启动时进入三种鉴权策略之一：
 
 ## 响应包络
 
-绝大多数 JSON 响应使用同一种形状（来自 `nomifun-api-types` 的
+绝大多数 JSON 响应使用同一种形状（来自 `openhub-api-types` 的
 `ApiResponse<T>`）：
 
 ```json
@@ -171,7 +171,7 @@ NomiFun 启动时进入三种鉴权策略之一：
 上面的列表只是为了把你引导到对的模块。到达后请阅读源码——每个 router
 在一处声明全部路由，每个 handler 都在同一个文件或紧挨着的下一个文件
 里。Router 装配本身位于
-[`crates/backend/nomifun-app/src/router/routes.rs`](../../crates/backend/nomifun-app/src/router/routes.rs)；
+[`crates/backend/openhub-app/src/router/routes.rs`](../../crates/backend/openhub-app/src/router/routes.rs)；
 中间件栈（CSRF、安全响应头、请求体上限、可选的 CORS）也在那里。
 
 ## 另见

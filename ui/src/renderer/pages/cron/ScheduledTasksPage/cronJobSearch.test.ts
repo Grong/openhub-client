@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -54,11 +54,11 @@ describe('filterCronJobsByQuery', () => {
       metadata: {
         conversation_id: 2002,
         conversation_title: 'Launch Plan',
-        agent_type: 'nomi',
+        agent_type: 'openhub',
         created_by: 'user',
         created_at: 2,
         updated_at: 2,
-        agent_config: { backend: 'nomi-provider', name: 'Nomi' },
+        agent_config: { backend: 'openhub-provider', name: 'OpenHub' },
       },
     }),
   ];

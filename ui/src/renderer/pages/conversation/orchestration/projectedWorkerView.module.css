@@ -1,13 +1,13 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /* ProjectedWorkerView — the content-area projection of a clicked DAG node
  * (「会话原生编排 v2」F7). A thin banner over a read-only worker transcript that
  * fills the content region. All colors flow through CSS variables so the view
- * honors every one of the 5 themes; it overlays the (display:none) main NomiChat
+ * honors every one of the 5 themes; it overlays the (display:none) main OpenHubChat
  * without unmounting it, so returning to main preserves scroll + input state. */
 
 /* The projection fills the content region and stacks: banner (fixed height) on

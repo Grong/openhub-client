@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -27,7 +27,7 @@ const toFileOrFolderItem = (item: SelectedFile, keepEmptyRelativePath: boolean):
 });
 
 /** Agent tool calls that touch the team layer, not the filesystem. */
-const isNonFileSystemTool = (name: string) => /^mcp__nomifun-team-|^team_/.test(name);
+const isNonFileSystemTool = (name: string) => /^mcp__openhub-team-|^team_/.test(name);
 
 /**
  * ChatWorkspace — 会话工作区右栏（会话源绑定）

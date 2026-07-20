@@ -1,7 +1,7 @@
 # Screenshot Manifest
 
 This file tracks every screenshot referenced by the documentation. All images
-are captured from the **real running NomiFun app** (not mockups) and saved into
+are captured from the **real running OpenHub app** (not mockups) and saved into
 this `docs/images/` directory.
 
 ## Naming scheme
@@ -16,7 +16,7 @@ this `docs/images/` directory.
 
 ## How to capture (current process)
 
-The desktop app and the `nomifun-web` host render the **same** production SPA
+The desktop app and the `openhub-web` host render the **same** production SPA
 (`ui/dist`), so in-app screens are pixel-identical between them. Capture in-app
 screens from the web host (scriptable, no native window needed); capture native
 window chrome from the installed app.
@@ -26,8 +26,8 @@ window chrome from the installed app.
    touches your real data or collides with the desktop app's database):
 
    ```bash
-   target/debug/nomifun-web --insecure-no-auth --port 8799 \
-     --dist ui/dist --data-dir /tmp/nomifun-shots
+   target/debug/openhub-web --insecure-no-auth --port 8799 \
+     --dist ui/dist --data-dir /tmp/openhub-shots
    ```
 
 3. **Seed synthetic demo data** through the local API (no real credentials),
@@ -39,7 +39,7 @@ window chrome from the installed app.
    ```python
    ctx = browser.new_context(viewport={"width":1440,"height":900},
                              color_scheme="dark", device_scale_factor=2)
-   ctx.add_init_script("localStorage.setItem('__nomifun_theme','dark')")
+   ctx.add_init_script("localStorage.setItem('__openhub_theme','dark')")
    page.goto("http://127.0.0.1:8799/#/<route>")
    ```
 
@@ -47,7 +47,7 @@ window chrome from the installed app.
    `--insecure-no-auth`. No admin yet → first-run setup; pass
    `--admin-user/--admin-password` → login screen.
 6. **Native window** (titlebar / tray): capture from the installed
-   `/Applications/NomiFun.app` with macOS window capture. Requires Screen
+   `/Applications/OpenHub.app` with macOS window capture. Requires Screen
    Recording permission for the capturing process.
 
 ## Module prefixes
@@ -79,7 +79,7 @@ see notes).
 | `readme-02-terminal-create.png` | `#/terminal-new` | desktop | Create terminal flow with expanded capability handoff panel | README / README.zh-CN | live |
 | `readme-03-assistants.png` | `#/assistants?tab=assistants` | desktop | Assistants and Skills capability library | README / README.zh-CN | live |
 | `readme-04-model-agents.png` | `#/models` | desktop | Models and Agents management with installed and supported CLI agents | README / README.zh-CN | live |
-| `readme-05-companions.png` | `#/nomi` | desktop | Desktop companion overview with memory and growth state | README / README.zh-CN | live |
+| `readme-05-companions.png` | `#/openhub` | desktop | Desktop companion overview with memory and growth state | README / README.zh-CN | live |
 | `readme-06-knowledge.png` | `#/knowledge` | desktop | Knowledge base list and local domain context | README / README.zh-CN | live |
 | `readme-07-requirements.png` | `#/requirements` | desktop | Requirements platform list and AutoWork entry | README / README.zh-CN | live |
 | `gs-01-introduction-hero.png` | `#/guid` | web | Home / new-session page | getting-started/introduction | live |
@@ -103,8 +103,8 @@ see notes).
 | `cron-01-list.png` | `#/scheduled` | web | Scheduled Tasks list + keep-awake banner | guides/scheduled-tasks | live |
 | `cron-02-create-dialog.png` | `#/scheduled` (New task) | web | Create scheduled task dialog | guides/scheduled-tasks | live |
 | `cron-03-detail.png` | `#/scheduled/:job_id` | web | Job detail: schedule, Run now, history | guides/scheduled-tasks | live |
-| `channels-01-overview.png` | `#/nomi?tab=remote` | web | Companion Remote tab — channel overview | guides/channels | live |
-| `channels-02-pairing.png` | `#/nomi?tab=remote` (connect) | web | Channel connect / settings dialog | guides/channels | live |
+| `channels-01-overview.png` | `#/openhub?tab=remote` | web | Companion Remote tab — channel overview | guides/channels | live |
+| `channels-02-pairing.png` | `#/openhub?tab=remote` (connect) | web | Channel connect / settings dialog | guides/channels | live |
 | `mcp-01-capabilities.png` | `#/mcp` | web | MCP page | guides/mcp-and-skills | live |
 | `mcp-03-skills.png` | `#/assistants?tab=skills` | web | Skills tab | guides/mcp-and-skills | live |
 | `assistants-01-list.png` | `#/assistants?tab=assistants` | web | Assistants list (builtin library) | guides/assistants | live |
@@ -127,7 +127,7 @@ copy-pasteable commands or an ASCII diagram, and several are platform-specific
 `gs-02` and `desktop-01` are marked `live\*`: they currently show the **real
 current app content** captured from the web host, but **without the native
 window chrome** (titlebar / traffic-lights / tray). Replace them with a true
-native capture from the installed `/Applications/NomiFun.app` (needs Screen
+native capture from the installed `/Applications/OpenHub.app` (needs Screen
 Recording permission, or a manual `Cmd+Shift+4` window capture) when convenient.
 
 A few data-heavy views are intentionally **not** screenshotted — a live

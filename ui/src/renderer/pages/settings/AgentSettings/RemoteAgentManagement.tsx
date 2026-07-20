@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -8,7 +8,7 @@ import { ipcBridge } from '@/common';
 import type { RemoteAgentConfig, RemoteAgentInput } from '@/common/types/agent/remoteAgentTypes';
 import EmojiPicker from '@/renderer/components/chat/EmojiPicker';
 import { openExternalUrl } from '@/renderer/utils/platform';
-import { useNomiQuickStart } from '@/renderer/hooks/agent/useNomiQuickStart';
+import { useOpenHubQuickStart } from '@/renderer/hooks/agent/useOpenHubQuickStart';
 import {
   Avatar,
   Button,
@@ -23,7 +23,7 @@ import {
   Tag,
   Typography,
 } from '@arco-design/web-react';
-import NomiModal from '@/renderer/components/base/NomiModal';
+import OpenHubModal from '@/renderer/components/base/OpenHubModal';
 import { Attention, Edit, Plus, ReduceOne, Robot, Speed } from '@icon-park/react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -33,7 +33,7 @@ const FormItem = Form.Item;
 
 const PAIRING_POLL_INTERVAL = 5_000;
 const PAIRING_TIMEOUT = 5 * 60 * 1000;
-const REMOTE_AGENT_GUIDE_URL = 'https://github.com/nomifun/nomifun-app/wiki/Remote-Agent-Guide-Chinese';
+const REMOTE_AGENT_GUIDE_URL = 'https://github.com/openhub/openhub-app/wiki/Remote-Agent-Guide-Chinese';
 
 type PairingState = 'idle' | 'handshaking' | 'pending' | 'timeout';
 
@@ -61,7 +61,7 @@ const openRemoteAgentGuide = (): void => {
   void openExternalUrl(REMOTE_AGENT_GUIDE_URL).catch(console.error);
 };
 
-/** Remote protocols NomiFun can connect to — surfaced so users can discover them. */
+/** Remote protocols OpenHub can connect to — surfaced so users can discover them. */
 const REMOTE_PROTOCOLS: { key: string; label: string }[] = [
   { key: 'openclaw', label: 'OpenClaw' },
   { key: 'zeroclaw', label: 'ZeroClaw' },
@@ -224,7 +224,7 @@ const RemoteAgentFormModal: React.FC<{
   // Render pairing waiting UI
   if (pairingState === 'pending' || pairingState === 'timeout') {
     return (
-      <NomiModal
+      <OpenHubModal
         visible={visible}
         onCancel={handleCancelPairing}
         header={{
@@ -267,12 +267,12 @@ const RemoteAgentFormModal: React.FC<{
             </>
           )}
         </div>
-      </NomiModal>
+      </OpenHubModal>
     );
   }
 
   return (
-    <NomiModal
+    <OpenHubModal
       visible={visible}
       onCancel={onClose}
       header={{
@@ -410,7 +410,7 @@ const RemoteAgentFormModal: React.FC<{
           </Button>
         </Form>
       </div>
-    </NomiModal>
+    </OpenHubModal>
   );
 };
 
@@ -451,7 +451,7 @@ const RemoteAgentManagement: React.FC = () => {
     await mutate();
   }, [mutate]);
 
-  const { start: startRemoteSetup } = useNomiQuickStart();
+  const { start: startRemoteSetup } = useOpenHubQuickStart();
   const [settingUp, setSettingUp] = useState<string | null>(null);
 
   const handleRemoteSetup = useCallback(
@@ -572,7 +572,7 @@ const RemoteAgentManagement: React.FC = () => {
         </div>
       )}
 
-      {/* Supported remote connections — discover protocols & get setup help from Nomi */}
+      {/* Supported remote connections — discover protocols & get setup help from OpenHub */}
       <div className='mt-8px border-t border-solid border-[var(--color-border-2)] border-l-0 border-r-0 border-b-0 pt-16px'>
         <div className='px-16px mb-2px'>
           <Typography.Text className='block text-12px font-medium text-t-secondary'>

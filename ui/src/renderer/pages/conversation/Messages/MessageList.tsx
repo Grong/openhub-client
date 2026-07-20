@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -639,7 +639,7 @@ const MessageItem: React.FC<{ message: TMessage; highlighted?: boolean; hideActi
 const MessageList: React.FC<{
   className?: string;
   emptySlot?: React.ReactNode;
-  /** Windowed-history paging (nomi surfaces): prepend the next older message
+  /** Windowed-history paging (openhub surfaces): prepend the next older message
    *  window when the user scrolls to the top. Omitted on chats that still load
    *  their whole transcript at once. */
   onLoadOlder?: () => void | Promise<void>;

@@ -1,6 +1,6 @@
 # AutoWork & Requirements
 
-AutoWork is Nomi's flagship automation: a **requirements board** plus an
+AutoWork is OpenHub's flagship automation: a **requirements board** plus an
 **orchestrator** that drives an AI agent (or an agent CLI in a terminal) to
 work through those requirements one at a time, without you holding its hand.
 
@@ -26,7 +26,7 @@ boot and runs whether or not you have the UI open.
 | **Lease sweeper**     | A background task (every 60 s) that re-pends `in_progress` rows whose lease expired and whose owning session is no longer live — so a crash never orphans work. |
 | **Orchestrator**      | The per-target loop that claims → injects → waits → finalises → repeats. One loop per bound session. Persistent: it idles when the queue drains, it does not exit. |
 | **Target**            | The thing executing the work. Two kinds: a **conversation** (an AI agent), or a **terminal** (a real CLI agent over a PTY).                                  |
-| **Turn completion** | How a turn signals "done." For agent targets, the agent ends its turn (or calls a Nomi-only tool); for terminal targets, the terminal simply goes quiescent — a clean end-of-turn.       |
+| **Turn completion** | How a turn signals "done." For agent targets, the agent ends its turn (or calls a OpenHub-only tool); for terminal targets, the terminal simply goes quiescent — a clean end-of-turn.       |
 | **Completion notifier** | A Lark/飞书 webhook fired when a requirement reaches `done`/`failed`/`cancelled`. Bound per tag.                                                            |
 | **IDMM**              | Intelligent Decision-Making Mode — a session supervisor that keeps targets alive through provider faults and decision stalls. Stacks on AutoWork.            |
 
@@ -128,7 +128,7 @@ What happens per turn:
 1. The orchestrator claims the next `pending` requirement in that tag.
 2. It builds an injection prompt that names the requirement and tells the
    agent how to signal completion. The exact contract is **engine-aware**:
-   - On Nomi-engine sessions only, the agent has the
+   - On OpenHub-engine sessions only, the agent has the
      `requirement_complete` / `requirement_update_status` tools registered
      and the prompt asks the model to call them.
    - On every other engine (ACP / Codex / Gemini / Openclaw / Nanobot /
@@ -243,7 +243,7 @@ clearing the binding to mute notifications for that tag.
 
 ## IDMM — keeping turns alive through stalls
 
-IDMM is a separate, optional supervisor (`nomifun-idmm`). It watches a
+IDMM is a separate, optional supervisor (`openhub-idmm`). It watches a
 session and intervenes when a stall is detected:
 
 - **Rule tier (no LLM)** — provider error, repeated retries, model spinning
@@ -258,7 +258,7 @@ from getting stuck so it actually reaches a terminal state instead of
 timing out. Toggle IDMM from the same place as AutoWork (the session
 header).
 
-See `crates/backend/nomifun-idmm/` for the per-tier policy detail and the
+See `crates/backend/openhub-idmm/` for the per-tier policy detail and the
 intervention log API.
 
 > For the full picture — the rule tier, the sidecar model, session keep-alive

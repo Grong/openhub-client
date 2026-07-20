@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -15,7 +15,7 @@ const FULL_AUTO_MODE: Record<string, string> = {
   qwen: 'yolo',
   opencode: 'build',
   gemini: 'yolo',
-  nomi: 'yolo',
+  openhub: 'yolo',
   codex: CODEX_MODE_NATIVE_FULL_ACCESS,
   snow: 'yolo',
 };

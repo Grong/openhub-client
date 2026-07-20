@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, Dropdown } from '@arco-design/web-react';
 import { Brain, Down } from '@icon-park/react';
 import type { TModelRef, TRunTask } from '@/common/types/orchestrator/orchestratorTypes';
-import NomiSelect from '@/renderer/components/base/NomiSelect';
+import OpenHubSelect from '@/renderer/components/base/OpenHubSelect';
 import { decodePair, encodePair, useModelRange } from '@/renderer/pages/orchestrator/useModelRange';
 import { iconColors } from '@/renderer/styles/colors';
 import { useArcoMessage } from '@/renderer/utils/ui/useArcoMessage';
@@ -38,7 +38,7 @@ type NodeModelPillProps = {
 
 /**
  * NodeModelPill — a single-model override pill for a PENDING node. A pending node has
- * no worker conversation yet, so there is no NomiSendBox model selector to reuse (a
+ * no worker conversation yet, so there is no OpenHubSendBox model selector to reuse (a
  * settled node reuses that selector, whose pick is written through as the override).
  * Lists ANY configured provider×model — not just the run's frozen fleet — and carries
  * the「跟随自动路由」clear option. Purely presentational: it reports the chosen model
@@ -79,29 +79,29 @@ const NodeModelPill: React.FC<NodeModelPillProps> = ({ task, onApply, className 
           </span>
         </div>
         {hasModels ? (
-          <NomiSelect
+          <OpenHubSelect
             value={value}
             onChange={(v) => void persist(v as string)}
             showSearch
             filterOption={filterByLabel}
             className='w-full'
           >
-            <NomiSelect.Option value={FOLLOW_AUTO}>
+            <OpenHubSelect.Option value={FOLLOW_AUTO}>
               {t('orchestrator.run.preconfig.followAuto', { defaultValue: '跟随自动路由（不指定）' })}
-            </NomiSelect.Option>
+            </OpenHubSelect.Option>
             {providers.map((p) => (
-              <NomiSelect.OptGroup key={p.id} label={p.name || p.platform}>
+              <OpenHubSelect.OptGroup key={p.id} label={p.name || p.platform}>
                 {getAvailableModels(p).map((m) => {
                   const ref: TModelRef = { provider_id: p.id, model: m };
                   return (
-                    <NomiSelect.Option key={encodePair(ref)} value={encodePair(ref)}>
+                    <OpenHubSelect.Option key={encodePair(ref)} value={encodePair(ref)}>
                       {formatModelLabel(p, m)}
-                    </NomiSelect.Option>
+                    </OpenHubSelect.Option>
                   );
                 })}
-              </NomiSelect.OptGroup>
+              </OpenHubSelect.OptGroup>
             ))}
-          </NomiSelect>
+          </OpenHubSelect>
         ) : (
           <span className='text-12px leading-18px text-[rgb(var(--warning-6))]'>
             {t('orchestrator.run.preconfig.noModels', { defaultValue: '暂无可用模型，请先在「模型」里配置 provider。' })}

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,7 +9,7 @@ import { useArcoMessage } from '@/renderer/utils/ui/useArcoMessage';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import ChatWorkspace from '../Workspace';
-import NomiSessionMetricsPanel from '../platforms/nomi/NomiSessionMetricsPanel';
+import OpenHubSessionMetricsPanel from '../platforms/openhub/OpenHubSessionMetricsPanel';
 
 const ChatSlider: React.FC<{
   conversation?: TChatConversation;
@@ -42,7 +42,7 @@ const ChatSlider: React.FC<{
         messageApi={messageApi}
       ></ChatWorkspace>
     );
-  } else if (conversation?.type === 'nomi' && conversation.extra?.workspace) {
+  } else if (conversation?.type === 'openhub' && conversation.extra?.workspace) {
     workspaceNode = (
       <ChatWorkspace
         conversation_id={conversation.id}
@@ -50,13 +50,13 @@ const ChatSlider: React.FC<{
         isTemporaryWorkspace={
           (conversation.extra as { is_temporary_workspace?: boolean } | undefined)?.is_temporary_workspace
         }
-        eventPrefix='nomi'
+        eventPrefix='openhub'
         messageApi={messageApi}
         extraTabs={[
           {
-            key: 'nomi-session-metrics',
+            key: 'openhub-session-metrics',
             title: t('conversation.sessionMetrics.tab'),
-            content: <NomiSessionMetricsPanel conversation={conversation} />,
+            content: <OpenHubSessionMetricsPanel conversation={conversation} />,
           },
         ]}
       ></ChatWorkspace>

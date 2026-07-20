@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -429,7 +429,7 @@ const EMOJI_CATEGORIES = {
 
 type CategoryKey = keyof typeof EMOJI_CATEGORIES;
 
-const RECENT_EMOJIS_KEY = 'nomifun.emoji.recent';
+const RECENT_EMOJIS_KEY = 'openhub.emoji.recent';
 const MAX_RECENT_EMOJIS = 24;
 
 // Arco Design Popover position types

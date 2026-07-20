@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -8,7 +8,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Button, Progress, Message } from '@arco-design/web-react';
 import { CheckOne, Download, FolderOpen, Refresh, CloseOne, Install } from '@icon-park/react';
 import { ipcBridge } from '@/common';
-import NomiModal from '@/renderer/components/base/NomiModal';
+import OpenHubModal from '@/renderer/components/base/OpenHubModal';
 import MarkdownView from '@/renderer/components/Markdown';
 import type { UpdateDownloadProgressEvent, UpdateReleaseInfo, AutoUpdateStatus } from '@/common/update/updateTypes';
 import { useTranslation } from 'react-i18next';
@@ -19,8 +19,8 @@ type UpdateStatus = 'checking' | 'upToDate' | 'available' | 'downloading' | 'dow
 type UpdateInfo = UpdateReleaseInfo;
 
 const BAIDU_RELEASE_MIRROR_URL = 'https://pan.baidu.com/s/5GPonoJNrwJ7GciBSDgXLaA';
-const PRODUCT_WEBSITE_URL = 'https://www.nomifun.com';
-const GITHUB_RELEASES_PAGE = 'https://github.com/nomifun/nomifun-tauri/releases/latest';
+const PRODUCT_WEBSITE_URL = 'https://www.openhub.dev';
+const GITHUB_RELEASES_PAGE = 'https://github.com/Grong/openhub-client/releases/latest';
 
 const UpdateModal: React.FC = () => {
   const { t } = useTranslation();
@@ -209,11 +209,11 @@ const UpdateModal: React.FC = () => {
 
   useEffect(() => {
     const removeOpenListener = ipcBridge.update.open.on(handleOpenUpdateModal);
-    window.addEventListener('nomifun-open-update-modal', handleOpenUpdateModal);
+    window.addEventListener('openhub-open-update-modal', handleOpenUpdateModal);
 
     return () => {
       removeOpenListener();
-      window.removeEventListener('nomifun-open-update-modal', handleOpenUpdateModal);
+      window.removeEventListener('openhub-open-update-modal', handleOpenUpdateModal);
     };
   }, []);
 
@@ -533,7 +533,7 @@ const UpdateModal: React.FC = () => {
   };
 
   return (
-    <NomiModal
+    <OpenHubModal
       visible={visible}
       onCancel={handleClose}
       size={status === 'available' ? 'medium' : 'small'}
@@ -554,7 +554,7 @@ const UpdateModal: React.FC = () => {
           'shrink-0 border-t border-solid border-[rgba(var(--warning-6),0.18)] bg-fill-1/60 px-20px py-10px text-center'
         )}
       </div>
-    </NomiModal>
+    </OpenHubModal>
   );
 };
 

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -77,9 +77,9 @@ const DEFAULT_PERSIST_NAMESPACE = 'conversation';
 
 // 持久化 key（按 persistNamespace 分桶，使不同表面的预览互不串扰）
 // Persistence keys (bucketed by persistNamespace so previews of different surfaces don't leak into each other)
-const previewTabsKey = (ns: string) => `nomifun_preview_tabs:${ns}`;
-const previewActiveTabIdKey = (ns: string) => `nomifun_preview_active_tab_id:${ns}`;
-const legacyPreviewStateKey = (ns: string) => `nomifun_preview_state:${ns}`;
+const previewTabsKey = (ns: string) => `openhub_preview_tabs:${ns}`;
+const previewActiveTabIdKey = (ns: string) => `openhub_preview_active_tab_id:${ns}`;
+const legacyPreviewStateKey = (ns: string) => `openhub_preview_state:${ns}`;
 
 // 仅持久化小体积文本预览，避免大文本导致 localStorage 写入卡顿
 // Persist only lightweight text previews to avoid localStorage jank on large files
@@ -135,7 +135,7 @@ const loadPersistedState = (ns: string): { isOpen: boolean; tabs: PreviewTab[]; 
       // Try the namespaced legacy key first; for the default 'conversation'
       // namespace, also fall back to the older un-namespaced bare key so existing
       // installs don't lose persisted preview tabs after upgrade.
-      const legacyStored = localStorage.getItem(legacyPreviewStateKey(ns)) || (ns === DEFAULT_PERSIST_NAMESPACE ? localStorage.getItem('nomifun_preview_state') : null);
+      const legacyStored = localStorage.getItem(legacyPreviewStateKey(ns)) || (ns === DEFAULT_PERSIST_NAMESPACE ? localStorage.getItem('openhub_preview_state') : null);
       if (legacyStored) {
         const parsed = JSON.parse(legacyStored) as { tabs?: unknown; activeTabId?: unknown };
         tabs = parsePersistedTabs(parsed.tabs);
@@ -201,7 +201,7 @@ export const PreviewProvider: React.FC<{
         // For the default namespace, also clear the older un-namespaced bare key
         // (already read as a fallback in loadPersistedState).
         if (persistNamespace === DEFAULT_PERSIST_NAMESPACE) {
-          localStorage.removeItem('nomifun_preview_state');
+          localStorage.removeItem('openhub_preview_state');
         }
       } catch {
         // 忽略存储错误（如存储空间不足）/ Ignore storage errors (e.g., quota exceeded)

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -82,7 +82,7 @@ export type GuidAgentSelectionResult = {
  *   1. Handshake `available_modes.current_mode_id` from `/api/agents`
  *   2. First entry of handshake `available_modes`
  *   3. First entry of the static `AGENT_MODES` table
- *   4. Literal `'default'` (legacy fallback — only correct for claude/qwen/gemini/nomi)
+ *   4. Literal `'default'` (legacy fallback — only correct for claude/qwen/gemini/openhub)
  *
  * This mirrors the runtime fallback inside `AgentModeSelector` so the
  * parent-held `selectedMode` stays in sync with what the UI shows.
@@ -128,9 +128,9 @@ export const useGuidAgentSelection = ({
 }: UseGuidAgentSelectionOptions): GuidAgentSelectionResult => {
   const [selectedAgentKey, _setSelectedAgentKey] = useState<string>(() => {
     try {
-      return configService.get('guid.lastSelectedAgent') || 'nomi';
+      return configService.get('guid.lastSelectedAgent') || 'openhub';
     } catch {
-      return 'nomi';
+      return 'openhub';
     }
   });
   const [availableAgents, setAvailableAgents] = useState<AvailableAgent[]>();
@@ -337,7 +337,7 @@ export const useGuidAgentSelection = ({
       const currentIsPreset = selectedAgentKey.startsWith('custom:');
       if (currentIsPreset) {
         const firstCliAgent = availableAgents.find((a) => !a.is_preset);
-        const fallbackKey = firstCliAgent ? getAgentKey(firstCliAgent) : 'nomi';
+        const fallbackKey = firstCliAgent ? getAgentKey(firstCliAgent) : 'openhub';
         _setSelectedAgentKey(fallbackKey);
         configService.set('guid.lastSelectedAgent', fallbackKey).catch((error) => {
           console.error('Failed to save reset agent key:', error);
@@ -471,8 +471,8 @@ export const useGuidAgentSelection = ({
         let preferred: string | undefined;
         let yoloMode = false;
 
-        if (configKey === 'nomi') {
-          const config = configService.get('nomi.config');
+        if (configKey === 'openhub') {
+          const config = configService.get('openhub.config');
           preferred = config?.preferredMode;
         } else {
           const config = configService.get('acp.config');
@@ -551,7 +551,7 @@ export const useGuidAgentSelection = ({
   // Key of the first non-preset CLI agent (used as fallback when leaving preset mode)
   const defaultAgentKey = useMemo(() => {
     const firstCliAgent = availableAgents?.find((a) => !a.is_preset);
-    return firstCliAgent ? getAgentKey(firstCliAgent) : 'nomi';
+    return firstCliAgent ? getAgentKey(firstCliAgent) : 'openhub';
   }, [availableAgents]);
 
   return {

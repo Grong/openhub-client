@@ -1,17 +1,17 @@
 # 应用内终端
 
-Nomi 在应用内附带了一个真正的终端。每个终端都是一个由后端管理的
+OpenHub 在应用内附带了一个真正的终端。每个终端都是一个由后端管理的
 PTY 会话，你可以从浏览器/桌面窗口中以交互方式驱动它 —— 当你把它
 绑定到一个 tag 上时，AutoWork 也可以代你来驱动它。
 
 > 需要自动化指南？参见 [AutoWork & Requirements](./autowork-requirements.md)。
 > 需要按计划运行 agent？参见 [定时任务](./scheduled-tasks.zh.md)。
 
-![Nomi 应用内终端](../images/terminal-01-session.png)
+![OpenHub 应用内终端](../images/terminal-01-session.png)
 
 ## 应用内终端是什么
 
-当你创建一个终端时，后端 (`nomifun-terminal`) 会通过
+当你创建一个终端时，后端 (`openhub-terminal`) 会通过
 [`portable-pty`] 派生一个连接到真实伪终端的子进程。该会话由三部分组成：
 
 - **持久化元数据** —— id、名称、工作目录、命令 + 参数、env、
@@ -58,10 +58,10 @@ PTY 子进程不能被暂停或在进程间迁移：当子进程退出时，
    一个可编辑字段中。在按下 **Launch** 之前可以自由调整 (额外
    flag、替代入口点等)。
 5. **知识库** (可选) —— 多选一个或多个知识库绑定到本会话。绑定的库
-   会在子进程派生前挂载到 `{workspace}/.nomi/knowledge/`，并生成一份
+   会在子进程派生前挂载到 `{workspace}/.openhub/knowledge/`，并生成一份
    `README.md` (检索协议 + 各库梗概 + TOC + 回写规则)；`claude`
    preset 还会额外附加一条指向该 README 的 `--append-system-prompt`
-   指针。改绑在下次重新启动时生效。(网关工具 `nomi_create_terminal`
+   指针。改绑在下次重新启动时生效。(网关工具 `openhub_create_terminal`
    通过 `knowledge_base_ids` 支持同样的绑定。)
 
 ![终端创建页面](../images/terminal-02-create-page.png)
@@ -101,7 +101,7 @@ PTY 子进程不能被暂停或在进程间迁移：当子进程退出时，
 ## 终端作为自动化目标
 
 驱动 UI 的同一个内存中的 PTY 映射通过 `TerminalDriver` trait
-与 `nomifun-requirement` 中的 **AutoWork orchestrator** 共享。该
+与 `openhub-requirement` 中的 **AutoWork orchestrator** 共享。该
 trait 让 AutoWork：
 
 - 订阅终端实时输出的副本 (它会监视完成标记并检测静默 ——
@@ -119,7 +119,7 @@ trait 让 AutoWork：
 推荐使用 Full Auto 模式，因为一轮如果撞上交互式审批提示
 会一直阻塞直到超时。
 
-如果工作区挂载了知识库 (存在 `{cwd}/.nomi/knowledge/`)，AutoWork 与
+如果工作区挂载了知识库 (存在 `{cwd}/.openhub/knowledge/`)，AutoWork 与
 cron 驱动注入的 prompt 会自动前置一行提示，让 CLI 先阅读挂载目录里的
 `README.md` 再开工。
 

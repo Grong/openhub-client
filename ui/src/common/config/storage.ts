@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -65,14 +65,14 @@ export interface IConfigStorageRefer {
   customCss: string; // 自定义 CSS 样式
   'css.themes': ICssTheme[]; // 自定义 CSS 主题列表 / Custom CSS themes list
   'css.activeThemeId': string; // 当前激活的主题 ID / Currently active theme ID
-  'nomi.config'?: {
+  'openhub.config'?: {
     /** Preferred session mode for new conversations / 新会话的默认模式 */
     preferredMode?: string;
   };
-  'nomi.defaultModel'?: { id: string; use_model: string };
-  // 智能编排「协作模型」默认偏好（多选）。主模型见 nomi.defaultModel；这里是供主模型
+  'openhub.defaultModel'?: { id: string; use_model: string };
+  // 智能编排「协作模型」默认偏好（多选）。主模型见 openhub.defaultModel；这里是供主模型
   // 按任务难度挑选的额外 worker 模型池。空 = 全程用主模型。
-  'nomi.orchestrationCollaborators'?: { provider_id: string; model: string }[];
+  'openhub.orchestrationCollaborators'?: { provider_id: string; model: string }[];
   'tools.imageGenerationModel': TProviderWithModel & {
     /** @deprecated Image generation is now controlled via built-in MCP server toggle */
     switch?: boolean;
@@ -122,7 +122,7 @@ export interface IConfigStorageRefer {
     custom_agent_id?: string;
     name?: string;
   };
-  // Skills Market: whether the nomifun-skills builtin skill is enabled
+  // Skills Market: whether the openhub-skills builtin skill is enabled
   'skillsMarket.enabled'?: boolean;
   /**
    * One-shot completion flag for the legacy `model.config` → backend providers
@@ -144,7 +144,7 @@ export interface IConfigStorageRefer {
 }
 
 export interface IEnvStorageRefer {
-  'nomifun.dir': {
+  'openhub.dir': {
     workDir: string;
     cacheDir: string;
   };
@@ -154,7 +154,7 @@ export interface IEnvStorageRefer {
  * Conversation source type - identifies where the conversation was created
  * 会话来源类型 - 标识会话创建的来源
  */
-export type ConversationSource = 'nomifun' | 'telegram' | 'lark' | 'dingtalk' | 'weixin' | 'wecom' | (string & {});
+export type ConversationSource = 'openhub' | 'telegram' | 'lark' | 'dingtalk' | 'weixin' | 'wecom' | (string & {});
 
 export type TChatConversationStatus = 'pending' | 'running' | 'finished';
 export type TConversationRuntimeStateKind = 'idle' | 'starting' | 'running' | 'waiting_confirmation';
@@ -185,7 +185,7 @@ interface IChatConversation<T, Extra> {
   model: TProviderWithModel;
   status?: TChatConversationStatus | undefined;
   runtime?: TConversationRuntimeSummary;
-  /** 会话来源，默认为 nomifun / Conversation source, defaults to nomifun */
+  /** 会话来源，默认为openhub/ Conversation source, defaults toopenhub*/
   source?: ConversationSource;
   /** Channel chat isolation ID (e.g. user:xxx, group:xxx) */
   channel_chat_id?: string;
@@ -198,15 +198,15 @@ interface IChatConversation<T, Extra> {
 // Token 使用统计数据类型
 export interface TokenUsageData {
   total_tokens: number;
-  /** Cumulative input tokens reported by the Nomi session usage payload. */
+  /** Cumulative input tokens reported by the OpenHub session usage payload. */
   input_tokens?: number;
-  /** Cumulative output tokens reported by the Nomi session usage payload. */
+  /** Cumulative output tokens reported by the OpenHub session usage payload. */
   output_tokens?: number;
   /** Tokens written into the provider prompt cache. */
   cache_creation_tokens?: number;
   /** Tokens read back from the provider prompt cache. */
   cache_read_tokens?: number;
-  /** Wall-clock duration of the last turn in milliseconds (optional; nomi
+  /** Wall-clock duration of the last turn in milliseconds (optional; openhub
    * turn_completed carries it). Absent on legacy persisted payloads. */
   elapsed_ms?: number;
   /** Current context occupancy (gauge numerator). */
@@ -350,7 +350,7 @@ export type TChatConversation =
   // open historical rows with type='gemini' (message history is served
   // by the shared messages table). The backend factory rejects any
   // attempt to resume this conversation — see
-  // Nomicore/crates/nomifun-common/src/enums.rs and factory.rs.
+  // OpenHubcore/crates/openhub-common/src/enums.rs and factory.rs.
   // Every field is optional because legacy rows shape-varies across
   // several older Gemini-runtime versions.
   | Omit<
@@ -423,7 +423,7 @@ export type TChatConversation =
       'model'
     >
   | IChatConversation<
-      'nomi',
+      'openhub',
       {
         workspace: string;
         custom_workspace?: boolean;
@@ -479,13 +479,13 @@ export type TChatConversation =
          * spawns (homepage「主模型 + 协作模型」picker). `models[0]` is the 主模型
          * (also the lead/planner); the rest are 协作模型 the planner may assign
          * per node by difficulty. Written by the homepage entry into `extra`; the
-         * `nomi_run_create` gateway handler reads it back to build the run's fleet
+         * `openhub_run_create` gateway handler reads it back to build the run's fleet
          * (deterministic — not relayed through the LLM). Absent ⇒ Auto (all enabled). */
         orchestrator_model_range?:
           | { mode: 'single'; model: { provider_id: string; model: string } }
           | { mode: 'auto' }
           | { mode: 'range'; models: { provider_id: string; model: string }[] };
-        /** Marks this nomi conversation as a desktop-companion's single per-companion
+        /** Marks this openhub conversation as a desktop-companion's single per-companion
          * session (单会话契约). Written by the backend at companion-session creation.
          * Drives the 桌面伙伴 session-list group, the constrained companion chat panel
          * (CompanionChatPanel), and the work-conversation list filter. */
@@ -520,13 +520,13 @@ export type ModelCapability = {
   type: ModelType;
   /**
    * 是否为用户手动选择，如果为true，则表示用户手动选择了该类型，否则表示用户手动禁止了该模型；如果为undefined，则表示使用默认值。
-   * 后端按 snake_case 序列化为 `is_user_selected`（见 crates/backend/nomifun-api-types/src/provider.rs 的 ModelCapability，无 rename），此处须与线名一致。
+   * 后端按 snake_case 序列化为 `is_user_selected`（见 crates/backend/openhub-api-types/src/provider.rs 的 ModelCapability，无 rename），此处须与线名一致。
    */
   is_user_selected?: boolean;
 };
 
 /**
- * 统一多模态能力词表 —— 镜像 crates/backend/nomifun-api-types/src/model_task.rs。
+ * 统一多模态能力词表 —— 镜像 crates/backend/openhub-api-types/src/model_task.rs。
  * ModelTask 决定端点/请求体；ModelTrait 是同一任务内的细化（主要修饰 chat）。
  * 无 ts-rs：改动须同步 Rust 与此处。
  */
@@ -684,7 +684,7 @@ export interface IMcpServer {
   created_at: number;
   updated_at: number;
   original_json: string; // 存储原始JSON配置，用于编辑时的准确显示
-  /** Built-in MCP server managed by Nomi (hide edit/delete in UI) */
+  /** Built-in MCP server managed by OpenHub (hide edit/delete in UI) */
   builtin?: boolean;
 }
 
@@ -701,8 +701,8 @@ export interface IConversationMcpStatus {
 
 /** Stable ID for the built-in image generation MCP server */
 export const BUILTIN_IMAGE_GEN_ID = 'builtin-image-gen';
-export const BUILTIN_IMAGE_GEN_NAME = 'nomifun-image-generation';
-export const BUILTIN_IMAGE_GEN_LEGACY_NAMES = ['Nomifun Image Generation', BUILTIN_IMAGE_GEN_ID] as const;
+export const BUILTIN_IMAGE_GEN_NAME = 'openhub-image-generation';
+export const BUILTIN_IMAGE_GEN_LEGACY_NAMES = ['Openhub Image Generation', BUILTIN_IMAGE_GEN_ID] as const;
 
 export interface IMcpTool {
   name: string;

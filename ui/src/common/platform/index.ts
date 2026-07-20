@@ -7,8 +7,8 @@ let _services: IPlatformServices | null = null;
  * Centralised so that every call-site stays in sync.
  */
 export function getDevAppName(): string {
-  const isMultiInstance = process.env.NOMIFUN_MULTI_INSTANCE === '1';
-  return isMultiInstance ? 'NomiFun-Dev-2' : 'NomiFun-Dev';
+  const isMultiInstance = process.env.OPENHUB_MULTI_INSTANCE === '1';
+  return isMultiInstance ? 'OpenHub-Dev-2' : 'OpenHub-Dev';
 }
 
 export function registerPlatformServices(services: IPlatformServices): void {

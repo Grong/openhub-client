@@ -1,22 +1,22 @@
 # Communication
 
-NomiFun has several transport surfaces. They deliberately serve different
+OpenHub has several transport surfaces. They deliberately serve different
 callers and security models.
 
 ## Channels
 
 | Channel | Direction | Carries | Source |
 | --- | --- | --- | --- |
-| HTTP REST | UI/browser/client -> backend | CRUD, commands, setup, file operations, terminal input | `nomifun-app` route tree |
-| WebSocket `/ws` | backend <-> UI | Agent stream events, terminal output, broadcast events, heartbeats | `nomifun-realtime` |
+| HTTP REST | UI/browser/client -> backend | CRUD, commands, setup, file operations, terminal input | `openhub-app` route tree |
+| WebSocket `/ws` | backend <-> UI | Agent stream events, terminal output, broadcast events, heartbeats | `openhub-realtime` |
 | Tauri IPC | SPA -> desktop shell | Desktop-only OS features | `apps/desktop/src/main.rs` + Tauri plugins |
-| ACP/agent stdio | backend <-> child CLI | External CLI-agent conversation traffic | `nomifun-ai-agent` |
-| MCP stdio/HTTP | agent/backend/client <-> MCP server | Tools/resources/prompts | `nomi-mcp`, `nomifun-mcp`, `nomifun-public`, bridge subcommands |
+| ACP/agent stdio | backend <-> child CLI | External CLI-agent conversation traffic | `openhub-ai-agent` |
+| MCP stdio/HTTP | agent/backend/client <-> MCP server | Tools/resources/prompts | `openhub-mcp`, `openhub-mcp`, `openhub-public`, bridge subcommands |
 | Public Remote fronts | external agents/scripts -> backend | MCP tools or REST capability calls | `/mcp`, `/mcp-agent`, `/v1` |
 
 ## Auth Modes
 
-The backend resolves trust through `nomifun-auth` and the `AppServices`
+The backend resolves trust through `openhub-auth` and the `AppServices`
 configuration:
 
 - **Required**: normal web mode. Login cookie is required for `/api/*`; CSRF
@@ -24,7 +24,7 @@ configuration:
 - **NoAuth**: explicit insecure mode, used only through flags such as
   `--insecure-no-auth` for trusted loopback/private use.
 - **TrustLocalToken**: desktop shell mode. The webview gets a per-boot secret
-  and sends it as `x-nomi-local-trust`; middleware resolves that request to the
+  and sends it as `x-openhub-local-trust`; middleware resolves that request to the
   trusted local user. This is not the same as the old blanket `--local` story.
 
 WebSocket auth accepts the normal authenticated browser path and the local-trust
@@ -34,7 +34,7 @@ path used by the desktop shell.
 
 The SPA bridge in `ui/src/common/adapter/httpBridge.ts` selects:
 
-- same-origin URLs for `nomifun-web`,
+- same-origin URLs for `openhub-web`,
 - `http://127.0.0.1:<window.__backendPort>` for the desktop webview.
 
 `/ws` is a singleton connection per page lifetime. The backend event bus fans
@@ -77,12 +77,12 @@ are historical and predate the current bridge set.
 
 MCP injection differs by runtime:
 
-- user MCP rows and OAuth-backed HTTP servers come from `nomifun-mcp`,
+- user MCP rows and OAuth-backed HTTP servers come from `openhub-mcp`,
 - requirement and knowledge servers are scoped internal MCP servers,
-- Desktop Gateway tools are exposed through `nomifun-gateway`,
+- Desktop Gateway tools are exposed through `openhub-gateway`,
 - browser/computer bridges are feature-gated,
 - public `/mcp` and `/mcp-agent` are companion-token authenticated fronts from
-  `nomifun-public`.
+  `openhub-public`.
 
 ## Public Capability Fronts
 
@@ -106,5 +106,5 @@ associated profile, model/persona choices, and scoped capabilities.
 | Desktop keep-awake | Tauri command |
 | Remote MCP tool call | `/mcp` or `/mcp-agent` |
 | Remote REST capability call | `/v1` |
-| Agent CLI conversation | child process stdio managed by `nomifun-ai-agent` |
+| Agent CLI conversation | child process stdio managed by `openhub-ai-agent` |
 | Internal knowledge search for ACP session | `mcp-knowledge-stdio` bridge |

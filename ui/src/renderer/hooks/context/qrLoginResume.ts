@@ -1,10 +1,10 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export const QR_LOGIN_RESUME_KEY = 'nomifun:qr-login-resume';
+export const QR_LOGIN_RESUME_KEY = 'openhub:qr-login-resume';
 
 const QR_LOGIN_RESUME_MAX_AGE_MS = 30_000;
 

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -19,7 +19,7 @@ interface SiderPublicServiceEntryProps {
   onClick: () => void;
 }
 
-/** 对外伙伴 (Public Companion) — top-level rail entry under the 对外服务 group. Mirrors SiderNomiEntry. */
+/** 对外伙伴 (Public Companion) — top-level rail entry under the 对外服务 group. Mirrors SiderOpenHubEntry. */
 const SiderPublicServiceEntry: React.FC<SiderPublicServiceEntryProps> = ({
   isMobile,
   isActive,

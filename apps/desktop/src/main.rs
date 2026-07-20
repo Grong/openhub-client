@@ -2,17 +2,17 @@
 // keep the console so backend `tracing` logs are visible during development.
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-//! `nomifun-desktop` — the Tauri shell (replaces the Electron shell).
+//! `openhub-desktop` — the Tauri shell (replaces the Electron shell).
 //!
 //! Core idea (the whole point of this rewrite): there is NO spawned backend
-//! binary. The unified Rust backend (`nomifun-app`, ex-`nomicore`) is linked
+//! binary. The unified Rust backend (`openhub-app`, ex-`nomicore`) is linked
 //! into THIS process and started in-process on a localhost port. The webview
 //! loads the bundled SPA (`ui/dist`) and talks to `http://127.0.0.1:<port>/api`
 //! exactly as it does today — so the renderer's ~295 HTTP calls are unchanged.
 //!
-//! ┌── nomifun-desktop (this process) ──────────────────────────┐
+//! ┌── openhub-desktop (this process) ──────────────────────────┐
 //! │  Tauri shell (window/tray/dialog/deep-link/updater)         │
-//! │  └─ tokio task: nomifun_app embedded axum on 127.0.0.1:<p>  │
+//! │  └─ tokio task: openhub_app embedded axum on 127.0.0.1:<p>  │
 //! │  WebView2/WKWebView/WebKitGTK ── HTTP ──▶ 127.0.0.1:<p>/api │
 //! └────────────────────────────────────────────────────────────┘
 
@@ -21,7 +21,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 
 use clap::Parser;
-use nomifun_app::{DesktopServer, WebUiStatus};
+use openhub_app::{DesktopServer, WebUiStatus};
 use tauri::menu::{Menu, MenuItem};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
 use tauri::{Emitter, Manager};
@@ -58,7 +58,7 @@ fn webui_init_script(port: u16, trust_secret: &str) -> String {
         if (isBackend(url)) {{
           init = init || {{}};
           var h = new Headers((init && init.headers) || undefined);
-          if (!h.has("x-nomi-local-trust")) h.set("x-nomi-local-trust", secret);
+          if (!h.has("x-openhub-local-trust")) h.set("x-openhub-local-trust", secret);
           init.headers = h;
           if (typeof input !== "string") input = url;
         }}
@@ -83,8 +83,8 @@ fn webui_init_script(port: u16, trust_secret: &str) -> String {
     }};
     proto.send = function () {{
       try {{
-        if (isBackend(this.__nomiUrl) && !(this.__nomiHeaders && this.__nomiHeaders["x-nomi-local-trust"])) {{
-          this.setRequestHeader("x-nomi-local-trust", secret);
+        if (isBackend(this.__nomiUrl) && !(this.__nomiHeaders && this.__nomiHeaders["x-openhub-local-trust"])) {{
+          this.setRequestHeader("x-openhub-local-trust", secret);
         }}
       }} catch (e) {{}}
       return origSend.apply(this, arguments);
@@ -98,12 +98,12 @@ fn webui_init_script(port: u16, trust_secret: &str) -> String {
 }
 
 /// Resolve the bundled SPA directory (`ui/dist`) served to remote browsers by
-/// the LAN listener. Probes a `NOMIFUN_WEBUI_DIST` override, several
+/// the LAN listener. Probes a `OPENHUB_WEBUI_DIST` override, several
 /// resource-dir layouts (production bundle), then dev-tree relatives. A
 /// candidate must contain `index.html` to be accepted; `None` means remote
 /// browsers get the API only (logged as a warning).
 fn resolve_webui_spa_dir(app: &tauri::App) -> Option<PathBuf> {
-    if let Some(p) = std::env::var_os("NOMIFUN_WEBUI_DIST") {
+    if let Some(p) = std::env::var_os("OPENHUB_WEBUI_DIST") {
         let p = PathBuf::from(p);
         if p.join("index.html").is_file() {
             return Some(p);
@@ -125,20 +125,20 @@ fn resolve_webui_spa_dir(app: &tauri::App) -> Option<PathBuf> {
 
 /// Data root resolution, in priority order:
 ///
-/// 1. `NOMIFUN_DATA_DIR` env — explicit override; the shell appends `/Nomi`
+/// 1. `OPENHUB_DATA_DIR` env — explicit override; the shell appends `/OpenHub`
 ///    (semantics unchanged since the Electron era).
-/// 2. The shared per-host default from `nomifun_app::cli::default_data_dir()`:
-///    `%LOCALAPPDATA%\NomiFun\Nomi` on Windows, `~/Library/Application
-///    Support/NomiFun/Nomi` on macOS, `$XDG_DATA_HOME/NomiFun/Nomi` on Linux,
-///    with the historic `<system temp>/nomifun-data/Nomi` as the extreme
+/// 2. The shared per-host default from `openhub_app::cli::default_data_dir()`:
+///    `%LOCALAPPDATA%\OpenHub\OpenHub` on Windows, `~/Library/Application
+///    Support/OpenHub/OpenHub` on macOS, `$XDG_DATA_HOME/OpenHub/OpenHub` on Linux,
+///    with the historic `<system temp>/openhub-data/OpenHub` as the extreme
 ///    fallback (installs that used to land there are auto-relocated, see
 ///    `relocate.rs`). The web host and the `nomicore` bin resolve to the SAME
 ///    directory, so dev loops and the installed app share one state.
 fn default_data_dir() -> PathBuf {
-    if let Some(dir) = std::env::var_os("NOMIFUN_DATA_DIR") {
-        return PathBuf::from(dir).join("Nomi");
+    if let Some(dir) = std::env::var_os("OPENHUB_DATA_DIR") {
+        return PathBuf::from(dir).join("OpenHub");
     }
-    nomifun_app::cli::default_data_dir()
+    openhub_app::cli::default_data_dir()
 }
 
 /// Updater scaffold: ask the configured update endpoint whether a newer signed
@@ -228,9 +228,9 @@ fn acquire_keep_awake() -> Result<keepawake::KeepAwake, String> {
         .display(false) // 不持有 PreventUserIdleDisplaySleep:允许显示器空闲关闭(省电 + 护屏)
         .idle(true) // PreventUserIdleSystemSleep:系统保持唤醒;电池供电时同样生效
         .sleep(false) // PreventSystemSleep:已废弃 + 电池下被忽略,显式关闭
-        .reason("NomiFun keep-awake enabled")
-        .app_name("NomiFun")
-        .app_reverse_domain("com.nomifun.desktop")
+        .reason("OpenHub keep-awake enabled")
+        .app_name("OpenHub")
+        .app_reverse_domain("com.openhub.desktop")
         .create()
         .map_err(|e| format!("failed to acquire keep-awake assertion: {e}"))
 }
@@ -467,7 +467,7 @@ fn reconcile_companion_windows(
                 // Placeholder title for the brief pre-load frame; the companion page
                 // overwrites it with the companion's custom name once its profile loads
                 // (see setTitle in pages/companion/index.tsx). Never the lowercase engine id.
-                .title("NomiFun")
+                .title("OpenHub")
                 // Matches DEFAULT_DESK (characters/index.ts): figure + minimal chrome,
                 // no reserved bubble headroom (the page grows the window on demand).
                 // Keeping these in sync avoids a visible startup resize for built-ins.
@@ -513,7 +513,7 @@ fn main() -> std::process::ExitCode {
     // BEFORE any runtime init, single-instance handling, or window creation.
     // Every host binary must honor these or the injected declaration tools
     // (requirement_complete / team / guide) never appear in the agent's session.
-    if let Some(code) = nomifun_app::commands::run_mcp_stdio_subcommand_if_present() {
+    if let Some(code) = openhub_app::commands::run_mcp_stdio_subcommand_if_present() {
         return code;
     }
 
@@ -523,25 +523,25 @@ fn main() -> std::process::ExitCode {
     // runtime cache, backend cli, embedded server — keys off the data dir it
     // returns. On relocation failure it falls back to the legacy dir.
     let data_dir = relocate::effective_data_dir(default_data_dir());
-    nomifun_runtime::init(&data_dir);
+    openhub_runtime::init(&data_dir);
     // SAFETY: no worker threads exist yet (Tauri's runtime is built by .run()).
-    let merged_path = unsafe { nomifun_runtime::enhance_process_path() };
+    let merged_path = unsafe { openhub_runtime::enhance_process_path() };
 
     // Backend config. The desktop does NOT use `--local`: `DesktopServer::start`
     // runs the backend under `TrustLocalToken` (trusts only its own webview via
     // a per-boot secret) so the LAN listener can require login. Only the data
     // dir + log level flow from here; the listeners bind their own ports.
-    let mut cli = nomifun_app::cli::Cli::parse_from(["nomifun-desktop"]);
+    let mut cli = openhub_app::cli::Cli::parse_from(["openhub-desktop"]);
     cli.data_dir = data_dir;
     // Opt-in verbose backend logging without a custom build, e.g.
-    //   NOMI_LOG_LEVEL=debug            (everything)
-    //   NOMI_LOG_LEVEL=info             (default)
-    // At `debug`, the `nomi_providers` target logs the outgoing request body and
-    // each SSE chunk, and `nomi_mcp` logs MCP connect results — exactly what is
+    //   OPENHUB_LOG_LEVEL=debug            (everything)
+    //   OPENHUB_LOG_LEVEL=info             (default)
+    // At `debug`, the `openhub_providers` target logs the outgoing request body and
+    // each SSE chunk, and `openhub_mcp` logs MCP connect results — exactly what is
     // needed to diagnose a provider/gateway stall. Console output appears in the
     // terminal that launched `tauri dev`; it is also written to the log files
     // under {data-dir}/logs/.
-    if let Ok(level) = std::env::var("NOMI_LOG_LEVEL") {
+    if let Ok(level) = std::env::var("OPENHUB_LOG_LEVEL") {
         let level = level.trim();
         if !level.is_empty() {
             cli.log_level = Some(level.to_owned());
@@ -600,7 +600,7 @@ fn main() -> std::process::ExitCode {
             let backend_err_handle = app.handle().clone();
             let status_emit_handle = app.handle().clone();
             std::thread::Builder::new()
-                .name("nomifun-backend".into())
+                .name("openhub-backend".into())
                 .spawn(move || {
                     let run = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| -> anyhow::Result<()> {
                         let rt = tokio::runtime::Builder::new_multi_thread()
@@ -638,7 +638,7 @@ fn main() -> std::process::ExitCode {
                     backend_err_handle
                         .dialog()
                         .message(error)
-                        .title("NomiFun backend failed to start")
+                        .title("OpenHub backend failed to start")
                         .kind(MessageDialogKind::Error)
                         .blocking_show();
                     backend_err_handle.exit(1);
@@ -670,13 +670,13 @@ fn main() -> std::process::ExitCode {
             app.manage(server);
             let win_builder =
                 tauri::WebviewWindowBuilder::new(app, "main", tauri::WebviewUrl::App("index.html".into()))
-                    .title("NomiFun")
+                    .title("OpenHub")
                     .inner_size(1280.0, 832.0)
                     .min_inner_size(880.0, 600.0)
                     .initialization_script(&init_script);
             // macOS: Overlay makes the titlebar transparent + extends content under
             // it, but it does NOT hide the native title text. With the title still
-            // set to "NomiFun", AppKit draws that string next to the traffic lights,
+            // set to "OpenHub", AppKit draws that string next to the traffic lights,
             // overlapping the React sidebar toggle. `hidden_title(true)` maps to
             // `setTitleVisibility(Hidden)` so the OS keeps the title for menus /
             // Mission Control while leaving the titlebar visually empty.
@@ -720,15 +720,15 @@ fn main() -> std::process::ExitCode {
             // Labels are English fallbacks, adopted from the renderer's locale via
             // `set_tray_labels` once it mounts (the renderer always loads before
             // the user can close, so the first menu open is already localized).
-            let tray_show = MenuItem::with_id(app, "tray-show", "Show NomiFun", true, None::<&str>)?;
+            let tray_show = MenuItem::with_id(app, "tray-show", "Show OpenHub", true, None::<&str>)?;
             let tray_quit = MenuItem::with_id(app, "tray-quit", "Quit", true, None::<&str>)?;
             let tray_menu = Menu::with_items(app, &[&tray_show, &tray_quit])?;
             app.manage(TrayMenuItems {
                 show: tray_show.clone(),
                 quit: tray_quit.clone(),
             });
-            let mut tray_builder = TrayIconBuilder::with_id("nomi-tray")
-                .tooltip("NomiFun")
+            let mut tray_builder = TrayIconBuilder::with_id("openhub-tray")
+                .tooltip("OpenHub")
                 .menu(&tray_menu)
                 // Left-click is reserved for "surface the window"; the menu is
                 // right-click only (otherwise a left-click would both pop the menu

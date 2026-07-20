@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -69,7 +69,7 @@ const ZoomControls: React.FC = () => {
         value={zoomToSlider(zoom)}
         onChange={onSlider}
         aria-label={t('workshopCanvas.zoom.slider', { defaultValue: '缩放' })}
-        className='nomi-ws-zoom-slider h-3px w-120px cursor-pointer'
+        className='openhub-ws-zoom-slider h-3px w-120px cursor-pointer'
       />
 
       <div

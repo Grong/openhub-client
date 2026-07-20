@@ -1,6 +1,6 @@
 # Development
 
-This page is for people changing **NomiFun** itself: the React SPA, the Rust
+This page is for people changing **OpenHub** itself: the React SPA, the Rust
 backend, the agent engine, or the Tauri shell. If you only want to install or
 operate the product, start with
 [`../getting-started/installation.md`](../getting-started/installation.md) or
@@ -29,8 +29,8 @@ Platform notes:
 ## Install
 
 ```bash
-git clone <repo-url> nomifun-tauri
-cd nomifun-tauri
+git clone <repo-url> openhub-client
+cd openhub-client
 bun install
 cargo check --workspace
 ```
@@ -43,8 +43,8 @@ the root `Cargo.toml`.
 | Command | Use when | What runs |
 | --- | --- | --- |
 | `bun run dev:ui` | UI-only work that can tolerate missing API calls | Vite on `http://localhost:5173`; no backend. |
-| `bun run dev:web` | Browser + backend iteration with auth disabled | `nomifun-web --port 8787 --dist ui/dist --insecure-no-auth` plus Vite dev server. |
-| `bun run serve:web` | Running the production-style web host from source | `nomifun-web` on `http://127.0.0.1:8787`; serves built `ui/dist`; auth on by default. |
+| `bun run dev:web` | Browser + backend iteration with auth disabled | `openhub-web --port 8787 --dist ui/dist --insecure-no-auth` plus Vite dev server. |
+| `bun run serve:web` | Running the production-style web host from source | `openhub-web` on `http://127.0.0.1:8787`; serves built `ui/dist`; auth on by default. |
 | `bun run dev` | Desktop/Tauri work | Tauri dev shell, Vite, and embedded backend under the desktop local-trust policy. |
 
 `serve:web` expects a built SPA:
@@ -58,7 +58,7 @@ bun run serve:web
 `--insecure-no-auth`, so keep it on localhost or an isolated network.
 
 The desktop loop does **not** use the old Electron process model. The Tauri
-shell links `nomifun-app`, starts the backend in-process on a free localhost
+shell links `openhub-app`, starts the backend in-process on a free localhost
 port, injects `window.__backendPort` and `window.__nomiLocalTrust`, and the
 renderer presents that per-boot trust secret on every request.
 
@@ -87,7 +87,7 @@ bun run help --check
 
 ## Backend CLI
 
-`nomifun-app` still ships a standalone `nomicore` binary. The app hosts do not
+`openhub-app` still ships a standalone `nomicore` binary. The app hosts do not
 spawn it, but it is useful for diagnostics, stdio MCP bridges, and public
 capability calls.
 
@@ -108,7 +108,7 @@ Current subcommands:
 When agents fail to launch, start with:
 
 ```bash
-cargo run -p nomifun-app --bin nomicore -- doctor
+cargo run -p openhub-app --bin nomicore -- doctor
 ```
 
 It probes installed agent CLIs from the same PATH shape the backend uses and
@@ -118,9 +118,9 @@ prints a table to stdout.
 
 All hosts share the same unset default data directory:
 
-- Windows: `%LOCALAPPDATA%\NomiFun\Nomi`
-- macOS: `~/Library/Application Support/NomiFun/Nomi`
-- Linux: `$XDG_DATA_HOME/NomiFun/Nomi` or `~/.local/share/NomiFun/Nomi`
+- Windows: `%LOCALAPPDATA%\OpenHub\OpenHub`
+- macOS: `~/Library/Application Support/OpenHub/OpenHub`
+- Linux: `$XDG_DATA_HOME/OpenHub/OpenHub` or `~/.local/share/OpenHub/OpenHub`
 
 The data dir contains SQLite state, logs, Bun runtime cache, extension data,
 agent state, and other persistent local state. The backend takes an exclusive
@@ -130,16 +130,16 @@ same data directory at the same time.
 For isolated development, set an explicit directory:
 
 ```bash
-NOMIFUN_DATA_DIR=/tmp/nomifun-dev bun run serve:web
-NOMIFUN_DATA_DIR=/tmp/nomifun-dev bun run dev
+OPENHUB_DATA_DIR=/tmp/openhub-dev bun run serve:web
+OPENHUB_DATA_DIR=/tmp/openhub-dev bun run dev
 ```
 
-Desktop app semantics append the channel-specific `Nomi` leaf; web and
+Desktop app semantics append the channel-specific `OpenHub` leaf; web and
 `nomicore` take the env value literally. See
 [`../reference/configuration.md`](../reference/configuration.md) before relying
 on this in automation.
 
-`NOMIFUN_WORK_DIR` controls where conversation workspaces are created. If unset,
+`OPENHUB_WORK_DIR` controls where conversation workspaces are created. If unset,
 the backend falls back to the data dir.
 
 ## Logs
@@ -147,10 +147,10 @@ the backend falls back to the data dir.
 Logs go to stdout and to `<data-dir>/logs/nomicore.log`. Use:
 
 ```bash
-NOMIFUN_LOG_LEVEL='info,nomifun_mcp=trace' bun run serve:web
+OPENHUB_LOG_LEVEL='info,openhub_mcp=trace' bun run serve:web
 ```
 
-or pass `--log-level` to `nomicore` / `nomifun-web` directly. The value is a
+or pass `--log-level` to `nomicore` / `openhub-web` directly. The value is a
 `tracing_subscriber::EnvFilter` directive.
 
 ## Where to Read Next

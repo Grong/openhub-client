@@ -1,13 +1,13 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
  * Creative Workshop REST client.
  *
- * Talks to `nomifun-workshop` (`/api/workshop/*`) and `nomifun-creation`
+ * Talks to `openhub-workshop` (`/api/workshop/*`) and `openhub-creation`
  * (`/api/creation/*`) over the same HTTP channel the rest of the app uses:
  * `httpRequest` from the shared `httpBridge` (base-URL resolution for desktop vs
  * WebUI, local-trust / CSRF headers, `{ success, data }` envelope unwrapping, and

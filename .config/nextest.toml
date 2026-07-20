@@ -1,7 +1,7 @@
 # cargo-nextest 配置。
 #
 # 真 Chrome 集成/端到端测试的串行化（browser-use 自研引擎）：
-# nomi-browser-engine / nomi-browser 的 `#[ignore]` 真 Chrome 用例每个都 fork 一个
+# openhub-browser-engine / openhub-browser 的 `#[ignore]` 真 Chrome 用例每个都 fork 一个
 # 完整 Chrome 进程。nextest 默认跨二进制并行调度,`--run-ignored all` 会同时拉起十几个
 # Chrome → 机器过载,个别会话在启动/早期 navigate 阶段掉线,报
 # "browser session lost (recoverable=false)"。这是**并行负载竞争的伪失败,非产品/测试
@@ -18,5 +18,5 @@
 serial-chrome = { max-threads = 1 }
 
 [[profile.default.overrides]]
-filter = '(package(nomi-browser-engine) | package(nomi-browser)) & (binary_id(/integration/) | binary_id(/_e2e$/) | test(/_real$/))'
+filter = '(package(openhub-browser-engine) | package(openhub-browser)) & (binary_id(/integration/) | binary_id(/_e2e$/) | test(/_real$/))'
 test-group = 'serial-chrome'

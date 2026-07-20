@@ -1,6 +1,6 @@
 # crates/backend
 
-Backend crates. Package names use the `nomifun-*` prefix. Together these crates
+Backend crates. Package names use the `openhub-*` prefix. Together these crates
 provide the HTTP/WS server, data layer, auth, conversations, MCP/skills,
 knowledge, requirements/AutoWork, terminal sessions, companions, public
 capability gateway, and app composition.
@@ -10,29 +10,29 @@ are:
 
 | Crate | Role |
 | --- | --- |
-| `nomifun-app` | Composition root, CLI, bootstrap, service graph, router assembly, and embedded-server helpers. |
-| `nomifun-db` | SQLite, migrations, repository traits, and repository implementations. |
-| `nomifun-api-types` | Shared HTTP/WS request and response types. |
-| `nomifun-auth` | JWT, local trust, CSRF, auth routes, QR login, and security middleware. |
-| `nomifun-conversation` | Conversation/message service and agent stream relay. |
-| `nomifun-ai-agent` | Single bridge into `crates/agent`; agent factory, registry, ACP/session management, worker tasks. |
-| `nomifun-mcp` | MCP server config, OAuth, adapters, sync, and connection tests. |
-| `nomifun-extension` | Extension, skill, assistant contribution, and hub plumbing. |
-| `nomifun-requirement` | Requirements Platform and AutoWork orchestration. |
-| `nomifun-terminal` | PTY-backed terminal sessions. |
-| `nomifun-knowledge` | Knowledge bases and scoped knowledge MCP server. |
-| `nomifun-companion` | Desktop companions and companion memory/persona state. |
-| `nomifun-gateway` | Desktop Gateway MCP tools exposed to internal and external agents. |
-| `nomifun-public` | Companion-token authenticated `/mcp`, `/mcp-agent`, and `/v1` public front doors. |
+| `openhub-app` | Composition root, CLI, bootstrap, service graph, router assembly, and embedded-server helpers. |
+| `openhub-db` | SQLite, migrations, repository traits, and repository implementations. |
+| `openhub-api-types` | Shared HTTP/WS request and response types. |
+| `openhub-auth` | JWT, local trust, CSRF, auth routes, QR login, and security middleware. |
+| `openhub-conversation` | Conversation/message service and agent stream relay. |
+| `openhub-ai-agent` | Single bridge into `crates/agent`; agent factory, registry, ACP/session management, worker tasks. |
+| `openhub-mcp` | MCP server config, OAuth, adapters, sync, and connection tests. |
+| `openhub-extension` | Extension, skill, assistant contribution, and hub plumbing. |
+| `openhub-requirement` | Requirements Platform and AutoWork orchestration. |
+| `openhub-terminal` | PTY-backed terminal sessions. |
+| `openhub-knowledge` | Knowledge bases and scoped knowledge MCP server. |
+| `openhub-companion` | Desktop companions and companion memory/persona state. |
+| `openhub-gateway` | Desktop Gateway MCP tools exposed to internal and external agents. |
+| `openhub-public` | Companion-token authenticated `/mcp`, `/mcp-agent`, and `/v1` public front doors. |
 
 See `docs/architecture/backend-crates.md` for the maintained map.
 
 ## Agent Boundary
 
-Only `nomifun-ai-agent` should depend directly on `nomi-*` crates. Other backend
+Only `openhub-ai-agent` should depend directly on `openhub-*` crates. Other backend
 crates consume agent-facing types through its re-exports, for example
-`nomifun_ai_agent::{nomi_config, nomi_types, RequirementSink}`.
+`openhub_ai_agent::{openhub_config, openhub_types, RequirementSink}`.
 
 This keeps the agent layer isolated enough to reason about, but the older
-`nomifun-agent-rs` extraction language in historical specs is not a current
+`openhub-agent-rs` extraction language in historical specs is not a current
 roadmap commitment.

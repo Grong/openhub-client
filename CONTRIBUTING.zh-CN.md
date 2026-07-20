@@ -1,8 +1,8 @@
-# NomiFun 贡献手册
+# OpenHub 贡献手册
 
 English: [CONTRIBUTING.md](CONTRIBUTING.md)
 
-NomiFun 是一个 Rust + Tauri + React monorepo，也是一套本地优先的高权限自动化系统：它可以驱动 shell、文件、浏览器、桌面应用、智能体、MCP server 和远程能力 API。我们非常欢迎贡献，但贡献必须让维护者能快速理解、快速验证，并且不伤害用户数据与本地安全承诺。
+OpenHub 是一个 Rust + Tauri + React monorepo，也是一套本地优先的高权限自动化系统：它可以驱动 shell、文件、浏览器、桌面应用、智能体、MCP server 和远程能力 API。我们非常欢迎贡献，但贡献必须让维护者能快速理解、快速验证，并且不伤害用户数据与本地安全承诺。
 
 这份手册是本仓库的开发与提交约定：如何选题、如何改代码、如何验证、如何提交一个维护者愿意认真 review 的 PR。
 
@@ -12,7 +12,7 @@ NomiFun 是一个 Rust + Tauri + React monorepo，也是一套本地优先的高
 
 1. PR 要小。一个问题、一个行为变化、一个能说清楚的审查故事。
 2. 大功能、新顶层页面、数据库迁移、安全/权限相关逻辑、内置资产、vendored code、大范围重构，先开 issue 或讨论，不要直接开大 PR。
-3. 尊重仓库边界：前端在 `ui/`，后端功能在 `crates/backend/`，agent 引擎在 `crates/agent/`，后端需要 agent 能力时优先走 `nomifun-ai-agent` 这条边界。
+3. 尊重仓库边界：前端在 `ui/`，后端功能在 `crates/backend/`，agent 引擎在 `crates/agent/`，后端需要 agent 能力时优先走 `openhub-ai-agent` 这条边界。
 4. 跑能证明你改动的最小检查。跑不了就如实写在 PR 里，不要假装跑过。
 5. 不提交密钥、本地数据、构建产物、私人工作区、专有素材、许可证不明确的第三方资产。
 6. 用户能感知的变化，要同步补齐用户侧证据：UI 截图、文档、双语 i18n、需要时更新 changelog。
@@ -46,7 +46,7 @@ NomiFun 是一个 Rust + Tauri + React monorepo，也是一套本地优先的高
 
 请遵守 [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)。我们欢迎直接、事实清楚的技术讨论；不接受人身攻击、骚扰、歧视或无关争吵。
 
-安全问题请按 [SECURITY.md](SECURITY.md) 私下报告，不要直接开公开 issue。NomiFun 能操作本地工具和高权限自动化能力，安全报告必须谨慎处理。
+安全问题请按 [SECURITY.md](SECURITY.md) 私下报告，不要直接开公开 issue。OpenHub 能操作本地工具和高权限自动化能力，安全报告必须谨慎处理。
 
 可以使用 AI 辅助贡献，但你仍然要对每一行负责：自己审查生成代码，删除不存在的 API，不把私有/受限代码贴进 prompt。若 AI 大量参与了实现，建议在 PR 备注中说明，方便 reviewer 判断风险。
 
@@ -65,8 +65,8 @@ NomiFun 是一个 Rust + Tauri + React monorepo，也是一套本地优先的高
 安装与基础检查：
 
 ```bash
-git clone <repo-url> nomifun-tauri
-cd nomifun-tauri
+git clone <repo-url> openhub-client
+cd openhub-client
 bun install
 cargo check --workspace
 ```
@@ -88,10 +88,10 @@ cargo check --workspace
 
 | 路径 | 负责什么 |
 | --- | --- |
-| `apps/web` | 独立 `nomifun-web` server，提供 API + SPA。 |
+| `apps/web` | 独立 `openhub-web` server，提供 API + SPA。 |
 | `apps/desktop` | Tauri 桌面壳，内嵌后端和桌面插件。 |
-| `crates/agent` | `nomi-*` crates，独立 agent 引擎。 |
-| `crates/backend` | `nomifun-*` crates，HTTP/WS 后端、数据层、鉴权、功能域、公开 API。 |
+| `crates/agent` | `openhub-*` crates，独立 agent 引擎。 |
+| `crates/backend` | `openhub-*` crates，HTTP/WS 后端、数据层、鉴权、功能域、公开 API。 |
 | `crates/shared` | 少量跨 backend/agent 的共享工具。 |
 | `ui` | React 19 + TypeScript + Vite 单页应用。 |
 | `docs` | 当前用户文档、运维文档、架构文档、贡献者文档。 |
@@ -114,10 +114,10 @@ cargo check --workspace
 
 - Rust 改动提交前运行 `cargo fmt`。
 - 共享 Rust 依赖统一走根目录 [Cargo.toml](Cargo.toml) 的 workspace dependency。
-- 后端功能代码放进拥有它的 `nomifun-*` crate。`nomifun-app` 主要负责组合、启动、router glue，不要堆业务逻辑。
-- 后端 crate 需要 agent 类型时，通常通过 `nomifun-ai-agent::{nomi_config, nomi_types, RequirementSink}`。新增 backend -> `nomi-*` 直连依赖必须写清理由，通常还要 feature-gated。
-- HTTP request/response DTO 如果属于 API contract，放在 `nomifun-api-types`。
-- 数据库 schema 变化使用 `crates/backend/nomifun-db/migrations/` 下追加编号 SQL 文件，同时更新 model、repository 和聚焦测试。
+- 后端功能代码放进拥有它的 `openhub-*` crate。`openhub-app` 主要负责组合、启动、router glue，不要堆业务逻辑。
+- 后端 crate 需要 agent 类型时，通常通过 `openhub-ai-agent::{openhub_config, openhub_types, RequirementSink}`。新增 backend -> `openhub-*` 直连依赖必须写清理由，通常还要 feature-gated。
+- HTTP request/response DTO 如果属于 API contract，放在 `openhub-api-types`。
+- 数据库 schema 变化使用 `crates/backend/openhub-db/migrations/` 下追加编号 SQL 文件，同时更新 model、repository 和聚焦测试。
 - 面向用户的后端失败用 `AppError`，日志用 `tracing` 保留有用上下文。
 - async request path 上不要无隔离地做阻塞工作。
 - parser、migration、repository、安全校验、bugfix 都应该有聚焦测试。
@@ -142,7 +142,7 @@ cargo check --workspace
 
 ### 依赖、资产与许可证
 
-NomiFun 使用 Apache-2.0。你的贡献会按同一许可证接收。
+OpenHub 使用 Apache-2.0。你的贡献会按同一许可证接收。
 
 新增依赖、资产、内置 skill、模型 preset 或生成文件前，请确认：
 
@@ -200,7 +200,7 @@ build(mac): generate updater latest.json after signed bundle
 | 前端功能 | `bun run check`；可见 UI 附截图。 |
 | Rust 编译路径 | `cargo check --workspace` 或更窄的 `cargo check -p <crate>`。 |
 | Rust 行为 | `cargo test -p <crate>` 或覆盖改动的聚焦测试。 |
-| 数据库迁移 | migration test 或 repository 聚焦测试；可行时跑 `cargo test -p nomifun-db`。 |
+| 数据库迁移 | migration test 或 repository 聚焦测试；可行时跑 `cargo test -p openhub-db`。 |
 | 打包/发布 | 相关 build script 加你修改过的 release docs。 |
 | 安全敏感路径 | 聚焦测试、PR 中写 threat-model 备注；私密漏洞不要公开细节。 |
 
@@ -258,7 +258,7 @@ cargo test -p <crate>
 
 ## 参考的开源社区实践
 
-这份指南是为 NomiFun 定制的，但借鉴了这些成熟实践：
+这份指南是为 OpenHub 定制的，但借鉴了这些成熟实践：
 
 - [GitHub contributor guideline docs](https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/setting-guidelines-for-repository-contributors)
 - [Open Source Guides: How to Contribute](https://opensource.guide/how-to-contribute/)

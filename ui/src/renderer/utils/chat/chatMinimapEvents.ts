@@ -1,4 +1,4 @@
-export const CHAT_MESSAGE_JUMP_EVENT = 'nomifun-chat-message-jump';
+export const CHAT_MESSAGE_JUMP_EVENT = 'openhub-chat-message-jump';
 
 export interface ChatMessageJumpDetail {
   conversation_id: number;

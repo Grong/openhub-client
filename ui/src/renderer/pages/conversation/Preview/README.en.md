@@ -59,8 +59,8 @@ docs or examples.
 
 `PreviewProvider` persists only lightweight text tabs:
 
-- namespace-aware keys: `nomifun_preview_tabs:<namespace>` and
-  `nomifun_preview_active_tab_id:<namespace>`;
+- namespace-aware keys: `openhub_preview_tabs:<namespace>` and
+  `openhub_preview_active_tab_id:<namespace>`;
 - default namespace: `conversation`;
 - persistable content types: markdown, HTML, code, and diff;
 - content-size cap to avoid localStorage jank.

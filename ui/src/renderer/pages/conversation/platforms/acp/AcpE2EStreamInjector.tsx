@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,7 +9,7 @@ import { useAddOrUpdateMessage } from '@/renderer/pages/conversation/Messages/ho
 import React, { useEffect } from 'react';
 
 const STREAM_TICK_MS = 35;
-const ENABLED_CONVERSATION_KEY = 'nomifun:e2e-message-stream-conversation-id';
+const ENABLED_CONVERSATION_KEY = 'openhub:e2e-message-stream-conversation-id';
 
 type RunScenarioOptions = {
   historyPairs?: number;
@@ -27,7 +27,7 @@ type StreamRegistry = {
 
 declare global {
   interface Window {
-    __NOMIFUN_E2E_MESSAGE_STREAM__?: StreamRegistry;
+    __OPENHUB_E2E_MESSAGE_STREAM__?: StreamRegistry;
   }
 }
 
@@ -94,7 +94,7 @@ const AcpE2EStreamInjector: React.FC<{ conversationId: number }> = ({ conversati
       return;
     }
 
-    const registry = (window.__NOMIFUN_E2E_MESSAGE_STREAM__ ??= { controllers: {} });
+    const registry = (window.__OPENHUB_E2E_MESSAGE_STREAM__ ??= { controllers: {} });
     const registryKey = String(conversationId);
 
     registry.controllers[registryKey] = {
@@ -142,8 +142,8 @@ const AcpE2EStreamInjector: React.FC<{ conversationId: number }> = ({ conversati
     };
 
     return () => {
-      if (window.__NOMIFUN_E2E_MESSAGE_STREAM__) {
-        delete window.__NOMIFUN_E2E_MESSAGE_STREAM__.controllers[registryKey];
+      if (window.__OPENHUB_E2E_MESSAGE_STREAM__) {
+        delete window.__OPENHUB_E2E_MESSAGE_STREAM__.controllers[registryKey];
       }
     };
   }, [addOrUpdateMessage, conversationId]);

@@ -1,13 +1,13 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import { ipcBridge } from '@/common';
 import type { ComputerPermissionKind, ComputerPermissionStatus } from '@/common/adapter/ipcBridge';
 import { configService } from '@/common/config/configService';
-import NomiScrollArea from '@/renderer/components/base/NomiScrollArea';
+import OpenHubScrollArea from '@/renderer/components/base/OpenHubScrollArea';
 import { Button, Switch } from '@arco-design/web-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -60,7 +60,7 @@ const ComputerUseSettingsContent: React.FC = () => {
   }, []);
 
   const isMac = perm?.platform === 'macos';
-  const appLabel = perm?.app_label || 'NomiFun';
+  const appLabel = perm?.app_label || 'OpenHub';
 
   const permRow = (kind: ComputerPermissionKind, granted: boolean | null, label: string, description: string) => (
     <PreferenceRow label={label} description={description}>
@@ -75,7 +75,7 @@ const ComputerUseSettingsContent: React.FC = () => {
 
   return (
     <div className='flex flex-col h-full w-full'>
-      <NomiScrollArea className='flex-1 min-h-0 pb-16px' disableOverflow={isPageMode}>
+      <OpenHubScrollArea className='flex-1 min-h-0 pb-16px' disableOverflow={isPageMode}>
         <div className='px-[12px] md:px-[32px] py-16px bg-2 rd-16px space-y-12px'>
           <div className='text-13px font-600 text-t-secondary'>{t('settings.computerUseSection')}</div>
           <div className='w-full flex flex-col divide-y divide-border-2'>
@@ -100,7 +100,7 @@ const ComputerUseSettingsContent: React.FC = () => {
             <div className='text-12px text-t-tertiary leading-relaxed'>{t('settings.computerUseRestartHint', { app: appLabel })}</div>
           </div>
         )}
-      </NomiScrollArea>
+      </OpenHubScrollArea>
     </div>
   );
 };

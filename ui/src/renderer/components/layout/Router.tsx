@@ -25,7 +25,7 @@ const ExtensionsPage = React.lazy(() => import('@renderer/pages/requirements/Ext
 const SourcesPage = React.lazy(() => import('@renderer/pages/requirements/SourcesPage'));
 const TerminalSessionPage = React.lazy(() => import('@renderer/pages/terminal/TerminalSessionPage'));
 const TerminalCreatePage = React.lazy(() => import('@renderer/pages/terminal/TerminalCreatePage'));
-const NomiConfigPage = React.lazy(() => import('@renderer/pages/nomi'));
+const OpenHubConfigPage = React.lazy(() => import('@renderer/pages/openhub'));
 const PublicCompanionRosterPage = React.lazy(() => import('@renderer/pages/publicCompanion'));
 const PublicAgentDetailPage = React.lazy(() => import('@renderer/pages/publicCompanion/PublicAgentDetailPage'));
 const KnowledgeListPage = React.lazy(() => import('@renderer/pages/knowledge/KnowledgeListPage'));
@@ -177,7 +177,7 @@ const PanelRoute: React.FC<{ layout: React.ReactElement }> = ({ layout }) => {
         {/* The desktop-companion window route: fullscreen transparent, no app layout/sidebar. */}
         <Route path='/companion' element={withRouteFallback(CompanionPage)} />
         <Route element={<ProtectedLayout layout={layout} />}>
-          <Route path='/settings/companion' element={<Navigate to='/nomi' replace />} />
+          <Route path='/settings/companion' element={<Navigate to='/openhub' replace />} />
           <Route path='/settings/requirements' element={<Navigate to='/requirements' replace />} />
           <Route path='/settings/public-service' element={<Navigate to='/public-companions' replace />} />
           <Route path='/settings/workshop' element={<Navigate to='/workshop' replace />} />
@@ -238,7 +238,7 @@ const PanelRoute: React.FC<{ layout: React.ReactElement }> = ({ layout }) => {
           <Route path='/autowork' element={<Navigate to='/requirements/extensions?tab=autowork' replace />} />
           {/* Webhook config relocated into 扩展能力 */}
           <Route path='/other' element={<Navigate to='/requirements/extensions?tab=notify' replace />} />
-          <Route path='/nomi' element={withRouteFallback(NomiConfigPage)} />
+          <Route path='/openhub' element={withRouteFallback(OpenHubConfigPage)} />
           {/* 对外伙伴 (Public Companion) — a first-class domain separate from desktop companions. */}
           <Route path='/public-companions' element={withRouteFallback(PublicCompanionRosterPage)} />
           <Route path='/public-companions/:id' element={withRouteFallback(PublicAgentDetailPage)} />

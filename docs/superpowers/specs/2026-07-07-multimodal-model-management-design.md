@@ -32,18 +32,18 @@ Provider error: API error 404:
 
 投诉链路的精确定位(`feat/creative-workshop` 现状,勘察坐实):
 
-- **无 `models` 表**:一个"模型"只是 `providers.models[]` JSON 数组里的一个字符串(`crates/backend/nomifun-db/migrations/001_baseline.sql:82-100`)。模型身份 = `(provider_id, model)` 值对。每模型属性散落在 provider 行上的并行 JSON map(`model_enabled` / `model_health` / `model_protocols` / `model_context_limits` / `model_descriptions` / `sort_order`)。
-- **能力/模态无持久化**:能力只存在 **provider 级**(`crates/backend/nomifun-api-types/src/provider.rs:25-31`);运行时靠**按模型名猜测**的启发式(Rust `crates/backend/nomifun-api-types/src/model_capability.rs` ⇄ TS `ui/src/common/utils/modelCapabilities.ts` 双份重复)。
-- **两套模态词表并存**:`ModelType`(10 项:Text/Vision/FunctionCalling/ImageGeneration/VideoGeneration/WebSearch/Reasoning/Embedding/Rerank/ExcludeFromPrimary,**无 TTS/ASR**)与 `MediaCapability`(`t2i|i2i|inpaint|t2v|i2v|v2v|tts|text`,`crates/backend/nomifun-creation/src/types.rs:9-57`)。
-- **404 精确位置**:`crates/backend/nomifun-ai-agent/src/factory/nomi.rs:951-954`,对 `stepfun`/`stepfun-plan`/`ark`/`zhipu` 等平台**硬编码 `/chat/completions`**;探测链路 `crates/backend/nomifun-ai-agent/src/services/provider_health.rs:70-82` **完全不分模态**;前端只传 `{provider_id, model}` 无模态提示。
+- **无 `models` 表**:一个"模型"只是 `providers.models[]` JSON 数组里的一个字符串(`crates/backend/openhub-db/migrations/001_baseline.sql:82-100`)。模型身份 = `(provider_id, model)` 值对。每模型属性散落在 provider 行上的并行 JSON map(`model_enabled` / `model_health` / `model_protocols` / `model_context_limits` / `model_descriptions` / `sort_order`)。
+- **能力/模态无持久化**:能力只存在 **provider 级**(`crates/backend/openhub-api-types/src/provider.rs:25-31`);运行时靠**按模型名猜测**的启发式(Rust `crates/backend/openhub-api-types/src/model_capability.rs` ⇄ TS `ui/src/common/utils/modelCapabilities.ts` 双份重复)。
+- **两套模态词表并存**:`ModelType`(10 项:Text/Vision/FunctionCalling/ImageGeneration/VideoGeneration/WebSearch/Reasoning/Embedding/Rerank/ExcludeFromPrimary,**无 TTS/ASR**)与 `MediaCapability`(`t2i|i2i|inpaint|t2v|i2v|v2v|tts|text`,`crates/backend/openhub-creation/src/types.rs:9-57`)。
+- **404 精确位置**:`crates/backend/openhub-ai-agent/src/factory/openhub.rs:951-954`,对 `stepfun`/`stepfun-plan`/`ark`/`zhipu` 等平台**硬编码 `/chat/completions`**;探测链路 `crates/backend/openhub-ai-agent/src/services/provider_health.rs:70-82` **完全不分模态**;前端只传 `{provider_id, model}` 无模态提示。
 - **三套互不相通的执行子系统**:
   | 子系统 | Crate | Trait | 入口 | 模态 |
   |---|---|---|---|---|
-  | LLM/聊天(流式) | `crates/agent/nomi-providers` | `LlmProvider` | `create_provider()`→`.stream()` | text, vision-in |
-  | 媒体生成(submit/poll) | `crates/backend/nomifun-creation` | `MediaProvider` | `CreationService::create_task()` | t2i,i2i,inpaint,t2v,i2v |
-  | ASR/STT(独立) | `crates/backend/nomifun-shell` | 无 | `SttService::transcribe()` | audio→text |
+  | LLM/聊天(流式) | `crates/agent/openhub-providers` | `LlmProvider` | `create_provider()`→`.stream()` | text, vision-in |
+  | 媒体生成(submit/poll) | `crates/backend/openhub-creation` | `MediaProvider` | `CreationService::create_task()` | t2i,i2i,inpaint,t2v,i2v |
+  | ASR/STT(独立) | `crates/backend/openhub-shell` | 无 | `SttService::transcribe()` | audio→text |
 
-  **图像/视频分发其实已能跑**(`nomifun-creation/src/adapters/openai_images.rs:34-63` 走 `/v1/images/generations`)——坏的只是"模型管理"这条链路对模态无知。ASR 更是独立在客户端偏好 `speechToText` 里(凭据重复一份)。
+  **图像/视频分发其实已能跑**(`openhub-creation/src/adapters/openai_images.rs:34-63` 走 `/v1/images/generations`)——坏的只是"模型管理"这条链路对模态无知。ASR 更是独立在客户端偏好 `speechToText` 里(凭据重复一份)。
 
 - **前端**:模型管理页 4 个 Tab(Agent / 模型 / 创作模型 / 全局模型配置)。`创作模型`(`CreationModelsContent.tsx`)只是 providers 的**只读镜头**(启发式过滤 + 平台级能力覆盖),非独立存储。`添加模型`表单(`AddModelModal.tsx:85-121`)只有 3 个字段(model id / context window / protocol),**无模态选择器**。
 
@@ -121,7 +121,7 @@ CREATE TABLE model_profiles (
 - **名字启发式降级**为"一次性回填种子 + 新模型默认建议",**不再是运行时权威**。
 - 迁移时用现有启发式**回填全部存量模型**,老聊天/图像模型行为不回归。
 - `source` 溯源:`user`(手改,最高权威)> `catalog`(本地 AI 目录)> `inferred`(自动猜)。用户手改后启发式不再覆盖。
-- 迁移由 `sqlx::migrate!()` 自动发现(`crates/backend/nomifun-db/src/database.rs:28`),无需注册列表;本分支无硬编码迁移计数常量需 bump。
+- 迁移由 `sqlx::migrate!()` 自动发现(`crates/backend/openhub-db/src/database.rs:28`),无需注册列表;本分支无硬编码迁移计数常量需 bump。
 
 ### 3.3 「任务→端点/请求体」解析器(404 根治 + 长尾可扩展)
 
@@ -140,7 +140,7 @@ CREATE TABLE model_profiles (
 - **平台覆盖**:StepFun Step Plan 的 base 已含 `/step_plan/v1`,`ImageGeneration` 追加 `/images/generations` 即得实测通过的正确 URL。
 - **逐模型覆盖逃生舱**(`params.endpoint` / `params.request_shape`):录入任何"非标准"多模态 provider(Deepgram `/v1/listen`、自建服务)时,无需改代码即可接入。**这是"方便录入其他多模态模型"的核心机制。**
 
-`factory/nomi.rs:951-954` 的硬编码 `/chat/completions` 由本解析器取代:非 Chat 任务不再走聊天端点。**探测与真实分发共用此解析器**。
+`factory/openhub.rs:951-954` 的硬编码 `/chat/completions` 由本解析器取代:非 Chat 任务不再走聊天端点。**探测与真实分发共用此解析器**。
 
 ### 3.4 模态感知探测(直接修好 StepFun 404)
 
@@ -159,7 +159,7 @@ CREATE TABLE model_profiles (
 
 ### 3.6 ASR/TTS/embedding 并入统一管理
 
-- **ASR**:现独立在客户端偏好 `speechToText`(`ui/src/common/types/provider/speech.ts:9-34`,凭据重复)。改为在 providers 表登记 `SpeechRecognition` 模型,STT 服务(`crates/backend/nomifun-shell`)从档案取 provider+model+端点;**一次性迁移**旧 `speechToText` 配置 → provider 行。Deepgram 异形 API(`/v1/listen`)用 §3.3 逐模型覆盖桥接(不强塞)。
+- **ASR**:现独立在客户端偏好 `speechToText`(`ui/src/common/types/provider/speech.ts:9-34`,凭据重复)。改为在 providers 表登记 `SpeechRecognition` 模型,STT 服务(`crates/backend/openhub-shell`)从档案取 provider+model+端点;**一次性迁移**旧 `speechToText` 配置 → provider 行。Deepgram 异形 API(`/v1/listen`)用 §3.3 逐模型覆盖桥接(不强塞)。
 - **TTS / Embedding**:新任务槽,做到"可管理+可探测+可分发",暂无消费方(就绪槽位)。
 
 ### 3.7 前端
@@ -191,7 +191,7 @@ UI 在模型参数编辑器里呈现,分发时作为默认注入。
 
 ### 4.2 消费(创意工坊图像)
 1. 工坊问能力权威 `resolve_models(ImageGeneration)` → 候选模型。
-2. 用户选一个 → `nomifun-creation` 从档案取能力 + §3.3 解析端点 + `params` 注入默认 → 生成。
+2. 用户选一个 → `openhub-creation` 从档案取能力 + §3.3 解析端点 + `params` 注入默认 → 生成。
 
 ### 4.3 消费(ASR)
 1. 语音输入 → `resolve_models(SpeechRecognition)` / 默认 → STT 服务从档案取 provider+端点(不再读客户端偏好)→ 转写。
@@ -203,10 +203,10 @@ UI 在模型参数编辑器里呈现,分发时作为默认注入。
 **并发原则**(按 memory `parallelize-disjoint-tasks-worktree`):地基串行锁契约,之后按文件不相交聚类用 git worktree 并行;耦合热点(共享 Rust/TS 类型)串行。
 
 - **Phase A — 地基(串行,阻塞后续)**:词表(`ModelTask`/`ModelTrait` + 旧词表派生)+ `model_profiles` 表迁移 + 回填 + Rust 类型 + `storage.ts` 镜像 + IPC 契约 + 解析器 + 能力权威。**这是耦合热点,必须先做。**
-- **Phase B — 探测(后端并行)**:`provider_health.rs` + `factory/nomi.rs` 模态感知。→ **StepFun 404 当场修好、可实测。**
+- **Phase B — 探测(后端并行)**:`provider_health.rs` + `factory/openhub.rs` 模态感知。→ **StepFun 404 当场修好、可实测。**
 - **Phase C — 前端(与后端并行,ui/ 零重叠)**:添加模型模态选择器 / 模型行模态 UI / 创作模型→筛选 / 参数编辑器 / 平台预设。
-- **Phase D — 图像端到端(后端并行,nomifun-creation)**:图像生成+编辑分发接档案 + 解析器;创意工坊 + 探测跑通 StepFun,真机验收。
-- **Phase E — 语音/embedding 并入(后端并行,nomifun-shell + 新分发)**:ASR/TTS/embedding 一等化;ASR 客户端偏好迁移 → provider 行。排最后、可回退。
+- **Phase D — 图像端到端(后端并行,openhub-creation)**:图像生成+编辑分发接档案 + 解析器;创意工坊 + 探测跑通 StepFun,真机验收。
+- **Phase E — 语音/embedding 并入(后端并行,openhub-shell + 新分发)**:ASR/TTS/embedding 一等化;ASR 客户端偏好迁移 → provider 行。排最后、可回退。
 
 契约锁定后,并行切面:**前端(ui/) ∥ 后端 B ∥ 后端 D ∥ 后端 E**,各在 worktree,主会话集成 + 验收。
 
@@ -234,9 +234,9 @@ UI 在模型参数编辑器里呈现,分发时作为默认注入。
 
 ## 8. 关键改动文件(勘察交叉引用)
 
-- 数据模型:`crates/backend/nomifun-api-types/src/provider.rs:8-31`、新 `crates/backend/nomifun-db/migrations/033_model_profiles.sql`、新 repo、`ui/src/common/config/storage.ts:507-607`
-- 词表/派生(取代启发式):`crates/backend/nomifun-api-types/src/model_capability.rs`、`ui/src/common/utils/modelCapabilities.ts`、`crates/backend/nomifun-creation/src/types.rs:9-57`
-- 解析器 + 探测修复:`crates/backend/nomifun-ai-agent/src/services/provider_health.rs:70-82`、`crates/backend/nomifun-ai-agent/src/factory/nomi.rs:951-954`
-- 图像分发:`crates/backend/nomifun-creation/src/adapters/mod.rs:37-45,56-77`、`service.rs`
-- ASR 并入:`crates/backend/nomifun-shell/src/routes.rs:155-178`、`ui/src/common/types/provider/speech.ts:9-34`
+- 数据模型:`crates/backend/openhub-api-types/src/provider.rs:8-31`、新 `crates/backend/openhub-db/migrations/033_model_profiles.sql`、新 repo、`ui/src/common/config/storage.ts:507-607`
+- 词表/派生(取代启发式):`crates/backend/openhub-api-types/src/model_capability.rs`、`ui/src/common/utils/modelCapabilities.ts`、`crates/backend/openhub-creation/src/types.rs:9-57`
+- 解析器 + 探测修复:`crates/backend/openhub-ai-agent/src/services/provider_health.rs:70-82`、`crates/backend/openhub-ai-agent/src/factory/openhub.rs:951-954`
+- 图像分发:`crates/backend/openhub-creation/src/adapters/mod.rs:37-45,56-77`、`service.rs`
+- ASR 并入:`crates/backend/openhub-shell/src/routes.rs:155-178`、`ui/src/common/types/provider/speech.ts:9-34`
 - 前端:`ui/src/renderer/pages/settings/components/AddModelModal.tsx:85-121`、`ui/src/renderer/components/settings/SettingsModal/contents/ModelModalContent.tsx:960-1024`、`ui/src/renderer/components/.../CreationModelsContent.tsx`、`ui/src/renderer/utils/model/modelPlatforms.ts`、`ui/src/renderer/pages/modelHub/index.tsx`

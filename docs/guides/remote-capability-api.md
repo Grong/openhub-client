@@ -1,6 +1,6 @@
 # Remote Capability API
 
-NomiFun can expose its platform capabilities through a network-reachable,
+OpenHub can expose its platform capabilities through a network-reachable,
 token-authenticated MCP and REST front door. A trusted external agent or MCP
 client can connect with a URL plus a companion access token and then call the
 same capability registry used by the desktop app.
@@ -90,14 +90,14 @@ curl -X DELETE \
 These token-management endpoints require local trust. A remote browser or plain
 curl client cannot mint tokens.
 
-### Headless `nomifun-web`
+### Headless `openhub-web`
 
-Seed a token at startup with `NOMIFUN_COMPANION_TOKEN`. The value binds to the
+Seed a token at startup with `OPENHUB_COMPANION_TOKEN`. The value binds to the
 default companion when no token is already configured:
 
 ```bash
-NOMIFUN_COMPANION_TOKEN="$(openssl rand -hex 32)" \
-  nomifun-web --host 127.0.0.1 --port 8787
+OPENHUB_COMPANION_TOKEN="$(openssl rand -hex 32)" \
+  openhub-web --host 127.0.0.1 --port 8787
 ```
 
 Use the generated hex string as the Bearer token. For non-local exposure,
@@ -110,7 +110,7 @@ Example Streamable-HTTP MCP configuration:
 ```json
 {
   "mcpServers": {
-    "nomifun": {
+    "openhub": {
       "type": "streamable-http",
       "url": "http://127.0.0.1:25808/mcp-agent",
       "headers": {
@@ -134,10 +134,10 @@ curl -s "http://127.0.0.1:25808/v1/tools?profile=agent" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
-Run a delegated NomiFun agent task:
+Run a delegated OpenHub agent task:
 
 ```bash
-curl -s -X POST "http://127.0.0.1:25808/v1/tools/nomi_agent_run" \
+curl -s -X POST "http://127.0.0.1:25808/v1/tools/openhub_agent_run" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"goal":"Research competitors and write notes.md","timeout_secs":600}'
@@ -146,7 +146,7 @@ curl -s -X POST "http://127.0.0.1:25808/v1/tools/nomi_agent_run" \
 Poll a long-running task:
 
 ```bash
-curl -s -X POST "http://127.0.0.1:25808/v1/tools/nomi_agent_result" \
+curl -s -X POST "http://127.0.0.1:25808/v1/tools/openhub_agent_result" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"conversation_id":123}'
@@ -161,7 +161,7 @@ confirmation-required calls return `409`.
 SSE streaming is available for tools that report progress:
 
 ```bash
-curl -N -X POST "http://127.0.0.1:25808/v1/tools/nomi_agent_run/stream" \
+curl -N -X POST "http://127.0.0.1:25808/v1/tools/openhub_agent_run/stream" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"goal":"Summarize the current repository"}'
@@ -172,7 +172,7 @@ Each event is a `data: <json>` line. The final event uses
 
 ## Companion Context
 
-Because the caller runs as the bound companion, `nomi_agent_run` can use that
+Because the caller runs as the bound companion, `openhub_agent_run` can use that
 companion's configured model when no `model` argument is supplied. Configure a
 usable provider/model for the companion before relying on model-backed tools;
 token creation may warn if the companion has no usable model.

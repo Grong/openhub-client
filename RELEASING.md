@@ -1,4 +1,4 @@
-# Releasing NomiFun
+# Releasing OpenHub
 
 中文发版手册见 `RELEASING.zh-CN.md`.
 
@@ -47,7 +47,7 @@ that an update package is ours; OS code signing controls Gatekeeper / SmartScree
 trust for people launching a manually downloaded app. You **cannot cross-compile**
 reliable desktop installers — build each platform on its own machine.
 
-The updater private key (`apps/desktop/signing/nomifun-updater.key`) is gitignored
+The updater private key (`apps/desktop/signing/openhub-updater.key`) is gitignored
 and lives only in your key store. On a fresh build machine (e.g. a Windows box that
 never generated it) copy it there before building; it must match the `pubkey`
 embedded in `tauri.conf.json` (keyID `F3AA272E60AA7952`), or installed clients
@@ -71,7 +71,7 @@ Use this order for every desktop release.
    the updater `.app.tar.gz` + `.sig`.
 
    ```bash
-   export TAURI_SIGNING_PRIVATE_KEY="$(cat apps/desktop/signing/nomifun-updater.key)"
+   export TAURI_SIGNING_PRIVATE_KEY="$(cat apps/desktop/signing/openhub-updater.key)"
    export TAURI_SIGNING_PRIVATE_KEY_PASSWORD=""
    bun run build:mac --config apps/desktop/tauri.updater.conf.json
    bun run make:latest
@@ -91,7 +91,7 @@ Use this order for every desktop release.
    unknown-publisher warnings.
 
    ```powershell
-   $env:TAURI_SIGNING_PRIVATE_KEY = Get-Content apps/desktop/signing/nomifun-updater.key -Raw
+   $env:TAURI_SIGNING_PRIVATE_KEY = Get-Content apps/desktop/signing/openhub-updater.key -Raw
    $env:TAURI_SIGNING_PRIVATE_KEY_PASSWORD = ""
    bun run build:win --config apps/desktop/tauri.updater.conf.json
    bun run make:latest
@@ -118,7 +118,7 @@ Use this order for every desktop release.
    run on builders without FUSE2.
 
    ```bash
-   export TAURI_SIGNING_PRIVATE_KEY="$(cat apps/desktop/signing/nomifun-updater.key)"
+   export TAURI_SIGNING_PRIVATE_KEY="$(cat apps/desktop/signing/openhub-updater.key)"
    export TAURI_SIGNING_PRIVATE_KEY_PASSWORD=""
    bun run build:linux --config apps/desktop/tauri.updater.conf.json
    bun run make:latest
@@ -148,9 +148,9 @@ Use this order for every desktop release.
 
    ```bash
    gh release create "v$VERSION" \
-     target/universal-apple-darwin/release/bundle/macos/NomiFun.app.tar.gz \
-     target/universal-apple-darwin/release/bundle/macos/NomiFun.app.tar.gz.sig \
-     dist/desktop/NomiFun_${VERSION}_universal.dmg \
+     target/universal-apple-darwin/release/bundle/macos/OpenHub.app.tar.gz \
+     target/universal-apple-darwin/release/bundle/macos/OpenHub.app.tar.gz.sig \
+     dist/desktop/OpenHub_${VERSION}_universal.dmg \
      apps/desktop/updater/latest.json \
      --title "v$VERSION" \
      --notes "Release notes"
@@ -172,7 +172,7 @@ Use this order for every desktop release.
 
    ```bash
    gh release view "v$VERSION" --json tagName,assets,url
-   curl -fsSL https://github.com/nomifun/nomifun-tauri/releases/latest/download/latest.json
+   curl -fsSL https://github.com/Grong/openhub-client/releases/latest/download/latest.json
    ```
 
    Confirm the downloaded manifest version is `VERSION`, every shipped platform
@@ -192,7 +192,7 @@ The one-click script auto-detects two scenarios:
 
 **One-click (recommended).** After one-time setup, repeat with a single command:
 
-1. Copy the updater private key `apps/desktop/signing/nomifun-updater.key` from
+1. Copy the updater private key `apps/desktop/signing/openhub-updater.key` from
    your key store (gitignored; must match the `pubkey` in `tauri.conf.json`).
 2. Configure `apps/desktop/signing/.env.signing` for Developer ID signing and
    notarization.
@@ -218,7 +218,7 @@ The one-click script auto-detects two scenarios:
 
 **Version** is the single source `Cargo.toml [workspace.package].version`. APPEND
 uses the current version. For CREATE, `-Version X.Y.Z` (when different) first runs
-`bun run bump`, then commits as `nomifun`, tags, and creates the Release.
+`bun run bump`, then commits as openhub, tags, and creates the Release.
 
 **Release notes are LLM-friendly**: passed on the command line (no CHANGELOG
 coupling), and the **same text is used for both the GitHub Release body and the
@@ -231,7 +231,7 @@ The script loads `GH_TOKEN` from `.env.release` when present (or uses existing
 `build:mac --signed --config apps/desktop/tauri.updater.conf.json`, validates
 stapling / codesign / Gatekeeper status, merges the darwin entries via
 `make:latest`, uploads (`--clobber` for APPEND, or `gh release create` for
-CREATE), commits `latest.json` (plus the bump for CREATE) as author `nomifun`,
+CREATE), commits `latest.json` (plus the bump for CREATE) as author openhub,
 and verifies the updater endpoint. It aborts with a clear error on any failure.
 
 ### Releasing Windows (append to an existing release, or Windows-first)
@@ -247,7 +247,7 @@ The one-click script auto-detects two scenarios:
 
 **One-click (recommended).** After a one-time setup, repeat with a single command:
 
-1. Copy the updater private key `apps/desktop/signing/nomifun-updater.key` from
+1. Copy the updater private key `apps/desktop/signing/openhub-updater.key` from
    your key store (gitignored; must match the `pubkey` in `tauri.conf.json`).
 2. Copy `apps/desktop/signing/.env.release.example` to `.env.release` (gitignored)
    and set `GH_TOKEN=...` (a classic PAT with `repo`, or a fine-grained PAT with
@@ -271,7 +271,7 @@ The one-click script auto-detects two scenarios:
 
 **Version** is the single source `Cargo.toml [workspace.package].version`. APPEND
 uses the current version. For CREATE, `-Version X.Y.Z` (when different) first runs
-`bun run bump`, then commits as `nomifun`, tags, and creates the Release.
+`bun run bump`, then commits as openhub, tags, and creates the Release.
 
 **Release notes are LLM-friendly**: passed on the command line (no CHANGELOG
 coupling), and the **same text is used for both the GitHub Release body and the
@@ -284,7 +284,7 @@ The script loads `GH_TOKEN` from `.env.release`, loads the signing key, detects 
 mode, removes stale NSIS artifacts, builds updater artifacts, merges the
 `windows-x86_64` entry via `make:latest`, uploads (`--clobber` for APPEND, or
 `gh release create` for CREATE), commits `latest.json` (plus the bump for CREATE)
-as author `nomifun`, and verifies the updater endpoint. It aborts with a clear
+as author openhub, and verifies the updater endpoint. It aborts with a clear
 error on any failure.
 
 **Manual steps** (equivalent to what the script runs internally):
@@ -301,12 +301,12 @@ error on any failure.
    existing Release.
 
 2. Build Windows updater artifacts with the same updater private key. The key is
-   gitignored, so first copy `apps/desktop/signing/nomifun-updater.key` onto this
+   gitignored, so first copy `apps/desktop/signing/openhub-updater.key` onto this
    Windows machine from your key store (it must match the `pubkey` in
    `tauri.conf.json`).
 
    ```powershell
-   $env:TAURI_SIGNING_PRIVATE_KEY = Get-Content apps/desktop/signing/nomifun-updater.key -Raw
+   $env:TAURI_SIGNING_PRIVATE_KEY = Get-Content apps/desktop/signing/openhub-updater.key -Raw
    $env:TAURI_SIGNING_PRIVATE_KEY_PASSWORD = ""
    bun run build:win --config apps/desktop/tauri.updater.conf.json
    bun run make:latest
@@ -347,9 +347,9 @@ See:
 
 ## Server Release
 
-1. Build `nomifun-web` and the SPA.
+1. Build `openhub-web` and the SPA.
 2. Build and smoke-test the Docker image.
-3. Verify first-run admin setup and `NOMIFUN_ADMIN_PASSWORD` pre-seeding.
+3. Verify first-run admin setup and `OPENHUB_ADMIN_PASSWORD` pre-seeding.
 4. Verify `127.0.0.1` default binding and explicit `0.0.0.0` deployment docs.
 
 ## After Release

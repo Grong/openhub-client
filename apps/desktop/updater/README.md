@@ -1,8 +1,8 @@
-# NomiFun Desktop Updater
+# OpenHub Desktop Updater
 
 中文说明见 `apps/desktop/updater/README.zh-CN.md`.
 
-In-app auto-update for `nomifun-desktop`, built on **Tauri's native updater**
+In-app auto-update for `openhub-desktop`, built on **Tauri's native updater**
 (`tauri-plugin-updater` + minisign signatures + a `latest.json` manifest hosted
 on GitHub Releases). The app checks → downloads → verifies → installs → relaunches.
 
@@ -24,7 +24,7 @@ App (running version, from workspace Cargo.toml)
   - **Startup silent check** (`Layout.tsx`): on launch, if a newer version is
     available the modal opens automatically; otherwise it stays silent.
 - **Config:** `apps/desktop/tauri.conf.json` →
-  - `plugins.updater.endpoints` = `https://github.com/nomifun/nomifun-tauri/releases/latest/download/latest.json`
+  - `plugins.updater.endpoints` = `https://github.com/Grong/openhub-client/releases/latest/download/latest.json`
   - `plugins.updater.pubkey` = the project updater public key (committed; safe).
 - **Permissions:** `apps/desktop/capabilities/default.json` grants
   `updater:default` + `updater:allow-check` + `updater:allow-download-and-install`,
@@ -36,7 +36,7 @@ A single minisign keypair signs **every** platform/chip; the matching public key
 is embedded in the app for verification.
 
 - **Public key** → `plugins.updater.pubkey` in `tauri.conf.json` (committed).
-- **Private key** → `apps/desktop/signing/nomifun-updater.key` — **gitignored**
+- **Private key** → `apps/desktop/signing/openhub-updater.key` — **gitignored**
   (`*.key`), never committed, never printed. **Back it up** to your release
   secret store: lose it and already-installed users stop receiving auto-updates
   (they must reinstall once); the app itself keeps working.
@@ -44,7 +44,7 @@ is embedded in the app for verification.
   `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` if you prefer). Regenerate with:
 
   ```bash
-  bun x tauri signer generate -w apps/desktop/signing/nomifun-updater.key --password "" --ci -f
+  bun x tauri signer generate -w apps/desktop/signing/openhub-updater.key --password "" --ci -f
   # then paste the printed public key into tauri.conf.json → plugins.updater.pubkey
   ```
 
@@ -66,7 +66,7 @@ has no quotes and works on every shell.
 Set the private key **content** (not the path) in the environment first:
 
 ```bash
-export TAURI_SIGNING_PRIVATE_KEY="$(cat apps/desktop/signing/nomifun-updater.key)"
+export TAURI_SIGNING_PRIVATE_KEY="$(cat apps/desktop/signing/openhub-updater.key)"
 export TAURI_SIGNING_PRIVATE_KEY_PASSWORD=""   # empty for the default key
 
 # Windows (NSIS .exe + .sig):
@@ -82,7 +82,7 @@ bun run build:linux --config apps/desktop/tauri.updater.conf.json
 You **cannot cross-compile**: build Windows on Windows, macOS on macOS, Linux on
 Linux. Each platform's artifacts land under `target/**/release/bundle/`. The
 updater private key is gitignored, so on a fresh build machine (e.g. your Windows
-box) copy it to `apps/desktop/signing/nomifun-updater.key` from your key store
+box) copy it to `apps/desktop/signing/openhub-updater.key` from your key store
 first — it must match the `pubkey` embedded in `tauri.conf.json` (keyID
 `F3AA272E60AA7952`), or installed clients silently reject the update.
 
@@ -94,7 +94,7 @@ unknown-publisher warnings. When a Windows certificate is available, set
 inline JSON, so run it under PowerShell 7+):
 
 ```powershell
-$env:TAURI_SIGNING_PRIVATE_KEY = Get-Content apps/desktop/signing/nomifun-updater.key -Raw
+$env:TAURI_SIGNING_PRIVATE_KEY = Get-Content apps/desktop/signing/openhub-updater.key -Raw
 $env:TAURI_SIGNING_PRIVATE_KEY_PASSWORD = ""
 $env:WINDOWS_CERTIFICATE_THUMBPRINT = "A1B2C3..."
 bun run build:win --signed --config apps/desktop/tauri.updater.conf.json
@@ -129,9 +129,9 @@ are manual download assets.
 3. Create a GitHub Release tagged `v<version>`.
 4. Upload **all** manual installers, updater packages, updater `.sig` files, and
    `latest.json` as release assets. For macOS this means both:
-   - `dist/desktop/NomiFun_<version>_universal.dmg` for manual install.
-   - `target/universal-apple-darwin/release/bundle/macos/NomiFun.app.tar.gz`
-     plus `NomiFun.app.tar.gz.sig` for auto-update.
+   - `dist/desktop/OpenHub_<version>_universal.dmg` for manual install.
+   - `target/universal-apple-darwin/release/bundle/macos/OpenHub.app.tar.gz`
+     plus `OpenHub.app.tar.gz.sig` for auto-update.
    For Windows, the updater `.exe` is also the normal manual installer; upload
    any `.msi` only if the build generated one.
 5. The endpoint `releases/latest/download/latest.json` resolves to the newest

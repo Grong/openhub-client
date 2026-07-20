@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -41,7 +41,7 @@ const NOOP_VALUE: PendingConversationContextValue = {
 };
 
 // After the real conversation page is navigated to, keep the overlay up for a
-// brief beat so the destination has time to mount and NomiSendBox can echo the
+// brief beat so the destination has time to mount and OpenHubSendBox can echo the
 // same user bubble in the same place — then the swap has nothing to flicker.
 // Worst case (slower echo) it degrades to the destination's own shimmer
 // skeleton, which is the same visual family, so no jarring blank flash either

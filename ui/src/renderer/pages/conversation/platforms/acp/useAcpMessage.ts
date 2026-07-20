@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -548,7 +548,7 @@ export const useAcpMessage = (conversation_id: number, options?: { skipWarmup?: 
   // Fetch slash commands via HTTP after warmup completes.
   // WebSocket push of available_commands arrives during warmup when no
   // StreamRelay is listening, so the initial load must come from HTTP.
-  // Mirrors the nomi pattern: warmup first, then fetch.
+  // Mirrors the openhub pattern: warmup first, then fetch.
   // In team mode, warmup is deferred to first user input — skip here.
   useEffect(() => {
     if (options?.skipWarmup) return;

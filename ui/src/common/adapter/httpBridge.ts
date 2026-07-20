@@ -1,6 +1,6 @@
 /**
  * HTTP/WS bridge factory — drop-in replacement for bridge.buildProvider / bridge.buildEmitter
- * that routes calls to nomicore via REST API and WebSocket.
+ * that routes calls to openhub-core via REST API and WebSocket.
  *
  * Exported helpers produce objects with the same shape as @/platform bridge,
  * so existing renderer code works without changes.
@@ -44,14 +44,14 @@ const NOISY_WS_EVENTS = new Set(['terminal.output', 'message.stream', 'conversat
 const NOISY_HTTP_FRAGMENTS = ['/input', '/resize'];
 
 /** CSRF double-submit cookie + header names (must match the backend constants). */
-const CSRF_COOKIE_NAME = 'nomifun-csrf-token';
+const CSRF_COOKIE_NAME = 'openhub-csrf-token';
 const CSRF_HEADER_NAME = 'x-csrf-token';
 
-/** Local-trust header the desktop webview presents (must match `nomifun_auth::LOCAL_TRUST_HEADER`). */
-const LOCAL_TRUST_HEADER = 'x-nomi-local-trust';
+/** Local-trust header the desktop webview presents (must match `openhub_auth::LOCAL_TRUST_HEADER`). */
+const LOCAL_TRUST_HEADER = 'x-openhub-local-trust';
 
 /** Window event emitted when an HTTP API response proves the browser session is expired. */
-export const AUTH_EXPIRED_EVENT = 'nomifun:auth-expired';
+export const AUTH_EXPIRED_EVENT = 'openhub:auth-expired';
 
 /**
  * The per-boot local-trust secret injected by the Tauri desktop shell, or null
@@ -121,7 +121,7 @@ function isWebUiBrowserMode(): boolean {
  * upload `XMLHttpRequest` in `FileService`. The desktop shell's `fetch`
  * interceptor (`apps/desktop/src/main.rs`) only patches `window.fetch`, so a raw
  * XHR escapes it — without applying these headers itself the upload reaches the
- * `TrustLocalToken`-guarded `/api/fs/upload` with no `x-nomi-local-trust` and is
+ * `TrustLocalToken`-guarded `/api/fs/upload` with no `x-openhub-local-trust` and is
  * rejected 403. In WebUI browser mode the same XHR also needs the CSRF header on
  * state-changing requests.
  *
@@ -315,7 +315,7 @@ function emitAuthExpiredEvent(): void {
 }
 
 function handleHttpAuthExpired(): void {
-  // Desktop shell requests should be trusted by x-nomi-local-trust, not redirected
+  // Desktop shell requests should be trusted by x-openhub-local-trust, not redirected
   // into the WebUI login flow. If a desktop request reaches this branch, keep the
   // original backend error visible so the trust-header path can be diagnosed.
   if (!isWebUiBrowserMode()) return;

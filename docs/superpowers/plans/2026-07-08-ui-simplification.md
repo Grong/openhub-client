@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** 将 NomiFun 侧边栏从 13 个入口精简到 5 个（新建对话 + 知识库 + 插件 + 项目列表 + 设置），加入首次引导 Wizard，简化会话创建流程。
+**Goal:** 将 OpenHub 侧边栏从 13 个入口精简到 5 个（新建对话 + 知识库 + 插件 + 项目列表 + 设置），加入首次引导 Wizard，简化会话创建流程。
 
 **Architecture:** 纯前端 UI 重组。不涉及后端 API 变更、数据库迁移或 agent 引擎改动。所有改动限定在 `ui/src/renderer/` 下。
 
@@ -38,7 +38,7 @@
 // 删除以下导入:
 // SiderAssetLibraryEntry,
 // SiderAssistantSkillsEntry,
-// SiderNomiEntry,
+// SiderOpenHubEntry,
 // SiderOpenCapabilitiesEntry,
 // SiderPublicServiceEntry,
 // SiderRequirementsEntry,
@@ -50,7 +50,7 @@
 ```tsx
 // 删除以下 handler:
 // handleScheduledClick, handleRequirementsClick, handleAssetLibraryClick,
-// handleNomiClick, handleWorkshopClick, handlePublicServiceClick,
+// handleOpenHubClick, handleWorkshopClick, handlePublicServiceClick,
 // handleAssistantSkillsClick, handleMcpClick, handleOpenCapabilitiesClick
 ```
 
@@ -142,7 +142,7 @@ const isSessionRoute =
 git add ui/src/renderer/components/layout/Sider/index.tsx
 git commit -m "feat: simplify sidebar from 13 entries to 5 core entries
 
-Remove: Nomi, Workshop, PublicService, AssetLibrary, Scheduled,
+Remove: OpenHub, Workshop, PublicService, AssetLibrary, Scheduled,
 Requirements, AssistantSkills, MCP, OpenCapabilities from sidebar.
 Add: Plugin entry (unified MCP+Skill+Extension).
 Keep: Conversation, Knowledge, ModelHub, Settings.
@@ -470,7 +470,7 @@ import WelcomeStep from './steps/WelcomeStep';
 import ApiKeyStep from './steps/ApiKeyStep';
 import CompanionStep from './steps/CompanionStep';
 
-const ONBOARDING_SKIPPED_KEY = 'nomifun_onboarding_skipped';
+const ONBOARDING_SKIPPED_KEY = 'openhub_onboarding_skipped';
 
 const OnboardingWizard: React.FC = () => {
   const [step, setStep] = useState(0);
@@ -550,7 +550,7 @@ const WelcomeStep: React.FC<WelcomeStepProps> = ({ onNext, onSkip }) => {
         <span className="text-48px">🤖</span>
       </div>
       <Typography.Title heading={4}>
-        {t('onboarding.welcome.title', { defaultValue: '欢迎来到 NomiFun' })}
+        {t('onboarding.welcome.title', { defaultValue: '欢迎来到 OpenHub' })}
       </Typography.Title>
       <Typography.Text type="secondary">
         {t('onboarding.welcome.subtitle', {
@@ -695,7 +695,7 @@ const CompanionStep: React.FC<CompanionStepProps> = ({ onNext }) => {
       </div>
       <Typography.Title heading={4}>
         {t('onboarding.companion.title', {
-          defaultValue: '你好，我是 Nomi（诺米）',
+          defaultValue: '你好，我是 OpenHub（诺米）',
         })}
       </Typography.Title>
       <Typography.Text type="secondary">
@@ -758,7 +758,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 
 - [ ] **Step 1: 查找并修改新建会话入口**
 
-找到新建会话的触发逻辑。将默认行为改为直接创建会话，使用默认配置：`nomi` Agent + 通用助手 + 我的知识库。
+找到新建会话的触发逻辑。将默认行为改为直接创建会话，使用默认配置：`openhub` Agent + 通用助手 + 我的知识库。
 
 高级配置（模型/Agent/知识库/MCP）折叠在可展开的面板中。
 
@@ -766,7 +766,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 // 在新建会话的逻辑中，替换配置向导为直接创建:
 const handleNewConversation = async () => {
   const defaultConfig = {
-    agentType: 'nomi',
+    agentType: 'openhub',
     assistantId: DEFAULT_ASSISTANT_ID,    // 通用助手
     knowledgeBaseIds: [DEFAULT_KB_ID],    // 我的知识库
   };
@@ -973,7 +973,7 @@ bun run typecheck
 - [ ] 首次安装（清除 localStorage）→ Wizard 弹出
 - [ ] Wizard 完整走完 3 步 → 进入主界面
 - [ ] Wizard 点击跳过 → 进入主界面，刷新不再弹出
-- [ ] 所有旧路由直接 URL 访问仍工作（`/mcp`、`/assistants`、`/nomi` 等）
+- [ ] 所有旧路由直接 URL 访问仍工作（`/mcp`、`/assistants`、`/openhub` 等）
 
 - [ ] **Step 3: 运行现有测试**
 

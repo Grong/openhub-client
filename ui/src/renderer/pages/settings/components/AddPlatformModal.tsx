@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { mutate as mutateSWR } from 'swr';
 import useModeModeList from '@renderer/hooks/agent/useModeModeList';
 import useProtocolDetection from '@renderer/hooks/system/useProtocolDetection';
-import NomiModal from '@/renderer/components/base/NomiModal';
+import OpenHubModal from '@/renderer/components/base/OpenHubModal';
 import ApiKeyEditorModal from './ApiKeyEditorModal';
 import {
   MODEL_PLATFORMS,
@@ -368,7 +368,7 @@ const AddPlatformModal = ModalHOC<{
       setIsFullUrl(false);
       setDismissedFixUrl(null); // 重置 base_url 修复建议 / Reset base_url fix suggestion
 
-      // Pre-fill from deep link data (nomifun:// protocol)
+      // Pre-fill from deep link data (openhub:// protocol)
       if (deepLinkData?.base_url || deepLinkData?.api_key) {
         // Default to new-api platform for deep links (typical one-api/new-api usage)
         const dlPlatform = deepLinkData.platform || 'new-api';
@@ -507,7 +507,7 @@ const AddPlatformModal = ModalHOC<{
   };
 
   return (
-    <NomiModal
+    <OpenHubModal
       visible={modalProps.visible}
       onCancel={modalCtrl.close}
       header={{ title: t('settings.addModel'), showClose: true }}
@@ -548,11 +548,11 @@ const AddPlatformModal = ModalHOC<{
                   setTasks([]);
                   setVisionInput(false);
                   // 预填模型供应商名称：预设平台用其展示名，自定义裸选项留空待用户填写。
-                  // 这样用户在新增时即可命名供应商，便于在 Nomi 中归类（尤其聚合平台）。
+                  // 这样用户在新增时即可命名供应商，便于在 OpenHub 中归类（尤其聚合平台）。
                   // Prefill provider name: preset platforms use their display name,
                   // the bare Custom option stays blank for the user to fill. Lets
                   // users name the provider at add-time for clean grouping in the
-                  // Nomi (especially for same-looking aggregator platforms).
+                  // OpenHub (especially for same-looking aggregator platforms).
                   form.setFieldValue('name', resolvePlatformName(value));
                   setDismissedFixUrl(null);
                 }
@@ -988,7 +988,7 @@ const AddPlatformModal = ModalHOC<{
           return testApiKeyForProvider(key, actualBaseUrl);
         }}
       />
-    </NomiModal>
+    </OpenHubModal>
   );
 });
 

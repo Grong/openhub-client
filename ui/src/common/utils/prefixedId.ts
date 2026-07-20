@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -8,7 +8,7 @@
  * Lowercase Crockford-style base32 alphabet (drops i/l/o/u for legibility),
  * in ascending ASCII order so a fixed-width big-endian encoding sorts
  * lexicographically by the integer it encodes. MUST match
- * `SHORT_ID_ALPHABET` in the Rust `nomifun-common::id` module.
+ * `SHORT_ID_ALPHABET` in the Rust `openhub-common::id` module.
  */
 const SHORT_ID_ALPHABET = '0123456789abcdefghjkmnpqrstvwxyz';
 
@@ -35,7 +35,7 @@ const encodeBase32 = (value: bigint, chars: number): string => {
  * Self-contained sortable short-id generator: a 45-bit unix-millisecond
  * timestamp (9 base32 chars) followed by 35 random bits (7 base32 chars),
  * for a 16-char body. Mirrors the Rust side
- * (`nomifun-common::generate_prefixed_id`), so ids minted by either side
+ * (`openhub-common::generate_prefixed_id`), so ids minted by either side
  * interleave and sort identically — they are lexicographically time-ordered
  * and globally unique, but roughly half the length of the former UUIDv7 tail.
  *
@@ -68,7 +68,7 @@ export const shortId = (): string => {
 /**
  * Mint an entity ID in the unified `{prefix}_{shortId}` format, e.g.
  * `prefixedId('msg')` -> `msg_0fh3k…`. Frontend mirror of the Rust
- * `nomifun-common::generate_prefixed_id` — the minting convention for the
+ * `openhub-common::generate_prefixed_id` — the minting convention for the
  * TEXT short-id entities (messages `msg_`, providers `prov_`, …).
  *
  * NOTE: conversations/requirements/terminal sessions are now

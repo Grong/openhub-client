@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -208,7 +208,7 @@ const WeixinConfigForm: React.FC<WeixinConfigFormProps> = ({
         : { plugin_id: 'weixin', config }
     );
     if (!result.success) {
-      throw new Error(result.error || result.message || t('nomi.settings.remoteEnableFailed', { defaultValue: 'Failed to enable channel' }));
+      throw new Error(result.error || result.message || t('openhub.settings.remoteEnableFailed', { defaultValue: 'Failed to enable channel' }));
     }
     Message.success(t('settings.weixin.pluginEnabled', 'WeChat channel enabled'));
     const plugins = await channel.getPluginStatus.invoke();

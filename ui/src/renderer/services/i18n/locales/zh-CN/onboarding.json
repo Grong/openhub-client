@@ -1,6 +1,6 @@
 {
   "welcome": {
-    "title": "欢迎来到 NomiFun",
+    "title": "欢迎来到 OpenHub",
     "subtitle": "你的 AI 工作站，一切数据留在你自己的电脑上",
     "start": "开始设置",
     "skip": "跳过，直接使用"
@@ -14,7 +14,7 @@
     "timeout": "验证超时，可稍后在设置中配置"
   },
   "companion": {
-    "title": "你好，我是 Nomi（诺米）",
+    "title": "你好，我是 OpenHub（诺米）",
     "desc": "我是你的 AI 伙伴，会陪你聊天、帮你干活、越用越懂你",
     "start": "开始聊天"
   }

@@ -10,7 +10,7 @@
 
 - 把编排塞进「会话」（lead 会话、会话顶部状态条、右栏 DAG tab、会话模型选择器三态/主管模型、useGuidSend lead 标记）引入了过多 UX 复杂度与边缘 bug。
 - 决策：**回归专用「智能编排」Tab**。用户进 Tab 做多 agent 工作，全程不离开 Tab。「会话」回到纯单 agent，**无任何编排痕迹**。
-- **引擎不是 bug 源**：`nomifun-orchestrator`（RunEngine/Router/LlmPlanProducer/worker/run_service）、迁移 018-022、DAG/inspector/run-control 组件 已过 1880 测试 + e2e + 评审。**全部保留复用**。
+- **引擎不是 bug 源**：`openhub-orchestrator`（RunEngine/Router/LlmPlanProducer/worker/run_service）、迁移 018-022、DAG/inspector/run-control 组件 已过 1880 测试 + e2e + 评审。**全部保留复用**。
 - 在当前分支就地清理（已同步 origin/main，HEAD b7b0f96c）。
 
 ## 2. 核心概念（沿用引擎，去掉会话融合层）
@@ -18,7 +18,7 @@
 | 概念 | 说明 | 变化 |
 |---|---|---|
 | **Run** | 一次多 agent 执行 | 引擎不变 |
-| **Worker** | 每任务 = 一个真实会话(nomi yolo+desktopGateway)，从主侧栏隐藏(`orchestrator_task_id` 过滤) | 不变(仍隐藏;但不再有 lead 会话) |
+| **Worker** | 每任务 = 一个真实会话(openhub yolo+desktopGateway)，从主侧栏隐藏(`orchestrator_task_id` 过滤) | 不变(仍隐藏;但不再有 lead 会话) |
 | **Agent/角色** | = 助手(assistant)，含偏好模型/人设/技能 | 沿用 P4 统一 |
 | **模型范围** | 单一/自动/范围 | 沿用,但移到 **Tab 表单**(不在会话) |
 | **自主级别** | interactive(默认,审批闸)/supervised | 沿用 |
@@ -69,7 +69,7 @@
 
 **适配**：
 1. **新增 REST 路由 `POST /api/orchestrator/runs/adhoc`** → `RunService::create_adhoc`（Tab 表单经此直建 run）。当前 create_adhoc 只被 caps 调用;需一个 Tab 面向的受保护 REST 端点 + `ipcBridge.orchestrator.runs.createAdhoc`。请求体 = `{ goal, work_dir?, model_range, pinned_roles?, autonomy?, max_parallel? }`(CreateAdhocRunRequest 已存在,workspace_id 已可空)。autonomy 默认 interactive。
-2. **`caps_orchestrator.nomi_run_create` 适配回显式参数**：不再读调用会话的 extra(lead-conversation 概念移除);改为工具入参 `{ goal, model_range?/autonomy? }`(model_range 缺省=自动/全部启用)，agent 经 MCP 显式发起。`nomi_run_status`/`nomi_run_result` 不变。
+2. **`caps_orchestrator.openhub_run_create` 适配回显式参数**：不再读调用会话的 extra(lead-conversation 概念移除);改为工具入参 `{ goal, model_range?/autonomy? }`(model_range 缺省=自动/全部启用)，agent 经 MCP 显式发起。`openhub_run_status`/`openhub_run_result` 不变。
 3. **不再写 lead 会话 extra.orchestrator_run_id**（lead 概念移除）。worker 仍写 `orchestrator_run_id`+`orchestrator_task_id`(隐藏过滤靠 task_id,不变)。
 
 ## 6. 前端（建 Tab + 拆胶水）
@@ -83,8 +83,8 @@
 **移除/回退会话融合胶水**：
 - 删 `OrchestrationStatusStrip.tsx`、`DagRailTab.tsx`、`useOrchestrationStatus.ts`、`GuidOrchestrationMode.tsx`。
 - `ChatSlider.tsx`：去掉「编排」extraTab(orchestration-dag)。
-- `ChatConversation.tsx`(NomiConversationPanel)：去掉状态条挂载。
-- `useGuidSend.ts`：去掉 lead 标记 + model_range 注入(会话创建回到普通 nomi)。
+- `ChatConversation.tsx`(OpenHubConversationPanel)：去掉状态条挂载。
+- `useGuidSend.ts`：去掉 lead 标记 + model_range 注入(会话创建回到普通 openhub)。
 - `GuidModelSelector.tsx` + `useGuidModelSelection.ts`：**回退为单选**(去三态/主管模型/leadLabel/leadHint);`GuidPage.tsx`：去 orchestrationModeNode + 隐藏/主管模型逻辑。
 - `workspaceEvents.ts`：去 `WORKSPACE_SELECT_TAB_EVENT`(仅右栏 DAG 用过) + `WorkspaceRailBody` 对应监听。
 - i18n：清 guid.orchestration.* / guid.modelSelector.lead* / orchestrator.status.* 等死键 + gen:i18n。
@@ -101,7 +101,7 @@
 
 ## 8. 分期（保持构建始终绿：先建后拆）
 
-- **P1 — 后端适配**：REST `POST /runs/adhoc` + ipcBridge.createAdhoc;caps nomi_run_create 改显式参数(去会话 extra 读取);去 lead extra 回写。引擎/测试不回归。
+- **P1 — 后端适配**：REST `POST /runs/adhoc` + ipcBridge.createAdhoc;caps openhub_run_create 改显式参数(去会话 extra 读取);去 lead extra 回写。引擎/测试不回归。
 - **P2 — 建 Tab**：index.tsx master-detail + NewRunComposer + AgentRoster + Run 主视图(复用 DagCanvas/RunDetailHeader/inspector/useRunLive)。Tab 端到端可发起→审批→跑→看→控。（此时会话融合胶水仍在,但 Tab 已自洽。）
 - **P3 — 拆胶水 + 会话回退单选**：删状态条/右栏 DAG tab/三态选择器/lead 标记;会话模型选择器回单选;清死键。typecheck0 全清悬挂。
 - **P4 — 集成 + 真机冒烟 + 全分支评审**：build --workspace + 触碰 crate 测试 + e2e 4/4 + 前端;真机冒烟(Tab 发起→DAG→审批→inspector→控制;会话回到单 agent 无编排);controller 截图判美;最终评审。

@@ -4,14 +4,14 @@
 
 **Goal:** 删掉编排节点投影视图里独立的「启动前/重跑配置」大面板，把模型覆盖 + 预置要求折叠进底部对话输入框——单一模型入口、单一主文本框、外加一个「预置要求」pill。
 
-**Architecture:** Settled 节点复用 worker 会话自带的 `NomiSendBox`：增强其模型选择器写透 `override_model`，并在工具栏 `rightTools` 注入一个 `NodePresetPill`。Pending 节点无会话，用一条 `NodeConfigBar`（模型 pill + 预置要求 pill）替代原大面板。后端零改动（`setTaskConfig` + 引擎 override/preset 应用已存在）。
+**Architecture:** Settled 节点复用 worker 会话自带的 `OpenHubSendBox`：增强其模型选择器写透 `override_model`，并在工具栏 `rightTools` 注入一个 `NodePresetPill`。Pending 节点无会话，用一条 `NodeConfigBar`（模型 pill + 预置要求 pill）替代原大面板。后端零改动（`setTaskConfig` + 引擎 override/preset 应用已存在）。
 
 **Tech Stack:** React + TypeScript, arco-design (`Dropdown`/`Input.TextArea`/`Button`), `@icon-park/react`, i18next, UnoCSS 原子类；ipc 经 `ipcBridge.orchestrator.runs.setTaskConfig`。
 
 ## Global Constraints
 
 - `setTaskConfig` 是**全量替换**：任何一次写入必须带齐 `{ override_provider_id, override_model, preset_prompt }` 三元组，只改目标字段、其余用 live `task` 的当前值合并，否则会清空另一半配置。
-- worker 会话恒为 `nomi` 类型（`worker.rs` 确认），pill 只需注入 `NomiSendBox`。
+- worker 会话恒为 `openhub` 类型（`worker.rs` 确认），pill 只需注入 `OpenHubSendBox`。
 - 视觉硬门槛（[[ui-must-be-beautiful]]）：pill/popover 沿用 `sendbox-model-btn` + composer popover 视觉语言，与既有输入框对齐。
 - 前端无 vitest；每个 task 的验收 = `ui` 目录 `bun run typecheck` 退出码 0（用 `bun run typecheck`，勿用 `npx tsc` 会误报 0，见 [[typecheck-zero-and-arco-conventions]]）。禁 `any`/`ts-ignore`。arco 弹窗消息必经 `useArcoMessage`。
 - `@icon-park/react` 具名导入禁起别名（[[icon-park-imports-no-alias]]）。
@@ -26,9 +26,9 @@
 - **Create** `ui/src/renderer/pages/conversation/orchestration/NodePresetPill.tsx` — 「预置要求」pill + popover（textarea + 保存）。settled/pending 共用。
 - **Create** `ui/src/renderer/pages/conversation/orchestration/NodeModelPill.tsx` — 单选模型 pill（写 override）。仅 pending 用。
 - **Create** `ui/src/renderer/pages/conversation/orchestration/NodeConfigBar.tsx` — pending 窄配置条 = NodeModelPill + NodePresetPill + 提示。
-- **Modify** `ui/src/renderer/pages/conversation/platforms/nomi/NomiSendBox.tsx` — 新增可选 `extraRightTools?: React.ReactNode`，渲染进 `rightTools`。
-- **Modify** `ui/src/renderer/pages/conversation/platforms/nomi/NomiChat.tsx` — 新增可选 `extraRightTools` 透传给 `NomiSendBox`。
-- **Modify** `ui/src/renderer/pages/orchestrator/RunDetail/ReadOnlyConversationView.tsx` — 新增可选 `nodeBinding` + `extraRightTools`；`NomiReadOnlyChat.onSelectModel` 写透 override。
+- **Modify** `ui/src/renderer/pages/conversation/platforms/openhub/OpenHubSendBox.tsx` — 新增可选 `extraRightTools?: React.ReactNode`，渲染进 `rightTools`。
+- **Modify** `ui/src/renderer/pages/conversation/platforms/openhub/OpenHubChat.tsx` — 新增可选 `extraRightTools` 透传给 `OpenHubSendBox`。
+- **Modify** `ui/src/renderer/pages/orchestrator/RunDetail/ReadOnlyConversationView.tsx` — 新增可选 `nodeBinding` + `extraRightTools`；`OpenHubReadOnlyChat.onSelectModel` 写透 override。
 - **Modify** `ui/src/renderer/pages/conversation/orchestration/ProjectedWorkerView.tsx` — 删折叠面板；settled 传 `nodeBinding` + `<NodePresetPill>`；pending body 换 `<NodeConfigBar>`。
 - **Delete** `ui/src/renderer/pages/conversation/orchestration/NodePreconfigPanel.tsx`。
 - **Modify** `ui/src/renderer/services/i18n/locales/{en-US,zh-CN}/orchestrator.json` — 新增 pill 短标签，弃用面板专用 key。
@@ -50,7 +50,7 @@
 ```tsx
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -190,7 +190,7 @@ Expected: 退出码 0（确认 `TRunTask` 有 `preset_prompt`/`override_*`、`ic
 ```tsx
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -200,7 +200,7 @@ import { Button, Dropdown } from '@arco-design/web-react';
 import { Brain, Down } from '@icon-park/react';
 import { ipcBridge } from '@/common';
 import type { TModelRef, TRunTask } from '@/common/types/orchestrator/orchestratorTypes';
-import NomiSelect from '@/renderer/components/base/NomiSelect';
+import OpenHubSelect from '@/renderer/components/base/OpenHubSelect';
 import { decodePair, encodePair, useModelRange } from '@/renderer/pages/orchestrator/useModelRange';
 import { iconColors } from '@/renderer/styles/colors';
 import { useArcoMessage } from '@/renderer/utils/ui/useArcoMessage';
@@ -222,7 +222,7 @@ type NodeModelPillProps = {
 
 /**
  * NodeModelPill — a single-model override pill for a PENDING node (no worker
- * conversation yet, so no NomiSendBox model selector to reuse). Lists ANY
+ * conversation yet, so no OpenHubSendBox model selector to reuse). Lists ANY
  * configured provider×model (not just the run's fleet). Persists via
  * `setTaskConfig`, preserving the current preset_prompt.
  */
@@ -269,23 +269,23 @@ const NodeModelPill: React.FC<NodeModelPillProps> = ({ runId, taskId, task, onSa
         <span>{t('orchestrator.run.preconfig.modelLabel', { defaultValue: '指定模型' })}</span>
       </div>
       {hasModels ? (
-        <NomiSelect value={value} onChange={(v) => void persist(v as string)} showSearch filterOption={filterByLabel} className='w-full'>
-          <NomiSelect.Option value={FOLLOW_AUTO}>
+        <OpenHubSelect value={value} onChange={(v) => void persist(v as string)} showSearch filterOption={filterByLabel} className='w-full'>
+          <OpenHubSelect.Option value={FOLLOW_AUTO}>
             {t('orchestrator.run.preconfig.followAuto', { defaultValue: '跟随自动路由（不指定）' })}
-          </NomiSelect.Option>
+          </OpenHubSelect.Option>
           {providers.map((p) => (
-            <NomiSelect.OptGroup key={p.id} label={p.name || p.platform}>
+            <OpenHubSelect.OptGroup key={p.id} label={p.name || p.platform}>
               {getAvailableModels(p).map((m) => {
                 const ref: TModelRef = { provider_id: p.id, model: m };
                 return (
-                  <NomiSelect.Option key={encodePair(ref)} value={encodePair(ref)}>
+                  <OpenHubSelect.Option key={encodePair(ref)} value={encodePair(ref)}>
                     {formatModelLabel(p, m)}
-                  </NomiSelect.Option>
+                  </OpenHubSelect.Option>
                 );
               })}
-            </NomiSelect.OptGroup>
+            </OpenHubSelect.OptGroup>
           ))}
-        </NomiSelect>
+        </OpenHubSelect>
       ) : (
         <span className='text-12px leading-18px text-[rgb(var(--warning-6))]'>
           {t('orchestrator.run.preconfig.noModels', { defaultValue: '暂无可用模型，请先在「模型」里配置 provider。' })}
@@ -331,7 +331,7 @@ export default NodeModelPill;
 ```tsx
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -351,7 +351,7 @@ type NodeConfigBarProps = {
 
 /**
  * NodeConfigBar — the PENDING node's 启动前配置 surface. A pending node has no worker
- * conversation (hence no NomiSendBox to reuse), so we mirror the composer's bottom
+ * conversation (hence no OpenHubSendBox to reuse), so we mirror the composer's bottom
  * toolbar as a slim bar carrying the SAME two controls (model + 预置要求 pills) that a
  * settled node gets inside its real composer. No text-send — nothing to chat with yet.
  */
@@ -396,16 +396,16 @@ export default NodeConfigBar;
 
 ---
 
-### Task 4: `NomiSendBox` / `NomiChat` 透传 `extraRightTools`
+### Task 4: `OpenHubSendBox` / `OpenHubChat` 透传 `extraRightTools`
 
 **Files:**
-- Modify: `ui/src/renderer/pages/conversation/platforms/nomi/NomiSendBox.tsx`
-- Modify: `ui/src/renderer/pages/conversation/platforms/nomi/NomiChat.tsx`
+- Modify: `ui/src/renderer/pages/conversation/platforms/openhub/OpenHubSendBox.tsx`
+- Modify: `ui/src/renderer/pages/conversation/platforms/openhub/OpenHubChat.tsx`
 
 **Interfaces:**
-- Produces: `NomiSendBox` + `NomiChat` 均新增可选 prop `extraRightTools?: React.ReactNode`；渲染在 `rightTools` 内、`collaboratorSelectorNode` 与 `AgentModeSelector` 之间（或末尾）。
+- Produces: `OpenHubSendBox` + `OpenHubChat` 均新增可选 prop `extraRightTools?: React.ReactNode`；渲染在 `rightTools` 内、`collaboratorSelectorNode` 与 `AgentModeSelector` 之间（或末尾）。
 
-- [ ] **Step 1: NomiSendBox** — 在其 props 类型加 `extraRightTools?: React.ReactNode;`，解构它，并在 `rightTools` 的那个 `<div ...data-testid='nomi-sendbox-config-group'>` 里、`{collaboratorSelectorNode}` 之后加一行 `{extraRightTools}`：
+- [ ] **Step 1: OpenHubSendBox** — 在其 props 类型加 `extraRightTools?: React.ReactNode;`，解构它，并在 `rightTools` 的那个 `<div ...data-testid='openhub-sendbox-config-group'>` 里、`{collaboratorSelectorNode}` 之后加一行 `{extraRightTools}`：
 
 ```tsx
 // props 类型里（collaboratorSelectorNode 附近）新增：
@@ -417,13 +417,13 @@ extraRightTools?: React.ReactNode;
               <AgentModeSelector
 ```
 
-- [ ] **Step 2: NomiChat** — 在其 props 类型加 `extraRightTools?: React.ReactNode;`，解构，透传给 `<NomiSendBox ... extraRightTools={extraRightTools} />`：
+- [ ] **Step 2: OpenHubChat** — 在其 props 类型加 `extraRightTools?: React.ReactNode;`，解构，透传给 `<OpenHubSendBox ... extraRightTools={extraRightTools} />`：
 
 ```tsx
 // props 类型（collaboratorSelectorNode 后）：
   extraRightTools?: React.ReactNode;
 // 解构参数里新增 extraRightTools,
-// NomiSendBox 调用处：
+// OpenHubSendBox 调用处：
               collaboratorSelectorNode={collaboratorSelectorNode}
               extraRightTools={extraRightTools}
 ```
@@ -438,10 +438,10 @@ extraRightTools?: React.ReactNode;
 - Modify: `ui/src/renderer/pages/orchestrator/RunDetail/ReadOnlyConversationView.tsx`
 
 **Interfaces:**
-- Consumes: `NomiChat.extraRightTools`（Task 4）
-- Produces: `ReadOnlyConversationView` 新增两个可选 prop：`nodeBinding?: { runId: string; taskId: string; task: TRunTask; onSaved: () => void | Promise<void> }`、`extraRightTools?: React.ReactNode`。仅 `nomi` 分支消费；其它平台忽略（保持零回归）。
+- Consumes: `OpenHubChat.extraRightTools`（Task 4）
+- Produces: `ReadOnlyConversationView` 新增两个可选 prop：`nodeBinding?: { runId: string; taskId: string; task: TRunTask; onSaved: () => void | Promise<void> }`、`extraRightTools?: React.ReactNode`。仅 `openhub` 分支消费；其它平台忽略（保持零回归）。
 
-- [ ] **Step 1: 增强 `NomiReadOnlyChat`**——新增 `nodeBinding`/`extraRightTools` props；`onSelectModel` 成功后若有 `nodeBinding` 则写透 override（保留 preset）；把 `extraRightTools` 传给 `NomiChat`。
+- [ ] **Step 1: 增强 `OpenHubReadOnlyChat`**——新增 `nodeBinding`/`extraRightTools` props；`onSelectModel` 成功后若有 `nodeBinding` 则写透 override（保留 preset）；把 `extraRightTools` 传给 `OpenHubChat`。
 
 ```tsx
 // import 增补：
@@ -455,9 +455,9 @@ export type OrchestratorNodeBinding = {
   onSaved: () => void | Promise<void>;
 };
 
-// NomiReadOnlyChat props 增加 nodeBinding?/extraRightTools?：
-const NomiReadOnlyChat: React.FC<{
-  conversation: NomiConversation;
+// OpenHubReadOnlyChat props 增加 nodeBinding?/extraRightTools?：
+const OpenHubReadOnlyChat: React.FC<{
+  conversation: OpenHubConversation;
   agent_name?: string;
   hideSendBox?: boolean;
   nodeBinding?: OrchestratorNodeBinding;
@@ -468,7 +468,7 @@ const NomiReadOnlyChat: React.FC<{
       const selected = { ..._provider, use_model: modelName } as TProviderWithModel;
       const ok = await ipcBridge.conversation.update.invoke({ id: conversation.id, updates: { model: selected } });
       if (ok) {
-        void saveNomiDefaultModel(_provider.id, modelName);
+        void saveOpenHubDefaultModel(_provider.id, modelName);
         // 写透 per-node override —— 改一次模型同时定 live 会话 + 下次重跑；保留 preset。
         if (nodeBinding) {
           try {
@@ -483,7 +483,7 @@ const NomiReadOnlyChat: React.FC<{
             });
             await nodeBinding.onSaved();
           } catch (e) {
-            console.error('[NomiReadOnlyChat] write-through node override failed:', e);
+            console.error('[OpenHubReadOnlyChat] write-through node override failed:', e);
           }
         }
       }
@@ -492,10 +492,10 @@ const NomiReadOnlyChat: React.FC<{
     [conversation.id, nodeBinding]
   );
 
-  const modelSelection = useNomiModelSelection({ initialModel: conversation.model, onSelectModel });
+  const modelSelection = useOpenHubModelSelection({ initialModel: conversation.model, onSelectModel });
 
   return (
-    <NomiChat
+    <OpenHubChat
       conversation_id={conversation.id}
       workspace={conversation.extra.workspace}
       modelSelection={modelSelection}
@@ -507,7 +507,7 @@ const NomiReadOnlyChat: React.FC<{
 };
 ```
 
-- [ ] **Step 2: `ReadOnlyConversationView` props + nomi 分支透传**
+- [ ] **Step 2: `ReadOnlyConversationView` props + openhub 分支透传**
 
 ```tsx
 type ReadOnlyConversationViewProps = {
@@ -517,12 +517,12 @@ type ReadOnlyConversationViewProps = {
   nodeBinding?: OrchestratorNodeBinding;
   extraRightTools?: React.ReactNode;
 };
-// 解构 nodeBinding/extraRightTools；仅 'nomi' case 传入：
-      case 'nomi':
+// 解构 nodeBinding/extraRightTools；仅 'openhub' case 传入：
+      case 'openhub':
         return (
-          <NomiReadOnlyChat
+          <OpenHubReadOnlyChat
             key={conversation.id}
-            conversation={conversation as NomiConversation}
+            conversation={conversation as OpenHubConversation}
             agent_name={agent_name}
             hideSendBox={hideSendBox}
             nodeBinding={nodeBinding}

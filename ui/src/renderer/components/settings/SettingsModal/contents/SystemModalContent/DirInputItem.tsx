@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -42,7 +42,7 @@ const DirInputItem: React.FC<{
         };
 
         return (
-          <div className='nomi-dir-input h-[32px] flex items-center rounded-8px border border-solid border-transparent pl-14px bg-[var(--fill-0)]'>
+          <div className='openhub-dir-input h-[32px] flex items-center rounded-8px border border-solid border-transparent pl-14px bg-[var(--fill-0)]'>
             <Tooltip content={current_value || t('settings.dirNotConfigured')} position='top'>
               <div className='flex-1 min-w-0 text-13px text-t-primary truncate '>
                 {current_value || t('settings.dirNotConfigured')}

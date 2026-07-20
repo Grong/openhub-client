@@ -1,10 +1,10 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export const ADAPTER_BRIDGE_EVENT_KEY = 'nomifun-bridge-adapter';
+export const ADAPTER_BRIDGE_EVENT_KEY = 'openhub-bridge-adapter';
 
 /**
  * File/Directory selection events

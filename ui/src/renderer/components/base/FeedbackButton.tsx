@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -23,7 +23,7 @@ type FeedbackButtonProps = {
 
 /**
  * Inline feedback chip shown near error messages — styled as a compact pill
- * consistent with Nomi's existing Mention/Agent pill patterns. Click
+ * consistent with OpenHub's existing Mention/Agent pill patterns. Click
  * auto-captures the current window and opens the feedback modal with the
  * relevant module preselected; the user only needs to describe the issue.
  */

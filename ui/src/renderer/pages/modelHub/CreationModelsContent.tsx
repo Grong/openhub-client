@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -14,7 +14,7 @@ import type { IProvider, ModelCapability } from '@/common/config/storage';
 import { useArcoMessage } from '@/renderer/utils/ui/useArcoMessage';
 import { useProvidersQuery } from '@/renderer/hooks/agent/useModelProviderList';
 import { useModelProfiles } from '@/renderer/hooks/agent/useModelProfiles';
-import NomiScrollArea from '@/renderer/components/base/NomiScrollArea';
+import OpenHubScrollArea from '@/renderer/components/base/OpenHubScrollArea';
 import SegmentedTabs, { type SegmentedTabItem } from '@/renderer/components/base/SegmentedTabs';
 import { useSettingsViewMode } from '@/renderer/components/settings/SettingsModal/settingsViewContext';
 import {
@@ -141,7 +141,7 @@ const CreationModelsContent: React.FC = () => {
       </div>
 
       {/* Content */}
-      <NomiScrollArea className='flex-1 min-h-0' disableOverflow={isPageMode}>
+      <OpenHubScrollArea className='flex-1 min-h-0' disableOverflow={isPageMode}>
         {groups.length === 0 ? (
           <div className='flex flex-col items-center justify-center py-48px text-center'>
             <MagicWand theme='outline' size='44' className='text-t-tertiary mb-14px' />
@@ -221,7 +221,7 @@ const CreationModelsContent: React.FC = () => {
             })}
           </div>
         )}
-      </NomiScrollArea>
+      </OpenHubScrollArea>
     </div>
   );
 };

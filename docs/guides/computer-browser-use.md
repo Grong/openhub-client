@@ -1,12 +1,12 @@
 # Computer Use And Browser Use
 
-NomiFun exposes two optional automation capability families to agents:
+OpenHub exposes two optional automation capability families to agents:
 
 - **Computer use**: screenshots, mouse/keyboard input, window enumeration, and
-  focus control through the in-process Rust implementation (`nomi-computer`,
-  with accessibility helpers in `nomi-a11y`).
+  focus control through the in-process Rust implementation (`openhub-computer`,
+  with accessibility helpers in `openhub-a11y`).
 - **Browser use**: Chrome automation through the in-process Rust CDP engine
-  (`nomi-browser-engine`) and the tool facade (`nomi-browser`).
+  (`openhub-browser-engine`) and the tool facade (`openhub-browser`).
 
 Both are high-privilege capabilities. In the desktop product UI they are
 compiled in and enabled by default so a user can opt out from Settings. In
@@ -21,7 +21,7 @@ native CDP engine. ACP/Codex-style sessions can reach the same engine through
 the `mcp-browser-stdio` bridge.
 
 Computer use is desktop-oriented. It can observe the screen and synthesize
-input, so it is compiled into desktop/Nomi CLI builds but omitted from the
+input, so it is compiled into desktop/OpenHub CLI builds but omitted from the
 headless web/server build.
 
 ## Enabling And Disabling Capabilities
@@ -50,16 +50,16 @@ Both camelCase and snake_case keys are accepted by compatibility paths.
 ### Host Environment
 
 ```bash
-NOMIFUN_COMPUTER_USE=1
-NOMIFUN_BROWSER_USE=1
+OPENHUB_COMPUTER_USE=1
+OPENHUB_BROWSER_USE=1
 ```
 
-These set default availability for Nomi-engine sessions in the host where they
+These set default availability for OpenHub-engine sessions in the host where they
 are read. They do not bypass build-time feature gates.
 
-### Nomi Engine Config
+### OpenHub Engine Config
 
-`~/.nomi/config.toml` or project `.nomi/config.toml`:
+`~/.openhub/config.toml` or project `.openhub/config.toml`:
 
 ```toml
 [tools]
@@ -84,9 +84,9 @@ requiring Node, npm, or Playwright.
 
 | Host | Computer use | Browser use |
 | --- | --- | --- |
-| `nomifun-desktop` | Compiled by the `computer-use` feature | Compiled by the `browser-use` feature |
-| `nomi` CLI | Enabled in the current `nomi-cli` build | Not enabled in the current `nomi-cli` manifest |
-| `nomifun-web` / Docker | Not compiled | Not compiled in the current headless web host |
+| `openhub-desktop` | Compiled by the `computer-use` feature | Compiled by the `browser-use` feature |
+| `openhub` CLI | Enabled in the current `openhub-cli` build | Not enabled in the current `openhub-cli` manifest |
+| `openhub-web` / Docker | Not compiled | Not compiled in the current headless web host |
 
 Web/server builds should not promise desktop or managed-browser control. If a
 config enables these tools in a host that was built without the relevant
@@ -102,10 +102,10 @@ Computer use needs OS permissions the first time it is used:
   means this permission is missing.
 
 These run **in-process inside the desktop app**, so the permission must be
-granted to **NomiFun itself** (the entry named "NomiFun" in System Settings),
+granted to **OpenHub itself** (the entry named "OpenHub" in System Settings),
 not to the terminal/editor — and a freshly-granted permission only takes effect
 after the app is **completely quit and reopened** (macOS does not hot-load TCC
-grants into a running process). Permission-failure messages name "NomiFun"
+grants into a running process). Permission-failure messages name "OpenHub"
 explicitly so the guidance is unambiguous.
 
 Settings → Computer Use surfaces a live status panel (macOS): it shows whether
@@ -114,13 +114,13 @@ which is authoritative, since a System Settings toggle bound to a stale
 code-signing identity reads "Not in effect" even while it looks on — with
 buttons that deep-link to the exact Privacy pane and trigger the OS prompt.
 Backed by `GET/POST /api/computer/permissions[/request|/open-settings]`
-(`nomi_computer::permissions` → `AXIsProcessTrusted` /
+(`openhub_computer::permissions` → `AXIsProcessTrusted` /
 `CG*ScreenCaptureAccess`).
 
 > **Stale grant.** If a toggle is clearly on yet computer use still fails, the
-> grant is bound to an older build's identity. Quit NomiFun, run
-> `tccutil reset Accessibility com.nomifun.desktop` and
-> `tccutil reset ScreenCapture com.nomifun.desktop`, relaunch, re-grant, and
+> grant is bound to an older build's identity. Quit OpenHub, run
+> `tccutil reset Accessibility com.openhub.desktop` and
+> `tccutil reset ScreenCapture com.openhub.desktop`, relaunch, re-grant, and
 > fully restart once more.
 
 ## Approval Semantics

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -8,9 +8,9 @@
  * Helpers for injecting user-selected background images into theme CSS.
  */
 
-export const BACKGROUND_BLOCK_START = '/* Nomi Theme Background Start */';
-export const BACKGROUND_BLOCK_END = '/* Nomi Theme Background End */';
-export const BACKGROUND_MASK_VERSION = '/* Nomi Theme Background Mask v2 */';
+export const BACKGROUND_BLOCK_START = '/* OpenHub Theme Background Start */';
+export const BACKGROUND_BLOCK_END = '/* OpenHub Theme Background End */';
+export const BACKGROUND_MASK_VERSION = '/* OpenHub Theme Background Mask v2 */';
 
 const LIGHT_IMAGE_MASK = 'rgba(255, 255, 255, 0.66)';
 const DARK_IMAGE_MASK = 'rgba(0, 0, 0, 0.34)';
@@ -28,11 +28,11 @@ const buildBackgroundCss = (imageDataUrl: string): string => {
 ${BACKGROUND_MASK_VERSION}
 /* 明暗模式蒙版变量 / Light-dark image mask variable */
 :root {
-  --nomi-manual-bg-mask: ${LIGHT_IMAGE_MASK};
+  --openhub-manual-bg-mask: ${LIGHT_IMAGE_MASK};
 }
 
 html[data-theme='dark'] {
-  --nomi-manual-bg-mask: ${DARK_IMAGE_MASK};
+  --openhub-manual-bg-mask: ${DARK_IMAGE_MASK};
 }
 
 /* 根容器设置背景图 / Root container background image */
@@ -41,7 +41,7 @@ html,
 .arco-layout,
 .app-shell {
   background-image:
-    linear-gradient(var(--nomi-manual-bg-mask), var(--nomi-manual-bg-mask)),
+    linear-gradient(var(--openhub-manual-bg-mask), var(--openhub-manual-bg-mask)),
     url("${imageDataUrl}");
   background-size: cover;
   background-repeat: no-repeat;

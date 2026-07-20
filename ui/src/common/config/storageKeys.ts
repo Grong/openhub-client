@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -15,14 +15,14 @@
  */
 export const STORAGE_KEYS = {
   /** Workspace tree collapse state / 工作空间目录树折叠状态 */
-  WORKSPACE_TREE_COLLAPSE: 'nomifun_workspace_collapse_state',
+  WORKSPACE_TREE_COLLAPSE: 'openhub_workspace_collapse_state',
 
   /** Sidebar collapse state / 侧边栏折叠状态 */
-  SIDEBAR_COLLAPSE: 'nomifun_sider_collapsed',
+  SIDEBAR_COLLAPSE: 'openhub_sider_collapsed',
 
   /** Theme preference / 主题偏好 */
-  THEME: 'nomifun_theme',
+  THEME: 'openhub_theme',
 
   /** Language preference / 语言偏好 */
-  LANGUAGE: 'nomifun_language',
+  LANGUAGE: 'openhub_language',
 } as const;

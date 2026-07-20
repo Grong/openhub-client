@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -14,8 +14,8 @@ import { ipcBridge } from '@/common';
 import { emitter, useAddEventListener } from '@renderer/utils/emitter.ts';
 import { iconColors } from '@renderer/styles/colors';
 
-const MONITOR_URL_STORAGE_KEY = 'nomifun.openclaw.monitorUrl';
-const STAR_OFFICE_URL_KEY = 'nomifun.starOffice.url';
+const MONITOR_URL_STORAGE_KEY = 'openhub.openclaw.monitorUrl';
+const STAR_OFFICE_URL_KEY = 'openhub.starOffice.url';
 const DEFAULT_MONITOR_URL = 'http://127.0.0.1:19000';
 const STAR_OFFICE_DETECT_TIMEOUT_DEFAULT = 1200;
 const STAR_OFFICE_DETECT_TIMEOUT_RETRY = 2400;

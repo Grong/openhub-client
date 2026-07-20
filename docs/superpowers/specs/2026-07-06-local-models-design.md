@@ -2,7 +2,7 @@
 
 - 日期:2026-07-06
 - 状态:设计定稿待评审(评审通过后按模块并行实施)
-- 领域代号:`local-ai`(crate `nomifun-local-ai`,数据目录 `{data_dir}/local-ai/`,路由 `/api/local-ai/*`)
+- 领域代号:`local-ai`(crate `openhub-local-ai`,数据目录 `{data_dir}/local-ai/`,路由 `/api/local-ai/*`)
 - 用户可见名:「本地模型」
 
 ---
@@ -21,20 +21,20 @@
 
 ## 1. 设计原则(不可妥协)
 
-1. **零捆绑**:安装包不含任何运行时二进制与模型;运行时(llama-server/sd-server/nomi-speech)与模型全部按需下载。
+1. **零捆绑**:安装包不含任何运行时二进制与模型;运行时(llama-server/sd-server/openhub-speech)与模型全部按需下载。
 2. **数据驱动、可扩展**:支持哪些模型由**远程目录(catalog)**决定,不硬编码;用户可自定义导入(HF/ModelScope 仓库或本地 GGUF)。
 3. **OpenAI 兼容是唯一接入语言**:所有本地能力以 OpenAI 兼容面(chat/embeddings/images/audio)进入平台,复用既有 provider 体系,**不为"本地"发明第二套模型消费协议**。
 4. **本地模型 = 一个受管 provider**:对会话/编排/IDMM/failover/创意工坊而言,本地与云只是不同的 provider 行,能力面完全同构——这是"少返工"的核心。
-5. **进程必须可收尸**:一切 sidecar 走 `nomifun-runtime::Builder`(Job Object/PDEATHSIG,随主进程死),杜绝僵尸锁文件。
-6. **中国网络友好**:ModelScope/hf-mirror 优先、canonical 兜底、env 覆写指向内网源(沿用 `NOMIFUN_CHROME_BINARY` 的优先级设计)。
+5. **进程必须可收尸**:一切 sidecar 走 `openhub-runtime::Builder`(Job Object/PDEATHSIG,随主进程死),杜绝僵尸锁文件。
+6. **中国网络友好**:ModelScope/hf-mirror 优先、canonical 兜底、env 覆写指向内网源(沿用 `OPENHUB_CHROME_BINARY` 的优先级设计)。
 
 ## 2. 总体架构
 
 ```
-                    ┌──────────────────────── NomiFun 后端(单进程)────────────────────────┐
+                    ┌──────────────────────── OpenHub 后端(单进程)────────────────────────┐
  会话/编排/IDMM ──→ │  provider 体系(platform='local' 受管行,base_url=门面,boot 对账)     │
- 创意工坊生成引擎 ─→ │  nomifun-creation MediaProvider: local_image 适配器(进程内 trait)    │
- 渠道语音/伙伴TTS ─→ │  nomifun-local-ai crate                                              │
+ 创意工坊生成引擎 ─→ │  openhub-creation MediaProvider: local_image 适配器(进程内 trait)    │
+ 渠道语音/伙伴TTS ─→ │  openhub-local-ai crate                                              │
                     │   ├─ 门面 Facade  /api/local-ai/v1/{chat/completions,embeddings,     │
                     │   │                audio/transcriptions,audio/speech,models}          │
                     │   │   (长期 bearer token 鉴权;反代/翻译到下方实例;按需拉起+就绪等待) │
@@ -46,7 +46,7 @@
                     └───────────┬──────────────────┬─────────────────┬─────────────────────┘
                         127.0.0.1:auto        127.0.0.1:auto      127.0.0.1:auto
                     ┌───────────┴────────┐ ┌───────┴─────────┐ ┌─────┴──────────────┐
-                    │ llama-server       │ │ sd-server       │ │ nomi-speech(自建)   │
+                    │ llama-server       │ │ sd-server       │ │ openhub-speech(自建)   │
                     │ router mode        │ │ (sd.cpp 官方)    │ │ sherpa-onnx 静态链   │
                     │ chat/VL/embedding  │ │ 生图/编辑        │ │ ASR SenseVoice      │
                     │ 多GGUF LRU 按需载   │ │ Z-Image/SDXL/…  │ │ TTS Kokoro/Melo     │
@@ -59,15 +59,15 @@
 |---|---|---|---|
 | **llama** | llama.cpp `llama-server` 官方预编译(锁版本) | 文本 LLM、视觉理解(mmproj)、embedding | **常驻单进程 router mode**:`--models-dir` + `/models/load\|unload` + `--models-max`(LRU);supervisor 叠加"全局闲置 TTL→停进程释放显存" |
 | **sdcpp** | stable-diffusion.cpp `sd-server` 官方预编译(锁版本) | 文生图/图生图/局部重绘(Z-Image/Qwen-Image/SDXL/Flux…) | **按需常驻**:首个生图任务拉起(冷载 4-12s 摊薄),闲置 TTL 停;切模型=重启实例 |
-| **speech** | **nomi-speech**(我们自建的 Rust sidecar:官方 `sherpa-onnx` crate 静态链 + axum) | ASR(SenseVoice-Small int8)、TTS(MeloTTS-zh_en / Kokoro) | 按需常驻,内存占用小;原生暴露 OpenAI `/v1/audio/transcriptions` + `/v1/audio/speech` |
+| **speech** | **openhub-speech**(我们自建的 Rust sidecar:官方 `sherpa-onnx` crate 静态链 + axum) | ASR(SenseVoice-Small int8)、TTS(MeloTTS-zh_en / Kokoro) | 按需常驻,内存占用小;原生暴露 OpenAI `/v1/audio/transcriptions` + `/v1/audio/speech` |
 
-自建 nomi-speech 的理由:调研确认**不存在非 Python 的现成 OpenAI 兼容语音 server**;sherpa-onnx 官方 Rust 绑定 2025 年已就位(第三方 sherpa-rs 已归档),静态链单可执行 +20-40MB,全 Apache-2.0。它作为独立 workspace bin crate 由我们 CI 按平台构建、随 release 发布、**运行期按需下载**(不进主安装包)。
+自建 openhub-speech 的理由:调研确认**不存在非 Python 的现成 OpenAI 兼容语音 server**;sherpa-onnx 官方 Rust 绑定 2025 年已就位(第三方 sherpa-rs 已归档),静态链单可执行 +20-40MB,全 Apache-2.0。它作为独立 workspace bin crate 由我们 CI 按平台构建、随 release 发布、**运行期按需下载**(不进主安装包)。
 
 ### 2.2 后端变体策略(硬件适配)
 
 - 变体维度:`os × arch × backend`。默认:**Windows/Linux→Vulkan**(单二进制覆盖 A/N/I 卡,解码速度接近 CUDA,MIT 干净)、**macOS→Metal**、无 GPU→CPU(AVX2)。
 - **CUDA 为可选升级**(NVIDIA 用户在硬件面板一键切换):prefill/峰值更强,但引入 ~373MB cudart 包与 **NVIDIA EULA 再分发条款**(上线前法务过一遍;初期可让 CUDA 变体直接从 llama.cpp 官方 release 下载,规避我们再分发)。
-- 运行时工件来源:目录里每个 runtime 版本声明多源 URL——**长期主选"我们 CI 重打包+签名"**(治 SmartScreen/杀软误报+镜像可靠性),官方 release 直链作兜底;`NOMIFUN_LOCALAI_RUNTIME_DIR` env 覆写支持内网离线部署。
+- 运行时工件来源:目录里每个 runtime 版本声明多源 URL——**长期主选"我们 CI 重打包+签名"**(治 SmartScreen/杀软误报+镜像可靠性),官方 release 直链作兜底;`OPENHUB_LOCALAI_RUNTIME_DIR` env 覆写支持内网离线部署。
 - 版本管理:`{data_dir}/local-ai/runtimes/{family}/{version}/{variant}/` 并存,升级=下载新版目录+闲时切换,坏版本可即时回退(目录还在)。
 
 ## 3. 统一门面与受管 provider(平台接入的关键设计)
@@ -77,21 +77,21 @@
 挂在主后端 router 的 `/api/local-ai/v1/*`,**独立 bearer token 域**(不走登录鉴权,照 public token 域的 `.nest()` 模式;禁 extract CurrentUser):
 
 - `POST /v1/chat/completions`、`/v1/embeddings` → 反代 llama-server(流式透传 SSE);请求带 `model` 字段,router mode 自动按需加载。
-- `POST /v1/audio/transcriptions`、`/v1/audio/speech` → 反代 nomi-speech。
+- `POST /v1/audio/transcriptions`、`/v1/audio/speech` → 反代 openhub-speech。
 - `GET /v1/models` → 汇总已安装可用模型(含能力标签),这让"拉取模型列表/协议探测/健康检查"现有机制原样可用。
 - 生图**不走门面**(见 §5.2,进程内 trait 更优);后续若要给外部 MCP/agent 暴露 `/v1/images/generations` 翻译层,再按需加。
 - 反代期间由 Supervisor 完成"实例未起→拉起→就绪探针→转发",首请求慢(冷启动秒级)但语义简单;门面对上游永远是"同步可用"。
 
-token:首次启用领域时生成一枚**长期 token**(加密落 `{data_dir}/local-ai/config.json`),门面校验它;llama-server 的 `--api-key` 与 nomi-speech 的 token 每次启动随机(仅 supervisor 知道),外界只见门面。
+token:首次启用领域时生成一枚**长期 token**(加密落 `{data_dir}/local-ai/config.json`),门面校验它;llama-server 的 `--api-key` 与 openhub-speech 的 token 每次启动随机(仅 supervisor 知道),外界只见门面。
 
 ### 3.2 受管 provider 行(零改动接入全平台)
 
 系统自动创建并维护**一条** providers 行:
 
-- `platform='local'`(自由字符串,未知值天然落引擎 OpenAI 分支——勘察坐实 `map_nomi_provider` 的 `_ => "openai"`)、`name='本地模型'`、`api_key`=门面长期 token(既有 AES-GCM 加密存储)、`base_url=http://127.0.0.1:{port}/api/local-ai`(引擎默认补 `/v1/chat/completions`,恰好命中门面路径)。
+- `platform='local'`(自由字符串,未知值天然落引擎 OpenAI 分支——勘察坐实 `map_openhub_provider` 的 `_ => "openai"`)、`name='本地模型'`、`api_key`=门面长期 token(既有 AES-GCM 加密存储)、`base_url=http://127.0.0.1:{port}/api/local-ai`(引擎默认补 `/v1/chat/completions`,恰好命中门面路径)。
 - **动态端口对策**:主后端 loopback 端口每次启动漂移 → **boot 时对账受管行 base_url**(providers 表支持 partial update;desktop/webui 单实例由 server.lock 保证不打架)。
 - 行上的 `models[]` = 已安装且能力为 chat/vision/embedding 的本地模型 id,安装/卸载时同步;能力标注直接来自**目录元数据**(比名字启发式更准,例如 Qwen3-VL 标 Vision)。
-- 保护:`nomi_system_update/delete_provider` 与 Model Hub 对该行只允许启停模型,不允许改 base_url/删除(注册进 provider 守卫;删除=在「本地模型」页关闭领域)。
+- 保护:`openhub_system_update/delete_provider` 与 Model Hub 对该行只允许启停模型,不允许改 base_url/删除(注册进 provider 守卫;删除=在「本地模型」页关闭领域)。
 
 **由此白拿的能力**:会话模型选择器直接出现本地模型;编排/协作模型可选本地;IDMM 可用本地模型值守;故障转移队列可配"云挂了切本地";健康检查走既有 chat 探测;per-companion 能力收窄照常生效。
 
@@ -144,9 +144,9 @@ token:首次启用领域时生成一枚**长期 token**(加密落 `{data_dir}/lo
 现有下载先例(CfT/MODNet/bun)都是整包进内存,GB 级必须新写,但风格全部沿用既有范式:
 
 - **流式落盘** `.part` + rename(原子);**HTTP Range 断点续传**(跨应用重启,断点态存 state/);
-- **sha256 流式校验**(写法抄 `nomifun-runtime/build.rs`,唯一带校验的先例);
+- **sha256 流式校验**(写法抄 `openhub-runtime/build.rs`,唯一带校验的先例);
 - **多源顺序回退**(ModelScope/hf-mirror 优先、hf 兜底——抄 matting_model 的 UPSTREAMS 语义),单文件失败换源续传;
-- 代理:统一 `nomifun_net::http_client()`;connect 超时 15s、**总传输不封顶**(matting 的既定语义);
+- 代理:统一 `openhub_net::http_client()`;connect 超时 15s、**总传输不封顶**(matting 的既定语义);
 - 并发闸(同时 ≤2 文件)、磁盘预检(剩余空间<所需×1.2 拒绝并提示)、单飞锁防重复;
 - **进度事件**:复用既有 WS 事件通道推 `{model_id, file, received, total, speed}`,前端进度条/暂停/取消。
 
@@ -158,7 +158,7 @@ token:首次启用领域时生成一枚**长期 token**(加密落 `{data_dir}/lo
 
 ### 5.2 生图 —— 进创意工坊生成引擎,不绕 HTTP 弯路
 
-`nomifun-creation` 新增适配器 `local_image`(能力 t2i/i2i/inpaint):它不发外网 HTTP,而是通过 app 层注入的 `LocalImageBackend` trait(仿 AssetSink 防环模式)调用 `nomifun-local-ai` 的 Supervisor→sd-server。生图模型在创意工坊「生成卡片」的模型选择器中与云模型并列(provider=本地模型行,capability=image_generation 来自目录)。**依赖:`feat/creative-workshop` 先合入 main。**
+`openhub-creation` 新增适配器 `local_image`(能力 t2i/i2i/inpaint):它不发外网 HTTP,而是通过 app 层注入的 `LocalImageBackend` trait(仿 AssetSink 防环模式)调用 `openhub-local-ai` 的 Supervisor→sd-server。生图模型在创意工坊「生成卡片」的模型选择器中与云模型并列(provider=本地模型行,capability=image_generation 来自目录)。**依赖:`feat/creative-workshop` 先合入 main。**
 
 ### 5.3 ASR —— 三个消费点
 
@@ -172,7 +172,7 @@ token:首次启用领域时生成一枚**长期 token**(加密落 `{data_dir}/lo
 
 ### 5.5 视觉桥(用户点名的体验场景)+ 用户图片内联补齐
 
-勘察发现一个重要现状:**桌面 nomi 会话的用户图片目前并不内联给模型**(`SendMessageData.files` 是路径,引擎只吃文本;内联 Image 块只来自工具结果截图)。因此设计两件事,一并做:
+勘察发现一个重要现状:**桌面 openhub 会话的用户图片目前并不内联给模型**(`SendMessageData.files` 是路径,引擎只吃文本;内联 Image 块只来自工具结果截图)。因此设计两件事,一并做:
 
 1. **补齐用户图片内联链路**(独立价值,云 VL 也受益):conversation service 发送预处理读取 files 中的图片字节→构造 Image 块进用户回合(受 `supports_image` 门控,大小/数量限幅)。
 2. **视觉桥**:发送预处理中,若目标模型无视觉(capabilities/VisionUnsupportedRegistry)且本轮含图片→用**本地 VL 模型**(设置里指定,默认 Qwen3-VL-2B)经既有 `one_shot_completion` 生成结构化描述→以文本前置注入(与 knowledge prelude 同构),UI 标注「图片已由本地视觉模型转述」。模式三挡:关闭/自动(仅无视觉模型时)/总是。
@@ -180,7 +180,7 @@ token:首次启用领域时生成一枚**长期 token**(加密落 `{data_dir}/lo
 
 ## 6. InstanceSupervisor 与 ResourceBroker
 
-- **实例状态机**:`stopped → starting(下载缺件→spawn→就绪探针) → ready → idle(TTL 计时) → stopping`;崩溃→退避重启(1s/5s/30s,三次进 `failed` 并缓存失败态,学 browser_fetcher 不无限重拉);全部经 `nomifun-runtime::Builder`(Job Object/CREATE_NO_WINDOW),端口用 `bind_with_fallback` 语义取临时口。
+- **实例状态机**:`stopped → starting(下载缺件→spawn→就绪探针) → ready → idle(TTL 计时) → stopping`;崩溃→退避重启(1s/5s/30s,三次进 `failed` 并缓存失败态,学 browser_fetcher 不无限重拉);全部经 `openhub-runtime::Builder`(Job Object/CREATE_NO_WINDOW),端口用 `bind_with_fallback` 语义取临时口。
 - **ResourceBroker**:硬件探测(总/可用 RAM;VRAM 经 Vulkan 枚举,探不到则保守按 RAM 模式);每模型内存需求来自目录 `requirements`;加载前预算检查,不足时按策略逐出——llama 内部靠 router LRU(`--models-max` 由预算折算),跨家族(要开 sd-server 而 llama 占满)由 broker 令 llama 卸载模型或停机;**用户可 pin 常驻**(pin 的不逐出,预算不够直接明示)。并发钳制:llama `--parallel` 默认 1-2(KV cache×并发×上下文是 OOM 主因——Ollama 的教训),生图任务经创意工坊队列天然串行。
 - **配置走文件不走 env**(Ollama 守护进程 env 不可见的教训):所有实例参数(ctx/gpu-layers/TTL/pin)入 config.json,UI 改即热重载。
 
@@ -206,12 +206,12 @@ token:首次启用领域时生成一枚**长期 token**(加密落 `{data_dir}/lo
 ## 9. crate 与代码布局
 
 ```
-crates/backend/nomifun-local-ai/        # 领域 crate(public-agent 范式)
+crates/backend/openhub-local-ai/        # 领域 crate(public-agent 范式)
   lib.rs(常量/目录规划) catalog.rs  store.rs(blobs/manifests/GC)
   download.rs(流式/续传/校验/进度) hardware.rs(探测) broker.rs
   supervisor.rs(实例状态机) runtimes/{llama.rs,sdcpp.rs,speech.rs}
   facade.rs(门面路由) provider_sync.rs(受管行对账) config.rs state.rs
-apps/nomi-speech/                        # 自建语音 sidecar(独立 bin,CI 单独出工件,不进主包)
+apps/openhub-speech/                        # 自建语音 sidecar(独立 bin,CI 单独出工件,不进主包)
 ui/src/renderer/pages/modelHub/localAi/  # UI 区
 ```
 
@@ -228,13 +228,13 @@ ui/src/renderer/pages/modelHub/localAi/  # UI 区
 | CUDA 再分发的 NVIDIA EULA | 初期 CUDA 变体从官方 release 直下(不经我们分发);法务确认后再纳入重分发 |
 | 磁盘被模型吃爆 | 预检+存储面板+GC+可迁移目录(承接 windows-disk-hygiene 的教训) |
 | Z-Image 三件套内存叠加(扩散+4B 编码器+VAE) | 目录 requirements 按三件套合计标注;`--offload-to-cpu`+FA 默认开;4GB VRAM 档验证过(官方 wiki) |
-| sherpa-onnx 官方 Rust 绑定较新 | 锁版本+关键路径自测;nomi-speech 是薄壳,替换引擎(如未来 SenseVoice-on-llama.cpp 坐实)不影响门面契约 |
+| sherpa-onnx 官方 Rust 绑定较新 | 锁版本+关键路径自测;openhub-speech 是薄壳,替换引擎(如未来 SenseVoice-on-llama.cpp 坐实)不影响门面契约 |
 | 桌面用户图片内联是新链路 | §5.5 拆成独立模块,云 VL 同步受益,单独可测 |
 
 ## 11. 与既有工作的关系 & 模块拆分(实施并行用)
 
 - **依赖 `feat/creative-workshop` 合入**:仅 §5.2 生图适配器;其余模块与该分支无耦合,可先行。
-- 模块(所有权互斥,可并行):M-A 目录+ModelStore+Downloader → M-B Supervisor+Broker+llama 家族 → M-C 门面+受管行对账(主干串行);M-D sdcpp+local_image 适配器、M-E nomi-speech+audio 面、M-F Model Hub UI、M-G 图片内联+视觉桥、M-H 渠道语音转写(依赖 A/B/C 后并行)。
+- 模块(所有权互斥,可并行):M-A 目录+ModelStore+Downloader → M-B Supervisor+Broker+llama 家族 → M-C 门面+受管行对账(主干串行);M-D sdcpp+local_image 适配器、M-E openhub-speech+audio 面、M-F Model Hub UI、M-G 图片内联+视觉桥、M-H 渠道语音转写(依赖 A/B/C 后并行)。
 
 ## 12. 决策记录(为什么不是……)
 

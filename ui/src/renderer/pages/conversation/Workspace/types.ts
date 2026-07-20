@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -24,7 +24,7 @@ export interface WorkspaceProps {
    * Renamed here to camelCase per the frontend prop convention.
    */
   isTemporaryWorkspace?: boolean;
-  eventPrefix?: 'acp' | 'codex' | 'nomi' | 'openclaw-gateway' | 'nanobot' | 'remote';
+  eventPrefix?: 'acp' | 'codex' | 'openhub' | 'openclaw-gateway' | 'nanobot' | 'remote';
   messageApi?: MessageApi;
   extraTabs?: WorkspaceExtraTab[];
 }

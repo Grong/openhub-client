@@ -11,7 +11,7 @@ import AgentSkillImportDrawer from '@/renderer/pages/settings/skill/AgentSkillIm
 import AssistantTagPicker from './AssistantTagPicker';
 import EmojiPicker from '@/renderer/components/chat/EmojiPicker';
 import MarkdownView from '@/renderer/components/Markdown';
-import NomiSelect from '@/renderer/components/base/NomiSelect';
+import OpenHubSelect from '@/renderer/components/base/OpenHubSelect';
 import { useModelProviderList } from '@/renderer/hooks/agent/useModelProviderList';
 import { Avatar, Button, Checkbox, Collapse, Drawer, Input, Select, Tag, Typography } from '@arco-design/web-react';
 import { Close, Delete, Info, Plus, Robot } from '@icon-park/react';
@@ -426,7 +426,7 @@ const AssistantEditDrawer: React.FC<AssistantEditDrawerProps> = ({
             <Typography.Text bold>
               {t('settings.assistantPreferredModels', { defaultValue: '偏好模型（可选）' })}
             </Typography.Text>
-            <NomiSelect
+            <OpenHubSelect
               mode='multiple'
               className='mt-10px w-full'
               value={editModels}
@@ -445,11 +445,11 @@ const AssistantEditDrawer: React.FC<AssistantEditDrawerProps> = ({
               data-testid='select-assistant-preferred-models'
             >
               {availableModelNames.map((modelName) => (
-                <NomiSelect.Option key={modelName} value={modelName}>
+                <OpenHubSelect.Option key={modelName} value={modelName}>
                   {modelName}
-                </NomiSelect.Option>
+                </OpenHubSelect.Option>
               ))}
-            </NomiSelect>
+            </OpenHubSelect>
           </div>
 
           {/* Summary */}

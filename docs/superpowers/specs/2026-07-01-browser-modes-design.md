@@ -6,7 +6,7 @@
 
 ## 1. 背景与目标
 
-现状：`browser-use` 由自研的进程内 Rust CDP 引擎 `nomi-browser-engine`（仅 Chromium）实现。它**总是自己拉起一个独立的 Chromium 子进程**，用**专属 `--user-data-dir`**（红线：绝不碰用户真实 Chrome 资料目录），通过 CDP 管道连接。在桌面端，因为 `BrowserConfig.headless` 默认 `false`，引擎会**弹出一个可见窗口** —— 这正是用户的痛点：弹窗浏览器既不是用户常用的浏览器，也打扰体验。
+现状：`browser-use` 由自研的进程内 Rust CDP 引擎 `openhub-browser-engine`（仅 Chromium）实现。它**总是自己拉起一个独立的 Chromium 子进程**，用**专属 `--user-data-dir`**（红线：绝不碰用户真实 Chrome 资料目录），通过 CDP 管道连接。在桌面端，因为 `BrowserConfig.headless` 默认 `false`，引擎会**弹出一个可见窗口** —— 这正是用户的痛点：弹窗浏览器既不是用户常用的浏览器，也打扰体验。
 
 用户诉求（原话概括）：
 1. **静默浏览器**（用户看不到窗口，系统直接驱动）—— 高优
@@ -30,11 +30,11 @@
 
 ## 2. 现状关键事实（实现依据，含文件/行）
 
-- 引擎入口 `nomi_browser_engine::create_engine(EngineConfig)`（`crates/agent/nomi-browser-engine/src/lib.rs:203`）：resolve chrome → 专属 `user_data_dir=<data_dir>/profile`（`lib.rs:209`）→ `build_backend` 启动。
-- Chrome 解析 `acquire::resolve_chrome_path`（`acquire.rs:236`）优先级：`NOMIFUN_CHROME_BINARY` env > 打包 CfT > 已下载 CfT > **系统 Chrome/Edge**（`detect_system_browser_in`，`acquire.rs:215`）> 下载 CfT。**系统浏览器探测逻辑已存在**，只是排在 CfT 之后当兜底。
+- 引擎入口 `openhub_browser_engine::create_engine(EngineConfig)`（`crates/agent/openhub-browser-engine/src/lib.rs:203`）：resolve chrome → 专属 `user_data_dir=<data_dir>/profile`（`lib.rs:209`）→ `build_backend` 启动。
+- Chrome 解析 `acquire::resolve_chrome_path`（`acquire.rs:236`）优先级：`OPENHUB_CHROME_BINARY` env > 打包 CfT > 已下载 CfT > **系统 Chrome/Edge**（`detect_system_browser_in`，`acquire.rs:215`）> 下载 CfT。**系统浏览器探测逻辑已存在**，只是排在 CfT 之后当兜底。
 - headless 决策 `backend/cdp.rs::build_backend`：`force_headless = !display_available() || !config.headful`。`EngineConfig.headful` 来自 `BrowserConfig.headless`(`!headless`)。`--headless=new` 已是现成机制（截图可用）。
-- `BrowserConfig`（`crates/agent/nomi-config/src/config.rs:283`）有 `headless: bool`（默认 false），**无 UI 开关**（仅 config.toml）。
-- 配置链路：UI `configService` → `client_preferences` → 后端工厂 `factory/nomi.rs` 每会话 `read_bool_pref` LIVE 读 → `NomiResolvedConfig`（`types.rs:59`）→ `manager/nomi/agent.rs:235-249` 写进 `config.tools.browser.*` → `bootstrap.rs:670` `BrowserTool::with_policy` → `tool.rs::engine()`(`tool.rs:773`) 构造 `EngineConfig`。
+- `BrowserConfig`（`crates/agent/openhub-config/src/config.rs:283`）有 `headless: bool`（默认 false），**无 UI 开关**（仅 config.toml）。
+- 配置链路：UI `configService` → `client_preferences` → 后端工厂 `factory/openhub.rs` 每会话 `read_bool_pref` LIVE 读 → `OpenHubResolvedConfig`（`types.rs:59`）→ `manager/openhub/agent.rs:235-249` 写进 `config.tools.browser.*` → `bootstrap.rs:670` `BrowserTool::with_policy` → `tool.rs::engine()`(`tool.rs:773`) 构造 `EngineConfig`。
 - `BrowserTool`（`tool.rs`）在 `new()`(`tool.rs:359`) 由 `!config.headless` 得 `headful` 存字段；`with_policy` **不带** headful/source 参 —— 故这两个开关都经 `config.tools.browser.*` 流入，**无需改 `with_policy` 签名**。
 - 唯一浏览器设置 UI：`ui/.../BrowserUseSettingsContent.tsx`（6 个 Arco `Switch`，无来源/静默控件）。
 - 前端 schema：`ui/src/common/config/configKeys.ts:63-87`（`agent.browserUse.*`）。
@@ -55,11 +55,11 @@ UI 两个控件 (Switch + Radio.Group)
   → configService 写 client_preferences:
       agent.browserUse.silent  (bool,   缺省=ON=静默)
       agent.browserUse.source  (string, 'managed'|'system', 缺省='managed')
-  → factory/nomi.rs 每会话 LIVE 读:
+  → factory/openhub.rs 每会话 LIVE 读:
       read_bool_pref(PREF_BROWSER_SILENT, host_default=true)
       read_string_pref(PREF_BROWSER_SOURCE, host_default="managed")   // 新增 helper
-  → NomiResolvedConfig { browser_silent: bool, browser_source: String }  // 新增两字段
-  → manager/nomi/agent.rs 写进 config.tools.browser:
+  → OpenHubResolvedConfig { browser_silent: bool, browser_source: String }  // 新增两字段
+  → manager/openhub/agent.rs 写进 config.tools.browser:
       config.tools.browser.headless = browser_silent      // silent → headless
       config.tools.browser.source   = browser_source       // 新增 String 字段
   → BrowserTool::new(&config): headful = !config.headless（现有）
@@ -70,7 +70,7 @@ UI 两个控件 (Switch + Radio.Group)
 
 **默认静默的兑现**：`silent` 的 host_default = `true` → `headless=true` → `headful=false` → 引擎 headless。老用户从未设置过该 pref，读到缺省即静默 —— 直接消除弹窗（正是用户诉求）。config.toml 的 `headless`（默认 false）仍保留给 CLI/高级用户;桌面会话由 pref 覆写(pref 优先)。
 
-### 4.2 引擎层改动（`nomi-browser-engine`）
+### 4.2 引擎层改动（`openhub-browser-engine`）
 
 **`acquire.rs`**：
 - 新增 `pub enum ChromeSource { Managed, System }`（`Default = Managed`, `Copy`），带 `from_source_str(&str)`（`"system"`→System，其余→Managed）。
@@ -91,14 +91,14 @@ UI 两个控件 (Switch + Radio.Group)
 
 ### 4.3 工具/配置/工厂/管理器改动
 
-- `nomi-browser/src/tool.rs`：`BrowserTool` 加 `chrome_source: ChromeSource` 字段；`with_data_dir` 默认 `Managed`；`new()` 从 `config.source` 解析；`engine()` 的 `EngineConfig` 字面量加 `chrome_source: self.chrome_source`。**不动 `with_policy` 签名。**
-- `nomi-config/src/config.rs`：`BrowserConfig` 加 `source: String`（`#[serde(default = "default_browser_source")]`，默认 `"managed"`）；`Default` 与 layer-merge 补上（project 非默认则覆盖 global）。
-- `types.rs`：`NomiResolvedConfig` 加 `browser_silent: bool` + `browser_source: String`。
-- `factory/nomi.rs`：加 `PREF_BROWSER_SILENT="agent.browserUse.silent"` / `PREF_BROWSER_SOURCE="agent.browserUse.source"`；`browser_silent`=`read_bool_pref(..,true)`；`browser_source`=`read_string_pref(..,"managed")`（新增 `read_string_pref` helper）；填入 `NomiResolvedConfig`。
-- `manager/nomi/agent.rs`：在现有 browser 字段映射后加
+- `openhub-browser/src/tool.rs`：`BrowserTool` 加 `chrome_source: ChromeSource` 字段；`with_data_dir` 默认 `Managed`；`new()` 从 `config.source` 解析；`engine()` 的 `EngineConfig` 字面量加 `chrome_source: self.chrome_source`。**不动 `with_policy` 签名。**
+- `openhub-config/src/config.rs`：`BrowserConfig` 加 `source: String`（`#[serde(default = "default_browser_source")]`，默认 `"managed"`）；`Default` 与 layer-merge 补上（project 非默认则覆盖 global）。
+- `types.rs`：`OpenHubResolvedConfig` 加 `browser_silent: bool` + `browser_source: String`。
+- `factory/openhub.rs`：加 `PREF_BROWSER_SILENT="agent.browserUse.silent"` / `PREF_BROWSER_SOURCE="agent.browserUse.source"`；`browser_silent`=`read_bool_pref(..,true)`；`browser_source`=`read_string_pref(..,"managed")`（新增 `read_string_pref` helper）；填入 `OpenHubResolvedConfig`。
+- `manager/openhub/agent.rs`：在现有 browser 字段映射后加
   `config.tools.browser.headless = config_extra.browser_silent;` 与
   `config.tools.browser.source = config_extra.browser_source.clone();`
-- 更新所有 `NomiResolvedConfig { .. }` 构造点（factory、manager 测试、`provider_health.rs` ×2、`agent_types_integration.rs`）补两字段。
+- 更新所有 `OpenHubResolvedConfig { .. }` 构造点（factory、manager 测试、`provider_health.rs` ×2、`agent_types_integration.rs`）补两字段。
 
 ### 4.4 前端改动
 

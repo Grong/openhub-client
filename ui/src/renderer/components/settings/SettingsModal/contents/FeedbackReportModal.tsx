@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -12,47 +12,47 @@ import { Tooltip } from '@arco-design/web-react';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export const NOMIFUN_PUBLIC_LINKS = {
-  repository: 'https://github.com/nomifun/nomifun-tauri',
-  officialWebsite: 'https://www.nomifun.com',
-  contact: 'https://www.nomifun.com/contact',
-  issues: 'https://github.com/nomifun/nomifun-tauri/issues',
-  releases: 'https://github.com/nomifun/nomifun-tauri/releases',
+export const OPENHUB_PUBLIC_LINKS = {
+  repository: 'https://github.com/Grong/openhub-client',
+  officialWebsite: 'https://www.openhub.dev',
+  contact: 'https://www.openhub.dev/contact',
+  issues: 'https://github.com/Grong/openhub-client/issues',
+  releases: 'https://github.com/Grong/openhub-client/releases',
   baiduPan: 'https://pan.baidu.com/s/5GPonoJNrwJ7GciBSDgXLaA',
   email: '535526063@qq.com',
   emailHref: 'mailto:535526063@qq.com',
 } as const;
 
-const COPYRIGHT = '© 2025-2026 NomiFun · www.nomifun.com';
+const COPYRIGHT = '© 2025-2026 OpenHub · www.openhub.dev';
 
 const CONTACT_ITEMS = [
   {
     labelKey: 'settings.contactAddress',
     fallbackLabel: '联系地址',
-    value: NOMIFUN_PUBLIC_LINKS.contact,
-    url: NOMIFUN_PUBLIC_LINKS.contact,
-    copyValue: NOMIFUN_PUBLIC_LINKS.contact,
+    value: OPENHUB_PUBLIC_LINKS.contact,
+    url: OPENHUB_PUBLIC_LINKS.contact,
+    copyValue: OPENHUB_PUBLIC_LINKS.contact,
   },
   {
     labelKey: 'settings.githubIssues',
     fallbackLabel: 'GitHub Issues',
-    value: NOMIFUN_PUBLIC_LINKS.issues,
-    url: NOMIFUN_PUBLIC_LINKS.issues,
-    copyValue: NOMIFUN_PUBLIC_LINKS.issues,
+    value: OPENHUB_PUBLIC_LINKS.issues,
+    url: OPENHUB_PUBLIC_LINKS.issues,
+    copyValue: OPENHUB_PUBLIC_LINKS.issues,
   },
   {
     labelKey: 'settings.officialWebsite',
     fallbackLabel: '官网',
-    value: NOMIFUN_PUBLIC_LINKS.officialWebsite,
-    url: NOMIFUN_PUBLIC_LINKS.officialWebsite,
-    copyValue: NOMIFUN_PUBLIC_LINKS.officialWebsite,
+    value: OPENHUB_PUBLIC_LINKS.officialWebsite,
+    url: OPENHUB_PUBLIC_LINKS.officialWebsite,
+    copyValue: OPENHUB_PUBLIC_LINKS.officialWebsite,
   },
   {
     labelKey: 'settings.contactEmail',
     fallbackLabel: '邮箱',
-    value: NOMIFUN_PUBLIC_LINKS.email,
-    url: NOMIFUN_PUBLIC_LINKS.emailHref,
-    copyValue: NOMIFUN_PUBLIC_LINKS.email,
+    value: OPENHUB_PUBLIC_LINKS.email,
+    url: OPENHUB_PUBLIC_LINKS.emailHref,
+    copyValue: OPENHUB_PUBLIC_LINKS.email,
     trailingKey: 'settings.contactEmailPending',
     trailingFallback: '、（待补充中）……',
   },
@@ -84,7 +84,7 @@ const FeedbackReportModal: React.FC<FeedbackReportModalProps> = ({ visible, onCa
   const { t } = useTranslation();
 
   const openContactPage = useCallback(() => {
-    void openExternalUrl(NOMIFUN_PUBLIC_LINKS.contact).catch((e) => console.error('open contact page failed', e));
+    void openExternalUrl(OPENHUB_PUBLIC_LINKS.contact).catch((e) => console.error('open contact page failed', e));
   }, []);
 
   const openContactTarget = useCallback((url: string) => {

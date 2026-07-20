@@ -42,7 +42,7 @@
   --message-error-accent-alt: #f59e0b;
 }
 
-.message-error-note--nomifun {
+.message-error-note--openhub {
   --message-error-accent: var(--danger);
   --message-error-accent-alt: #e11d48;
 }

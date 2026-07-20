@@ -4,7 +4,7 @@
 
 **Goal:** 实现 spec §6 的「智能分派」核心：一个**确定性能力 Router** 对 `成员×任务` 打分（硬约束过滤 + 软评分）并给出**自然语言理由**；`RunService.plan` 用 Router 选成员（替代盲选 planner 的 member_index，planner 建议作先验）；写入 assignment 带 score+rationale；用户可**改派/锁定**（覆盖，locked 再规划不动）。RunDetail 加 `fleet_members`(快照) 供前端解析 member→agent/model（同时修 P1b 节点 chip 只显 member_id 的遗留）。
 
-**Architecture:** 新 `nomifun-orchestrator/src/router.rs`（纯函数打分）;改 `run_service.rs`（plan 用 Router + reassign）;扩 `RunDetail` DTO（fleet_members）;新 REST `PUT .../runs/{run}/tasks/{task}/assignment`;前端节点详情/run 详情加理由展示 + 改派/锁定控件。
+**Architecture:** 新 `openhub-orchestrator/src/router.rs`（纯函数打分）;改 `run_service.rs`（plan 用 Router + reassign）;扩 `RunDetail` DTO（fleet_members）;新 REST `PUT .../runs/{run}/tasks/{task}/assignment`;前端节点详情/run 详情加理由展示 + 改派/锁定控件。
 
 **Spec：** §6（路由/能力匹配）。承接 P0/P1a 的 capability_profile(成员) + task_profile(任务) 形态。
 
@@ -16,10 +16,10 @@
 - 前端:禁 any/ts-ignore;useArcoMessage;theme vars;icon-park 不别名;npm run typecheck。后端:禁 cargo fmt;只跑触碰 crate;app 必编过。**禁合并 main**。
 
 ## File Structure
-- 创建 `crates/backend/nomifun-orchestrator/src/router.rs`（score_member/rank_members + ScoredCandidate）。
+- 创建 `crates/backend/openhub-orchestrator/src/router.rs`（score_member/rank_members + ScoredCandidate）。
 - 修改 `run_service.rs`（plan 用 Router;reassign 方法）、`src/lib.rs`（re-export router 类型若需）。
-- 修改 `crates/backend/nomifun-api-types/src/orchestrator.rs`（RunDetail 加 fleet_members;ReassignRequest）。
-- 修改 `nomifun-orchestrator/src/routes.rs`（PUT assignment 路由）。
+- 修改 `crates/backend/openhub-api-types/src/orchestrator.rs`（RunDetail 加 fleet_members;ReassignRequest）。
+- 修改 `openhub-orchestrator/src/routes.rs`（PUT assignment 路由）。
 - 修改 `ui/src/common/adapter/ipcBridge.ts`（runs.reassign）+ `orchestratorTypes.ts`（RunDetail.fleet_members、TReassign）。
 - 修改前端：DagCanvas/TaskNode（chip 用 fleet_members 友好标签）+ 节点详情或 run 详情加理由+改派控件。
 
@@ -27,7 +27,7 @@
 
 ## Task 1: 能力 Router 打分（纯函数）
 
-**Files:** Create `crates/backend/nomifun-orchestrator/src/router.rs`;Modify `src/lib.rs`;Test 内联。
+**Files:** Create `crates/backend/openhub-orchestrator/src/router.rs`;Modify `src/lib.rs`;Test 内联。
 
 **Interfaces produced:**
 ```rust
@@ -44,16 +44,16 @@ pub fn rank_members(members: &[FleetMember], profile: &TaskProfile) -> Vec<Score
 参照模板：无直接模板（新逻辑）;参照 FleetMember.capability_profile / TaskProfile 字段（api-types orchestrator.rs）。
 
 - [ ] **Step 1: 写打分测试（失败优先）** — (a) needs_vision 任务 + 无 vision 成员 → score_member None(排除);有 vision → Some;(b) kind=coding 任务,成员 strengths 含 coding 比不含的分高;(c) needs_high_reasoning,reasoning=high 比 low 分高;(d) rank_members 排序 desc + 同分稳定;(e) 全排除 → 空 vec;(f) rationale 非空且含命中因素。
-- [ ] **Step 2: 跑确认失败** — `cargo nextest run -p nomifun-orchestrator router`。
+- [ ] **Step 2: 跑确认失败** — `cargo nextest run -p openhub-orchestrator router`。
 - [ ] **Step 3: 实现 router.rs + lib re-export**。
-- [ ] **Step 4: 跑确认通过** + `cargo build -p nomifun-orchestrator`。
+- [ ] **Step 4: 跑确认通过** + `cargo build -p openhub-orchestrator`。
 - [ ] **Step 5: 提交** `git commit -m "feat(orchestrator): 能力 Router 打分(纯函数)"`
 
 ---
 
 ## Task 2: plan 用 Router + reassign + RunDetail.fleet_members
 
-**Files:** Modify `run_service.rs`、`api-types/src/orchestrator.rs`（RunDetail+ReassignRequest）、`nomifun-orchestrator/src/routes.rs`（PUT assignment）;Test 内联。
+**Files:** Modify `run_service.rs`、`api-types/src/orchestrator.rs`（RunDetail+ReassignRequest）、`openhub-orchestrator/src/routes.rs`（PUT assignment）;Test 内联。
 
 **Interfaces:**
 ```rust
@@ -73,9 +73,9 @@ impl RunService {
 参照模板：P1a run_service.plan（现 member_index 直选);P0 orchestrator routes handler 形态。
 
 - [ ] **Step 1: 写测试（失败优先）** — plan 后 assignment 有 rationale + 选了 Router 最高分成员(构造一个明显更匹配的成员,断言被选);reassign 改 member + locked,且再 plan 不动 locked;get_detail 返回 fleet_members(快照成员)。
-- [ ] **Step 2: 跑确认失败** — `cargo nextest run -p nomifun-orchestrator`（router/run_service）。
+- [ ] **Step 2: 跑确认失败** — `cargo nextest run -p openhub-orchestrator`（router/run_service）。
 - [ ] **Step 3: 实现** plan 用 Router + reassign + repo upsert_assignment(若需) + RunDetail.fleet_members + 路由 + DTO。
-- [ ] **Step 4: 跑确认通过** + `cargo build -p nomifun-orchestrator`。
+- [ ] **Step 4: 跑确认通过** + `cargo build -p openhub-orchestrator`。
 - [ ] **Step 5: 提交** `git commit -m "feat(orchestrator): plan 用能力 Router + 分派覆盖/锁定 + RunDetail.fleet_members"`
 
 ---

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -8,7 +8,7 @@
  * Wire-contract types for `/api/providers/*`.
  *
  * Direct mirror of the Rust types in
- * `crates/nomifun-api-types/src/provider.rs`. Keep in sync with the
+ * `crates/openhub-api-types/src/provider.rs`. Keep in sync with the
  * backend spec.
  */
 
@@ -125,7 +125,7 @@ export interface ProviderHealthCheckResponse {
 
 // ---------------------------------------------------------------------------
 // Model-profile endpoints (multimodal model hub) — mirror
-// crates/backend/nomifun-api-types/src/{model_task,model_catalog}.rs
+// crates/backend/openhub-api-types/src/{model_task,model_catalog}.rs
 // ---------------------------------------------------------------------------
 
 /** Body for `POST /api/model-profiles` (upsert one profile). */

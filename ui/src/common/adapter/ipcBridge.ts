@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -194,9 +194,9 @@ export const assistantTags = {
 export const conversation = {
   create: withResponseMap(
     httpPost<TChatConversation, ICreateConversationParams>('/api/conversations', (p) => {
-      // Top-level `model` is nomi-only on the backend (spec 2026-05-12).
+      // Top-level `model` is openhub-only on the backend (spec 2026-05-12).
       // Other agent types carry model info via `extra`.
-      const isNomi = p.type === 'nomi';
+      const isOpenHub = p.type === 'openhub';
       // Conversations are minted by the backend (INTEGER AUTOINCREMENT,
       // numeric-id spec §5) — never send a client-supplied id.
       const body: Record<string, unknown> = {
@@ -204,7 +204,7 @@ export const conversation = {
         name: p.name,
         extra: p.extra,
       };
-      if (isNomi) {
+      if (isOpenHub) {
         const model = toApiModelOptional(p.model);
         if (model) body.model = model;
       }
@@ -214,7 +214,7 @@ export const conversation = {
   ),
   createWithConversation: withResponseMap(
     httpPost<TChatConversation, { conversation: TChatConversation }>('/api/conversations/clone', (p) => {
-      const isNomi = p.conversation.type === 'nomi';
+      const isOpenHub = p.conversation.type === 'openhub';
       // Drop `id` here too: conversations use backend-minted INTEGER ids
       // (numeric-id spec §5), so the clone endpoint assigns a fresh one — the
       // source id must never leak into the new row.
@@ -222,7 +222,7 @@ export const conversation = {
         model?: TProviderWithModel;
       };
       const clonedConversation: Record<string, unknown> = { ...rest };
-      if (isNomi) {
+      if (isOpenHub) {
         const model = toApiModelOptional(_rawModel);
         if (model) clonedConversation.model = model;
       }
@@ -500,7 +500,7 @@ export interface IRendererLogEntry {
 export const application = {
   restart: shellProvider<void, void>(() => tauriRelaunch(), undefined),
   // Arm a factory reset: the backend writes a marker and the wipe happens early
-  // on the next boot (see nomifun_common::factory_reset). Callers should relaunch
+  // on the next boot (see openhub_common::factory_reset). Callers should relaunch
   // (application.restart) right after this resolves.
   factoryReset: httpPost<void, void>('/api/system/factory-reset'),
   // DEGRADE_STUB: Tauri v2 has no public JS API to toggle the webview devtools.
@@ -520,7 +520,7 @@ export const application = {
   ),
   getPath: shellProvider<string, { name: 'desktop' | 'home' | 'downloads' }>(({ name }) => tauriGetPath(name), ''),
   // Persist the user-chosen work dir to a pre-boot config file that the next
-  // boot reads before resolving work_dir (Rust `nomifun_common::dir_config`).
+  // boot reads before resolving work_dir (Rust `openhub_common::dir_config`).
   // The caller restarts right after this resolves; the new dir applies then.
   // `cacheDir` is accepted for back-compat but ignored — it is no longer
   // user-editable (removed from the settings UI), only `workDir` is sent.
@@ -589,7 +589,7 @@ export const application = {
 // each call with `isTauriRuntime()`, so the WebUI browser degrades to the safe fallback.
 
 /** Releases page shown in the modal's "go to release" affordance. */
-const GITHUB_RELEASES_PAGE = 'https://github.com/nomifun/nomifun-tauri/releases/latest';
+const GITHUB_RELEASES_PAGE = 'https://github.com/Grong/openhub-client/releases/latest';
 
 export const update = {
   open: noopEmitter<{ source?: 'menu' | 'about' }>(),
@@ -863,7 +863,7 @@ export const googleAuth = {
 };
 
 // ---------------------------------------------------------------------------
-// Google subscription status (Google OAuth provider path, used by nomi)
+// Google subscription status (Google OAuth provider path, used by openhub)
 // ---------------------------------------------------------------------------
 
 export const google = {
@@ -1478,7 +1478,7 @@ export const webui = {
    * Mint returns the plaintext exactly ONCE (`token`) — it is never persisted nor
    * re-emitted; the backend stores only a hash. `warning` is present when the
    * companion has no resolvable model (the token still mints, but model-dependent
-   * capabilities like `nomi_agent_run` will fail until a provider/model is set).
+   * capabilities like `openhub_agent_run` will fail until a provider/model is set).
    */
   companionAccessToken: {
     status: httpGet<{ configured: boolean }, { companionId: string }>(
@@ -1661,7 +1661,7 @@ export interface ICreateTerminalParams {
   rows?: number;
   /** 推迟到首个 resize(携带真实尺寸)再 spawn PTY,使全屏 TUI(claude)首帧即按正确尺寸绘制,避免「进入即花屏、需手动调尺寸」 / Defer the PTY spawn until the first resize carries the real size. */
   defer_spawn?: boolean;
-  /** 创建即绑定的知识库 id；启动时挂载到 {cwd}/.nomi/knowledge/ / Knowledge bases bound at creation, mounted before the PTY spawns. */
+  /** 创建即绑定的知识库 id；启动时挂载到 {cwd}/.openhub/knowledge/ / Knowledge bases bound at creation, mounted before the PTY spawns. */
   knowledge_base_ids?: string[];
 }
 
@@ -1761,7 +1761,7 @@ export interface IConfirmMessageParams {
 }
 
 export interface ICreateConversationParams {
-  type: 'acp' | 'codex' | 'openclaw-gateway' | 'nanobot' | 'remote' | 'nomi';
+  type: 'acp' | 'codex' | 'openclaw-gateway' | 'nanobot' | 'remote' | 'openhub';
   name?: string;
   model: TProviderWithModel;
   extra: {
@@ -1792,12 +1792,12 @@ export interface ICreateConversationParams {
     orchestrator_role?: string;
     /** Curated model range for the orchestration run this lead conversation
      *  spawns (homepage「主模型 + 协作模型」picker). `models[0]` = 主模型 (also the
-     *  lead/planner); the rest = 协作模型. Read back by the `nomi_run_create`
+     *  lead/planner); the rest = 协作模型. Read back by the `openhub_run_create`
      *  gateway handler from the conversation's extra (deterministic, not via the
      *  LLM). Absent ⇒ Auto (every enabled model). */
     orchestrator_model_range?: TModelRange;
     /** 「agent 集群」意图标记（需求1）：composer 顶部 toggle 选中后落此键。后端
-     *  nomi 工厂据此在常驻 subagent 提示之上追加 CLUSTER_MODE_HINT（对每个任务
+     *  openhub 工厂据此在常驻 subagent 提示之上追加 CLUSTER_MODE_HINT（对每个任务
      *  刻意评估是否开集群、太简单先向用户说明原因）。 */
     agent_cluster_mode?: boolean;
     /** 节点级审批模式（需求5，迁移 030）：'manual' = 集群节点遇关键决策挂起向
@@ -2293,7 +2293,7 @@ export const channel = {
   /**
    * 启动微信扫码登录流程。后端立即返回，二维码生命周期事件经 WebSocket 的
    * `weixinLogin` 推送。改用 WS（不再用 SSE）：`EventSource` 带不了桌面的
-   * `x-nomi-local-trust` 头，旧 SSE 流被鉴权中间件 403 → 前端秒弹"微信登录失败"。
+   * `x-openhub-local-trust` 头，旧 SSE 流被鉴权中间件 403 → 前端秒弹"微信登录失败"。
    */
   startWeixinLogin: httpPost<void, void>('/api/channel/weixin/login/start'),
   pairingRequested: wsMappedEmitter<IChannelPairingRequest>('channel.pairing-requested', (raw) =>
@@ -2536,7 +2536,7 @@ export const requirements = {
 export type IdmmTargetKind = 'conversation' | 'terminal';
 export type IdmmRunState = 'off' | 'armed' | 'intervening';
 
-// ── Phase-2 dual-watch config (mirrors `nomifun-api-types/src/idmm.rs` D1/D2). ──
+// ── Phase-2 dual-watch config (mirrors `openhub-api-types/src/idmm.rs` D1/D2). ──
 // IDMM is reorganized into two independently-toggleable, default-off watches that
 // share one engine: 故障值守 (fault watch) and 决策值守 (decision watch). The
 // backend flattens `WatchBase` into each watch (serde `#[flatten]`), so the base
@@ -2722,7 +2722,7 @@ export const idmm = {
 
 // ── Phase-3 model failover queue (mirrors `ModelFailoverConfig`, plan D1/D8). ──
 // A global, ordered list of provider+model candidates the conversation send-loop
-// falls back through when a NOMI session hits a pre-response provider fault. Read
+// falls back through when a OPENHUB session hits a pre-response provider fault. Read
 // & written through the `agent.model_failover` client preference (one JSON blob),
 // the same idmm-settings-style channel as `idmm.getSettings`/`updateSettings`.
 
@@ -2970,7 +2970,7 @@ export const orchestrator = {
   },
 };
 
-// ─────────────────────────── Companion (nomi 桌面伙伴) ───────────────────────────
+// ─────────────────────────── Companion (openhub 桌面伙伴) ───────────────────────────
 
 export interface ICompanionCollectConfig {
   chat_user_messages: boolean;
@@ -3116,7 +3116,7 @@ export interface ICompanionDayDigest {
   token_estimate: number;
 }
 
-/** 伙伴的唯一专属会话 — 一条真实的 `type='nomi'` 会话。每个伙伴生命周期内恒一条。 */
+/** 伙伴的唯一专属会话 — 一条真实的 `type='openhub'` 会话。每个伙伴生命周期内恒一条。 */
 export interface ICompanionThread {
   conversation_id: number;
   companion_id: string;
@@ -3221,7 +3221,7 @@ export interface ICompanionSharedConfig {
   evolve: ICompanionEvolveConfig;
   /** Session-window archiving (伙伴会话归档). */
   archive: ICompanionArchiveConfig;
-  /** 智能编排：开启后本地伙伴会话可用 nomi_run_create 把复杂大任务拆给子 agent。 */
+  /** 智能编排：开启后本地伙伴会话可用 openhub_run_create 把复杂大任务拆给子 agent。 */
   smart_orchestration: boolean;
   /** Empty when no companion exists yet (zero-companion state is allowed). */
   default_companion_id: string | null;

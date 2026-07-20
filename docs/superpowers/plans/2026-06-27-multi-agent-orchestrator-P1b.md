@@ -19,7 +19,7 @@
 - **canvas 全幅**：DagCanvas 必须**不在** `mx-auto max-w-1100px py-32px` 包裹内；作为 flex-1 pane 直接子节点，`size-full min-h-0`，自己管 overflow（react-flow 需显式定高的非滚动父容器，链路每层 `min-h-0`）。canvas 模式父 pane `overflow-y-auto`→`overflow-hidden`。
 - **react-flow**：`bun add @xyflow/react`（ui/ 目录）；`import '@xyflow/react/dist/style.css'`；**lazy 加载**（`React.lazy(() => import('./DagCanvas'))` + `<Suspense fallback={<AppLoader/>}>`，模板 `WebuiControlPanel.tsx` 的 React.lazy）；JS 侧颜色（minimap/marker）用 data-theme MutationObserver（模板 `MermaidBlock.tsx`），节点/边样式优先 CSS 变量。
 - **UI 必须漂亮**（硬验收，[[ui-must-be-beautiful]]）：对齐既有视觉语言；orchestrator 内用 `<div role=button bg-primary-6>` 主操作（非 Arco Button）；header `text-18px font-600` + `text-12px text-t-tertiary` 副标题；卡片 `rd-12px bg-1`；走 frontend-design 打磨画布。
-- 真机视觉验收：控制台跑（`bun run dev:web` + NOMIFUN_DATA_DIR）；无头 Chrome 截图（puppeteer-core + 系统 Chrome）法见 P0 验收。
+- 真机视觉验收：控制台跑（`bun run dev:web` + OPENHUB_DATA_DIR）；无头 Chrome 截图（puppeteer-core + 系统 Chrome）法见 P0 验收。
 - 提交：feature 分支 `feat/multi-agent-orchestrator`；每任务末提交；提交前 `git pull --rebase`。
 
 ## File Structure（P1b）
@@ -94,7 +94,7 @@ export function useRunLive(runId: string | undefined): { detail: TRunDetail | nu
 参照模板：`useCronJobs.ts` 的 `useCronJobRuns`（per-id REST+订阅）；`useTeamSession.ts`（SWR+多 .on() unsub）；useOrchestratorData.ts 既有 useFleets/useWorkspaces。
 
 - [ ] **Step 1: 写 useRuns**（仿 useFleets/useWorkspaces SWR）。
-- [ ] **Step 2: 写 useRunLive.ts**（订阅 5 事件 filter run_id refetch；NomiFun Apache header）。
+- [ ] **Step 2: 写 useRunLive.ts**（订阅 5 事件 filter run_id refetch；OpenHub Apache header）。
 - [ ] **Step 3: typecheck** → 0。
 - [ ] **Step 4: 提交** `git commit -m "feat(orchestrator): useRuns + useRunLive 实时 hook"`
 
@@ -106,7 +106,7 @@ export function useRunLive(runId: string | undefined): { detail: TRunDetail | nu
 
 **行为:**
 - RunHistory：取 workspaces（useWorkspaces）→ 对每个 workspace useRuns → 合并按 created_at desc 列出（或先做「选一个 workspace 看其 runs」+ 默认首个，**取简单可用**：workspace 下拉 + 该 workspace 的 run 列表）。每行 = goal 截断 + status 徽标 + 时间 + 点击 `onOpenRun(run.id)`（page 注入，setSearchParams `{run:id}`）。空态 + 「新建 Run」。
-- CreateRunModal（NomiModal）：workspace select（useWorkspaces）+ fleet select（useFleets）+ goal textarea + autonomy select（自主/守护/协同，默认守护）→ `ipcBridge.orchestrator.runs.create.invoke({workspace_id,goal,fleet_id,autonomy})` → `mutate` + `useArcoMessage` 成功 → 回调 onCreated(run.id) → page 打开该 run。校验 goal 非空、workspace+fleet 必选。
+- CreateRunModal（OpenHubModal）：workspace select（useWorkspaces）+ fleet select（useFleets）+ goal textarea + autonomy select（自主/守护/协同，默认守护）→ `ipcBridge.orchestrator.runs.create.invoke({workspace_id,goal,fleet_id,autonomy})` → `mutate` + `useArcoMessage` 成功 → 回调 onCreated(run.id) → page 打开该 run。校验 goal 非空、workspace+fleet 必选。
 - i18n：orchestrator.run.{title,emptyTitle,emptyDesc,newRun,goal,workspace,fleet,autonomy,autonomyAutonomous,autonomySupervised,autonomyInteractive,status.*} 双语 + gen:i18n。
 
 参照模板：`WorkspaceList.tsx`（list+create modal 骨架、SWR、role=button 主操作、卡片 rd-12px bg-1）；P0 FleetManager/FleetEditDrawer（select 模式）。
@@ -150,7 +150,7 @@ export function useRunLive(runId: string | undefined): { detail: TRunDetail | nu
 
 **行为:** 复刻 `SubagentDrawer.tsx`：Arco `<Drawer width={560} footer={null} onCancel>`；按 `task.conversation_id`（number，无 string 转换）`ipcBridge.conversation.get.invoke({id})` 取 `TChatConversation`（cancelled-flag effect 兜底）；body `<TeamChatView conversation={conv} hideSendBox agent_name={task.title} />`（`hideSendBox` 即只读开关；不传 team_id）。无 conversation_id（任务未跑）时显示「该任务尚未开始/无对话」。
 
-参照模板：`pages/conversation/components/multiAgent/SubagentDrawer.tsx` + `TeamChatView.tsx`；只读复用见 extraction notes（NomiChat 自挂 provider + 合并实时流，conversation_id 是 number）。
+参照模板：`pages/conversation/components/multiAgent/SubagentDrawer.tsx` + `TeamChatView.tsx`；只读复用见 extraction notes（OpenHubChat 自挂 provider + 合并实时流，conversation_id 是 number）。
 
 - [ ] **Step 1: WorkerTranscriptPanel.tsx**（Drawer + TeamChatView hideSendBox + load-by-id + 无对话兜底）。
 - [ ] **Step 2: typecheck** → 0。
@@ -175,7 +175,7 @@ export function useRunLive(runId: string | undefined): { detail: TRunDetail | nu
 - [ ] **Step 1: index.tsx 主从态 + 全幅 canvas 分支 + lazy DagCanvas + 移动兜底**。
 - [ ] **Step 2: RunHistory onOpenRun 接线**。
 - [ ] **Step 3: typecheck** → 0；`cd ui && bun run build` 绿。
-- [ ] **Step 4: 真机验收** — `bun run dev:web`（NOMIFUN_DATA_DIR 临时目录）+ 无头 Chrome 截图：进「智能编排」→ run-history → 新建 Run（选 workspace/fleet/填 goal）→ 列表出现 → 打开 → DAG 画布渲染（即便无 provider 致 plan 出错，画布壳+空态/错误态应优雅渲染；若配了 provider 则见任务节点）。截图留证（画布 + 列表 + 新建弹窗）。零 console error。
+- [ ] **Step 4: 真机验收** — `bun run dev:web`（OPENHUB_DATA_DIR 临时目录）+ 无头 Chrome 截图：进「智能编排」→ run-history → 新建 Run（选 workspace/fleet/填 goal）→ 列表出现 → 打开 → DAG 画布渲染（即便无 provider 致 plan 出错，画布壳+空态/错误态应优雅渲染；若配了 provider 则见任务节点）。截图留证（画布 + 列表 + 新建弹窗）。零 console error。
 - [ ] **Step 5: 提交** `git commit -m "feat(orchestrator): Run 主从页接线 + DAG 画布集成 + 真机验收"`
 
 ---

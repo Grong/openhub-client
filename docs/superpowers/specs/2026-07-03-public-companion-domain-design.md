@@ -9,7 +9,7 @@
 
 **已对齐决策（2026-07-03）**：
 - **P1 范围 = 企业核心**：独立实体+控制台 + 身份/话术 + 知识库(grounded) + 服务守则 + 渠道部署 + 审计(搜索/天级保留)。护栏细化/转人工/营业时间/限流 → P2；版本化/灰度/分析看板 → P3。
-- **知识库 = 复用平台知识库（nomifun-knowledge）+ 独立绑定 + grounded 只读**（不重建 KB 管理）。
+- **知识库 = 复用平台知识库（openhub-knowledge）+ 独立绑定 + grounded 只读**（不重建 KB 管理）。
 
 ## 1. 桌面伙伴 vs 对外伙伴（拆分依据）
 
@@ -29,10 +29,10 @@
 ## 2. 架构：换掉"身份与管理"，保留"安全执行内核"
 
 **两层边界：**
-- **管理/数据/入口层 —— 独立重建**：新领域 `nomifun-public-agent` crate，实体 `PublicAgentConfig`，独立存储 `public-agents/{id}/`，独立控制台入口。不复用 companion。
+- **管理/数据/入口层 —— 独立重建**：新领域 `openhub-public-agent` crate，实体 `PublicAgentConfig`，独立存储 `public-agents/{id}/`，独立控制台入口。不复用 companion。
 - **运行时执行层 —— 复用已建成的安全内核**：exposure 钳制 / C3 修复 / KB 烘死 / 首轮语言（均身份无关）。运行时身份从 `companion_id` 改由 `public_agent_id` 解析配置，再套安全钳制。
 
-**无环依赖（照 companion 范式）**：`nomifun-ai-agent` 定义 `PublicAgentProvider` trait（按 id 解析 persona/model/policy/kb/grounded）；`nomifun-public-agent` 实现它；`nomifun-app` 装配。ai-agent 不依赖 public-agent（无环）。
+**无环依赖（照 companion 范式）**：`openhub-ai-agent` 定义 `PublicAgentProvider` trait（按 id 解析 persona/model/policy/kb/grounded）；`openhub-public-agent` 实现它；`openhub-app` 装配。ai-agent 不依赖 public-agent（无环）。
 
 ## 3. 数据模型 `PublicAgentConfig`（`public-agents/{id}/config.json`）
 
@@ -43,7 +43,7 @@ struct PublicAgentConfig {
     name: String,
     greeting: String,        // 开场白/欢迎语（首轮下发）
     tone: String,            // 语气/风格规范（P1 自由文本）
-    model: ModelConfig,      // 复用 nomifun-common ModelConfig
+    model: ModelConfig,      // 复用 openhub-common ModelConfig
     knowledge_base_ids: Vec<String>,  // 绑定的平台 KB 子集（grounded 只读）
     grounded_mode: bool,     // true=只答 KB 内内容，查不到礼貌拒答（防幻觉，默认 true）
     service_policy: String,  // 服务守则/系统设定（P1 自由文本，结构化留 P2）
@@ -60,13 +60,13 @@ struct PublicAgentConfig {
 
 ## 4. 运行时解析
 
-- `NomiBuildExtra.public_agent_id: Option<String>`（新）。设置时：工厂经 `PublicAgentProvider` 解析 → 注入 persona(greeting/tone)+service_policy+grounded 指令+首轮语言指令；隐式 `exposure=PublicService` 钳制（安全白名单 + 无网关/computer/browser/spawn）；KB 烘死为 `knowledge_base_ids`。
+- `OpenHubBuildExtra.public_agent_id: Option<String>`（新）。设置时：工厂经 `PublicAgentProvider` 解析 → 注入 persona(greeting/tone)+service_policy+grounded 指令+首轮语言指令；隐式 `exposure=PublicService` 钳制（安全白名单 + 无网关/computer/browser/spawn）；KB 烘死为 `knowledge_base_ids`。
 - **grounded 指令**：grounded_mode=true 时系统提示强约束"只依据下方知识库作答；库中无据则礼貌说明无法回答或建议转人工，严禁编造"。
 - 隐式 exposure：public_agent 会话 = PublicService（不再依赖 companion.exposure；companion.exposure 字段可退役或仅保留兼容）。
 
 ## 5. 渠道部署
 
-渠道绑定从"绑 companion"扩展为"绑 companion 或 public_agent"。channel 绑定新增可选 `public_agent_id`；置位时 `message_service` 入站消息路由到 public-agent 会话（`NomiBuildExtra.public_agent_id` + surface=Channel + 隐式 PublicService）。一个渠道 bot 二选一（私人伙伴 or 对外伙伴）。
+渠道绑定从"绑 companion"扩展为"绑 companion 或 public_agent"。channel 绑定新增可选 `public_agent_id`；置位时 `message_service` 入站消息路由到 public-agent 会话（`OpenHubBuildExtra.public_agent_id` + surface=Channel + 隐式 PublicService）。一个渠道 bot 二选一（私人伙伴 or 对外伙伴）。
 
 ## 6. 审计（独立位置 + 搜索 + 天级保留）
 
@@ -91,7 +91,7 @@ struct PublicAgentConfig {
 
 ## 9. 分期
 
-- **P1（企业核心，可真机对外服务）**：`nomifun-public-agent` crate（实体+registry+CRUD+routes）→ `PublicAgentProvider`+运行时解析+隐式钳制 → KB 绑定(grounded) → 服务守则注入 → 渠道部署绑定 → 审计(按天/保留/搜索) → 前端"对外服务"控制台 + i18n → 退役旧 outbound 管理。
+- **P1（企业核心，可真机对外服务）**：`openhub-public-agent` crate（实体+registry+CRUD+routes）→ `PublicAgentProvider`+运行时解析+隐式钳制 → KB 绑定(grounded) → 服务守则注入 → 渠道部署绑定 → 审计(按天/保留/搜索) → 前端"对外服务"控制台 + i18n → 退役旧 outbound 管理。
 - **P2**：安全护栏细化 + 转人工/升级 + 营业时间 + 限流/黑名单 + 安全网搜 + 服务守则结构化。
 - **P3**：版本/灰度/回滚 + 分析看板 + 未答问题策展回流。
 

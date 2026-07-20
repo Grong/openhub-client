@@ -1,7 +1,7 @@
 # Building and Packaging
 
-This page covers release artifacts from the current **NomiFun** monorepo: the
-React SPA, `nomifun-web`, Tauri desktop bundles, updater payloads, Docker, and
+This page covers release artifacts from the current **OpenHub** monorepo: the
+React SPA, `openhub-web`, Tauri desktop bundles, updater payloads, Docker, and
 native Linux service files.
 
 For day-to-day loops, see [`development.md`](development.md). For operator
@@ -12,7 +12,7 @@ deployment, see [`../guides/web-server-deployment.md`](../guides/web-server-depl
 | Artifact | Current state |
 | --- | --- |
 | SPA (`ui/dist`) | Built by `bun run build:ui`; consumed by desktop and web hosts. |
-| `nomifun-web` | Supported self-hosted binary; auth on by default. |
+| `openhub-web` | Supported self-hosted binary; auth on by default. |
 | Tauri desktop bundles | Built by `bun run build` for the current OS. |
 | macOS Developer ID signing + notarization | Supported through `bun run build:signed` when local Apple signing credentials are configured. |
 | Tauri updater artifacts | `bun run build:updater` emits updater `.sig` files; production endpoint/key management still needs release setup. |
@@ -29,33 +29,33 @@ bun run build:ui
 Output: `ui/dist/`.
 
 Desktop builds bundle this directory through `frontendDist` in
-`apps/desktop/tauri.conf.json`. `nomifun-web` serves it from `--dist` /
-`NOMIFUN_WEB_DIST`; when running from the repo, the default points at
+`apps/desktop/tauri.conf.json`. `openhub-web` serves it from `--dist` /
+`OPENHUB_WEB_DIST`; when running from the repo, the default points at
 `../../ui/dist` from `apps/web`.
 
 ## Web Binary
 
 ```bash
 bun run build:ui
-cargo build --release -p nomifun-web
+cargo build --release -p openhub-web
 ```
 
 Runtime requirements:
 
 - built SPA directory;
 - writable data directory;
-- Bun on `PATH`, unless the binary was built with `NOMIFUN_EMBED_BUN=1`;
+- Bun on `PATH`, unless the binary was built with `OPENHUB_EMBED_BUN=1`;
 - configured auth/admin flow, or explicit `--insecure-no-auth` for trusted
   loopback-only development.
 
 Example:
 
 ```bash
-target/release/nomifun-web --host 127.0.0.1 --port 8787 --dist ui/dist
+target/release/openhub-web --host 127.0.0.1 --port 8787 --dist ui/dist
 ```
 
-First browser visit creates the admin account unless `NOMIFUN_ADMIN_USERNAME`
-and `NOMIFUN_ADMIN_PASSWORD` pre-seed it.
+First browser visit creates the admin account unless `OPENHUB_ADMIN_USERNAME`
+and `OPENHUB_ADMIN_PASSWORD` pre-seed it.
 
 ## Desktop Bundles
 
@@ -68,8 +68,8 @@ then creates OS-specific bundles under `target/release/bundle/`.
 
 Product identity comes from `apps/desktop/tauri.conf.json`:
 
-- `productName: "NomiFun"`
-- `identifier: "com.nomifun.desktop"`
+- `productName: "OpenHub"`
+- `identifier: "com.openhub.desktop"`
 - version from workspace package metadata
 - dev URL `http://localhost:5173`
 - bundled frontend `../../ui/dist`
@@ -120,15 +120,15 @@ See [`apps/desktop/updater/README.md`](../../apps/desktop/updater/README.md).
 docker compose up -d --build
 ```
 
-The root `Dockerfile` builds the SPA with Bun, builds `nomifun-web` in release
+The root `Dockerfile` builds the SPA with Bun, builds `openhub-web` in release
 mode, and copies the binary plus `ui/dist` into a slim runtime image. Compose
-starts one `nomifun` service on port `8787` with `/data` as `NOMIFUN_DATA_DIR`.
+starts one openhub service on port `8787` with `/data` as `OPENHUB_DATA_DIR`.
 
 Open `http://<server>:8787` after boot. If no admin was pre-seeded, the first
 reachable browser gets the first-run admin setup screen.
 
 The optional Caddy service in `docker-compose.yml` is commented out; use it or a
-similar reverse proxy for TLS and set `NOMIFUN_HTTPS=true` when the browser
+similar reverse proxy for TLS and set `OPENHUB_HTTPS=true` when the browser
 reaches the app over HTTPS.
 
 ## Native Linux + systemd
@@ -139,12 +139,12 @@ shape is:
 ```bash
 bun install
 bun run build:ui
-cargo build --release -p nomifun-web
-sudo cp target/release/nomifun-web /opt/nomifun/
-sudo cp -r ui/dist/. /opt/nomifun/web/
-sudo cp packaging/linux/nomifun-web.service /etc/systemd/system/
+cargo build --release -p openhub-web
+sudo cp target/release/openhub-web /opt/openhub/
+sudo cp -r ui/dist/. /opt/openhub/web/
+sudo cp packaging/linux/openhub-web.service /etc/systemd/system/
 sudo systemctl daemon-reload
-sudo systemctl enable --now nomifun-web
+sudo systemctl enable --now openhub-web
 ```
 
 For systemd, set `SHELL` explicitly if agent child processes need a shell; a

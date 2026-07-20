@@ -6,7 +6,7 @@
 
 **Architecture:** 新增「智能重调」能力:`RunService::adjust(run_id, intent)` → lead 模型(一次性)收到 {用户意图 + 当前 run 全态:每任务 id/title/spec/role/kind/status/output_summary 截断/deps} → 产出**调整后计划**(每节点 = KEEP(现有 task_id,保留其完成产出) 或 NEW(新任务),deps 引用 kept-id 或 new-index)→ 引擎**对账 reconcile**(保留 KEEP 任务的 status/output/conv/assignment,删除未保留的旧任务,新增 pending 新任务并路由,按调整计划重建 deps)→ 复用 Phase-2 per-run 锁 + 终态重激活 re-drive。主 agent prompt **明确赋权**:据意图与交付现状自行判断保留还是重做,不限死。新运行亦可由意图框创建(意图→初始计划)。
 
-**Tech Stack:** Rust(nomifun-orchestrator plan/run_service/engine)+ React/Arco(意图框 UI)。
+**Tech Stack:** Rust(openhub-orchestrator plan/run_service/engine)+ React/Arco(意图框 UI)。
 
 ## Global Constraints
 - 不引入 IR/compile/typed-graph/手画图。主 agent=一次性 lead 调用,无常驻会话(对齐用户「意图→编辑,无常驻会话」)。
@@ -16,7 +16,7 @@
 - 禁 cargo fmt;禁合并 main;提交前 git pull --rebase。
 
 ## File Structure
-- `nomifun-orchestrator/src/plan.rs`(adjust prompt + 调整计划 schema/解析,支持 keep-id + new + 混合 deps;fail-soft)、`run_service.rs`(adjust + reconcile 对账)、`engine.rs`(reconcile 复用锁/重激活,新任务路由)、`api-types`(AdjustedPlan DTO + 请求体)+ TS 镜像、`routes.rs`(POST /runs/{id}/adjust + POST /runs/adhoc-from-intent 或复用)、ipcBridge。
+- `openhub-orchestrator/src/plan.rs`(adjust prompt + 调整计划 schema/解析,支持 keep-id + new + 混合 deps;fail-soft)、`run_service.rs`(adjust + reconcile 对账)、`engine.rs`(reconcile 复用锁/重激活,新任务路由)、`api-types`(AdjustedPlan DTO + 请求体)+ TS 镜像、`routes.rs`(POST /runs/{id}/adjust + POST /runs/adhoc-from-intent 或复用)、ipcBridge。
 - `ui/src/renderer/pages/orchestrator/`(意图框组件:新建运行 + 在运行中重调;复用 RunView/DagCanvas 展示结果)。
 
 ## 分期(3a 后端 reconcile 先行 → 3b 前端意图框)

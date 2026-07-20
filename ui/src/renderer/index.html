@@ -3,22 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="application-name" content="NomiFun" />
+    <meta name="application-name" content="OpenHub" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="NomiFun" />
+    <meta name="apple-mobile-web-app-title" content="OpenHub" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="theme-color" content="#4E5969" />
     <link rel="icon" type="image/png" href="./pwa/icon-192.png" />
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="apple-touch-icon" href="./pwa/icon-180.png" />
-    <title>NomiFun</title>
+    <title>OpenHub</title>
     <script>
       // Synchronously restore theme from localStorage to prevent theme flash
       (function () {
         try {
-          var theme = localStorage.getItem('__nomifun_theme');
-          var colorScheme = localStorage.getItem('__nomifun_colorScheme');
+          var theme = localStorage.getItem('__openhub_theme');
+          var colorScheme = localStorage.getItem('__openhub_colorScheme');
           if (theme) {
             document.documentElement.setAttribute('data-theme', theme);
           }
@@ -44,7 +44,7 @@
     <script>
       // Set arco-theme on body synchronously
       try {
-        var t = localStorage.getItem('__nomifun_theme');
+        var t = localStorage.getItem('__openhub_theme');
         if (t) document.body.setAttribute('arco-theme', t);
       } catch (e) {}
     </script>

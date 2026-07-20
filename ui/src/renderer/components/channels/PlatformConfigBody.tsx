@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -39,7 +39,7 @@ import { findEnabledChannelStatus } from './channelStatusSelection';
 /**
  * Shared channel-config machinery for the multi-bot flows. Both the desktop
  * companion's 「远程连接」 (RemoteConnectSection) and the 对外伙伴 console's
- * ChannelsSection render this body inside their own NomiModal — the only
+ * ChannelsSection render this body inside their own OpenHubModal — the only
  * difference is who the bot is bound to (`channelTarget.companionId` vs
  * `channelTarget.publicAgentId`).
  */
@@ -194,7 +194,7 @@ export const PlatformConfigBody: React.FC<{
           throw new Error(
             result.error ||
               result.message ||
-              t('nomi.settings.remoteEnableFailed', { defaultValue: 'Failed to enable channel' })
+              t('openhub.settings.remoteEnableFailed', { defaultValue: 'Failed to enable channel' })
           );
         }
         const latestStatuses = await channel.getPluginStatus.invoke();
@@ -227,8 +227,8 @@ export const PlatformConfigBody: React.FC<{
       {/* 渠道启停 / Channel enable-disable */}
       <div className='flex items-center justify-between gap-12px bg-fill-2 rd-10px px-14px py-10px'>
         <div className='min-w-0'>
-          <div className='text-14px text-t-primary font-500'>{t('nomi.settings.remoteEnableChannel')}</div>
-          <div className='text-12px text-t-tertiary mt-2px'>{t('nomi.settings.remoteEnableChannelHint')}</div>
+          <div className='text-14px text-t-primary font-500'>{t('openhub.settings.remoteEnableChannel')}</div>
+          <div className='text-12px text-t-tertiary mt-2px'>{t('openhub.settings.remoteEnableChannelHint')}</div>
         </div>
         <Switch
           checked={status?.enabled || false}

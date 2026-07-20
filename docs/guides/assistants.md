@@ -15,7 +15,7 @@ Assistants are merged from three sources:
 
 | Source | Where it comes from | Editable? |
 | --- | --- | --- |
-| Builtin | Embedded manifest under `crates/backend/nomifun-app/assets/builtin-assistants/`, loaded by `BuiltinAssistantRegistry`. | Content is read-only; enable/sort/last-used state and builtin `preset_agent_type` override are stored separately. |
+| Builtin | Embedded manifest under `crates/backend/openhub-app/assets/builtin-assistants/`, loaded by `BuiltinAssistantRegistry`. | Content is read-only; enable/sort/last-used state and builtin `preset_agent_type` override are stored separately. |
 | Custom | User-created rows in the `assistants` table plus files in the data dir. | Fully editable and deletable. |
 | Extension | Installed extensions via `resolvers::assistant`. | Read-only from this page; manage the extension lifecycle instead. |
 
@@ -26,7 +26,7 @@ The merged list is returned by `GET /api/assistants`.
 Key fields:
 
 - `id`, `source`, `name`, `description`, `avatar`
-- `preset_agent_type`: default backend such as `nomi`, `claude`, `codex`, `gemini`
+- `preset_agent_type`: default backend such as `openhub`, `claude`, `codex`, `gemini`
 - `models`: optional preferred model ids
 - `prompts` / `prompts_i18n`: assistant instructions
 - `enabled_skills`: skills attached when starting a session
@@ -89,7 +89,7 @@ routes so builtin, extension, and user sources can be dispatched correctly.
 ## Notes
 
 - Creating an assistant without `preset_agent_type` requires at least one
-  configured provider; the service defaults to `nomi` when possible.
+  configured provider; the service defaults to `openhub` when possible.
 - CLI-backed agents still require their CLI to be installed on the host. Picking
   `claude`, `codex`, or `gemini` as an assistant backend does not install those
   tools.

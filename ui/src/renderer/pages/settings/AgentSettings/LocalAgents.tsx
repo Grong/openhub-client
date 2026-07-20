@@ -1,13 +1,13 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import { ipcBridge } from '@/common';
 import type { AgentMetadata } from '@/renderer/utils/model/agentTypes';
 import classNames from 'classnames';
-import NomiModal from '@/renderer/components/base/NomiModal';
+import OpenHubModal from '@/renderer/components/base/OpenHubModal';
 import { useAgents } from '@/renderer/hooks/agent/useAgents';
 import { useContainerWidth } from '@/renderer/hooks/ui/useContainerWidth';
 import { Button, Typography } from '@arco-design/web-react';
@@ -21,7 +21,7 @@ import { AgentHubModal } from './AgentHubModal';
 import InlineAgentEditor, { type CustomAgentDraft } from './InlineAgentEditor';
 import { getAgentKey } from '@/renderer/pages/guid/hooks/agentSelectionUtils';
 import { openExternalUrl } from '@/renderer/utils/platform';
-import { useNomiQuickStart } from '@/renderer/hooks/agent/useNomiQuickStart';
+import { useOpenHubQuickStart } from '@/renderer/hooks/agent/useOpenHubQuickStart';
 import { SUPPORTED_AGENTS, type SupportedAgent } from './supportedAgents';
 
 /**
@@ -67,20 +67,20 @@ const LocalAgents: React.FC = () => {
   const customAgents: AgentMetadata[] = allAgents.filter((a) => a.agent_source === 'custom');
 
   // Diff the curated catalog against what was detected so users can see — and
-  // install — the agents NomiFun supports but that aren't on this machine yet.
+  // install — the agents OpenHub supports but that aren't on this machine yet.
   const installedBackends = new Set(detectedAgents.map((a) => a.backend || a.agent_type));
   const notInstalledAgents = SUPPORTED_AGENTS.filter(
     (s) => !installedBackends.has(s.backend) && (Boolean(s.website) || s.installHint.trim().length > 0)
   );
 
-  const { start: startNomiInstall } = useNomiQuickStart();
+  const { start: startOpenHubInstall } = useOpenHubQuickStart();
   const [installingBackend, setInstallingBackend] = useState<string | null>(null);
 
   const handleOneClickInstall = useCallback(
     async (agent: SupportedAgent) => {
       setInstallingBackend(agent.backend);
       const hint = agent.installHint || t('settings.agentManagement.installHintUnknown');
-      await startNomiInstall({
+      await startOpenHubInstall({
         name: t('settings.agentManagement.installConversationName', { name: agent.name }),
         prompt: t('settings.agentManagement.installPrompt', {
           name: agent.name,
@@ -91,7 +91,7 @@ const LocalAgents: React.FC = () => {
       });
       setInstallingBackend(null);
     },
-    [startNomiInstall, t]
+    [startOpenHubInstall, t]
   );
 
   const [editorVisible, setEditorVisible] = useState(false);
@@ -148,9 +148,9 @@ const LocalAgents: React.FC = () => {
     [mutateAgents]
   );
 
-  // Nomi first among detected agents
-  const nomiAgent = detectedAgents?.find((a) => a.agent_type === 'nomi' || a.backend === 'nomi');
-  const otherDetected = detectedAgents?.filter((a) => a.agent_type !== 'nomi' && a.backend !== 'nomi') ?? [];
+  // OpenHub first among detected agents
+  const nomiAgent = detectedAgents?.find((a) => a.agent_type === 'openhub' || a.backend === 'openhub');
+  const otherDetected = detectedAgents?.filter((a) => a.agent_type !== 'openhub' && a.backend !== 'openhub') ?? [];
 
   const openCustomAgentEditor = useCallback(() => {
     setEditingAgent(null);
@@ -290,7 +290,7 @@ const LocalAgents: React.FC = () => {
         </div>
       )}
 
-      <NomiModal
+      <OpenHubModal
         visible={editorVisible}
         onCancel={() => {
           setEditorVisible(false);
@@ -327,7 +327,7 @@ const LocalAgents: React.FC = () => {
             }}
           />
         )}
-      </NomiModal>
+      </OpenHubModal>
 
       <div className='flex flex-col gap-4px px-0'>
         {customAgents?.map((agent) => (

@@ -6,62 +6,62 @@ members = ["crates/agent/*", "crates/backend/*", "crates/shared/*", "apps/web", 
 version = "0.2.13"
 edition = "2024"
 license = "Apache-2.0"
-repository = "local/nomifun-tauri"
+repository = "local/openhub-client"
 
 [workspace.dependencies]
-# --- Internal crates: backend (from nomifun-be-rs) ---
-nomifun-common = { path = "crates/backend/nomifun-common" }
-nomifun-assets = { path = "crates/backend/nomifun-assets" }
-nomifun-db = { path = "crates/backend/nomifun-db" }
-nomifun-api-types = { path = "crates/backend/nomifun-api-types" }
-nomifun-realtime = { path = "crates/backend/nomifun-realtime" }
-nomifun-runtime = { path = "crates/backend/nomifun-runtime" }
-nomifun-auth = { path = "crates/backend/nomifun-auth" }
-nomifun-system = { path = "crates/backend/nomifun-system" }
-nomifun-file = { path = "crates/backend/nomifun-file" }
-nomifun-office = { path = "crates/backend/nomifun-office" }
-nomifun-shell = { path = "crates/backend/nomifun-shell" }
-nomifun-ai-agent = { path = "crates/backend/nomifun-ai-agent" }
-nomifun-mcp = { path = "crates/backend/nomifun-mcp" }
-nomifun-conversation = { path = "crates/backend/nomifun-conversation" }
-nomifun-extension = { path = "crates/backend/nomifun-extension" }
-nomifun-channel = { path = "crates/backend/nomifun-channel" }
-nomifun-cron = { path = "crates/backend/nomifun-cron" }
-nomifun-requirement = { path = "crates/backend/nomifun-requirement" }
-nomifun-idmm = { path = "crates/backend/nomifun-idmm" }
-nomifun-knowledge = { path = "crates/backend/nomifun-knowledge" }
-nomifun-companion = { path = "crates/backend/nomifun-companion" }
-nomifun-gateway = { path = "crates/backend/nomifun-gateway" }
-nomifun-public = { path = "crates/backend/nomifun-public" }
-nomifun-webhook = { path = "crates/backend/nomifun-webhook" }
-nomifun-orchestrator = { path = "crates/backend/nomifun-orchestrator" }
-nomifun-terminal = { path = "crates/backend/nomifun-terminal" }
-nomifun-assistant = { path = "crates/backend/nomifun-assistant" }
-nomifun-secret = { path = "crates/backend/nomifun-secret" }
-nomifun-public-agent = { path = "crates/backend/nomifun-public-agent" }
-nomifun-workshop = { path = "crates/backend/nomifun-workshop" }
-nomifun-creation = { path = "crates/backend/nomifun-creation" }
-nomifun-app = { path = "crates/backend/nomifun-app" }
+# --- Internal crates: backend (from openhub-be-rs) ---
+openhub-common = { path = "crates/backend/openhub-common" }
+openhub-assets = { path = "crates/backend/openhub-assets" }
+openhub-db = { path = "crates/backend/openhub-db" }
+openhub-api-types = { path = "crates/backend/openhub-api-types" }
+openhub-realtime = { path = "crates/backend/openhub-realtime" }
+openhub-runtime = { path = "crates/backend/openhub-runtime" }
+openhub-auth = { path = "crates/backend/openhub-auth" }
+openhub-system = { path = "crates/backend/openhub-system" }
+openhub-file = { path = "crates/backend/openhub-file" }
+openhub-office = { path = "crates/backend/openhub-office" }
+openhub-shell = { path = "crates/backend/openhub-shell" }
+openhub-ai-agent = { path = "crates/backend/openhub-ai-agent" }
+openhub-mcp = { path = "crates/backend/openhub-mcp" }
+openhub-conversation = { path = "crates/backend/openhub-conversation" }
+openhub-extension = { path = "crates/backend/openhub-extension" }
+openhub-channel = { path = "crates/backend/openhub-channel" }
+openhub-cron = { path = "crates/backend/openhub-cron" }
+openhub-requirement = { path = "crates/backend/openhub-requirement" }
+openhub-idmm = { path = "crates/backend/openhub-idmm" }
+openhub-knowledge = { path = "crates/backend/openhub-knowledge" }
+openhub-companion = { path = "crates/backend/openhub-companion" }
+openhub-gateway = { path = "crates/backend/openhub-gateway" }
+openhub-public = { path = "crates/backend/openhub-public" }
+openhub-webhook = { path = "crates/backend/openhub-webhook" }
+openhub-orchestrator = { path = "crates/backend/openhub-orchestrator" }
+openhub-terminal = { path = "crates/backend/openhub-terminal" }
+openhub-assistant = { path = "crates/backend/openhub-assistant" }
+openhub-secret = { path = "crates/backend/openhub-secret" }
+openhub-public-agent = { path = "crates/backend/openhub-public-agent" }
+openhub-workshop = { path = "crates/backend/openhub-workshop" }
+openhub-creation = { path = "crates/backend/openhub-creation" }
+openhub-app = { path = "crates/backend/openhub-app" }
 
 # --- Internal crates: shared ---
-nomifun-net = { path = "crates/shared/nomifun-net" }
-nomi-redact = { path = "crates/shared/nomi-redact" }
+openhub-net = { path = "crates/shared/openhub-net" }
+openhub-redact = { path = "crates/shared/openhub-redact" }
 
-# --- Internal crates: agent (from nomifun-agent-rs, now local) ---
-nomi-types = { path = "crates/agent/nomi-types" }
-nomi-protocol = { path = "crates/agent/nomi-protocol" }
-nomi-compact = { path = "crates/agent/nomi-compact" }
-nomi-config = { path = "crates/agent/nomi-config" }
-nomi-providers = { path = "crates/agent/nomi-providers" }
-nomi-tools = { path = "crates/agent/nomi-tools" }
-nomi-mcp = { path = "crates/agent/nomi-mcp" }
-nomi-skills = { path = "crates/agent/nomi-skills" }
-nomi-memory = { path = "crates/agent/nomi-memory" }
-nomi-agent = { path = "crates/agent/nomi-agent" }
-nomi-computer = { path = "crates/agent/nomi-computer" }
-nomi-a11y = { path = "crates/agent/nomi-a11y" }
-nomi-browser-engine = { path = "crates/agent/nomi-browser-engine" }
-nomi-browser = { path = "crates/agent/nomi-browser" }
+# --- Internal crates: agent (from openhub-agent-rs, now local) ---
+openhub-types = { path = "crates/agent/openhub-types" }
+openhub-protocol = { path = "crates/agent/openhub-protocol" }
+openhub-compact = { path = "crates/agent/openhub-compact" }
+openhub-config = { path = "crates/agent/openhub-config" }
+openhub-providers = { path = "crates/agent/openhub-providers" }
+openhub-tools = { path = "crates/agent/openhub-tools" }
+openhub-agent-mcp = { path = "crates/agent/openhub-agent-mcp" }
+openhub-skills = { path = "crates/agent/openhub-skills" }
+openhub-memory = { path = "crates/agent/openhub-memory" }
+openhub-agent = { path = "crates/agent/openhub-agent" }
+openhub-computer = { path = "crates/agent/openhub-computer" }
+openhub-a11y = { path = "crates/agent/openhub-a11y" }
+openhub-browser-engine = { path = "crates/agent/openhub-browser-engine" }
+openhub-browser = { path = "crates/agent/openhub-browser" }
 
 # --- Core framework ---
 tokio = { version = "1", features = ["full"] }
@@ -97,14 +97,14 @@ sqlx = { version = "0.8", features = ["runtime-tokio", "sqlite"] }
 rusqlite = { version = "0.32", features = ["bundled"] }
 
 # --- Auth / Crypto ---
-# NOTE: nomi-providers uses jsonwebtoken 10; nomifun-auth pins 9 in its own
+# NOTE: openhub-providers uses jsonwebtoken 10; openhub-auth pins 9 in its own
 # manifest (the only be-rs consumer). Keep the workspace default at 10.
 jsonwebtoken = "10"
 bcrypt = "0.17"
 aes-gcm = "0.10"
 ed25519-dalek = { version = "2", features = ["rand_core"] }
 # Public Suffix List (compile-time embedded, offline) for eTLD+1 domain binding
-# in nomifun-secret. Correctly handles multi-level suffixes (co.uk, com.cn).
+# in openhub-secret. Correctly handles multi-level suffixes (co.uk, com.cn).
 psl = "2"
 
 uuid = { version = "1", features = ["v7"] }
@@ -171,8 +171,8 @@ rustls-native-certs = "0.8"
 
 # --- OAuth / config ---
 oauth2 = "5.0.0-rc.1"
-# NOTE: nomi-config uses toml 1.0; be-rs (nomifun-mcp/runtime) uses 0.8 which is
-# the workspace default. nomi-config pins 1.0 in its own manifest.
+# NOTE: openhub-config uses toml 1.0; be-rs (openhub-mcp/runtime) uses 0.8 which is
+# the workspace default. openhub-config pins 1.0 in its own manifest.
 toml = "0.8"
 
 # --- Encoding / misc ---
@@ -198,12 +198,12 @@ is-terminal = "0.4"
 image = { version = "0.25", default-features = false, features = ["png"] }
 xcap = "0.9"
 enigo = "0.6"
-# In-process self-hosted CDP browser engine (nomi-browser-engine). 0.9.1 has NO
+# In-process self-hosted CDP browser engine (openhub-browser-engine). 0.9.1 has NO
 # `tokio-runtime` feature — its transport rides `async-tungstenite` and is
 # runtime-agnostic, so the core CDP engine needs NO extra features here.
 # Deliberately default-features-only: we do NOT use chromiumoxide's built-in
 # Chrome *fetcher*. Task 6 ships a self-contained, proxy-aware download
-# (workspace `zip` + `nomifun_net::http_client`) instead — the fetcher uses a
+# (workspace `zip` + `openhub_net::http_client`) instead — the fetcher uses a
 # non-proxy-aware reqwest and would break the proxy-aware install promise, so its
 # `rustls`/`native-tls`/`zip*` features stay OFF (enabling a TLS feature without
 # `zip0`/`zip8` also won't compile in 0.9.1). CDP generated types arrive
@@ -247,10 +247,10 @@ debug = "line-tables-only"
 [profile.test.package."*"]
 debug = false
 
-# Size-optimized release profile. The packaged `nomifun-desktop.exe` is the first
+# Size-optimized release profile. The packaged `openhub-desktop.exe` is the first
 # and largest file the NSIS installer writes, and an oversized *unsigned* binary
 # is the dominant cause of end-user "Extract: error writing to file
-# nomifun-desktop.exe" failures: the longer the write window, the more likely
+# openhub-desktop.exe" failures: the longer the write window, the more likely
 # antivirus real-time scanning locks/quarantines the half-written exe (and the
 # bigger the download). Cargo's default release profile (no LTO,
 # codegen-units=16) left the binary at ~140 MB. These knobs cut the machine-code
@@ -270,9 +270,9 @@ debug = false
 #   strip = true       drop residual symbol tables (also shrinks the non-Windows
 #                      appimage/deb/rpm/dmg artifacts).
 # NOT panic = "abort": the codebase relies on panic = "unwind" to isolate a
-# panicking tool from the agent process (nomi-agent/src/orchestration.rs,
+# panicking tool from the agent process (openhub-agent/src/orchestration.rs,
 # apps/desktop/src/main.rs catch_unwind boundaries) and a test asserts unwind
-# semantics (nomifun-ai-agent/src/protocol/acp.rs). Aborting would turn a single
+# semantics (openhub-ai-agent/src/protocol/acp.rs). Aborting would turn a single
 # tool panic into a full-process crash — a real behavior regression.
 [profile.release]
 opt-level = 3

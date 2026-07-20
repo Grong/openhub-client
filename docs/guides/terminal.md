@@ -1,17 +1,17 @@
 # In-App Terminals
 
-Nomi ships a real terminal inside the app. Each terminal is a backend-managed
+OpenHub ships a real terminal inside the app. Each terminal is a backend-managed
 PTY session you can drive interactively from your browser/desktop window — and
 that AutoWork can drive on your behalf when you bind it to a tag.
 
 > Need the automation guide? See [AutoWork & Requirements](./autowork-requirements.md).
 > Need to run an agent on a schedule? See [Scheduled Tasks](./scheduled-tasks.md).
 
-![Nomi in-app terminal](../images/terminal-01-session.png)
+![OpenHub in-app terminal](../images/terminal-01-session.png)
 
 ## What an in-app terminal is
 
-When you create a terminal, the backend (`nomifun-terminal`) spawns a child
+When you create a terminal, the backend (`openhub-terminal`) spawns a child
 process attached to a real pseudo-terminal via [`portable-pty`]. The session
 has three pieces:
 
@@ -63,11 +63,11 @@ section, or navigate to `/terminal-new`). You pick five things:
    etc.) before pressing **Launch**.
 5. **Knowledge bases** (optional) — multi-select one or more knowledge bases
    to bind to this session. Bound bases are mounted at
-   `{workspace}/.nomi/knowledge/` before the child spawns, together with a
+   `{workspace}/.openhub/knowledge/` before the child spawns, together with a
    generated `README.md` (retrieval protocol + per-base digests + TOC +
    write-back rules); the `claude` preset additionally gets an
    `--append-system-prompt` pointer to that README. Rebinding takes effect on
-   the next re-launch. (The gateway tool `nomi_create_terminal` accepts the
+   the next re-launch. (The gateway tool `openhub_create_terminal` accepts the
    same binding via `knowledge_base_ids`.)
 
 ![Terminal create page](../images/terminal-02-create-page.png)
@@ -112,7 +112,7 @@ stdin.
 ## Terminals as automation targets
 
 The same in-memory PTY map that powers the UI is shared with the **AutoWork
-orchestrator** in `nomifun-requirement` via the `TerminalDriver` trait. That
+orchestrator** in `openhub-requirement` via the `TerminalDriver` trait. That
 trait lets AutoWork:
 
 - Subscribe to a copy of the terminal's live output (it watches for completion
@@ -130,7 +130,7 @@ running in this terminal. Only agent-CLI terminals (`claude`, `codex`,
 AutoWork target. The orchestrator also recommends Full Auto mode, because a
 turn that hits an interactive approval prompt will block until it times out.
 
-If the workspace has knowledge bases mounted (`{cwd}/.nomi/knowledge/`
+If the workspace has knowledge bases mounted (`{cwd}/.openhub/knowledge/`
 exists), AutoWork- and cron-driven prompts are automatically prefixed with a
 one-line hint pointing the CLI at the mounted `README.md` before it starts
 working.

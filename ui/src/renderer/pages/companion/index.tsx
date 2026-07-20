@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -137,13 +137,13 @@ const CompanionPage: React.FC = () => {
   /** Set while the user is dragging / just dragged, so a config-updated echo
    *  doesn't snap the window back to a stale position. */
   const lastLocalMoveAt = useRef(0);
-  /** Active companion thread (a real nomi conversation id). */
+  /** Active companion thread (a real openhub conversation id). */
   const activeThreadRef = useRef<number | null>(null);
   /** True from send until finish/error/stall. NO LONGER gates rendering
    *  (that gate dropped badcase-3 replies); it now only drives the stall vs.
    *  dismiss timer choice in the stream handler. */
   const turnActiveRef = useRef(false);
-  /** Per-segment text buffers for the in-flight turn (a nomi turn can span
+  /** Per-segment text buffers for the in-flight turn (a openhub turn can span
    *  several assistant msg_ids; rendered joined in arrival order). */
   const segmentsRef = useRef(new Map<string, string>());
   const segmentOrderRef = useRef<string[]>([]);
@@ -575,7 +575,7 @@ const CompanionPage: React.FC = () => {
       const justMoved = Date.now() - lastLocalMoveAt.current < 2_000;
       void applyWindowState(next, { skipPosition: justMoved }).then(() => applyDeskSize(next));
     });
-    // Our companion was deleted (from /nomi or the API): this window is orphaned —
+    // Our companion was deleted (from /openhub or the API): this window is orphaned —
     // close it. The main window's sync would close it too; doing it here keeps
     // the window autonomous (sync may not be running, e.g. main window gone).
     const unsubDeleted = ipcBridge.companion.onCompanionDeleted.on(({ companion_id }) => {
@@ -596,10 +596,10 @@ const CompanionPage: React.FC = () => {
       if (!companionId || m.scope_companion_id !== companionId) return;
       if (turnActiveRef.current) return;
       const brief = m.content.length > 40 ? `${m.content.slice(0, 40)}…` : m.content;
-      popBubble(t('nomi.companion.memorySavedToast', { brief }));
+      popBubble(t('openhub.companion.memorySavedToast', { brief }));
     });
     // Streamed companion reply → live bubble updates. The companion thread is
-    // a real nomi conversation; message.stream is a global broadcast, so we
+    // a real openhub conversation; message.stream is a global broadcast, so we
     // filter to the active thread ONLY (no turn-ownership gate — see the
     // responseStream handler below: that gate dropped badcase-3 replies).
     const endTurn = (finalText?: string) => {
@@ -708,7 +708,7 @@ const CompanionPage: React.FC = () => {
             text ||
               (message.type === 'error'
                 ? t(companionErrorKey(streamErrorCode(message.data)))
-                : t('nomi.companion.done'))
+                : t('openhub.companion.done'))
           );
           dismissRemoteLater(BUBBLE_MS * 2);
           break;
@@ -793,8 +793,8 @@ const CompanionPage: React.FC = () => {
           setBubbleLoading(false);
           const browser = browserNarrationFor(message.data);
           const hint = browser
-            ? t(browser.key, { name: profileRef.current?.name || 'Nomi', ...browser.params })
-            : t('nomi.companion.usingTools', { name: profileRef.current?.name || 'Nomi' });
+            ? t(browser.key, { name: profileRef.current?.name || 'OpenHub', ...browser.params })
+            : t('openhub.companion.usingTools', { name: profileRef.current?.name || 'OpenHub' });
           setBubble((prev) => (prev && prev !== '…' ? prev : hint));
           armBubbleDismiss(STREAM_STALL_MS, () => endTurn(''));
           break;
@@ -803,7 +803,7 @@ const CompanionPage: React.FC = () => {
         case 'acp_permission':
           // The bubble has no confirmation UI — route the user to the full
           // chat surface where MessagePermission renders.
-          endTurn(t('nomi.companion.needsConfirm'));
+          endTurn(t('openhub.companion.needsConfirm'));
           break;
         case 'finish': {
           // The engine emits exactly one finish per turn; close even when the
@@ -812,7 +812,7 @@ const CompanionPage: React.FC = () => {
           const text = joinedSegments();
           const keepSegments = segmentsRef.current;
           const keepOrder = segmentOrderRef.current;
-          endTurn(text || t('nomi.companion.done'));
+          endTurn(text || t('openhub.companion.done'));
           segmentsRef.current = keepSegments;
           segmentOrderRef.current = keepOrder;
           break;
@@ -954,9 +954,9 @@ const CompanionPage: React.FC = () => {
     };
   }, []);
 
-  // 让原生窗口标题跟随伙伴的自定义名字。建窗时只给了占位标题 "NomiFun"（见 main.rs），
+  // 让原生窗口标题跟随伙伴的自定义名字。建窗时只给了占位标题 "OpenHub"（见 main.rs），
   // 窗口虽 skip_taskbar，但 alt-tab / 屏幕阅读器 / macOS 窗口菜单仍会读到它——给每个
-  // 伙伴专属称呼而非千篇一律的 "nomi"。初次加载与重命名（config-updated → setProfile）
+  // 伙伴专属称呼而非千篇一律的 "openhub"。初次加载与重命名（config-updated → setProfile）
   // 都会触发本 effect。
   useEffect(() => {
     if (!isTauriRuntime()) return;
@@ -1160,7 +1160,7 @@ const CompanionPage: React.FC = () => {
         const conversation_id = await ensureThread();
         turnActiveRef.current = true;
         setBubbleRunning(true);
-        // 把图片路径以 NOMIFUN_FILES_MARKER 形式嵌进 input（与 NomiSendBox 一致），
+        // 把图片路径以 OPENHUB_FILES_MARKER 形式嵌进 input（与 OpenHubSendBox 一致），
         // 这样 agent 才能看到附件；空 workspace 下绝对路径原样保留。
         const displayInput = files.length > 0 ? buildDisplayMessage(text, files, '') : text;
         await ipcBridge.conversation.sendMessage.invoke({
@@ -1186,7 +1186,7 @@ const CompanionPage: React.FC = () => {
         // 未配置对话模型时 ensureCompanionSession 返回 400 → 引导配置；其余后端错误按
         // error code 给可执行文案(鉴权/网络/限流/…),只有真正未知错误才退回通用兜底。
         if (isBackendHttpError(e) && e.status === 400) {
-          setBubble(t('nomi.chat.modelMissing'));
+          setBubble(t('openhub.chat.modelMissing'));
         } else {
           const code = isBackendHttpError(e) ? e.code : '';
           setBubble(t(companionErrorKey(code)));
@@ -1312,7 +1312,7 @@ const CompanionPage: React.FC = () => {
     (action: CompanionMenuAction) => {
       if (action === 'open-chat') {
         // 聊天已迁进「会话」：解析（幂等 ensure）该伙伴的唯一会话并在主窗口打开标准
-        // /conversation/:id（旧的 /nomi?tab=chat 已废除）。未配置对话模型时 ensureThread
+        // /conversation/:id（旧的 /openhub?tab=chat 已废除）。未配置对话模型时 ensureThread
         // 返回 400 → 回退到管理中心总览引导配置。
         void (async () => {
           try {
@@ -1320,7 +1320,7 @@ const CompanionPage: React.FC = () => {
             await openMainAt(`/conversation/${cid}`);
           } catch {
             await openMainAt(
-              companionId ? `/nomi?companion=${encodeURIComponent(companionId)}&tab=overview` : '/nomi'
+              companionId ? `/openhub?companion=${encodeURIComponent(companionId)}&tab=overview` : '/openhub'
             );
           }
         })();
@@ -1330,12 +1330,12 @@ const CompanionPage: React.FC = () => {
         // Lands on the scope-aware Memories tab for this companion (shared +
         // its own private). Memories live in the companion domain now.
         void openMainAt(
-          companionId ? `/nomi?companion=${encodeURIComponent(companionId)}&tab=memories` : '/nomi?tab=memories'
+          companionId ? `/openhub?companion=${encodeURIComponent(companionId)}&tab=memories` : '/openhub?tab=memories'
         );
         return;
       }
       if (action === 'open-config') {
-        void openMainAt(companionId ? `/nomi?companion=${encodeURIComponent(companionId)}&tab=settings` : '/nomi');
+        void openMainAt(companionId ? `/openhub?companion=${encodeURIComponent(companionId)}&tab=settings` : '/openhub');
         return;
       }
       if (action === 'clear-unread') {
@@ -1348,7 +1348,7 @@ const CompanionPage: React.FC = () => {
   );
 
   const openNativeContextMenu = useCallback(async () => {
-    const entries = buildCompanionMenuEntries({ name: profileRef.current?.name || 'Nomi', t });
+    const entries = buildCompanionMenuEntries({ name: profileRef.current?.name || 'OpenHub', t });
     try {
       const [{ Menu }, { getCurrentWindow }] = await Promise.all([
         import('@tauri-apps/api/menu'),
@@ -1374,7 +1374,7 @@ const CompanionPage: React.FC = () => {
       // explicitly accepts/dismisses it in the panel, and the resulting
       // companion.suggestion-decided event then syncs this bubble.
       setShowSuggestions(false);
-      await openMainAt(s.action?.to || '/nomi?tab=suggestions');
+      await openMainAt(s.action?.to || '/openhub?tab=suggestions');
     },
     [openMainAt]
   );
@@ -1388,8 +1388,8 @@ const CompanionPage: React.FC = () => {
       {(bubbleRunning || remoteRunning) && (
         <button
           type='button'
-          className='nomi-companion-reaction'
-          title={t('nomi.companion.interrupt')}
+          className='openhub-companion-reaction'
+          title={t('openhub.companion.interrupt')}
           onClick={(e) => {
             e.stopPropagation();
             interruptReply();
@@ -1403,8 +1403,8 @@ const CompanionPage: React.FC = () => {
       {bubble && (
         <button
           type='button'
-          className='nomi-companion-reaction'
-          title={t('nomi.companion.dismiss')}
+          className='openhub-companion-reaction'
+          title={t('openhub.companion.dismiss')}
           onClick={(e) => {
             e.stopPropagation();
             dismissBubble();
@@ -1420,7 +1420,7 @@ const CompanionPage: React.FC = () => {
 
   if (!isTauriRuntime()) {
     return (
-      <div className='nomi-companion-web-hint'>
+      <div className='openhub-companion-web-hint'>
         <CompanionAvatar
           character={profile?.character}
           mood={mood}
@@ -1429,14 +1429,14 @@ const CompanionPage: React.FC = () => {
           companionId={companionId ?? undefined}
           customFigure={customFigureMetaOf(profile)}
         />
-        <div>{t('nomi.companion.desktopOnly')}</div>
+        <div>{t('openhub.companion.desktopOnly')}</div>
       </div>
     );
   }
 
   return (
     <div
-      className='nomi-companion-window'
+      className='openhub-companion-window'
       // 气泡可用高度 = 100vh − 预留（立绘高 + 输入条/边距）。让正文吃满窗口剩余空间又不压到立绘。
       style={{ '--companion-reserve': `${desk.figureHeight + 84}px` } as React.CSSProperties}
       onContextMenu={(e) => {
@@ -1452,7 +1452,7 @@ const CompanionPage: React.FC = () => {
     >
       {bubble && (
         <div
-          className={`nomi-companion-bubble ${bubbleLoading ? 'nomi-companion-bubble--loading' : ''}`}
+          className={`openhub-companion-bubble ${bubbleLoading ? 'openhub-companion-bubble--loading' : ''}`}
           data-companion-hit
           onMouseEnter={() => {
             // 悬停即暂停消散——长回复不会没读完就消失（点 1）。
@@ -1471,17 +1471,17 @@ const CompanionPage: React.FC = () => {
           }}
         >
           {remoteHeader && (
-            <div className='nomi-companion-bubble__remote'>
+            <div className='openhub-companion-bubble__remote'>
               {CHANNEL_LOGOS[remoteHeader.platform] && (
                 <img src={CHANNEL_LOGOS[remoteHeader.platform]} alt={remoteHeader.platform} title={remoteHeader.platform} />
               )}
-              <span>{remoteHeader.inbound || t('nomi.companion.remoteIncoming')}</span>
+              <span>{remoteHeader.inbound || t('openhub.companion.remoteIncoming')}</span>
             </div>
           )}
-          <div className='nomi-companion-bubble__scroll' ref={bubbleScrollRef} onScroll={onBubbleScroll}>
-            <div className='nomi-companion-bubble__content' ref={bubbleContentRef}>
+          <div className='openhub-companion-bubble__scroll' ref={bubbleScrollRef} onScroll={onBubbleScroll}>
+            <div className='openhub-companion-bubble__content' ref={bubbleContentRef}>
               {bubble === '…' ? (
-                <span className='nomi-companion-bubble__typing' aria-label='…'>
+                <span className='openhub-companion-bubble__typing' aria-label='…'>
                   <i />
                   <i />
                   <i />
@@ -1493,10 +1493,10 @@ const CompanionPage: React.FC = () => {
           </div>
         </div>
       )}
-      <div className='nomi-companion-stage'>
+      <div className='openhub-companion-stage'>
         {unread > 0 && (
           <div
-            className='nomi-companion-badge'
+            className='openhub-companion-badge'
             data-companion-hit
             onClick={(e) => {
               e.stopPropagation();
@@ -1507,18 +1507,18 @@ const CompanionPage: React.FC = () => {
           </div>
         )}
         {showSuggestions && suggestions.length > 0 && (
-          <div className='nomi-companion-suggestions' data-companion-hit onClick={(e) => e.stopPropagation()}>
+          <div className='openhub-companion-suggestions' data-companion-hit onClick={(e) => e.stopPropagation()}>
             {suggestions.map((s) => (
-              <div key={s.id} className='nomi-companion-suggestions__item' onClick={() => void clickSuggestion(s)}>
-                <div className='nomi-companion-suggestions__title'>{s.title}</div>
-                <div className='nomi-companion-suggestions__body'>{s.body}</div>
+              <div key={s.id} className='openhub-companion-suggestions__item' onClick={() => void clickSuggestion(s)}>
+                <div className='openhub-companion-suggestions__title'>{s.title}</div>
+                <div className='openhub-companion-suggestions__body'>{s.body}</div>
               </div>
             ))}
           </div>
         )}
         <div
           ref={figureHitRef}
-          className='nomi-companion-figure-hit'
+          className='openhub-companion-figure-hit'
           data-companion-hit
           onMouseDown={(e) => void startDrag(e)}
         >
@@ -1535,18 +1535,18 @@ const CompanionPage: React.FC = () => {
       </div>
       {composerOpen ? (
         <div
-          className={`nomi-companion-composer ${dragOver ? 'is-dragover' : ''}`}
+          className={`openhub-companion-composer ${dragOver ? 'is-dragover' : ''}`}
           data-companion-hit
           onClick={(e) => e.stopPropagation()}
         >
           {attachedFiles.length > 0 && (
-            <div className='nomi-companion-composer__thumbs'>
+            <div className='openhub-companion-composer__thumbs'>
               {attachedFiles.map((path, i) => (
-                <div key={`${path}-${i}`} className='nomi-companion-composer__thumb'>
+                <div key={`${path}-${i}`} className='openhub-companion-composer__thumb'>
                   <LocalImageView src={path} alt='' />
                   <button
-                    className='nomi-companion-composer__thumb-x'
-                    title={t('nomi.companion.collapse')}
+                    className='openhub-companion-composer__thumb-x'
+                    title={t('openhub.companion.collapse')}
                     onClick={() => setAttachedFiles((prev) => prev.filter((_, idx) => idx !== i))}
                   >
                     ×
@@ -1556,9 +1556,9 @@ const CompanionPage: React.FC = () => {
             </div>
           )}
           <textarea
-            className='nomi-companion-composer__input'
+            className='openhub-companion-composer__input'
             value={composerText}
-            placeholder={t('nomi.companion.chatPlaceholder', { name: profile?.name || 'Nomi' })}
+            placeholder={t('openhub.companion.chatPlaceholder', { name: profile?.name || 'OpenHub' })}
             autoFocus
             onChange={(e) => setComposerText(e.target.value)}
             onFocus={onComposerFocus}
@@ -1570,16 +1570,16 @@ const CompanionPage: React.FC = () => {
               }
             }}
           />
-          <div className='nomi-companion-composer__bar'>
+          <div className='openhub-companion-composer__bar'>
             <button
               type='button'
-              className='nomi-companion-composer__attach'
-              title={t('nomi.companion.attachImage')}
+              className='openhub-companion-composer__attach'
+              title={t('openhub.companion.attachImage')}
               disabled={sendboxUpload.isUploading}
               onClick={pickImages}
             >
               {sendboxUpload.isUploading ? (
-                <span className='nomi-companion-spinner' aria-hidden='true' />
+                <span className='openhub-companion-spinner' aria-hidden='true' />
               ) : (
                 <svg
                   width='16'
@@ -1596,36 +1596,36 @@ const CompanionPage: React.FC = () => {
               )}
             </button>
             <div className='spacer' />
-            <button className='nomi-companion-composer__ghost' onClick={collapseComposer}>
-              {t('nomi.companion.collapse')}
+            <button className='openhub-companion-composer__ghost' onClick={collapseComposer}>
+              {t('openhub.companion.collapse')}
             </button>
             <button
-              className='nomi-companion-composer__send'
+              className='openhub-companion-composer__send'
               disabled={(!composerText.trim() && attachedFiles.length === 0) || sending || sendboxUpload.isUploading}
               onClick={() => void sendComposer()}
             >
-              {t('nomi.companion.send')}
+              {t('openhub.companion.send')}
             </button>
             {reactionControls}
           </div>
         </div>
       ) : (
         <div
-          className={`nomi-companion-chatbar ${input || sending || barRevealed ? 'is-active' : ''}`}
+          className={`openhub-companion-chatbar ${input || sending || barRevealed ? 'is-active' : ''}`}
           // 常驻命中候选；隐藏态 pointer-events:none 会被 companionHitTarget 跳过，
           // CSS hover 先显示但 React reveal 尚未赶上时也不会出现「看得到却穿透」。
           data-companion-hit
         >
           <input
             value={input}
-            placeholder={t('nomi.companion.chatPlaceholder', { name: profile?.name || 'Nomi' })}
+            placeholder={t('openhub.companion.chatPlaceholder', { name: profile?.name || 'OpenHub' })}
             onChange={(e) => setInput(e.target.value)}
             onPaste={onComposerPaste}
             onKeyDown={(e) => {
               if (e.key === 'Enter') void sendChat();
             }}
           />
-          <div className='nomi-companion-iconbtn' title={t('nomi.companion.expand')} onClick={openComposer}>
+          <div className='openhub-companion-iconbtn' title={t('openhub.companion.expand')} onClick={openComposer}>
             <svg
               width='14'
               height='14'
@@ -1643,11 +1643,11 @@ const CompanionPage: React.FC = () => {
             </svg>
           </div>
           <button
-            className='nomi-companion-send'
+            className='openhub-companion-send'
             disabled={!input.trim() || sending}
             onClick={() => void sendChat()}
           >
-            {t('nomi.companion.send')}
+            {t('openhub.companion.send')}
           </button>
           {reactionControls}
         </div>

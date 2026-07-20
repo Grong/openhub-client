@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -105,7 +105,7 @@ const QQBotConfigForm: React.FC<QQBotConfigFormProps> = ({
       throw new Error(
         result.error ||
           result.message ||
-          t('nomi.settings.remoteEnableFailed', { defaultValue: 'Failed to enable channel' })
+          t('openhub.settings.remoteEnableFailed', { defaultValue: 'Failed to enable channel' })
       );
     }
     Message.success(t('settings.qqbot.pluginEnabled', 'QQ bot enabled'));

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -8,11 +8,11 @@ import type { ConfigKeyMap } from './configKeys';
 import type { IProvider } from './storage';
 
 export const IMAGE_GEN_ENV_KEYS = {
-  providerId: 'NOMIFUN_IMG_PROVIDER_ID',
-  platform: 'NOMIFUN_IMG_PLATFORM',
-  baseUrl: 'NOMIFUN_IMG_BASE_URL',
-  apiKey: 'NOMIFUN_IMG_API_KEY',
-  model: 'NOMIFUN_IMG_MODEL',
+  providerId: 'OPENHUB_IMG_PROVIDER_ID',
+  platform: 'OPENHUB_IMG_PLATFORM',
+  baseUrl: 'OPENHUB_IMG_BASE_URL',
+  apiKey: 'OPENHUB_IMG_API_KEY',
+  model: 'OPENHUB_IMG_MODEL',
 } as const;
 
 type ImageGenerationSelection = Partial<ConfigKeyMap['tools.imageGenerationModel']>;

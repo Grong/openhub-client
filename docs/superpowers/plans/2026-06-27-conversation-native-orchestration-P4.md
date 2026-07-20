@@ -16,15 +16,15 @@
 
 ## File Structure（已勘察）
 - 前端：`ui/.../AssistantEditDrawer.tsx` + `useAssistantEditor.ts`（加 models 编辑）、`pages/.../index.tsx`(透传)
-- api-types：`nomifun-api-types/src/orchestrator.rs`（FleetMember 富化字段）
-- gateway：`nomifun-gateway/src/deps.rs`（GatewayDeps + AssistantService）、`nomifun-app/src/router/routes.rs`（接线）、`caps_orchestrator.rs`（构建助手成员）、可能 `tools_provider.rs`(provider+model 解析复用)
+- api-types：`openhub-api-types/src/orchestrator.rs`（FleetMember 富化字段）
+- gateway：`openhub-gateway/src/deps.rs`（GatewayDeps + AssistantService）、`openhub-app/src/router/routes.rs`（接线）、`caps_orchestrator.rs`（构建助手成员）、可能 `tools_provider.rs`(provider+model 解析复用)
 - orchestrator：`worker.rs`（build_worker_extra 读 persona/skills）、`plan.rs`（build_plan_user_prompt 读 member.description）、`router.rs`(可选 capability 用)
 
 ---
 
 ## Task 1: AssistantEditDrawer 开放偏好模型编辑
 
-**Files:** Modify `ui/.../AssistantEditDrawer.tsx`、`useAssistantEditor.ts`、`pages/nomi/.../index.tsx`(或承载 drawer 的父组件,透传 props)。
+**Files:** Modify `ui/.../AssistantEditDrawer.tsx`、`useAssistantEditor.ts`、`pages/openhub/.../index.tsx`(或承载 drawer 的父组件,透传 props)。
 
 **契约（已勘察）：** 助手 DTO 已有 `models: string[]`，后端已持久化往返；**仅 UI 未读写**。Create/Update 请求对象(`useAssistantEditor.ts:281-291`/`:313-326`)未发 models。模型列表用现成 hook `useModelProviderList`（`hooks/agent/useModelProviderList.ts:37-102`，返回 providers/getAvailableModels；同 GuidModelSelector 用法）。
 
@@ -39,7 +39,7 @@
 
 ## Task 2: FleetMember 富化 + caps 层构建助手角色成员
 
-**Files:** Modify `nomifun-api-types/src/orchestrator.rs`（FleetMember）、`nomifun-gateway/src/deps.rs`、`nomifun-app/src/router/routes.rs`、`nomifun-gateway/src/caps_orchestrator.rs`；测试内联。
+**Files:** Modify `openhub-api-types/src/orchestrator.rs`（FleetMember）、`openhub-gateway/src/deps.rs`、`openhub-app/src/router/routes.rs`、`openhub-gateway/src/caps_orchestrator.rs`；测试内联。
 
 **FleetMember 富化字段（全 serde default，向后兼容）：**
 ```rust
@@ -57,7 +57,7 @@ pub struct FleetMember {
 }
 ```
 
-**GatewayDeps + 接线：** `deps.rs` 加 `pub assistant_service: Arc<AssistantService>`（来自 nomifun-assistant）；`routes.rs` 的 `GatewayDeps{...}` 字面量接 `states.assistant.service.clone()`（O(1) 增长模式）。
+**GatewayDeps + 接线：** `deps.rs` 加 `pub assistant_service: Arc<AssistantService>`（来自 openhub-assistant）；`routes.rs` 的 `GatewayDeps{...}` 字面量接 `states.assistant.service.clone()`（O(1) 增长模式）。
 
 **caps_orchestrator 构建助手角色成员（在 create handler，model_range 已展开后）：**
 - `deps.assistant_service.list()` → 过滤 `enabled` 的助手。
@@ -70,19 +70,19 @@ pub struct FleetMember {
 **capability 派生（轻量 helper，可在 api-types 或 orchestrator）：** `derive_capability(tags: &[String], description: Option<&str>) -> CapabilityProfile`：tags/描述关键词→strengths；其余取基线（reasoning="medium",cost/speed="standard",tools=true 若有 skills）。保守即可（规划 LLM 读 description 才是主力）。
 
 - [ ] **Step 1: 测试（失败优先）** — (a) FleetMember 富化字段 serde 往返(旧 JSON 无新字段→默认值); (b) caps 构建:mock assistant_service.list 返 1 启用助手(models 含范围内模型)→快照含该助手成员(agent_id=助手id,role_hint=name,system_prompt=persona,enabled_skills,description); 助手偏好模型不在范围→跳过; (c) derive_capability 基本映射。
-- [ ] **Step 2: RED** `cargo nextest run -p nomifun-gateway -p nomifun-api-types -p nomifun-orchestrator`。
+- [ ] **Step 2: RED** `cargo nextest run -p openhub-gateway -p openhub-api-types -p openhub-orchestrator`。
 - [ ] **Step 3: 实现** 富化字段 + GatewayDeps/接线 + caps 构建助手成员 + create_adhoc 合并 + derive_capability。
-- [ ] **Step 4: GREEN** 上述 nextest + `cargo build -p nomifun-gateway -p nomifun-orchestrator -p nomifun-app` + e2e 4/4。
+- [ ] **Step 4: GREEN** 上述 nextest + `cargo build -p openhub-gateway -p openhub-orchestrator -p openhub-app` + e2e 4/4。
 - [ ] **Step 5: 提交** `git commit -m "feat(orchestrator): caps 层把启用助手构建为编排角色成员(富化快照)"`
 
 ---
 
 ## Task 3: worker 继承助手 persona/技能/模型 + 规划读 member.description
 
-**Files:** Modify `nomifun-orchestrator/src/worker.rs`（build_worker_extra + run 透传成员富化）、`engine.rs`（compose_brief/dispatch 透传）、`plan.rs`（build_plan_user_prompt 读 member.description）；测试内联。
+**Files:** Modify `openhub-orchestrator/src/worker.rs`（build_worker_extra + run 透传成员富化）、`engine.rs`（compose_brief/dispatch 透传）、`plan.rs`（build_plan_user_prompt 读 member.description）；测试内联。
 
 **改动：**
-1. **worker persona**：`ConversationWorkerRunner::run` 已持 `member: &FleetMember`。`build_worker_extra` 增参，当 `member.system_prompt` 非空 → 设 `extra.preset_rules = member.system_prompt`（工厂 nomi.rs:29-34 会把 preset_rules 接在 system_prompt 后，得 `brief\n\npersona`）。
+1. **worker persona**：`ConversationWorkerRunner::run` 已持 `member: &FleetMember`。`build_worker_extra` 增参，当 `member.system_prompt` 非空 → 设 `extra.preset_rules = member.system_prompt`（工厂 openhub.rs:29-34 会把 preset_rules 接在 system_prompt 后，得 `brief\n\npersona`）。
 2. **worker 模型**：已天然继承（member.model 来自助手偏好，Task2 已解析）。无需改。
 3. **worker 技能**：调查最简 seam 并接入：
    - 优先尝试 (c) `send_message` 的 `inject_skills`（worker.rs:163 现传空 `vec![]`）→ 改传 `member.enabled_skills`。**先查 inject_skills 语义**（send_message 参数；若它确实把技能注入该回合则用之）。
@@ -91,22 +91,22 @@ pub struct FleetMember {
 4. **规划读描述**：`build_plan_user_prompt` 的 `desc=` 列优先取 `member.description`（Task2 已填充，含助手描述与模型描述）；P3 的 provider_repo 查询可保留作裸模型兜底或简化为只读 member.description（**优先 member.description 统一**，若简化则确保裸模型成员的 description 已由 caps 填充）。
 
 - [ ] **Step 1: 测试（失败优先）** — (a) build_worker_extra:member.system_prompt 非空→extra.preset_rules 设置(含 persona); 空→不设; (b) 若技能 seam 可行:member.enabled_skills 透传到 send_message inject_skills/extra.skills; (c) build_plan_user_prompt 用 member.description。
-- [ ] **Step 2: RED** `cargo nextest run -p nomifun-orchestrator`。
+- [ ] **Step 2: RED** `cargo nextest run -p openhub-orchestrator`。
 - [ ] **Step 3: 实现** persona + (技能 if 可行) + 规划读 description。
-- [ ] **Step 4: GREEN** `cargo nextest run -p nomifun-orchestrator` + `cargo build -p nomifun-orchestrator -p nomifun-app` + e2e 4/4。
+- [ ] **Step 4: GREEN** `cargo nextest run -p openhub-orchestrator` + `cargo build -p openhub-orchestrator -p openhub-app` + e2e 4/4。
 - [ ] **Step 5: 提交** `git commit -m "feat(orchestrator): worker 继承助手 persona/技能 + 规划读成员描述"`（技能若 BLOCKED 则改 "继承 persona + 规划读描述(技能 carry-forward)"）
 
 ---
 
 ## Task 4: 集成 + 真机冒烟
 
-- [ ] **Step 1:** `cargo build --workspace` 绿 + `cargo nextest run -p nomifun-orchestrator -p nomifun-gateway -p nomifun-api-types -p nomifun-assistant -p nomifun-app` 全绿（e2e 4/4）；前端 typecheck0+build。
-- [ ] **Step 2: 真机冒烟（controller）** — `nomifun-web --dist --insecure-no-auth`（temp target/_p4_smoke）。①助手编辑抽屉的偏好模型多选渲染+保存+持久化；②(seam e2e/mock 已证)启用助手 → 编排候选成员。零 console error，UI 漂亮，截图。真·角色复用跑需 provider,留用户。
+- [ ] **Step 1:** `cargo build --workspace` 绿 + `cargo nextest run -p openhub-orchestrator -p openhub-gateway -p openhub-api-types -p openhub-assistant -p openhub-app` 全绿（e2e 4/4）；前端 typecheck0+build。
+- [ ] **Step 2: 真机冒烟（controller）** — `openhub-web --dist --insecure-no-auth`（temp target/_p4_smoke）。①助手编辑抽屉的偏好模型多选渲染+保存+持久化；②(seam e2e/mock 已证)启用助手 → 编排候选成员。零 console error，UI 漂亮，截图。真·角色复用跑需 provider,留用户。
 - [ ] **Step 3: 记账 + 提交**（若有微调）；账本追加 P4 完成行（注明技能继承交付/延后）。
 
 ## Self-Review（spec §5）
 **覆盖：** 助手偏好模型可编辑→T1；agent_id→助手 + 自动纳入启用助手为角色→T2；worker 继承 persona/模型(+技能 if 可行)→T3；规划读助手描述→T3；capability 派生→T2。
-**风险：** 技能 seam 缺失(nomi 无 extra-key)→T3 调查+允许 BLOCKED 延后(persona+模型仍交付);FleetMember 富化向后兼容→serde default + 旧快照测试;caps 加 assistant 依赖无环(assistant 不依赖 gateway)→T2 build 闸;快照体积(persona 文本)→可接受。
+**风险：** 技能 seam 缺失(openhub 无 extra-key)→T3 调查+允许 BLOCKED 延后(persona+模型仍交付);FleetMember 富化向后兼容→serde default + 旧快照测试;caps 加 assistant 依赖无环(assistant 不依赖 gateway)→T2 build 闸;快照体积(persona 文本)→可接受。
 **自包含快照：** 引擎/worker 不依赖 assistant crate,属性在 caps 层富化进成员。
 
 ## Execution Handoff

@@ -17,7 +17,7 @@
   status: 'pending' | 'in_progress' | 'completed'; priority? }>`（见
   `common/types/platform/acpTypes.ts` 的 `PlanUpdate`）。
 - 计划消息由 `transformMessage`（`common/chat/chatLib.ts`）构造，**所有平台**
-  （acp / nomi / nanobot / openclaw / remote）都可能产生。
+  （acp / openhub / nanobot / openclaw / remote）都可能产生。
 - 计划更新逻辑（`Messages/hooks.ts` 的 `composeMessageWithIndex`）：同 `msg_id`
   的新计划会替换旧内容并被移动到列表末尾，因此「列表中最后一条 plan」即为当前计划。
 - 布局：每个平台 chat wrapper 结构统一为
@@ -114,7 +114,7 @@ if (message.type === 'plan') continue;
 `<PinnedPlan />`：
 
 - `platforms/acp/AcpChat.tsx`
-- `platforms/nomi/NomiChat.tsx`
+- `platforms/openhub/OpenHubChat.tsx`
 - `platforms/nanobot/NanobotChat.tsx`
 - `platforms/openclaw/OpenClawChat.tsx`
 - `platforms/remote/RemoteChat.tsx`
@@ -148,7 +148,7 @@ backend update ──► transformMessage ──► addOrUpdateMessage
 ## 边界情形
 
 - 无 plan / `entries` 为空：固定栏隐藏（`null`）。
-- 窗口化历史（nomi，初始仅加载最新窗口）：若计划早于已加载窗口则暂不显示；
+- 窗口化历史（openhub，初始仅加载最新窗口）：若计划早于已加载窗口则暂不显示；
   活跃计划必在近窗口内，可接受。
 - `hideSendBox` 锁定 / 嵌入面板：固定栏仍显示（只读信息）。
 - 长清单：展开态 `max-h-[30vh]` 内部滚动，不挤压输入框。

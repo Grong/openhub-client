@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -25,8 +25,8 @@ const MobileConversationBrand: React.FC<MobileConversationBrandProps> = ({ conve
   const backend =
     conversation?.type === 'acp'
       ? conversation.extra?.backend
-      : conversation?.type === 'nomi'
-        ? 'nomi'
+      : conversation?.type === 'openhub'
+        ? 'openhub'
         : conversation?.type === 'codex'
           ? 'codex'
           : conversation?.type === 'openclaw-gateway'

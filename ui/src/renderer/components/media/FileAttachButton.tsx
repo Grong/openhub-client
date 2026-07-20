@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -144,7 +144,7 @@ const FileAttachButton: React.FC<FileAttachButtonProps> = ({
         shape='circle'
         icon={plusIcon}
         onClick={openFileSelector}
-        data-testid='nomi-attach-folder-btn'
+        data-testid='openhub-attach-folder-btn'
       />
     );
   }
@@ -318,7 +318,7 @@ const FileAttachButton: React.FC<FileAttachButtonProps> = ({
           icon={plusIcon}
           loading={uploading}
           disabled={uploading}
-          data-testid='nomi-attach-folder-btn'
+          data-testid='openhub-attach-folder-btn'
         />
       </Trigger>
       <input
@@ -327,7 +327,7 @@ const FileAttachButton: React.FC<FileAttachButtonProps> = ({
         multiple
         style={{ display: 'none' }}
         onChange={handleLocalFileChange}
-        data-testid='nomi-file-upload-input'
+        data-testid='openhub-file-upload-input'
       />
     </>
   );

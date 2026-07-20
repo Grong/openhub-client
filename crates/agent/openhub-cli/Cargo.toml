@@ -1,0 +1,31 @@
+[package]
+name = "openhub-cli"
+description = "CLI binary for OpenHub — a multi-provider AI agent with tool orchestration"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+keywords = ["ai", "agent", "cli", "llm", "anthropic"]
+categories = ["command-line-utilities"]
+
+[[bin]]
+name = "openhub"
+path = "src/main.rs"
+
+[dependencies]
+openhub-agent = { workspace = true, features = ["computer-use"] }
+openhub-compact.workspace  = true
+openhub-config.workspace   = true
+openhub-memory.workspace   = true
+openhub-providers.workspace = true
+openhub-tools.workspace    = true
+openhub-agent-mcp.workspace      = true
+openhub-protocol.workspace = true
+openhub-skills.workspace   = true
+
+tokio.workspace              = true
+anyhow.workspace             = true
+clap.workspace               = true
+tracing.workspace            = true
+tracing-subscriber.workspace = true
+

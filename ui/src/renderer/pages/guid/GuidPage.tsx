@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -77,12 +77,12 @@ const GuidPage: React.FC = () => {
   const [drawerMode, setDrawerMode] = useState<'assistant' | 'skills'>('assistant');
   // 「agent 集群」模式（需求1）：composer 顶部 toggle。选中后发送即在新会话 extra
   // 落 agent_cluster_mode=true——主 agent 对每个任务刻意评估是否开多 agent 集群，
-  // 太简单则先向用户说明使用简单模式的原因。仅 nomi 主 agent 路径消费。
+  // 太简单则先向用户说明使用简单模式的原因。仅 openhub 主 agent 路径消费。
   const [clusterMode, setClusterMode] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [clusterApprovalMode, setClusterApprovalMode] = useState<GuidClusterApprovalMode>('auto');
   const [orchestrationCollaborators, setOrchestrationCollaborators] = useState<TModelRef[]>(
-    () => configService.get('nomi.orchestrationCollaborators') ?? []
+    () => configService.get('openhub.orchestrationCollaborators') ?? []
   );
 
   // --- Skills state ---
@@ -146,9 +146,9 @@ const GuidPage: React.FC = () => {
   }, []);
 
   // --- Hooks ---
-  // Only nomi uses this provider-based model picker now (Gemini runs as a
+  // Only openhub uses this provider-based model picker now (Gemini runs as a
   // regular ACP backend with its own model selector).
-  const modelSelection = useGuidModelSelection('nomi');
+  const modelSelection = useGuidModelSelection('openhub');
   const mainModelRef = useMemo<TModelRef | null>(
     () =>
       modelSelection.current_model
@@ -158,7 +158,7 @@ const GuidPage: React.FC = () => {
   );
   const handleOrchestrationCollaboratorsChange = useCallback((next: TModelRef[]) => {
     setOrchestrationCollaborators(next);
-    void configService.set('nomi.orchestrationCollaborators', next).catch((error) => {
+    void configService.set('openhub.orchestrationCollaborators', next).catch((error) => {
       console.error('[GuidPage] Failed to save orchestration collaborators:', error);
     });
   }, []);
@@ -555,8 +555,8 @@ const GuidPage: React.FC = () => {
     : agentSelection.selectedAgent;
 
   // Agents that use configured model providers instead of ACP probe-based models.
-  // Only nomi now — Gemini runs as a regular ACP backend with ACP-cached models.
-  const PROVIDER_BASED_AGENTS = new Set(['nomi']);
+  // Only openhub now — Gemini runs as a regular ACP backend with ACP-cached models.
+  const PROVIDER_BASED_AGENTS = new Set(['openhub']);
   const isGeminiMode =
     PROVIDER_BASED_AGENTS.has(effectiveAgentType) &&
     (!agentSelection.is_presetAgent || agentSelection.currentEffectiveAgentInfo.isAvailable);
@@ -588,7 +588,7 @@ const GuidPage: React.FC = () => {
       value={orchestrationCollaborators}
       onChange={handleOrchestrationCollaboratorsChange}
       mainModel={mainModelRef}
-      className='nomi-sendbox-model-btn'
+      className='openhub-sendbox-model-btn'
     />
   );
   const clusterApprovalSelectorNode = (

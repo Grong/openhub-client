@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -33,7 +33,7 @@ describe('Guid agent cluster controls', () => {
     expect(configGroup.indexOf('<AgentModeSelector')).toBeGreaterThan(configGroup.indexOf('{clusterApprovalSelectorNode}'));
   });
 
-  test('stores the homepage cluster model range and approval mode on the created Nomi conversation', () => {
+  test('stores the homepage cluster model range and approval mode on the created OpenHub conversation', () => {
     const pageSource = readSource(new URL('./GuidPage.tsx', import.meta.url));
     const sendSource = readSource(new URL('./hooks/useGuidSend.ts', import.meta.url));
 

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -17,7 +17,7 @@ const cssRuleFor = (selector: string) => {
 };
 
 describe('MessageTips structured error presentation', () => {
-  test('uses a NomiFun-native diagnostic note instead of the legacy open-source alert block', () => {
+  test('uses a OpenHub-native diagnostic note instead of the legacy open-source alert block', () => {
     expect(source.includes('message-error-note')).toBe(true);
     expect(source.includes('message-error-note__rail')).toBe(true);
     expect(source.includes('message-error-note__status')).toBe(true);

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -587,7 +587,7 @@ const DagCanvas: React.FC<DagCanvasProps> = ({
         target: dep.blocked_task_id,
         animated: downstreamRunning,
         // 流光样式类（需求2）：下游 running 时边缘发亮流动，静止边保持淡雅。
-        className: downstreamRunning ? 'nomi-dag-edge-live' : undefined,
+        className: downstreamRunning ? 'openhub-dag-edge-live' : undefined,
         style: {
           stroke: downstreamRunning ? 'rgb(var(--primary-6))' : 'var(--border-base)',
           strokeWidth: downstreamRunning ? 2 : 1.5,
@@ -644,7 +644,7 @@ const DagCanvas: React.FC<DagCanvasProps> = ({
       <div ref={flowWrapRef} className='flex-1 min-h-0'>
         {noTasks ? (
           <div className='flex size-full flex-col items-center justify-center gap-12px px-24px text-center'>
-            <span className='nomi-dag-pulse flex size-52px items-center justify-center rd-16px bg-fill-2 text-primary-6'>
+            <span className='openhub-dag-pulse flex size-52px items-center justify-center rd-16px bg-fill-2 text-primary-6'>
               <Branch theme='outline' size='26' strokeWidth={3} />
             </span>
             <div className='text-15px font-600 text-t-primary'>{t('orchestrator.run.detail.planningTitle')}</div>
@@ -654,21 +654,21 @@ const DagCanvas: React.FC<DagCanvasProps> = ({
             {phaseKeys.length > 0 && (
               <div className='flex max-w-340px flex-col items-stretch gap-4px' aria-live='polite'>
                 {phaseKeys.slice(-4).map((key) => (
-                  <div key={key} className='nomi-dag-phase-line text-12px leading-18px text-t-secondary'>
+                  <div key={key} className='openhub-dag-phase-line text-12px leading-18px text-t-secondary'>
                     {PHASE_I18N[key] ? t(PHASE_I18N[key]) : key}
                   </div>
                 ))}
               </div>
             )}
             {leadThinking?.active && reasoningTail && (
-              <div className='nomi-dag-reasoning-tail max-w-340px text-11px leading-16px text-t-tertiary'>
+              <div className='openhub-dag-reasoning-tail max-w-340px text-11px leading-16px text-t-tertiary'>
                 {reasoningTail}
               </div>
             )}
           </div>
         ) : (
           <ReactFlow
-            className='nomi-dag-flow'
+            className='openhub-dag-flow'
             onInit={(instance) => {
               rfRef.current = instance;
             }}

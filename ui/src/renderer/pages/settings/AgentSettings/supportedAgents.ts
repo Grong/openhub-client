@@ -1,11 +1,11 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * Curated catalog of the external CLI agents NomiFun knows how to detect.
+ * Curated catalog of the external CLI agents OpenHub knows how to detect.
  *
  * The backend (`/api/agents`) only returns agents whose CLI is actually
  * installed (it filters to `enabled && available`), and it carries no
@@ -13,14 +13,14 @@
  * so users can discover the full set of supported agents and install them —
  * we keep this small front-end catalog. The list mirrors the seeded
  * `agent_metadata` rows in 001_baseline.sql (ACP builtins + nanobot +
- * openclaw); `nomi` (internal, always available) and remote agents are
+ * openclaw); `openhub` (internal, always available) and remote agents are
  * intentionally excluded.
  *
  * `backend` matches both the detected agent's `backend` key and the logo map
  * in `agentLogo.ts`. `website` is optional — when absent the card hides the
  * "manual install" button. `installHint` is a locale-neutral install command
  * embedded into the one-click install prompt; keep it empty unless the command
- * is product-owned, current, and low-risk enough for Nomi-assisted install.
+ * is product-owned, current, and low-risk enough for OpenHub-assisted install.
  */
 export interface SupportedAgent {
   /** Stable backend key — matches detected `agent.backend` and the logo map. */

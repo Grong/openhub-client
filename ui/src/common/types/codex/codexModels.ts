@@ -1,13 +1,13 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * Default Codex model list maintained by Nomi.
+ * Default Codex model list maintained by OpenHub.
  * These are known models that Codex CLI supports.
- * Validation is done by Codex CLI itself — Nomi only passes the model name.
+ * Validation is done by Codex CLI itself — OpenHub only passes the model name.
  *
  * The first entry is used as the default when the user hasn't made a selection.
  */

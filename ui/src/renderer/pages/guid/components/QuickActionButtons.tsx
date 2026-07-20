@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -93,7 +93,7 @@ const QuickActionButtons: React.FC<QuickActionButtonsProps> = ({
   }, [navigate]);
 
   const handleCheckUpdate = useCallback(() => {
-    window.dispatchEvent(new CustomEvent('nomifun-open-update-modal', { detail: { source: 'guid' } }));
+    window.dispatchEvent(new CustomEvent('openhub-open-update-modal', { detail: { source: 'guid' } }));
   }, []);
 
   const webuiStatusLabel =

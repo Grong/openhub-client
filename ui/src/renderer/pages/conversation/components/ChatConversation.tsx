@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -23,16 +23,16 @@ import ChatSlider from './ChatSlider.tsx';
 import NanobotChat from '../platforms/nanobot/NanobotChat';
 import OpenClawChat from '../platforms/openclaw/OpenClawChat';
 import RemoteChat from '../platforms/remote/RemoteChat';
-import { saveNomiDefaultModel } from '@/renderer/pages/guid/hooks/agentSelectionUtils';
+import { saveOpenHubDefaultModel } from '@/renderer/pages/guid/hooks/agentSelectionUtils';
 import { configService } from '@/common/config/configService';
 import { useModelProviderList } from '@/renderer/hooks/agent/useModelProviderList';
-import { resolveHealModel } from '../platforms/nomi/healConversationModel';
+import { resolveHealModel } from '../platforms/openhub/healConversationModel';
 import { getConversationOrNull, seedConversationCache } from '@/renderer/pages/conversation/utils/conversationCache';
 import { getConversationCreateErrorMessage } from '@/renderer/pages/conversation/utils/conversationCreateError';
 import { isConversationProcessing } from '@/renderer/pages/conversation/utils/conversationRuntime';
-import NomiChat from '../platforms/nomi/NomiChat';
-import { useNomiModelSelection } from '../platforms/nomi/useNomiModelSelection';
-import CompanionChatPanel from '@/renderer/pages/nomi/companion/CompanionChatPanel';
+import OpenHubChat from '../platforms/openhub/OpenHubChat';
+import { useOpenHubModelSelection } from '../platforms/openhub/useOpenHubModelSelection';
+import CompanionChatPanel from '@/renderer/pages/openhub/companion/CompanionChatPanel';
 import GuidCollaboratorSelector from '@/renderer/pages/guid/components/GuidCollaboratorSelector';
 import ClusterModePill from './ClusterModePill';
 import type { TModelRange, TModelRef } from '@/common/types/orchestrator/orchestratorTypes';
@@ -147,9 +147,9 @@ const _AddNewConversation: React.FC<{ conversation: TChatConversation }> = ({ co
   );
 };
 
-type NomiConversation = Extract<TChatConversation, { type: 'nomi' }>;
+type OpenHubConversation = Extract<TChatConversation, { type: 'openhub' }>;
 
-const NomiConversationPanel: React.FC<{ conversation: NomiConversation; sliderTitle: React.ReactNode }> = ({
+const OpenHubConversationPanel: React.FC<{ conversation: OpenHubConversation; sliderTitle: React.ReactNode }> = ({
   conversation,
   sliderTitle,
 }) => {
@@ -200,7 +200,7 @@ const NomiConversationPanel: React.FC<{ conversation: NomiConversation; sliderTi
       await ipcBridge.conversation.stop.invoke({ conversation_id: conversation.id });
       const ok = await ipcBridge.conversation.update.invoke({ id: conversation.id, updates: { model: selected } });
       if (ok) {
-        void saveNomiDefaultModel(_provider.id, modelName);
+        void saveOpenHubDefaultModel(_provider.id, modelName);
         // 主模型即 range 的 models[0](lead/planner):切换主模型后同步重写 range,
         // 让协作池仍钉在新主模型之后。
         void persistModelRange({ provider_id: _provider.id, model: modelName }, collaborators);
@@ -210,7 +210,7 @@ const NomiConversationPanel: React.FC<{ conversation: NomiConversation; sliderTi
     [conversation.id, persistModelRange, collaborators]
   );
 
-  const modelSelection = useNomiModelSelection({
+  const modelSelection = useOpenHubModelSelection({
     initialModel: conversation.model,
     onSelectModel,
   });
@@ -239,14 +239,14 @@ const NomiConversationPanel: React.FC<{ conversation: NomiConversation; sliderTi
       value={collaborators}
       onChange={onCollaboratorsChange}
       mainModel={mainModelRef}
-      className='nomi-sendbox-model-btn'
+      className='openhub-sendbox-model-btn'
     />
   );
 
   const { providers: healProviders, getAvailableModels: healGetAvailable } = useModelProviderList();
   useEffect(() => {
     if (!healProviders.length) return;
-    const saved = configService.get('nomi.defaultModel');
+    const saved = configService.get('openhub.defaultModel');
     const heal = resolveHealModel(
       conversation.model,
       healProviders,
@@ -258,7 +258,7 @@ const NomiConversationPanel: React.FC<{ conversation: NomiConversation; sliderTi
       const selected = { ...heal.provider, use_model: heal.use_model } as TProviderWithModel;
       const ok = await ipcBridge.conversation.update.invoke({ id: conversation.id, updates: { model: selected } });
       if (ok) {
-        void saveNomiDefaultModel(heal.provider.id, heal.use_model);
+        void saveOpenHubDefaultModel(heal.provider.id, heal.use_model);
         Message.info(t('conversation.chat.modelHealedToDefault', { model: heal.use_model }));
       }
     })();
@@ -290,7 +290,7 @@ const NomiConversationPanel: React.FC<{ conversation: NomiConversation; sliderTi
     workspacePath: conversation.extra?.workspace,
     isTemporaryWorkspace: (conversation.extra as { is_temporary_workspace?: boolean } | undefined)
       ?.is_temporary_workspace,
-    backend: 'nomi' as const,
+    backend: 'openhub' as const,
     presetAssistant: presetAssistantInfo ? { ...presetAssistantInfo, id: nomiAssistantId } : undefined,
   };
 
@@ -306,13 +306,13 @@ const NomiConversationPanel: React.FC<{ conversation: NomiConversation; sliderTi
             {/* 智能编排「编排后不自动执行」提示条:仅当本会话关联的 run 停在
                 awaiting_plan_approval 时显示,复用批准 IPC;其余情况渲染 null。 */}
             <PlanApprovalBanner />
-            {/* Content-area projection (会话原生编排, F7): keeps NomiChat ALWAYS
+            {/* Content-area projection (会话原生编排, F7): keeps OpenHubChat ALWAYS
                 mounted and just toggles its visibility, overlaying a clicked DAG
                 worker node's read-only transcript when a node is projected. Node
                 clicks in the right canvas pane project the worker transcript into
                 this chat region; default main. */}
             <ConversationContentSwitcher>
-              <NomiChat
+              <OpenHubChat
                 conversation_id={conversation.id}
                 workspace={conversation.extra.workspace}
                 modelSelection={modelSelection}
@@ -344,11 +344,11 @@ const ChatConversation: React.FC<{
   const { t } = useTranslation();
   const workspaceEnabled = Boolean(conversation?.extra?.workspace);
 
-  const isNomiConversation = conversation?.type === 'nomi';
+  const isOpenHubConversation = conversation?.type === 'openhub';
 
   // 使用统一的 Hook 获取预设助手信息（ACP/Codex 会话）
   // Use unified hook for preset assistant info (ACP/Codex conversations)
-  const acpConversation = isNomiConversation ? undefined : conversation;
+  const acpConversation = isOpenHubConversation ? undefined : conversation;
   const { info: presetAssistantInfo, isLoading: isLoadingPreset } = usePresetAssistantInfo(acpConversation);
   const acpAssistantId = acpConversation ? (resolveAssistantConfigId(acpConversation) ?? undefined) : undefined;
 
@@ -356,7 +356,7 @@ const ChatConversation: React.FC<{
   const assistantDisplayName = presetAssistantInfo?.name || conversationAgentName;
 
   const conversationNode = useMemo(() => {
-    if (!conversation || isNomiConversation) return null;
+    if (!conversation || isOpenHubConversation) return null;
     switch (conversation.type) {
       case 'acp':
         {
@@ -385,7 +385,7 @@ const ChatConversation: React.FC<{
         // removed. The message history is still served by the shared messages
         // table, so AcpChat renders it fine. The composer is left enabled —
         // any send attempt will get a BadRequest from the factory branch in
-        // nomifun-common/src/enums.rs → factory.rs, surfacing a clear error
+        // openhub-common/src/enums.rs → factory.rs, surfacing a clear error
         // to the user.
         return (
           <AcpChat
@@ -454,7 +454,7 @@ const ChatConversation: React.FC<{
       default:
         return null;
     }
-  }, [conversation, isNomiConversation, assistantDisplayName, hideSendBox]);
+  }, [conversation, isOpenHubConversation, assistantDisplayName, hideSendBox]);
 
   const sliderTitle = useMemo(() => {
     return (
@@ -464,13 +464,13 @@ const ChatConversation: React.FC<{
     );
   }, [t]);
 
-  if (conversation && conversation.type === 'nomi') {
+  if (conversation && conversation.type === 'openhub') {
     // 桌面伙伴的专属会话（单会话契约）走受限面板：保留锁定模型/隐藏高级控制/强制 yolo/
     // 固定工作区（详见 CompanionChatPanel → CompanionConversation），而非全功能编排面板。
     if (conversation.extra?.companionSession) {
       return <CompanionChatPanel key={conversation.id} conversation={conversation} />;
     }
-    return <NomiConversationPanel key={conversation.id} conversation={conversation} sliderTitle={sliderTitle} />;
+    return <OpenHubConversationPanel key={conversation.id} conversation={conversation} sliderTitle={sliderTitle} />;
   }
 
   // 如果有预设助手信息，使用预设助手的 logo 和名称；加载中时不进入 fallback；否则使用 backend 的 logo
@@ -485,7 +485,7 @@ const ChatConversation: React.FC<{
           backend:
             conversation?.type === 'acp'
               ? conversation?.extra?.backend
-              : // `nomi` conversations are handled by the early return above and can
+              : // `openhub` conversations are handled by the early return above and can
                 // never reach this branch, so the chain starts at `codex`.
                 conversation?.type === 'codex'
                 ? 'codex'

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,12 +9,12 @@
 
 declare global {
   interface Window {
-    __NomiSafeResizeObserver__?: boolean;
-    __NomiResizeObserverPatched__?: boolean;
+    __OpenHubSafeResizeObserver__?: boolean;
+    __OpenHubResizeObserverPatched__?: boolean;
   }
 
   interface Console {
-    __NomiResizeObserverPatched__?: boolean;
+    __OpenHubResizeObserverPatched__?: boolean;
   }
 }
 
@@ -96,7 +96,7 @@ const patchGlobalErrorListeners = () => {
 const patchResizeObserver = () => {
   // Wrap ResizeObserver callbacks in requestAnimationFrame to break the feedback loop that
   // browsers treat as "ResizeObserver loop" (在下一帧执行回调，可彻底规避 ResizeObserver loop limit 警告).
-  if (!window.__NomiSafeResizeObserver__ && typeof ResizeObserver !== 'undefined') {
+  if (!window.__OpenHubSafeResizeObserver__ && typeof ResizeObserver !== 'undefined') {
     const NativeResizeObserver = window.ResizeObserver;
     class SafeResizeObserver extends NativeResizeObserver {
       constructor(callback: ResizeObserverCallback) {
@@ -117,14 +117,14 @@ const patchResizeObserver = () => {
       }
     }
     window.ResizeObserver = SafeResizeObserver as typeof ResizeObserver;
-    window.__NomiSafeResizeObserver__ = true;
+    window.__OpenHubSafeResizeObserver__ = true;
   }
 };
 
 const patchGlobalErrorFilters = () => {
   // Global error/rejection filter: quietly drop known RO-loop messages but keep other errors
   // (全局过滤 ResizeObserver 循环提示，只忽略白名单消息，其余错误依然向外抛出).
-  if (!window.__NomiResizeObserverPatched__) {
+  if (!window.__OpenHubResizeObserverPatched__) {
     const errorHandler = (event: ErrorEvent) => {
       if (shouldSilence(extractMessage(event.error) ?? event.message)) {
         event.preventDefault();
@@ -139,13 +139,13 @@ const patchGlobalErrorFilters = () => {
     };
     window.addEventListener('error', errorHandler, true);
     window.addEventListener('unhandledrejection', rejectionHandler, true);
-    window.__NomiResizeObserverPatched__ = true;
+    window.__OpenHubResizeObserverPatched__ = true;
   }
 };
 
 const patchConsole = () => {
   // Console patch mirrors the listener filters so devtools logs stay clean（控制台同样做拦截，防止被重复警告淹没）.
-  if (typeof console !== 'undefined' && !console.__NomiResizeObserverPatched__) {
+  if (typeof console !== 'undefined' && !console.__OpenHubResizeObserverPatched__) {
     const rawError = console.error.bind(console);
     console.error = (...args: unknown[]) => {
       if (args.some((arg) => shouldSilence(extractMessage(arg)))) {
@@ -153,7 +153,7 @@ const patchConsole = () => {
       }
       rawError(...args);
     };
-    console.__NomiResizeObserverPatched__ = true;
+    console.__OpenHubResizeObserverPatched__ = true;
   }
 };
 

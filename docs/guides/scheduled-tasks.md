@@ -1,6 +1,6 @@
 # Scheduled Tasks (Cron)
 
-A scheduled task in NomiFun is a recurring (or one-shot) job that fires at a
+A scheduled task in OpenHub is a recurring (or one-shot) job that fires at a
 time you choose and drives an AI agent to do something. You can configure it
 from the Scheduled Tasks page, run it on demand, attach a personalised
 **skill** so the agent always behaves the right way for that job, and you
@@ -15,7 +15,7 @@ skill.
 
 ## What a job does
 
-`nomifun-cron` is a backend scheduler + executor:
+`openhub-cron` is a backend scheduler + executor:
 
 - The **scheduler** computes the next fire time for each enabled job using
   a 5-field (Unix) or 6-field (seconds-prefixed) cron expression — both are
@@ -80,7 +80,7 @@ Pick the agent that runs each fire. Three flavours show up in the picker:
 - **CLI agents** — `claude` / `codex` / `gemini` (whatever the backend
   detected on `PATH`). The job records the backend label and uses ACP
   end-to-end.
-- **Nomi (built-in)** — uses Nomi's own engine with your selected
+- **OpenHub (built-in)** — uses OpenHub's own engine with your selected
   provider/model.
 - **Preset assistants** — pre-configured agent personalities; the job
   records the assistant id.
@@ -134,12 +134,12 @@ fans out one thread per fire.
 ## Keep-Awake
 
 Cron jobs only fire while the host process is running. The list page has a
-**Keep system awake while NomiFun is running** toggle that asks the OS to
+**Keep system awake while OpenHub is running** toggle that asks the OS to
 inhibit sleep (Windows: `SetThreadExecutionState`, macOS: `caffeinate`,
 Linux: `systemd-inhibit` where available) so jobs you set up on a laptop
 do not silently miss their fires the moment the lid closes.
 
-If a fire is missed because the system slept anyway (or NomiFun was not
+If a fire is missed because the system slept anyway (or OpenHub was not
 running), the missed-trigger handler at next boot/wake will record a
 `missed` run and post a system message into the affected conversation,
 then re-arm the timer for the next normal fire.
@@ -147,7 +147,7 @@ then re-arm the timer for the next normal fire.
 ## Skills attached to a job
 
 A **skill** is a `SKILL.md` file the agent reads when it joins a session
-— same mechanism the rest of Nomi uses, but with a per-job scope. You can
+— same mechanism the rest of OpenHub uses, but with a per-job scope. You can
 write/edit the skill on the detail page; behind the scenes the file is
 written to the data directory under `cron/skills/cron-<job_id>/SKILL.md`,
 and the executor injects it into the agent's session each fire.
@@ -172,7 +172,7 @@ can review and save it as the job's skill in one click.
 
 ## Managing tasks from chat — the built-in `cron` skill
 
-NomiFun ships a built-in auto-inject skill named `cron` that any agent can
+OpenHub ships a built-in auto-inject skill named `cron` that any agent can
 load when you ask it to "set up a reminder", "schedule X every Monday",
 etc. The conversation middleware then watches the agent's reply for the
 following directive blocks and runs them through the cron service:

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -83,13 +83,13 @@ const UpdateModal = React.lazy(() => import('@/renderer/components/settings/Upda
 // resizable by dragging its right edge (clamped to [RAIL_MIN, RAIL_MAX]) and the
 // chosen width persists per device. Dragging narrower than RAIL_COLLAPSE_THRESHOLD
 // snaps the rail collapsed (collapse is also toggled from the titlebar).
-const DEFAULT_SIDER_WIDTH = 184;
-const RAIL_MIN_WIDTH = 160;
-const RAIL_MAX_WIDTH = 300;
+const DEFAULT_SIDER_WIDTH = 260;
+const RAIL_MIN_WIDTH = 200;
+const RAIL_MAX_WIDTH = 360;
 const DESKTOP_COLLAPSED_WIDTH = 0;
 const RAIL_COLLAPSE_THRESHOLD = 140;
 const SIDER_DRAG_HYSTERESIS = 6;
-const RAIL_WIDTH_STORAGE_KEY = 'nomifun:rail-width';
+const RAIL_WIDTH_STORAGE_KEY = 'openhub:rail-width';
 const MOBILE_SIDER_WIDTH_RATIO = 0.67;
 const MOBILE_SIDER_MIN_WIDTH = 260;
 const MOBILE_SIDER_MAX_WIDTH = 420;
@@ -385,7 +385,7 @@ const Layout: React.FC<{
       void navigate('/settings/about');
       // Trigger update modal after a short delay to ensure page is loaded
       setTimeout(() => {
-        window.dispatchEvent(new CustomEvent('nomifun-open-update-modal', { detail: { source: 'tray' } }));
+        window.dispatchEvent(new CustomEvent('openhub-open-update-modal', { detail: { source: 'tray' } }));
       }, 100);
     };
 
@@ -417,7 +417,7 @@ const Layout: React.FC<{
       try {
         const res = await ipcBridge.autoUpdate.check.invoke({ includePrerelease });
         if (!cancelled && res?.success && res.data?.updateInfo) {
-          window.dispatchEvent(new CustomEvent('nomifun-open-update-modal', { detail: { source: 'startup' } }));
+          window.dispatchEvent(new CustomEvent('openhub-open-update-modal', { detail: { source: 'startup' } }));
         }
       } catch {
         /* offline / endpoint unreachable — silent; the About page button still works */
@@ -607,7 +607,7 @@ const Layout: React.FC<{
                     <path key='logo-bowl' d='M14 49 H66 Q61.5 70 40 70 Q18.5 70 14 49 Z' fill='url(#sidebar-logo-bowl)'></path>
                   </svg>
                 </div>
-                <div className='text-16px text-t-primary collapsed-hidden font-semibold'>NomiFun</div>
+                <div className='text-16px text-t-primary collapsed-hidden font-semibold'>OpenHub</div>
                 {isMobile && !collapsed && (
                   <button
                     type='button'

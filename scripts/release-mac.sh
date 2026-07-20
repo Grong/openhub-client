@@ -20,14 +20,14 @@
 #   CREATE：只本地 bump/构建/合并 latest.json，不 commit/tag/push、不建 Release（供离线预演）。
 #
 # 前提（一次性配好即可反复用）：
-#   1) apps/desktop/signing/nomifun-updater.key —— updater 私钥（keyID F3AA272E60AA7952），
+#   1) apps/desktop/signing/openhub-updater.key —— updater 私钥（keyID F3AA272E60AA7952），
 #      gitignored；必须与 tauri.conf.json 内嵌 pubkey 匹配。
 #   2) apps/desktop/signing/.env.signing —— Apple Developer ID / notarization 配置。
 #   3) apps/desktop/signing/.env.release —— 可选，内含 GH_TOKEN=...；也可使用 gh auth login。
 # ============================================================================
 set -euo pipefail
 
-if [[ "${NOMIFUN_RELEASE_TEST_UNAME:-$(uname -s)}" != "Darwin" ]]; then
+if [[ "${OPENHUB_RELEASE_TEST_UNAME:-$(uname -s)}" != "Darwin" ]]; then
   echo "release:mac 只能在 macOS 上运行。Windows 包用 release:win，Linux 包用 build:linux。" >&2
   exit 1
 fi
@@ -36,11 +36,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$ROOT"
 
-Repo="nomifun/nomifun-tauri"
+Repo="openhub/openhub-client"
 Triple="universal-apple-darwin"
-KeyFile="${NOMIFUN_RELEASE_KEY_FILE:-apps/desktop/signing/nomifun-updater.key}"
-EnvRelease="${NOMIFUN_RELEASE_ENV_FILE:-apps/desktop/signing/.env.release}"
-SigningEnv="${NOMIFUN_RELEASE_SIGNING_ENV:-apps/desktop/signing/.env.signing}"
+KeyFile="${OPENHUB_RELEASE_KEY_FILE:-apps/desktop/signing/openhub-updater.key}"
+EnvRelease="${OPENHUB_RELEASE_ENV_FILE:-apps/desktop/signing/.env.release}"
+SigningEnv="${OPENHUB_RELEASE_SIGNING_ENV:-apps/desktop/signing/.env.signing}"
 UpdaterConf="apps/desktop/tauri.updater.conf.json"
 LatestJson="apps/desktop/updater/latest.json"
 
@@ -151,7 +151,7 @@ commit_paths() {
     echo "  无待提交改动，跳过 commit。"
     return 0
   fi
-  git -c user.name=nomifun -c user.email=nomifun@users.noreply.github.com commit -m "$message"
+  git -c user.name=openhub -c user.email=openhub@users.noreply.github.com commit -m "$message"
 }
 
 validate_manifest() {
@@ -229,10 +229,10 @@ if [[ "$Mode" == "CREATE" && -z "${NotesContent//[[:space:]]/}" ]]; then
   fail "首发(CREATE)需要 release note。请用 -NotesFile <md>（推荐，多行）或 -Notes \"...\" 提供；GitHub Release 正文与 latest.json notes 共用这一份。"
 fi
 
-Tar="target/$Triple/release/bundle/macos/NomiFun.app.tar.gz"
+Tar="target/$Triple/release/bundle/macos/OpenHub.app.tar.gz"
 Sig="$Tar.sig"
-Dmg="dist/desktop/NomiFun_${TargetVersion}_universal.dmg"
-App="target/$Triple/release/bundle/macos/NomiFun.app"
+Dmg="dist/desktop/OpenHub_${TargetVersion}_universal.dmg"
+App="target/$Triple/release/bundle/macos/OpenHub.app"
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "一键 macOS 发版计划"
@@ -260,7 +260,7 @@ fi
 if [[ "$NoPush" -eq 1 ]]; then
   echo "  推送      : -NoPush（见脚本头部语义说明）"
 else
-  echo "  推送      : 开启 (author=nomifun -> origin main)"
+  echo "  推送      : 开启 (author=openhub -> origin main)"
 fi
 echo "  签名      : Developer ID 签名 + Apple notarization（build:mac --signed）"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -281,7 +281,7 @@ if [[ "$NeedBump" -eq 1 ]]; then
 fi
 
 if [[ -n "${NotesContent//[[:space:]]/}" ]]; then
-  NotesTmp="$(mktemp "${TMPDIR:-/tmp}/nomifun-relnotes-${TargetVersion}.XXXXXX.md")"
+  NotesTmp="$(mktemp "${TMPDIR:-/tmp}/openhub-relnotes-${TargetVersion}.XXXXXX.md")"
   printf "%s\n" "$NotesContent" > "$NotesTmp"
 fi
 
@@ -309,7 +309,7 @@ if [[ "$Mode" == "CREATE" ]]; then
     echo "  -NoPush（CREATE）：已本地 bump/构建/合并 latest.json，但不提交/建 Release。"
     echo "  待办：git 提交 bump+latest.json、打 tag ${Tag}、push、gh release create。"
   else
-    echo "▶ 提交并打 tag ${Tag}（author=nomifun）..."
+    echo "▶ 提交并打 tag ${Tag}（author=openhub）..."
     commit_paths "chore(release): $Tag" \
       Cargo.toml Cargo.lock package.json ui/package.json apps/desktop/tauri.conf.json "$LatestJson"
     if git rev-parse -q --verify "refs/tags/$Tag" >/dev/null 2>&1; then
@@ -333,7 +333,7 @@ else
   if [[ "$NoPush" -eq 1 ]]; then
     echo "  -NoPush（APPEND）：跳过提交/推送，latest.json 改动留在本地。"
   else
-    echo "▶ 提交 latest.json 回 main（author=nomifun）..."
+    echo "▶ 提交 latest.json 回 main（author=openhub）..."
     commit_paths "chore(release): add macOS updater entry to ${Tag} latest.json" "$LatestJson"
     git push origin main || fail "push 失败。"
   fi

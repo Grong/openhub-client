@@ -1,6 +1,6 @@
 # Companions
 
-Nomi's virtual companion has grown from "a single nomi" into a **multi-companion
+OpenHub's virtual companion has grown from "a single openhub" into a **multi-companion
 family**: you can create several companions, use them side by side, raise
 them separately, and give each its own name, character, persona, and
 chat model. Each companion can also be bound to its own **dedicated knowledge
@@ -11,7 +11,7 @@ family remembers. Memories, companions, and knowledge bases can each be
 packed into a `.zip` bundle for export/import, making machine-to-machine
 migration painless.
 
-> The entry point is the **Desktop Companion** page in the sidebar (the `/nomi`
+> The entry point is the **Desktop Companion** page in the sidebar (the `/openhub`
 > route); the right-click menu of any desktop companion window ("Open chat")
 > deep-links there too.
 
@@ -105,7 +105,7 @@ is `('companion', companionId)`). Scope of effect:
   conversations without a companionId keep their conversation-level bindings;
   the two are **not merged**.
 - **What the agent sees**: bases are mounted at
-  `{workspace}/.nomi/knowledge/`, and the injected context carries, per
+  `{workspace}/.openhub/knowledge/`, and the injected context carries, per
   base, the description + an AI digest + "when to consult" hints + a
   budgeted table of contents (20 entries per base / 60 global,
   directories aggregated beyond that), plus an explicit retrieval
@@ -127,14 +127,14 @@ is `('companion', companionId)`). Scope of effect:
   AI-compressed) and auto-generates the digest — refreshable from the
   detail page; *live* mode lets the agent fetch at runtime (engines
   without a web tool can call the gateway tool
-  `nomi_knowledge_fetch_url`). Only public `http/https` URLs are
+  `openhub_knowledge_fetch_url`). Only public `http/https` URLs are
   accepted (SSRF guard).
 - The companion can also **grow its own libraries**: the Desktop Gateway
   ships seven knowledge tools (list / bindings / create / write /
   autogen / fetch-url), and knowledge-deposit tips are built into the
   companion's system prompt — a companion or channel chat can create a base
   and distill notes into it unprompted. When
-  `nomi_knowledge_create_base` is called with `urls`, the fetching runs
+  `openhub_knowledge_create_base` is called with `urls`, the fetching runs
   as a background job — the tool returns immediately, so the agent must
   not create the base again just because the snapshots haven't appeared
   yet; once the base's description shows up, the fetch + digest
@@ -148,7 +148,7 @@ all per-companion, while memory stays shared.
 
 Each IM platform (Telegram / Lark / DingTalk / WeChat) can bind its own
 greeter companion for remote messages: open the companion's **Remote**
-tab (`/nomi?companion=<id>&tab=remote`) and connect or rebind the bot
+tab (`/openhub?companion=<id>&tab=remote`) and connect or rebind the bot
 there. The binding is still persisted as `assistant.{platform}.companionId`
 for legacy platform-level preferences when a channel row has no direct
 companion binding. With no binding the **default companion** takes over;
@@ -199,9 +199,9 @@ Migration steps:
 ## Automatic migration of legacy data
 
 After upgrading from the single-companion version, the first boot detects the
-legacy layout `{data_dir}/companion/nomi/`: if it exists and `companion/shared/`
+legacy layout `{data_dir}/companion/openhub/`: if it exists and `companion/shared/`
 does not, it is automatically migrated into the shared memory hub plus
-a first companion (default name **"Nomi"**, inheriting the existing XP /
+a first companion (default name **"OpenHub"**, inheriting the existing XP /
 persona / character / model / desktop-companion position / companion
 threads). The migration is idempotent and re-entrant; on completion a
 `.migrated` marker is written into the legacy directory, which is kept

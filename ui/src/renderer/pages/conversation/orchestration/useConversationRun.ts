@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025-2026 NomiFun (nomifun.com)
+ * Copyright 2025-2026 OpenHub (openhub.dev)
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -35,15 +35,15 @@ export interface ConversationRunState {
  * threads it into {@link useRunLive} (run detail + run-engine WS refetch) and
  * {@link useLeadThinking} (lead-agent planning stream).
  *
- * The field only exists on the `nomi` variant of the discriminated union, so we
- * narrow on `conversation.type === 'nomi'` before reading it (no `as any`). When
+ * The field only exists on the `openhub` variant of the discriminated union, so we
+ * narrow on `conversation.type === 'openhub'` before reading it (no `as any`). When
  * there is no run, `runId` is `null` and both hooks are called with their silent
  * sentinels (`useRunLive(undefined)` / `useLeadThinking(null)`) so they hold no
  * subscriptions. Both hooks are always called (Rules of Hooks); only their
  * argument changes.
  */
 export function useConversationRun(conversation: TChatConversation | null | undefined): ConversationRunState {
-  const runId = conversation?.type === 'nomi' ? conversation.extra.orchestrator_run_id ?? null : null;
+  const runId = conversation?.type === 'openhub' ? conversation.extra.orchestrator_run_id ?? null : null;
 
   const { detail, loading, refetch } = useRunLive(runId ?? undefined);
   const leadThinking = useLeadThinking(runId);

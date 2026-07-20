@@ -35,7 +35,7 @@ linker = "rust-lld.exe"
 build-dir = "{workspace-root}/build.noindex"
 
 # Enlarge rustc's compilation-thread stack. The release `tauri build` embeds the
-# entire frontend `ui/dist` (~34 MB, hundreds of files) into the `nomifun-desktop`
+# entire frontend `ui/dist` (~34 MB, hundreds of files) into the `openhub-desktop`
 # binary via `tauri::generate_context!`, then optimizes it at opt-level=3. That
 # codegen overflows rustc's default 8 MB thread stack and the compiler dies on its
 # guard page WITHOUT a diagnostic — surfacing as a non-deterministic native crash

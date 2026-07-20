@@ -1,5 +1,5 @@
 {
-  "name": "@nomifun-tauri/ui",
+  "name": "@openhub-client/ui",
   "private": true,
   "version": "0.2.13",
   "type": "module",

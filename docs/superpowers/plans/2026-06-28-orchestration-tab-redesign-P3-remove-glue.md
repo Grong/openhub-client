@@ -16,8 +16,8 @@
 ## File Structure（移除/回退清单，spec §6）
 - **删文件**：`ui/src/renderer/pages/orchestrator/RunDetail/OrchestrationStatusStrip.tsx`、`RunDetail/DagRailTab.tsx`、`RunDetail/useOrchestrationStatus.ts`、`pages/guid/components/GuidOrchestrationMode.tsx`。
 - **改 `pages/conversation/components/ChatSlider.tsx`**：去掉 orchestration-dag extraTab(+ DagRailTab/leadRunId 引用)。
-- **改 `pages/conversation/components/ChatConversation.tsx`**：去掉 OrchestrationStatusStrip 挂载(NomiConversationPanel)。
-- **改 `pages/guid/hooks/useGuidSend.ts`**：去 lead 标记(orchestrator_role)+model_range 注入;nomi 会话创建回普通(session_mode 用 selectedMode,不强制 yolo)。
+- **改 `pages/conversation/components/ChatConversation.tsx`**：去掉 OrchestrationStatusStrip 挂载(OpenHubConversationPanel)。
+- **改 `pages/guid/hooks/useGuidSend.ts`**：去 lead 标记(orchestrator_role)+model_range 注入;openhub 会话创建回普通(session_mode 用 selectedMode,不强制 yolo)。
 - **改 `pages/guid/components/GuidModelSelector.tsx`** + `hooks/useGuidModelSelection.ts`：回退单选——去 selectionMode/selectedRange/toggleRangeModel/三态 droplist/主管模型(leadLabel/leadHint)/auto/range body,只留单选 Menu。
 - **改 `pages/guid/GuidPage.tsx`**：去 orchestrationModeNode + hideModelSelector/主管模型逻辑;modelSelectorNode 恒渲染单选。
 - **改 `utils/workspace/workspaceEvents.ts`** + `pages/conversation/Workspace/WorkspaceRailBody.tsx`：去 WORKSPACE_SELECT_TAB_EVENT + 其监听(仅右栏 DAG 用过;grep 确认)。
@@ -34,8 +34,8 @@
 1. 先删 4 个胶水文件。
 2. grep 全 ui/src 每个被删符号(`OrchestrationStatusStrip|DagRailTab|useOrchestrationStatus|GuidOrchestrationMode|WORKSPACE_SELECT_TAB`)+ 三态符号(`selectionMode|selectedRange|toggleRangeModel|orchestration-dag|orchestrator_role|model_range`(在 guid/会话侧))→ 逐个清除引用。
 3. GuidModelSelector/useGuidModelSelection 回退单选:对照 git 历史(三态是后加的)——去掉 selectionMode 三态分支,droplist 只留单选 Menu(provider 分组),触发钮显模型名(去主管模型 label)。useGuidModelSelection 去 selectionMode/selectedRange state + 返回。GuidPage 去 orchestrationModeNode/hideModelSelector,modelSelectorNode 恒渲染。
-4. useGuidSend nomi 分支:extra 去 orchestrator_role/model_range;session_mode 回 selectedMode。
-5. ChatSlider 去 orchestration-dag extraTab(只留 nomi-session-metrics 等原有)。ChatConversation 去状态条。
+4. useGuidSend openhub 分支:extra 去 orchestrator_role/model_range;session_mode 回 selectedMode。
+5. ChatSlider 去 orchestration-dag extraTab(只留 openhub-session-metrics 等原有)。ChatConversation 去状态条。
 6. workspaceEvents/WorkspaceRailBody 去 SELECT_TAB(grep 确认仅 DagRailTab/OrchestrationStatusStrip 用过)。
 7. 清死 i18n + gen:i18n + check:i18n。
 8. `cd ui && npm run typecheck` 反复直到 0(清每个悬挂);`bun run build` 绿。

@@ -1,6 +1,6 @@
 {
   "welcome": {
-    "title": "Welcome to NomiFun",
+    "title": "Welcome to OpenHub",
     "subtitle": "Your AI workstation. All data stays on your computer.",
     "start": "Start Setup",
     "skip": "Skip, start using"
@@ -14,7 +14,7 @@
     "timeout": "Verification timed out. You can configure this later in Settings."
   },
   "companion": {
-    "title": "Hi, I'm Nomi",
+    "title": "Hi, I'm OpenHub",
     "desc": "I'm your AI companion. I'll chat with you, help you work, and learn to know you better over time.",
     "start": "Start Chatting"
   }
