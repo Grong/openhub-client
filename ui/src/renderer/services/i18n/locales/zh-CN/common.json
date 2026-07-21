@@ -9,6 +9,16 @@
     "plugins": "插件",
     "project": "项目"
   },
+  "iaNav": {
+    "assign": "派活",
+    "review": "待验收",
+    "scheduled": "定时任务",
+    "roster": "员工名册",
+    "unassigned": "未分配任务",
+    "pinned": "置顶",
+    "projects": "项目",
+    "company": "公司"
+  },
   "send": "发送",
   "cancel": "取消",
   "save": "保存",

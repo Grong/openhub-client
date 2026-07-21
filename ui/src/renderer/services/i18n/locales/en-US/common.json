@@ -9,6 +9,16 @@
     "plugins": "Plugins",
     "project": "Project"
   },
+  "iaNav": {
+    "assign": "Assign work",
+    "review": "Review",
+    "scheduled": "Scheduled",
+    "roster": "Roster",
+    "unassigned": "Unassigned",
+    "pinned": "Pinned",
+    "projects": "Projects",
+    "company": "Company"
+  },
   "send": "Send",
   "cancel": "Cancel",
   "save": "Save",
