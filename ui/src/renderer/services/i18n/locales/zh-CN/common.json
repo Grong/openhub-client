@@ -19,6 +19,14 @@
     "projects": "项目",
     "company": "公司"
   },
+  "roster": {
+    "title": "员工名册",
+    "empty": "还没有员工",
+    "emptyAction": "去添加",
+    "typeAgent": "Agent 后端",
+    "typeAssistant": "助手",
+    "loadError": "加载失败"
+  },
   "send": "发送",
   "cancel": "取消",
   "save": "保存",

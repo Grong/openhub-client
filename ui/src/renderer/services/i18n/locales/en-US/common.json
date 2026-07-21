@@ -19,6 +19,14 @@
     "projects": "Projects",
     "company": "Company"
   },
+  "roster": {
+    "title": "Roster",
+    "empty": "No employees yet",
+    "emptyAction": "Add one",
+    "typeAgent": "Agent backend",
+    "typeAssistant": "Assistant",
+    "loadError": "Load failed"
+  },
   "send": "Send",
   "cancel": "Cancel",
   "save": "Save",
