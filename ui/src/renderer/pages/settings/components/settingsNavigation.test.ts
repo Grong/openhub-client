@@ -10,20 +10,24 @@ import { describe, expect, test } from 'bun:test';
 const readSource = (url: URL) => readFileSync(url, 'utf8');
 
 describe('settings navigation', () => {
-  test('exposes reorganized settings tabs with model, companion, requirements, public-service, workshop, and system', () => {
+  test('exposes reorganized settings tabs with model, companion, requirements, and system', () => {
     const siderSource = readSource(new URL('./SettingsSider.tsx', import.meta.url));
     const pageWrapperSource = readSource(new URL('./SettingsPageWrapper.tsx', import.meta.url));
 
-    for (const id of ['model', 'companion', 'requirements', 'public-service', 'workshop', 'system']) {
+    for (const id of ['model', 'companion', 'requirements', 'system']) {
       expect(siderSource.includes(`'${id}'`)).toBe(true);
       expect(pageWrapperSource.includes(`id: '${id}'`)).toBe(true);
     }
 
+    // Domains cut from the product must not remain as dead settings tabs.
+    for (const removed of ['public-service', 'workshop']) {
+      expect(siderSource.includes(`'${removed}'`)).toBe(false);
+      expect(pageWrapperSource.includes(`id: '${removed}'`)).toBe(false);
+    }
+
     expect(siderSource.indexOf("'model'")).toBeLessThan(siderSource.indexOf("'companion'"));
     expect(siderSource.indexOf("'companion'")).toBeLessThan(siderSource.indexOf("'requirements'"));
-    expect(siderSource.indexOf("'requirements'")).toBeLessThan(siderSource.indexOf("'public-service'"));
-    expect(siderSource.indexOf("'public-service'")).toBeLessThan(siderSource.indexOf("'workshop'"));
-    expect(siderSource.indexOf("'workshop'")).toBeLessThan(siderSource.indexOf("'system'"));
+    expect(siderSource.indexOf("'requirements'")).toBeLessThan(siderSource.indexOf("'system'"));
   });
 
   test('preserves legacy settings routes for direct access', () => {

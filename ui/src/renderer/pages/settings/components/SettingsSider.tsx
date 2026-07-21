@@ -7,7 +7,6 @@ import {
   AlarmClock,
   Computer,
   Earth,
-  FormatBrush,
   Info,
   Lightning,
   LinkCloud,
@@ -25,7 +24,7 @@ import { Tooltip } from '@arco-design/web-react';
 import { getSiderTooltipProps } from '@/renderer/utils/ui/siderTooltip';
 
 /** Builtin settings tab IDs in display order (must match router paths). */
-export const BUILTIN_TAB_IDS = ['model', 'companion', 'requirements', 'public-service', 'workshop', 'system'] as const;
+export const BUILTIN_TAB_IDS = ['model', 'companion', 'requirements', 'system'] as const;
 
 /**
  * Legacy anchor IDs that have been merged into other tabs.
@@ -73,8 +72,6 @@ const SettingsSider: React.FC<{ collapsed?: boolean; tooltipEnabled?: boolean }>
       model: { id: 'model', label: t('settings.model'), icon: <LinkCloud />, path: 'model' },
       companion: { id: 'companion', label: t('settings.companion', { defaultValue: '桌面伙伴' }), icon: <SmilingFace />, path: 'companion' },
       requirements: { id: 'requirements', label: t('settings.requirements', { defaultValue: '需求 & 自动化' }), icon: <AlarmClock />, path: 'requirements' },
-      'public-service': { id: 'public-service', label: t('settings.publicService', { defaultValue: '对外伙伴' }), icon: <Earth />, path: 'public-service' },
-      workshop: { id: 'workshop', label: t('settings.workshop', { defaultValue: '创意工坊 & 资产库' }), icon: <FormatBrush />, path: 'workshop' },
       assistants: {
         id: 'assistants',
         label: t('settings.assistants', { defaultValue: 'Assistants' }),
