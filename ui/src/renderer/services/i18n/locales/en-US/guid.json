@@ -87,5 +87,14 @@
     "assistantCount": "assistant(s)",
     "skillCount": "skill(s)",
     "assistantHint": "Click a card to summon — this session will use that assistant (single-select)"
+  },
+  "onboardingProject": {
+    "title": "Start with your first project",
+    "subtitle": "A project is the basic unit of work: tasks, members (AI + humans), resources, and rules live inside it.",
+    "create": "New project",
+    "open": "Open existing project",
+    "openHint": "\"Open\" mounts an existing directory as a project",
+    "createSuccess": "Project created",
+    "createFailed": "Failed to create project"
   }
 }

@@ -87,5 +87,14 @@
     "assistantCount": "位助手",
     "skillCount": "个 Skill",
     "assistantHint": "点卡片「召唤」即让本次会话使用该助手（单选）"
+  },
+  "onboardingProject": {
+    "title": "从第一个项目开始",
+    "subtitle": "项目是工作的基本单元：里面装着任务、成员（AI + 人）、资源和规则。",
+    "create": "新建项目",
+    "open": "打开已有项目",
+    "openHint": "「打开」= 把已有的目录/资料挂载为一个项目",
+    "createSuccess": "项目已创建",
+    "createFailed": "项目创建失败"
   }
 }
