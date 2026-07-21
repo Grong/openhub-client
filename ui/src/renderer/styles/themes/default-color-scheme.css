@@ -72,6 +72,12 @@
   --fill-white-to-black: #ffffff; /* 白到黑填充色 */
   --border-special: var(--bg-3); /* 特殊边框色 */
   --color-guid-agent-bar: #eaecf7; /* 首页 Agent 选择条背景 - 亮色 */
+
+  /* Elevation ramp — 明度分层（spec 11.1）。层级只用明度差表达，禁止 1px 边框。 */
+  --el-canvas: #ffffff;
+  --el-surface: #f5f5f6;
+  --el-elevated: #ececee;
+  --el-popover: rgba(255, 255, 255, 0.85);
 }
 
 /* Dark Mode */
@@ -145,6 +151,12 @@
   --fill-0: rgba(255, 255, 255, 0.08); /* 填充色 0 - 暗色模式下为半透明白色 */
   --fill-white-to-black: #000000; /* 白到黑填充色（暗色模式下为黑色） */
   --border-special: #60677e; /* 特殊边框色 */
+
+  /* Elevation ramp - Dark Mode */
+  --el-canvas: #141414;
+  --el-surface: #1c1c1e;
+  --el-elevated: #262628;
+  --el-popover: rgba(46, 46, 48, 0.85);
 }
 
 /* Primary ramp override — 品牌紫（登录页 #667eea 家族），替换 Arco 默认蓝。

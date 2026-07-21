@@ -135,3 +135,9 @@ body,
 [data-theme='dark'] *:hover::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.1);
 }
+
+/* 键盘焦点环（spec 11.2）：无边框风格下唯一的键盘导航信号，不可省略。 */
+:focus-visible {
+  outline: 2px solid rgb(var(--primary-6));
+  outline-offset: 2px;
+}
