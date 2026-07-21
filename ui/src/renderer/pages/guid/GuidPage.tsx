@@ -27,6 +27,7 @@ import type { GuidClusterApprovalMode } from './components/GuidClusterApprovalSe
 import GuidCollaboratorSelector from './components/GuidCollaboratorSelector';
 import GuidModelSelector from './components/GuidModelSelector';
 import GuidResourceCards from './components/GuidResourceCards';
+import ProjectContextStrip from './components/ProjectContextStrip';
 import MentionDropdown, { MentionSelectorBadge } from './components/MentionDropdown';
 import SummonDrawer from './components/SummonDrawer';
 import AutoWorkControl from '@/renderer/pages/conversation/components/AutoWorkControl';
@@ -45,6 +46,8 @@ import { useGuidModelSelection } from './hooks/useGuidModelSelection';
 import { useGuidSend } from './hooks/useGuidSend';
 import { usePendingConversation } from '@/renderer/pages/conversation/components/ConversationShell/PendingConversationContext';
 import { useTypewriterPlaceholder } from './hooks/useTypewriterPlaceholder';
+import { writeLastProjectId } from './utils/landingTarget';
+import { detectGitRepo, getSuggestionCards } from './utils/suggestionCards';
 import { ensureBackendMcpCatalog } from '@/renderer/hooks/mcp/catalog';
 import { resolveAgentLogo } from '@/renderer/utils/model/agentLogo';
 import { Collapse, ConfigProvider, Message } from '@arco-design/web-react';
@@ -257,6 +260,40 @@ const GuidPage: React.FC = () => {
     beginPending: pendingConversation.begin,
     endPending: pendingConversation.end,
   });
+
+  // --- Project home (spec §3)：项目名 / git 检测 / 建议卡 / 最近项目记录 ---
+  // 当前项目 = composer 的工作目录（guidInput.dir，来源 location.state.workspace
+  // 或工作路径选择器）。项目名为目录最后一段；无 workspace 时回落到通用首页。
+  const workpath = guidInput.dir;
+  const projectName = useMemo(() => {
+    const trimmed = workpath.replace(/[\\/]+$/, '');
+    if (!trimmed) return '';
+    const segments = trimmed.split(/[\\/]/);
+    return segments[segments.length - 1] || '';
+  }, [workpath]);
+  const [isGitRepo, setIsGitRepo] = useState(false);
+
+  useEffect(() => {
+    if (!workpath) {
+      setIsGitRepo(false);
+      return undefined;
+    }
+    let cancelled = false;
+    void detectGitRepo(workpath, (args) => ipcBridge.fs.getFileMetadata.invoke(args)).then((result) => {
+      if (!cancelled) setIsGitRepo(result);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [workpath]);
+
+  const suggestionCards = useMemo(() => getSuggestionCards(isGitRepo), [isGitRepo]);
+
+  // 进入 /guid 携带 workspace 时记录最近项目（spec 默认落点规则）。
+  useEffect(() => {
+    const workspace = (location.state as { workspace?: string } | null)?.workspace;
+    if (workspace) writeLastProjectId(workspace);
+  }, [location.state]);
 
   // --- Coordinated handlers (depend on multiple hooks) ---
   const handleInputChange = useCallback(
@@ -723,7 +760,7 @@ const GuidPage: React.FC = () => {
           <div className={styles.guidLayout}>
             <div className={styles.heroHeader}>
               <p className='text-2xl font-semibold mb-0 text-0 text-center'>
-                {t('conversation.welcome.title')}
+                {projectName ? t('guid.projectHome.hero', { project: projectName }) : t('conversation.welcome.title')}
               </p>
             </div>
 
@@ -739,6 +776,8 @@ const GuidPage: React.FC = () => {
               />
             ) : null}
 
+            {projectName && <ProjectContextStrip projectName={projectName} workpath={workpath} />}
+
             <GuidInputCard
               input={guidInput.input}
               onInputChange={handleInputChange}
@@ -746,7 +785,11 @@ const GuidPage: React.FC = () => {
               onPaste={guidInput.onPaste}
               onFocus={guidInput.handleTextareaFocus}
               onBlur={guidInput.handleTextareaBlur}
-              placeholder={`${mention.selectedAgentLabel}, ${typewriterPlaceholder || t('conversation.welcome.placeholder')}`}
+              placeholder={
+                projectName
+                  ? t('guid.projectHome.assignPlaceholder')
+                  : `${mention.selectedAgentLabel}, ${typewriterPlaceholder || t('conversation.welcome.placeholder')}`
+              }
               isInputActive={guidInput.isInputFocused}
               isFileDragging={guidInput.isFileDragging}
               activeBorderColor={activeBorderColor}
@@ -782,6 +825,22 @@ const GuidPage: React.FC = () => {
                 />
               }
             />
+
+            <div className={styles.guidSuggestCards}>
+              {suggestionCards.map((card) => (
+                <button
+                  key={card.key}
+                  type='button'
+                  className={styles.guidSuggestCard}
+                  onClick={() => {
+                    guidInput.setInput(t(card.labelKey));
+                    guidInput.handleTextareaFocus();
+                  }}
+                >
+                  {t(card.labelKey)}
+                </button>
+              ))}
+            </div>
 
             <GuidResourceCards />
 

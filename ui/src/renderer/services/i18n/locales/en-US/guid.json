@@ -88,6 +88,20 @@
     "skillCount": "skill(s)",
     "assistantHint": "Click a card to summon — this session will use that assistant (single-select)"
   },
+  "projectHome": {
+    "hero": "What should we build in {{project}}?",
+    "assignPlaceholder": "Assign work to this project…",
+    "suggest": {
+      "explore": "Explore and understand the code",
+      "build": "Build a feature, app, or tool",
+      "review": "Review code and suggest changes",
+      "fix": "Fix bugs and failures",
+      "write": "Draft a requirement",
+      "ask": "Ask a question",
+      "task": "Create a task",
+      "chat": "Just chat"
+    }
+  },
   "onboardingProject": {
     "title": "Start with your first project",
     "subtitle": "A project is the basic unit of work: tasks, members (AI + humans), resources, and rules live inside it.",
