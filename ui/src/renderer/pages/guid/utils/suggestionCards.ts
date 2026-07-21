@@ -38,12 +38,12 @@ export function getSuggestionCards(isGitRepo: boolean): SuggestionCard[] {
 /** git 检测：与 SessionList/hooks/useWorkpathBranches.ts 同一数据源。 */
 export async function detectGitRepo(
   workpath: string,
-  invoke: (args: { path: string; workspace: string }) => Promise<{ mode?: string }>
+  invoke: (args: { path: string; workspace: string }) => Promise<unknown>
 ): Promise<boolean> {
   const trimmed = workpath.replace(/[\\/]+$/, '');
   const separator = workpath.includes('\\') ? '\\' : '/';
   try {
-    const info = await invoke({ path: `${trimmed}${separator}.git`, workspace: workpath });
+    const info = (await invoke({ path: `${trimmed}${separator}.git`, workspace: workpath })) as { mode?: string } | null;
     return info?.mode === 'git-repo';
   } catch {
     return false;
