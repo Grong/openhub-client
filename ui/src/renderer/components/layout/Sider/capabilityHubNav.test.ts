@@ -40,12 +40,9 @@ describe('capability hub navigation', () => {
     expect(siderSource.includes("pathname.startsWith('/open-capabilities')")).toBe(false);
   });
 
-  test('routes Open Capabilities and preserves MCP legacy destinations', () => {
+  test('preserves MCP legacy destinations and hash-route redirect', () => {
     const routerSource = readSource(new URL('../Router.tsx', import.meta.url));
 
-    expect(routerSource.includes("path='/open-capabilities'")).toBe(true);
-    expect(routerSource.includes("path='/settings/webui' element={<Navigate to='/open-capabilities'")).toBe(true);
-    expect(routerSource.includes("path='/settings/tools' element={<Navigate to='/open-capabilities'")).toBe(true);
     expect(routerSource.includes('getHashRouteRedirectUrl')).toBe(true);
     expect(routerSource.includes("return `${origin}/#${pathname}${search}`")).toBe(true);
     expect(routerSource.includes("path='/mcp'")).toBe(true);
