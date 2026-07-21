@@ -68,7 +68,7 @@ const RosterPage: React.FC = () => {
   if (error) {
     return (
       <div data-testid='roster-page' className='size-full bg-[var(--el-canvas)]'>
-        <LoadErrorResult title={t('roster.loadError')} error={error} onRetry={load} />
+        <LoadErrorResult title={t('common.roster.loadError')} error={error} onRetry={load} />
       </div>
     );
   }
@@ -76,17 +76,17 @@ const RosterPage: React.FC = () => {
   return (
     <div data-testid='roster-page' className='size-full overflow-y-auto bg-[var(--el-canvas)]'>
       <div className='mx-auto max-w-860px px-24px py-20px flex flex-col gap-16px'>
-        <div className='text-18px font-semibold text-t-primary'>{t('roster.title')}</div>
+        <div className='text-18px font-semibold text-t-primary'>{t('common.roster.title')}</div>
 
         {!loading && items.length === 0 && (
           <div data-testid='roster-empty' className='flex flex-col items-center gap-12px py-60px'>
-            <div className='text-16px text-t-primary'>{t('roster.empty')}</div>
+            <div className='text-16px text-t-primary'>{t('common.roster.empty')}</div>
             <button
               type='button'
               onClick={() => void navigate('/models')}
               className='px-16px py-9px rd-[var(--radius-md)] bg-[rgb(var(--primary-6))] text-white text-13px cursor-pointer'
             >
-              {t('roster.emptyAction')}
+              {t('common.roster.emptyAction')}
             </button>
           </div>
         )}
@@ -103,7 +103,7 @@ const RosterPage: React.FC = () => {
               />
               <span className='flex-1 min-w-0 truncate text-14px text-t-primary'>{item.name}</span>
               <span className='shrink-0 px-8px py-3px rd-[var(--radius-md)] bg-[var(--el-elevated)] text-12px text-t-secondary'>
-                {item.kind === 'agent' ? t('roster.typeAgent') : t('roster.typeAssistant')}
+                {item.kind === 'agent' ? t('common.roster.typeAgent') : t('common.roster.typeAssistant')}
               </span>
             </div>
           ))}
