@@ -107,6 +107,19 @@
       "active": "活跃"
     }
   },
+  "reviewQueue": {
+    "title": "待验收",
+    "batchApprove": "全部通过",
+    "approve": "通过",
+    "reject": "打回",
+    "empty": "都验收完了",
+    "emptyAction": "去派活",
+    "waitingHours": "等待 {{hours}}h",
+    "waitingDays": "等待 {{days}}d",
+    "approveSuccess": "已通过",
+    "rejectSuccess": "已打回",
+    "loadError": "加载失败"
+  },
   "kanban": {
     "selectTag": "请选择标签",
     "emptyColumn": "空"
