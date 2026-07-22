@@ -3,6 +3,13 @@
 :root {
   --app-min-width: 360px;
   --titlebar-height: 36px;
+
+  /* 圆角语言：三档 token。
+     sm = 控件（按钮/输入框/小徽章），md = 卡片/面板，lg = hero 容器（composer 等）。
+     全圆角药丸继续用 999px，不占 token。 */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
 }
 
 .app-shell {
@@ -127,4 +134,10 @@ body,
 
 [data-theme='dark'] *:hover::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.1);
+}
+
+/* 键盘焦点环（spec 11.2）：无边框风格下唯一的键盘导航信号，不可省略。 */
+:focus-visible {
+  outline: 2px solid rgb(var(--primary-6));
+  outline-offset: 2px;
 }

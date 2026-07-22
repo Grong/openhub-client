@@ -107,6 +107,19 @@
       "active": "Active"
     }
   },
+  "reviewQueue": {
+    "title": "Review",
+    "batchApprove": "Approve all",
+    "approve": "Approve",
+    "reject": "Reject",
+    "empty": "All reviewed",
+    "emptyAction": "Assign work",
+    "waitingHours": "Waiting {{hours}}h",
+    "waitingDays": "Waiting {{days}}d",
+    "approveSuccess": "Approved",
+    "rejectSuccess": "Sent back",
+    "loadError": "Load failed"
+  },
   "kanban": {
     "selectTag": "Select a tag",
     "emptyColumn": "Empty"

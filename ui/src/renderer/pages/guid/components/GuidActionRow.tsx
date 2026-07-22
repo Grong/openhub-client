@@ -6,8 +6,6 @@
 
 import { ipcBridge } from '@/common';
 import type { IMcpServer } from '@/common/config/storage';
-import AgentModeSelector from '@/renderer/components/agent/AgentModeSelector';
-import { supportsModeSwitch, type AgentModeOption } from '@/renderer/utils/model/agentModes';
 import { useLayoutContext } from '@/renderer/hooks/context/LayoutContext';
 import { getCleanFileNames, FileService } from '@/renderer/services/FileService';
 import { iconColors } from '@/renderer/styles/colors';
@@ -16,7 +14,7 @@ import type { AvailableAgent } from '../types';
 import type { Assistant } from '@/common/types/agent/assistantTypes';
 import PresetAgentTag, { type AgentSwitcherItem } from './PresetAgentTag';
 import { Button, Checkbox, Dropdown, Menu, Message, Tooltip } from '@arco-design/web-react';
-import { ArrowUp, Plus, Robot, Shield, UploadOne } from '@icon-park/react';
+import { ArrowUp, EveryUser, Lightning, Plus, Robot, Shield, UploadOne } from '@icon-park/react';
 import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from '../index.module.css';
@@ -30,12 +28,6 @@ type GuidActionRowProps = {
   modelSelectorNode: React.ReactNode;
   collaboratorSelectorNode?: React.ReactNode;
   clusterApprovalSelectorNode?: React.ReactNode;
-
-  // Agent mode
-  selectedAgent: string | 'custom';
-  effectiveModeAgent?: string;
-  selectedMode: string;
-  onModeSelect: (mode: string) => void;
 
   // Preset agent tag
   is_presetAgent: boolean;
@@ -57,6 +49,18 @@ type GuidActionRowProps = {
   selectedMcpServerIds: number[];
   onToggleMcpServer: (serverId: number) => void;
 
+  // Composer entries (收进 [+] 菜单，保持 composer 安静)
+  /** 召唤助手 — 打开助手抽屉 */
+  onSummon?: () => void;
+  /** 使用 Skills — 打开 Skills 抽屉 */
+  onAdjustSkills?: () => void;
+  /** 已启用的 Skills 数（菜单项上展示） */
+  activeSkillCount?: number;
+  /** 「agent 集群」开关态 */
+  clusterActive?: boolean;
+  /** 切换「agent 集群」模式 */
+  onToggleCluster?: () => void;
+
   // Send button
   loading: boolean;
   isButtonDisabled: boolean;
@@ -74,10 +78,6 @@ const GuidActionRow: React.FC<GuidActionRowProps> = ({
   modelSelectorNode,
   collaboratorSelectorNode,
   clusterApprovalSelectorNode,
-  selectedAgent,
-  effectiveModeAgent,
-  selectedMode,
-  onModeSelect,
   is_presetAgent,
   selectedAgentInfo,
   assistants,
@@ -89,6 +89,11 @@ const GuidActionRow: React.FC<GuidActionRowProps> = ({
   mcpServers,
   selectedMcpServerIds,
   onToggleMcpServer,
+  onSummon,
+  onAdjustSkills,
+  activeSkillCount = 0,
+  clusterActive = false,
+  onToggleCluster,
   hidePresetTag = false,
   loading,
   isButtonDisabled,
@@ -100,13 +105,10 @@ const GuidActionRow: React.FC<GuidActionRowProps> = ({
   const layout = useLayoutContext();
   const isMobile = layout?.isMobile ?? false;
   const [isPlusDropdownOpen, setIsPlusDropdownOpen] = useState(false);
-  const modeBackend = effectiveModeAgent || selectedAgent;
-  const showModeSwitch = supportsModeSwitch(modeBackend);
   const configOptionCount =
     (modelSelectorNode ? 1 : 0) +
     (collaboratorSelectorNode ? 1 : 0) +
-    (clusterApprovalSelectorNode ? 1 : 0) +
-    (showModeSwitch ? 1 : 0);
+    (clusterApprovalSelectorNode ? 1 : 0);
 
   // Browser file picker ref (WebUI only)
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -133,9 +135,6 @@ const GuidActionRow: React.FC<GuidActionRowProps> = ({
     [onFilesUploaded, t]
   );
 
-  const getModeDisplayLabel = (mode: AgentModeOption): string =>
-    t(`agentMode.${mode.value}`, { defaultValue: mode.label });
-
   const isWebUI = !isDesktopShell();
 
   const activeMcpCount = selectedMcpServerIds.length;
@@ -157,9 +156,46 @@ const GuidActionRow: React.FC<GuidActionRowProps> = ({
             });
         } else if (key === 'device') {
           fileInputRef.current?.click();
+        } else if (key === 'summon') {
+          onSummon?.();
+        } else if (key === 'skills') {
+          onAdjustSkills?.();
+        } else if (key === 'cluster') {
+          onToggleCluster?.();
         }
       }}
     >
+      {onSummon && (
+        <Menu.Item key='summon'>
+          <div className='flex items-center gap-8px'>
+            <Robot theme='outline' size='16' fill={iconColors.secondary} style={{ lineHeight: 0 }} />
+            <span>{t('guid.entry.summon', { defaultValue: '召唤助手' })}</span>
+          </div>
+        </Menu.Item>
+      )}
+      {onAdjustSkills && (
+        <Menu.Item key='skills'>
+          <div className='flex items-center gap-8px'>
+            <Lightning theme='outline' size='16' fill={iconColors.secondary} style={{ lineHeight: 0 }} />
+            <span>
+              {activeSkillCount > 0
+                ? t('guid.entry.skillsActive', { defaultValue: '使用 Skills · 已启用' })
+                : t('guid.entry.skills', { defaultValue: '使用 Skills' })}
+            </span>
+            {activeSkillCount > 0 && <span className={styles.entryCountBadge}>{activeSkillCount}</span>}
+          </div>
+        </Menu.Item>
+      )}
+      {onToggleCluster && (
+        <Menu.Item key='cluster'>
+          <div className='flex items-center gap-8px'>
+            <EveryUser theme='outline' size='16' fill={iconColors.secondary} style={{ lineHeight: 0 }} />
+            <span className='flex-1'>{t('guid.entry.cluster', { defaultValue: 'agent 集群' })}</span>
+            {clusterActive && <span className='text-primary-6 text-12px'>✓</span>}
+          </div>
+        </Menu.Item>
+      )}
+      {(onSummon || onAdjustSkills || onToggleCluster) && <hr className='arco-menu-divider' />}
       {isWebUI ? (
         <>
           <Menu.Item key='file'>
@@ -269,17 +305,6 @@ const GuidActionRow: React.FC<GuidActionRowProps> = ({
             {modelSelectorNode}
             {collaboratorSelectorNode}
             {clusterApprovalSelectorNode}
-
-            {showModeSwitch && (
-              <AgentModeSelector
-                backend={modeBackend}
-                compact
-                initialMode={selectedMode}
-                onModeSelect={onModeSelect}
-                compactLeadingIcon={<Shield theme='outline' size='14' fill={iconColors.secondary} />}
-                modeLabelFormatter={getModeDisplayLabel}
-              />
-            )}
           </div>
         )}
 

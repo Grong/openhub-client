@@ -76,7 +76,9 @@ const Config: React.FC<PropsWithChildren> = ({ children }) => {
   } = useTranslation();
   const arcoLocale = arcoLocales[language] ?? enUS;
 
-  return React.createElement(ConfigProvider, { theme: { primaryColor: '#4E5969' }, locale: arcoLocale }, children);
+  // 品牌主色：与登录页 #667eea 同族（略深以过白字对比度）。ConfigProvider 会在
+  // body 内联 --arcoblue-5/6/7，进而经 var() 别名影响 --primary-*，必须在此改。
+  return React.createElement(ConfigProvider, { theme: { primaryColor: '#5968de' }, locale: arcoLocale }, children);
 };
 
 const Main = () => {

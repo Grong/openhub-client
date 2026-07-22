@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect } from 'react';
-import { HashRouter, Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { HashRouter, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import AppLoader from '@renderer/components/layout/AppLoader';
 import RouteErrorBoundary from '@renderer/components/layout/RouteErrorBoundary';
 import { useAuth } from '@renderer/hooks/context/AuthContext';
@@ -12,28 +12,20 @@ const Guid = React.lazy(() => import('@renderer/pages/guid'));
 const AssistantSettings = React.lazy(() => import('@renderer/pages/settings/AssistantSettings'));
 const ModelHubPage = React.lazy(() => import('@renderer/pages/modelHub'));
 const McpPage = React.lazy(() => import('@renderer/pages/mcp'));
-const OpenCapabilitiesPage = React.lazy(() => import('@renderer/pages/openCapabilities'));
 const SystemSettings = React.lazy(() => import('@renderer/pages/settings/SystemSettings'));
 const ExtensionSettingsPage = React.lazy(() => import('@renderer/pages/settings/ExtensionSettingsPage'));
 const LoginPage = React.lazy(() => import('@renderer/pages/login'));
 const ComponentsShowcase = React.lazy(() => import('@renderer/pages/TestShowcase'));
 const ScheduledTasksPage = React.lazy(() => import('@renderer/pages/cron/ScheduledTasksPage'));
 const TaskDetailPage = React.lazy(() => import('@renderer/pages/cron/ScheduledTasksPage/TaskDetailPage'));
-const RequirementsLayout = React.lazy(() => import('@renderer/pages/requirements/RequirementsLayout'));
-const WorkspacePage = React.lazy(() => import('@renderer/pages/requirements/WorkspacePage'));
-const ExtensionsPage = React.lazy(() => import('@renderer/pages/requirements/ExtensionsPage'));
-const SourcesPage = React.lazy(() => import('@renderer/pages/requirements/SourcesPage'));
+const ProjectOnboardingPage = React.lazy(() => import('@renderer/pages/onboardingProject'));
+const ReviewQueuePage = React.lazy(() => import('@renderer/pages/reviewQueue'));
+const RosterPage = React.lazy(() => import('@renderer/pages/roster'));
 const TerminalSessionPage = React.lazy(() => import('@renderer/pages/terminal/TerminalSessionPage'));
 const TerminalCreatePage = React.lazy(() => import('@renderer/pages/terminal/TerminalCreatePage'));
 const OpenHubConfigPage = React.lazy(() => import('@renderer/pages/openhub'));
-const PublicCompanionRosterPage = React.lazy(() => import('@renderer/pages/publicCompanion'));
-const PublicAgentDetailPage = React.lazy(() => import('@renderer/pages/publicCompanion/PublicAgentDetailPage'));
 const KnowledgeListPage = React.lazy(() => import('@renderer/pages/knowledge/KnowledgeListPage'));
 const KnowledgeDetailPage = React.lazy(() => import('@renderer/pages/knowledge/KnowledgeDetailPage'));
-const WorkshopListPage = React.lazy(() => import('@renderer/pages/workshop'));
-const PluginsPage = React.lazy(() => import('@renderer/pages/plugins'));
-const WorkshopCanvasPage = React.lazy(() => import('@renderer/pages/workshop/CanvasPage'));
-const AssetLibraryPage = React.lazy(() => import('@renderer/pages/assets'));
 const CompanionPage = React.lazy(() => import('@renderer/pages/companion'));
 const OnboardingWizard = React.lazy(() => import('@renderer/pages/onboarding'));
 const ConversationShell = React.lazy(() => import('@renderer/pages/conversation/components/ConversationShell'));
@@ -63,14 +55,6 @@ const LegacyExtensionsRedirect: React.FC = () => {
 
   searchParams.set('tab', 'skills');
   return <Navigate to={withSearch('/assistants', searchParams)} replace />;
-};
-
-// Legacy `/requirements/:id/edit` deep links → open the workspace with the
-// requirement pre-selected in edit mode (the new shell hosts editing in a
-// drawer, not a standalone form page).
-const RequirementEditRedirect: React.FC = () => {
-  const { id } = useParams();
-  return <Navigate to={`/requirements?req=${id}&edit=1`} replace />;
 };
 
 const getHashRouteRedirectUrl = () => {
@@ -179,15 +163,18 @@ const PanelRoute: React.FC<{ layout: React.ReactElement }> = ({ layout }) => {
         <Route element={<ProtectedLayout layout={layout} />}>
           <Route path='/settings/companion' element={<Navigate to='/openhub' replace />} />
           <Route path='/settings/requirements' element={<Navigate to='/requirements' replace />} />
-          <Route path='/settings/public-service' element={<Navigate to='/public-companions' replace />} />
-          <Route path='/settings/workshop' element={<Navigate to='/workshop' replace />} />
           <Route index element={<Navigate to='/guid' replace />} />
+          {/* ── 新 IA（spec §3）：落点 / 工作 / 公司 ── */}
+          <Route path='/welcome' element={withRouteFallback(ProjectOnboardingPage)} />
+          <Route path='/review' element={withRouteFallback(ReviewQueuePage)} />
+          <Route path='/roster' element={withRouteFallback(RosterPage)} />
+          {/* 一次性迁移重定向（CLAUDE.md 规则登记例外，spec §10.9） */}
+          <Route path='/requirements' element={<Navigate to='/review' replace />} />
+          <Route path='/requirements/*' element={<Navigate to='/review' replace />} />
           {/* Model Management, Assistant & Skill, and MCP — top-level homepage destinations */}
           <Route path='/models' element={withRouteFallback(ModelHubPage)} />
           <Route path='/extensions' element={<LegacyExtensionsRedirect />} />
           <Route path='/mcp' element={withRouteFallback(McpPage)} />
-          <Route path='/open-capabilities' element={withRouteFallback(OpenCapabilitiesPage)} />
-          <Route path='/plugins' element={withRouteFallback(PluginsPage)} />
           {/* Assistants — relocated out of Settings into a top-level homepage destination */}
           <Route path='/assistants' element={withRouteFallback(AssistantSettings)} />
           {/* Session section — the secondary sidebar (ContentSider) persists across these routes */}
@@ -224,31 +211,12 @@ const PanelRoute: React.FC<{ layout: React.ReactElement }> = ({ layout }) => {
           <Route path='/test/components' element={withRouteFallback(ComponentsShowcase)} />
           <Route path='/scheduled' element={withRouteFallback(ScheduledTasksPage)} />
           <Route path='/scheduled/:job_id' element={withRouteFallback(TaskDetailPage)} />
-          {/* Requirements platform — nested shell (ContentSider persists across sections) */}
-          <Route path='/requirements' element={withRouteFallback(RequirementsLayout)}>
-            <Route index element={withRouteFallback(WorkspacePage)} />
-            <Route path='extensions' element={withRouteFallback(ExtensionsPage)} />
-            <Route path='sources' element={withRouteFallback(SourcesPage)} />
-          </Route>
-          {/* Legacy requirement routes → fold into the new shell (preserve deep links) */}
-          <Route path='/requirements/kanban' element={<Navigate to='/requirements?view=board' replace />} />
-          <Route path='/requirements/new' element={<Navigate to='/requirements?new=1' replace />} />
-          <Route path='/requirements/:id/edit' element={<RequirementEditRedirect />} />
-          <Route path='/requirements/tag-sessions' element={<Navigate to='/requirements/extensions?tab=autowork' replace />} />
-          <Route path='/autowork' element={<Navigate to='/requirements/extensions?tab=autowork' replace />} />
-          {/* Webhook config relocated into 扩展能力 */}
-          <Route path='/other' element={<Navigate to='/requirements/extensions?tab=notify' replace />} />
+          {/* Legacy requirement-era routes → one-time migration to /review */}
+          <Route path='/autowork' element={<Navigate to='/review' replace />} />
+          <Route path='/other' element={<Navigate to='/review' replace />} />
           <Route path='/openhub' element={withRouteFallback(OpenHubConfigPage)} />
-          {/* 对外伙伴 (Public Companion) — a first-class domain separate from desktop companions. */}
-          <Route path='/public-companions' element={withRouteFallback(PublicCompanionRosterPage)} />
-          <Route path='/public-companions/:id' element={withRouteFallback(PublicAgentDetailPage)} />
           <Route path='/knowledge' element={withRouteFallback(KnowledgeListPage)} />
           <Route path='/knowledge/:id' element={withRouteFallback(KnowledgeDetailPage)} />
-          {/* 资产库 (Asset Library) — platform-level management of workshop assets. */}
-          <Route path='/assets' element={withRouteFallback(AssetLibraryPage)} />
-          {/* 创意工坊 (Creative Workshop) — infinite-canvas AI visual creation. */}
-          <Route path='/workshop' element={withRouteFallback(WorkshopListPage)} />
-          <Route path='/workshop/:id' element={withRouteFallback(WorkshopCanvasPage)} />
         </Route>
         <Route path='*' element={<Navigate to={status === 'authenticated' ? '/guid' : '/login'} replace />} />
       </Routes>

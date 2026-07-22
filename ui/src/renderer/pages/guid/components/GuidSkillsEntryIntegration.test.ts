@@ -10,11 +10,11 @@ import { describe, expect, test } from 'bun:test';
 const readSource = (url: URL) => readFileSync(url, 'utf8');
 
 describe('Guid current skills entry integration', () => {
-  test('passes resolved active skill metadata into the composer entry strip', () => {
+  test('passes the resolved active skill count into the [+] menu entry', () => {
     const source = readSource(new URL('../GuidPage.tsx', import.meta.url));
 
     expect(source.includes('const activeSkills = useMemo')).toBe(true);
-    expect(source.includes('activeSkills={activeSkills}')).toBe(true);
+    expect(source.includes('activeSkillCount={activeSkillCount}')).toBe(true);
     expect(source.includes('onAdjustSkills={handleOpenSkillsDrawer}')).toBe(true);
     expect(source.includes('onInsertSkill={handleInsertSkillCommand}')).toBe(false);
     expect(source.includes('onManageSkills={handleManageActiveSkills}')).toBe(false);

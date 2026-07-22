@@ -4,9 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Trigger } from '@arco-design/web-react';
-import { EveryUser, Lightning, Robot } from '@icon-park/react';
-import React, { useMemo, useState } from 'react';
+import { EveryUser, Robot } from '@icon-park/react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from '../index.module.css';
 
@@ -20,50 +19,30 @@ export interface ComposerEntryStripProps {
   isPresetAgent: boolean;
   assistantLabel?: string;
   assistantAvatar?: { kind: 'image' | 'emoji' | 'icon'; value?: string };
-  onSummon: () => void;
-  onAdjustSkills: () => void;
   onFree: () => void;
-  activeSkillCount?: number;
-  activeSkills?: GuidActiveSkill[];
-  /** 「agent 集群」toggle 是否选中（需求1）。 */
+  /** 「agent 集群」toggle 是否选中。选中时在 composer 顶部显示状态 chip。 */
   clusterActive?: boolean;
-  /** 切换「agent 集群」模式。缺省不渲染该按钮（向后兼容）。 */
+  /** 关闭「agent 集群」chip 时调用。 */
   onToggleCluster?: () => void;
 }
 
 /**
- * ComposerEntryStrip — top-edge entry bar inside the chat composer.
+ * ComposerEntryStrip — composer 顶部的「激活状态」展示区。
  *
- * Two states:
- * - Default (isPresetAgent=false): [agent 集群] [召唤助手] [使用 Skills + inline count]
- *   (free play is the implicit default — no dedicated pill needed)
- * - Summoned (isPresetAgent=true): [agent 集群] [persona token: avatar + label + close]
- *   [使用 Skills + inline count] ... [自由发挥]
- *
- * 「agent 集群」（需求1）是一个 toggle：选中后发送即在新会话 extra 落
- * `agent_cluster_mode=true`——主 agent 对每个任务刻意评估是否开启多 agent 集群
- * 协作，太简单则先在回复里说明使用简单模式的原因。
+ * 做减法后的定位：配置入口（召唤助手 / 使用 Skills / agent 集群开关）都收进
+ * 操作区 [+] 菜单，这里只显示「当前已激活」的状态 token——召唤的助手人格、
+ * 打开的 agent 集群——让用户一眼看到会话处于什么模式，并可一键退出。
+ * 没有激活状态时整体不渲染，composer 保持干净。
  */
 const ComposerEntryStrip: React.FC<ComposerEntryStripProps> = ({
   isPresetAgent,
   assistantLabel,
   assistantAvatar,
-  onSummon,
-  onAdjustSkills,
   onFree,
-  activeSkillCount,
-  activeSkills = [],
   clusterActive = false,
   onToggleCluster,
 }) => {
   const { t } = useTranslation();
-  const [skillsOpen, setSkillsOpen] = useState(false);
-  const skillCount = activeSkills.length > 0 ? activeSkills.length : (activeSkillCount ?? 0);
-  const skillsLabel = skillCount > 0
-    ? t('guid.entry.skillsActive', { defaultValue: '使用 Skills · 已启用' })
-    : t('guid.entry.skills', { defaultValue: '使用 Skills' });
-  const visibleSkills = useMemo(() => activeSkills.slice(0, 4), [activeSkills]);
-  const overflowSkillCount = Math.max(0, activeSkills.length - visibleSkills.length);
 
   // --- Avatar renderer (mirrors GuidPage selectedAssistantAvatar pattern) ---
   const renderAvatar = () => {
@@ -85,196 +64,57 @@ const ComposerEntryStrip: React.FC<ComposerEntryStripProps> = ({
     }
   };
 
-  const skillsPopover =
-    activeSkills.length > 0 ? (
-      <div className={styles.entrySkillPopover} data-testid='guid-current-skills-popover'>
-        <div className={styles.entrySkillPopoverTitleRow}>
-          <div className={styles.entrySkillPopoverTitle}>
-            {t('guid.skillsPopover.title', { defaultValue: '本次会话使用的 Skills' })}
-          </div>
-          <span className={styles.entrySkillPopoverCount}>
-            {t('guid.skillsPopover.enabledCount', {
-              count: skillCount,
-              defaultValue: '已启用 {{count}} 个',
-            })}
-          </span>
-        </div>
-        <div className={styles.entrySkillPopoverDesc}>
-          {t('guid.skillsPopover.description', {
-            defaultValue: '这些 Skills 会随本次会话注入，可在发送前由「使用 Skills」调整。',
-          })}
-        </div>
+  if (!isPresetAgent && !clusterActive) return null;
 
-        <div className={styles.entrySkillCompactList}>
-          {visibleSkills.map((skill) => (
-            <div className={styles.entrySkillCompactRow} key={skill.name}>
-              <span className={styles.entrySkillIcon}>
-                <Lightning theme='outline' size={13} strokeWidth={3} />
-              </span>
-              <div className={styles.entrySkillCompactBody}>
-                <div className={styles.entrySkillCompactNameRow}>
-                  <span className={styles.entrySkillCompactName} title={skill.name}>
-                    {skill.name}
-                  </span>
-                  {skill.isAuto && (
-                    <span className={styles.entrySkillSource}>
-                      {t('guid.drawer.autoInject', { defaultValue: '自动注入' })}
-                    </span>
-                  )}
-                </div>
-                {skill.description && (
-                  <div className={styles.entrySkillCompactDesc} title={skill.description}>
-                    {skill.description}
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-          {overflowSkillCount > 0 && (
-            <div className={styles.entrySkillOverflow}>
-              {t('guid.skillsPopover.overflowCount', {
-                count: overflowSkillCount,
-                defaultValue: '还有 {{count}} 个 Skills',
-              })}
-            </div>
-          )}
-        </div>
-
-        <div className={styles.entrySkillCompactHint}>
-          {t('guid.skillsPopover.adjustHint', { defaultValue: '点击「使用 Skills」调整本次会话。' })}
-        </div>
-      </div>
-    ) : null;
-
-  // --- Skills entry (shared in both states) ---
-  const skillsButton = (
-    <button
-      type='button'
-      className={`${styles.entryButton} ${styles.entryButtonInteractive}`}
-      onClick={onAdjustSkills}
-      aria-label={
-        skillCount > 0
-          ? t('guid.entry.skillsAdjustAria', {
-              count: skillCount,
-              defaultValue: '调整本次会话已启用的 {{count}} 个 Skills',
-            })
-          : t('guid.entry.skills', { defaultValue: '使用 Skills' })
-      }
-    >
-      <Lightning theme='outline' size={15} strokeWidth={3} />
-      <span className={styles.entryButtonText}>{skillsLabel}</span>
-    </button>
-  );
-
-  const skillsEntry =
-    skillsPopover ? (
-      <span className={styles.entrySkillControl}>
-        {skillsButton}
-        <Trigger
-          popup={() => skillsPopover}
-          trigger='click'
-          position='top'
-          popupVisible={skillsOpen}
-          onVisibleChange={setSkillsOpen}
-          clickToClose
-        >
-          <button
-            type='button'
-            className={`${styles.entryCountBadge} ${styles.entrySkillCountTrigger}`}
-            aria-label={t('guid.entry.skillsActiveAria', {
-              count: skillCount,
-              defaultValue: '查看本次会话已启用的 {{count}} 个 Skills',
-            })}
-          >
-            {skillCount}
-          </button>
-        </Trigger>
-      </span>
-    ) : (
-      <span className={styles.entrySkillControl}>
-        {skillsButton}
-        {skillCount > 0 && (
-          <span className={styles.entryCountBadge} aria-label={`${skillCount} skills`}>
-            {skillCount}
-          </span>
-        )}
-      </span>
-    );
-
-  // --- 「agent 集群」toggle（需求1，两种状态都渲染在最左 = 召唤助手左边）---
-  const clusterButton = onToggleCluster ? (
-    <button
-      type='button'
-      className={`${styles.entryButton} ${styles.entryButtonInteractive} ${clusterActive ? styles.entryButtonActive : ''}`}
-      onClick={onToggleCluster}
-      aria-pressed={clusterActive}
-      aria-label={t('guid.entry.clusterAria', { defaultValue: '切换 agent 集群模式' })}
-      title={t('guid.entry.clusterHint', {
-        defaultValue: '多 agent 协作：主 agent 刻意评估并拆分任务给多个独立 agent 并行交付；太简单的任务会说明原因后直接作答。',
-      })}
-    >
-      <EveryUser theme='outline' size={15} strokeWidth={3} />
-      <span className={styles.entryButtonText}>{t('guid.entry.cluster', { defaultValue: 'agent 集群' })}</span>
-    </button>
-  ) : null;
-
-  // --- Summoned state ---
-  if (isPresetAgent) {
-    return (
-      <div className={styles.entryStrip}>
-        {/* agent 集群 toggle（最左） */}
-        {clusterButton}
-
-        {/* Persona token */}
-        <span className={`${styles.entryButton} ${styles.entryButtonActive} ${styles.entryPersonaButton}`}>
-          <span className={styles.entryAvatar}>
-            {renderAvatar()}
-          </span>
-          <span className={styles.entryButtonText}>{assistantLabel || t('guid.entry.summon', { defaultValue: '召唤助手' })}</span>
-          <button
-            type='button'
-            className={styles.entryDismiss}
-            onClick={onFree}
-            aria-label={t('guid.entry.backToFree', { defaultValue: '自由发挥' })}
-          >
-            ✕
-          </button>
-        </span>
-
-        {/* Skills */}
-        {skillsEntry}
-
-        {/* Right: back to free */}
-        <button
-          type='button'
-          className={styles.entryBackButton}
-          onClick={onFree}
-        >
-          <span>↩</span>
-          <span>{t('guid.entry.backToFree', { defaultValue: '自由发挥' })}</span>
-        </button>
-      </div>
-    );
-  }
-
-  // --- Default state ---
   return (
     <div className={styles.entryStrip}>
-      {/* agent 集群 toggle（最左 = 召唤助手左边） */}
-      {clusterButton}
+      {/* agent 集群激活态 chip */}
+      {clusterActive && (
+        <span className={`${styles.entryButton} ${styles.entryButtonActive}`}>
+          <EveryUser theme='outline' size={15} strokeWidth={3} />
+          <span className={styles.entryButtonText}>{t('guid.entry.cluster', { defaultValue: 'agent 集群' })}</span>
+          {onToggleCluster && (
+            <button
+              type='button'
+              className={styles.entryDismiss}
+              onClick={onToggleCluster}
+              aria-label={t('guid.entry.clusterOffAria', { defaultValue: '关闭 agent 集群模式' })}
+            >
+              ✕
+            </button>
+          )}
+        </span>
+      )}
 
-      {/* Summon assistant */}
-      <button
-        type='button'
-        className={`${styles.entryButton} ${styles.entryButtonInteractive}`}
-        onClick={onSummon}
-      >
-        <Robot theme='outline' size={15} fill='currentColor' />
-        <span className={styles.entryButtonText}>{t('guid.entry.summon', { defaultValue: '召唤助手' })}</span>
-      </button>
+      {/* 召唤的助手人格 token */}
+      {isPresetAgent && (
+        <>
+          <span className={`${styles.entryButton} ${styles.entryButtonActive} ${styles.entryPersonaButton}`}>
+            <span className={styles.entryAvatar}>
+              {renderAvatar()}
+            </span>
+            <span className={styles.entryButtonText}>{assistantLabel || t('guid.entry.summon', { defaultValue: '召唤助手' })}</span>
+            <button
+              type='button'
+              className={styles.entryDismiss}
+              onClick={onFree}
+              aria-label={t('guid.entry.backToFree', { defaultValue: '自由发挥' })}
+            >
+              ✕
+            </button>
+          </span>
 
-      {/* Skills */}
-      {skillsEntry}
+          {/* Right: back to free */}
+          <button
+            type='button'
+            className={styles.entryBackButton}
+            onClick={onFree}
+          >
+            <span>↩</span>
+            <span>{t('guid.entry.backToFree', { defaultValue: '自由发挥' })}</span>
+          </button>
+        </>
+      )}
     </div>
   );
 };

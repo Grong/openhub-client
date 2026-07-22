@@ -1,32 +1,33 @@
 /* ============================================================================
- * Codex Neutral
+ * Codex Neutral (OpenHub 默认主题)
  *
- * A restrained black / white / gray preset for long coding and planning
- * sessions. Light mode mirrors the Codex reference: white work surface, soft
- * gray sider, black primary action. Dark mode flips the axis to near-black
- * work surfaces with silver primary emphasis, while keeping semantic states
+ * A restrained neutral preset for long coding and planning sessions, now
+ * wearing the OpenHub brand: light mode keeps the white work surface and soft
+ * gray sider, with brand-violet (#5968de, from the login page's #667eea
+ * family) as the primary action. Dark mode flips to near-black work surfaces
+ * with a brightened violet (#7c8bea) primary, while keeping semantic states
  * readable enough to remain useful.
  * ========================================================================== */
 
 /* ===== Light ===== */
 :root,
 body {
-  /* Primary */
-  --color-primary: #171717;
-  --primary: #171717;
-  --color-primary-light-1: #f5f5f5;
-  --color-primary-light-2: #e5e5e5;
-  --color-primary-light-3: #d4d4d4;
-  --color-primary-light-4: #a3a3a3;
-  --color-primary-dark-1: #000000;
-  --primary-rgb: 23, 23, 23;
+  /* Primary — 品牌紫（OpenHub #667eea 家族，白字对比度 4.5:1） */
+  --color-primary: #5968de;
+  --primary: #5968de;
+  --color-primary-light-1: #eff0fd;
+  --color-primary-light-2: #dfe3fa;
+  --color-primary-light-3: #c6cdf5;
+  --color-primary-light-4: #a2adf0;
+  --color-primary-dark-1: #4452c4;
+  --primary-rgb: 89, 104, 222;
 
   /* Brand */
-  --brand: #404040;
-  --brand-light: #f5f5f5;
-  --brand-hover: #d4d4d4;
-  --color-brand-fill: #404040;
-  --color-brand-bg: #f5f5f5;
+  --brand: #667eea;
+  --brand-light: #eff0fd;
+  --brand-hover: #9aa5f0;
+  --color-brand-fill: #667eea;
+  --color-brand-bg: #eff0fd;
 
   /* Neutral brand scale */
   --aou-1: #fafafa;
@@ -103,24 +104,24 @@ body {
   --info: #57606a;
 
   /* Components */
-  --message-user-bg: #eeeeec;
-  --message-tips-bg: #f5f5f4;
+  --message-user-bg: #eceefb;
+  --message-tips-bg: #f1f2fc;
   --workspace-btn-bg: #f0f0ef;
-  --color-guid-agent-bar: #eeeeec;
+  --color-guid-agent-bar: #eceefb;
   --sider-section-title-color: #777774;
 
   /* Terminal */
   --terminal-surface-bg: #111111;
   --terminal-border: rgba(0, 0, 0, 0.12);
 
-  /* Arco primary scale */
-  --primary-1: 245, 245, 245;
-  --primary-2: 229, 229, 229;
-  --primary-3: 212, 212, 212;
-  --primary-4: 163, 163, 163;
-  --primary-5: 82, 82, 82;
-  --primary-6: 23, 23, 23;
-  --primary-7: 0, 0, 0;
+  /* Arco primary scale — 品牌紫梯度 */
+  --primary-1: 239, 241, 252;
+  --primary-2: 216, 221, 249;
+  --primary-3: 182, 190, 244;
+  --primary-4: 145, 156, 238;
+  --primary-5: 124, 139, 234;
+  --primary-6: 89, 104, 222;
+  --primary-7: 68, 82, 196;
 
   /* Arco secondary */
   --color-secondary: #f2f2f1;
@@ -139,22 +140,22 @@ body {
 /* ===== Dark ===== */
 [data-theme='dark'],
 [data-theme='dark'] body {
-  /* Primary */
-  --color-primary: #e5e5e5;
-  --primary: #e5e5e5;
-  --color-primary-light-1: rgba(255, 255, 255, 0.08);
-  --color-primary-light-2: rgba(255, 255, 255, 0.14);
-  --color-primary-light-3: rgba(255, 255, 255, 0.22);
-  --color-primary-light-4: rgba(255, 255, 255, 0.34);
-  --color-primary-dark-1: #f5f5f5;
-  --primary-rgb: 229, 229, 229;
+  /* Primary — 品牌紫暗色提亮版 */
+  --color-primary: #7c8bea;
+  --primary: #7c8bea;
+  --color-primary-light-1: rgba(124, 139, 234, 0.14);
+  --color-primary-light-2: rgba(124, 139, 234, 0.2);
+  --color-primary-light-3: rgba(124, 139, 234, 0.28);
+  --color-primary-light-4: rgba(124, 139, 234, 0.4);
+  --color-primary-dark-1: #9aa5f0;
+  --primary-rgb: 124, 139, 234;
 
   /* Brand */
-  --brand: #d4d4d4;
-  --brand-light: #262626;
-  --brand-hover: #737373;
-  --color-brand-fill: #d4d4d4;
-  --color-brand-bg: #262626;
+  --brand: #7c8bea;
+  --brand-light: #2e3355;
+  --brand-hover: #9aa5f0;
+  --color-brand-fill: #7c8bea;
+  --color-brand-bg: #2e3355;
 
   /* Neutral brand scale */
   --aou-1: #171717;
@@ -231,24 +232,24 @@ body {
   --info: #c9d1d9;
 
   /* Components */
-  --message-user-bg: #2a2a2a;
-  --message-tips-bg: #242424;
+  --message-user-bg: #252a45;
+  --message-tips-bg: #20243c;
   --workspace-btn-bg: #242424;
-  --color-guid-agent-bar: #242424;
+  --color-guid-agent-bar: #252a45;
   --sider-section-title-color: #969696;
 
   /* Terminal */
   --terminal-surface-bg: #0f0f0f;
   --terminal-border: rgba(255, 255, 255, 0.1);
 
-  /* Arco primary scale */
-  --primary-1: 38, 38, 38;
-  --primary-2: 64, 64, 64;
-  --primary-3: 82, 82, 82;
-  --primary-4: 115, 115, 115;
-  --primary-5: 163, 163, 163;
-  --primary-6: 229, 229, 229;
-  --primary-7: 245, 245, 245;
+  /* Arco primary scale — 品牌紫暗色梯度 */
+  --primary-1: 26, 28, 77;
+  --primary-2: 38, 43, 117;
+  --primary-3: 52, 60, 158;
+  --primary-4: 70, 80, 196;
+  --primary-5: 108, 122, 230;
+  --primary-6: 124, 139, 234;
+  --primary-7: 156, 168, 242;
 
   /* Arco secondary */
   --color-secondary: rgba(255, 255, 255, 0.08);

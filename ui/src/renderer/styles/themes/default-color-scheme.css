@@ -38,7 +38,7 @@
   --text-disabled: #c9cdd4; /* 禁用文字 */
 
   /* Semantic Colors - Light Mode */
-  --primary: #165dff;
+  --primary: #5968de; /* 品牌紫（比 #667eea 略深，白字对比度 4.5:1 达标） */
   --success: #00b42a;
   --warning: #ff7d00;
   --danger: #f53f3f;
@@ -49,13 +49,13 @@
   --border-light: #f2f3f5; /* 浅色边框 */
 
   /* Brand Colors - Light Mode */
-  --brand: #7583b2; /* 品牌色 */
-  --brand-light: #eff0f6; /* 品牌浅色背景 */
-  --brand-hover: #b5bcd6; /* 品牌色悬停 */
+  --brand: #667eea; /* 品牌色 — 与登录页主色一致 */
+  --brand-light: #eff0fd; /* 品牌浅色背景 */
+  --brand-hover: #9aa5f0; /* 品牌色悬停 */
 
   /* Message & UI Component Colors - Light Mode */
-  --message-user-bg: #e9efff; /* 用户消息背景（浅蓝） */
-  --message-tips-bg: #f0f4ff; /* 提示信息背景（浅蓝） */
+  --message-user-bg: #eceefb; /* 用户消息背景（品牌浅紫） */
+  --message-tips-bg: #f1f2fc; /* 提示信息背景（品牌浅紫） */
   --workspace-btn-bg: #eff0f1; /* 工作区按钮背景 */
   --terminal-surface-bg: #1b1d23; /* 终端卡片背景（恒深色，与 xterm 画布一致） */
   --terminal-border: rgba(0, 0, 0, 0.12); /* 终端卡片边框 - 亮色 */
@@ -72,6 +72,12 @@
   --fill-white-to-black: #ffffff; /* 白到黑填充色 */
   --border-special: var(--bg-3); /* 特殊边框色 */
   --color-guid-agent-bar: #eaecf7; /* 首页 Agent 选择条背景 - 亮色 */
+
+  /* Elevation ramp — 明度分层（spec 11.1）。层级只用明度差表达，禁止 1px 边框。 */
+  --el-canvas: #ffffff;
+  --el-surface: #f5f5f6;
+  --el-elevated: #ececee;
+  --el-popover: rgba(255, 255, 255, 0.85);
 }
 
 /* Dark Mode */
@@ -112,7 +118,7 @@
   --text-disabled: #737373; /* 禁用文字 */
 
   /* Semantic Colors - Dark Mode */
-  --primary: #4d9fff;
+  --primary: #7c8bea; /* 品牌紫（暗色提亮版） */
   --success: #23c343;
   --warning: #ff9a2e;
   --danger: #f76560;
@@ -123,13 +129,13 @@
   --border-light: #262626; /* 浅色边框 */
 
   /* Brand Colors - Dark Mode */
-  --brand: #a1aacb; /* 品牌色 */
-  --brand-light: #3d4150; /* 品牌深色背景 */
-  --brand-hover: #6a749b; /* 品牌色悬停 */
+  --brand: #7c8bea; /* 品牌色 */
+  --brand-light: #2e3355; /* 品牌深色背景 */
+  --brand-hover: #9aa5f0; /* 品牌色悬停 */
 
   /* Message & UI Component Colors - Dark Mode */
-  --message-user-bg: #1e2a3a; /* 用户消息背景（深蓝灰） */
-  --message-tips-bg: #1a2333; /* 提示信息背景（深蓝灰） */
+  --message-user-bg: #252a45; /* 用户消息背景（品牌深紫） */
+  --message-tips-bg: #20243c; /* 提示信息背景（品牌深紫） */
   --workspace-btn-bg: #1f1f1f; /* 工作区按钮背景 */
   --terminal-surface-bg: #1b1d23; /* 终端卡片背景（恒深色） */
   --terminal-border: rgba(255, 255, 255, 0.08); /* 终端卡片边框 - 暗色 */
@@ -145,4 +151,40 @@
   --fill-0: rgba(255, 255, 255, 0.08); /* 填充色 0 - 暗色模式下为半透明白色 */
   --fill-white-to-black: #000000; /* 白到黑填充色（暗色模式下为黑色） */
   --border-special: #60677e; /* 特殊边框色 */
+
+  /* Elevation ramp - Dark Mode */
+  --el-canvas: #141414;
+  --el-surface: #1c1c1e;
+  --el-elevated: #262628;
+  --el-popover: rgba(46, 46, 48, 0.85);
+}
+
+/* Primary ramp override — 品牌紫（登录页 #667eea 家族），替换 Arco 默认蓝。
+   必须定义在 body 层级：Arco 的 --primary-* 也在 body 上，html 级定义会被
+   body 自身值屏蔽。本文件在 arco.css 之后加载，同优先级后定义生效；
+   DisplaySettings 预设主题在运行时注入、位置更靠后，仍可正常覆盖此处。 */
+body {
+  --primary-1: 239, 241, 252;
+  --primary-2: 216, 221, 249;
+  --primary-3: 182, 190, 244;
+  --primary-4: 145, 156, 238;
+  --primary-5: 124, 139, 234; /* hover — 比 6 浅 */
+  --primary-6: 89, 104, 222; /* #5968de — 品牌基准，白字对比度 4.5:1 */
+  --primary-7: 68, 82, 196; /* active — 比 6 深 */
+  --primary-8: 52, 64, 160;
+  --primary-9: 38, 48, 122;
+  --primary-10: 24, 31, 82;
+}
+
+body[arco-theme='dark'] {
+  --primary-1: 26, 28, 77;
+  --primary-2: 38, 43, 117;
+  --primary-3: 52, 60, 158;
+  --primary-4: 70, 80, 196;
+  --primary-5: 108, 122, 230;
+  --primary-6: 124, 139, 234; /* #7c8bea — 暗色提亮版品牌紫 */
+  --primary-7: 156, 168, 242;
+  --primary-8: 186, 194, 247;
+  --primary-9: 215, 221, 251;
+  --primary-10: 240, 242, 253;
 }

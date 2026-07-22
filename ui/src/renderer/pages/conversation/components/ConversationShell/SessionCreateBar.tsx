@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { FolderPlus, ListCheckbox, Plus, Terminal } from '@icon-park/react';
+import { FolderPlus, Plus, Terminal } from '@icon-park/react';
 import classNames from 'classnames';
 import InstantHoverTooltip from '@renderer/components/base/InstantHoverTooltip';
 import ConversationSearchPopover from '@renderer/pages/conversation/SessionList/ConversationSearchPopover';
@@ -55,7 +55,6 @@ const SessionCreateBar: React.FC<SessionCreateBarProps> = ({
     'flex-1 basis-0 min-w-0 h-34px px-9px rd-8px border border-solid outline-none flex items-center justify-center gap-6px text-13px font-[500] leading-none transition-colors focus:outline-none focus-visible:shadow-[0_0_0_3px_rgba(var(--primary-6),0.12)]';
   const restingButtonClassName =
     'cursor-pointer bg-transparent border-[var(--color-border-2)] text-t-primary hover:bg-fill-3 active:bg-fill-4';
-  const batchToggleLabel = t(batchMode ? 'sessionList.exitBatchSelect' : 'sessionList.batchSelect');
 
   return (
     <div className='shrink-0 px-10px pt-12px pb-8px flex flex-col gap-8px'>
@@ -69,6 +68,8 @@ const SessionCreateBar: React.FC<SessionCreateBarProps> = ({
             preferences={displayPreferences}
             onPresetChange={onDisplayPresetChange}
             onPreferenceChange={onDisplayPreferenceChange}
+            batchMode={batchMode}
+            onToggleBatchMode={onToggleBatchMode}
           />
         </div>
       </div>
@@ -107,26 +108,11 @@ const SessionCreateBar: React.FC<SessionCreateBarProps> = ({
         <button
           type='button'
           data-testid='workpath-create-project-btn'
-          className={classNames(actionButtonClassName, restingButtonClassName)}
+          className={classNames(actionButtonClassName, restingButtonClassName, 'col-span-2')}
           onClick={onCreateProject}
         >
           <FolderPlus theme='outline' size='15' fill='currentColor' className='block leading-none shrink-0' />
           <span className='truncate min-w-0'>{t('sessionList.createProject')}</span>
-        </button>
-        <button
-          type='button'
-          data-testid='workpath-batch-select-btn'
-          className={classNames(
-            actionButtonClassName,
-            batchMode
-              ? 'cursor-pointer bg-[rgba(var(--primary-6),0.1)] border-[rgba(var(--primary-6),0.28)] text-primary hover:bg-[rgba(var(--primary-6),0.14)]'
-              : restingButtonClassName
-          )}
-          onClick={onToggleBatchMode}
-          aria-pressed={batchMode}
-        >
-          <ListCheckbox theme='outline' size='15' fill='currentColor' className='block leading-none shrink-0' />
-          <span className='truncate min-w-0'>{batchToggleLabel}</span>
         </button>
       </div>
 

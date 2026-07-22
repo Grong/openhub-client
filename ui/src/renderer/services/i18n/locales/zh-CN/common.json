@@ -9,6 +9,24 @@
     "plugins": "插件",
     "project": "项目"
   },
+  "iaNav": {
+    "assign": "派活",
+    "review": "待验收",
+    "scheduled": "定时任务",
+    "roster": "员工名册",
+    "unassigned": "未分配任务",
+    "pinned": "置顶",
+    "projects": "项目",
+    "company": "公司"
+  },
+  "roster": {
+    "title": "员工名册",
+    "empty": "还没有员工",
+    "emptyAction": "去添加",
+    "typeAgent": "Agent 后端",
+    "typeAssistant": "助手",
+    "loadError": "加载失败"
+  },
   "send": "发送",
   "cancel": "取消",
   "save": "保存",
@@ -40,6 +58,7 @@
   "download": "下载",
   "close": "关闭",
   "retry": "重试",
+  "loadFailedHint": "没加载出来，请重试。若反复失败，请检查后端服务是否正常运行。",
   "reload": "重新加载",
   "technical_details": "技术详情",
   "error_details": "错误详情",

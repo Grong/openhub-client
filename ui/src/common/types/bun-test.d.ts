@@ -10,6 +10,7 @@ declare module 'bun:test' {
   interface Matchers {
     not: Matchers;
     toBe(expected: unknown): void;
+    toContain(expected: unknown): void;
     toEqual(expected: unknown): void;
     toHaveLength(expected: number): void;
     toBeCloseTo(expected: number, precision?: number): void;

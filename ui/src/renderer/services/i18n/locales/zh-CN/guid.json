@@ -47,6 +47,7 @@
   },
   "advanced": {
     "applyNote": "将在会话创建后自动应用。",
+    "permissionMode": "权限模式",
     "applyFailed": "「{{feature}}」设置应用失败，可进入会话后重新开启",
     "draftOn": "已预设 · 创建后启用",
     "draftOff": "未预设",
@@ -86,5 +87,28 @@
     "assistantCount": "位助手",
     "skillCount": "个 Skill",
     "assistantHint": "点卡片「召唤」即让本次会话使用该助手（单选）"
+  },
+  "projectHome": {
+    "hero": "我们应该在 {{project}} 中做什么？",
+    "assignPlaceholder": "给这个项目派活…",
+    "suggest": {
+      "explore": "探索并理解代码",
+      "build": "构建新功能、应用或工具",
+      "review": "审查代码并提出修改建议",
+      "fix": "修复问题和失败",
+      "write": "写一个需求",
+      "ask": "问一个问题",
+      "task": "创建一个任务",
+      "chat": "自由聊聊"
+    }
+  },
+  "onboardingProject": {
+    "title": "从第一个项目开始",
+    "subtitle": "项目是工作的基本单元：里面装着任务、成员（AI + 人）、资源和规则。",
+    "create": "新建项目",
+    "open": "打开已有项目",
+    "openHint": "「打开」= 把已有的目录/资料挂载为一个项目",
+    "createSuccess": "项目已创建",
+    "createFailed": "项目创建失败"
   }
 }

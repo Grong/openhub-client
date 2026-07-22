@@ -23,6 +23,9 @@ export interface SessionDisplaySettingsPopoverProps {
   preferences: SidebarDisplayPreferences;
   onPresetChange: (preset: PresetOption) => void;
   onPreferenceChange: (patch: Partial<Omit<SidebarDisplayPreferences, 'preset'>>) => void;
+  /** 批量选择模式（低频管理操作，收进设置面板而非占用主按钮位） */
+  batchMode?: boolean;
+  onToggleBatchMode?: () => void;
 }
 
 const PRESET_OPTIONS: PresetOption[] = ['compact', 'balanced', 'detailed'];
@@ -32,6 +35,8 @@ const SessionDisplaySettingsPopover: React.FC<SessionDisplaySettingsPopoverProps
   preferences,
   onPresetChange,
   onPreferenceChange,
+  batchMode,
+  onToggleBatchMode,
 }) => {
   const { t } = useTranslation();
 
@@ -98,6 +103,16 @@ const SessionDisplaySettingsPopover: React.FC<SessionDisplaySettingsPopoverProps
             </button>
           ))}
         </div>
+      </div>
+
+      <div className='flex items-center justify-between gap-12px'>
+        <span className='text-13px text-t-secondary'>{t('sessionList.batchSelect')}</span>
+        <Switch
+          size='small'
+          checked={batchMode ?? false}
+          onChange={() => onToggleBatchMode?.()}
+          data-testid='session-batch-mode-switch'
+        />
       </div>
 
       <div className='flex items-center justify-between gap-12px'>

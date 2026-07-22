@@ -92,7 +92,8 @@
     "videoAction": "观看视频",
     "feedbackTitle": "反馈与社区",
     "feedbackDescription": "遇到问题、想提建议或参与共建，可以通过官网联系页反馈。",
-    "feedbackAction": "联系我们"
+    "feedbackAction": "联系我们",
+    "dismiss": "收起引导卡片"
   },
   "companionPoster": {
     "eyebrow": "桌面伙伴",
