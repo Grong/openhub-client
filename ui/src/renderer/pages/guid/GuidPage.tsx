@@ -46,7 +46,8 @@ import { useGuidModelSelection } from './hooks/useGuidModelSelection';
 import { useGuidSend } from './hooks/useGuidSend';
 import { usePendingConversation } from '@/renderer/pages/conversation/components/ConversationShell/PendingConversationContext';
 import { useTypewriterPlaceholder } from './hooks/useTypewriterPlaceholder';
-import { writeLastProjectId } from './utils/landingTarget';
+import { readLastProjectId, resolveLandingTarget, writeLastProjectId } from './utils/landingTarget';
+import { getProjectWorkpaths } from '@/renderer/pages/conversation/SessionList/utils/projectWorkpaths';
 import { detectGitRepo, getSuggestionCards } from './utils/suggestionCards';
 import { ensureBackendMcpCatalog } from '@/renderer/hooks/mcp/catalog';
 import { resolveAgentLogo } from '@/renderer/utils/model/agentLogo';
@@ -294,6 +295,23 @@ const GuidPage: React.FC = () => {
     const workspace = (location.state as { workspace?: string } | null)?.workspace;
     if (workspace) writeLastProjectId(workspace);
   }, [location.state]);
+
+  // 默认落点规则：直接进 /guid（无 workspace）时，有项目跳最近项目，无项目跳 /welcome。
+  // 仅在挂载时判定一次，避免同路由 state 变化重复跳转。
+  useEffect(() => {
+    const workspace = (location.state as { workspace?: string } | null)?.workspace;
+    if (workspace) return;
+    const target = resolveLandingTarget(
+      readLastProjectId(),
+      getProjectWorkpaths().map((id) => ({ id }))
+    );
+    if (target.kind === 'onboarding') {
+      navigate('/welcome', { replace: true });
+    } else {
+      navigate('/guid', { state: { workspace: target.projectId }, replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // --- Coordinated handlers (depend on multiple hooks) ---
   const handleInputChange = useCallback(

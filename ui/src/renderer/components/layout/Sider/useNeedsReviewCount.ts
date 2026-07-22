@@ -30,6 +30,7 @@ export function useNeedsReviewCount(): { count: number } {
     const unsubs = [
       ipcBridge.requirements.onCreated.on(() => void refresh()),
       ipcBridge.requirements.onStatusChanged.on(() => void refresh()),
+      ipcBridge.requirements.onUpdated.on(() => void refresh()),
       ipcBridge.requirements.onDeleted.on(() => void refresh()),
     ];
     return () => unsubs.forEach((u) => u());

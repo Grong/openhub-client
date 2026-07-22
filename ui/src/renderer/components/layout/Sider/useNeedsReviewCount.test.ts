@@ -9,6 +9,7 @@ const source = readFileSync(join(here, 'useNeedsReviewCount.ts'), 'utf8');
 describe('useNeedsReviewCount', () => {
   test('subscribes to requirement change events for live badge', () => {
     expect(source).toContain('onStatusChanged');
+    expect(source).toContain('onUpdated');
     expect(source).toContain('onCreated');
     expect(source).toContain('onDeleted');
   });

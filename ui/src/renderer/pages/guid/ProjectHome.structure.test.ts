@@ -16,4 +16,7 @@ describe('guid → project home (spec §3)', () => {
   test('records last project on entry', () => {
     expect(pageSource).toContain('writeLastProjectId');
   });
+  test('resolves landing target when no workspace given', () => {
+    expect(pageSource).toContain('resolveLandingTarget');
+  });
 });

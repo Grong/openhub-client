@@ -362,6 +362,7 @@
 .guidSuggestCard {
   min-width: 0;
   padding: 10px 12px;
+  border: none;
   border-radius: var(--radius-sm);
   background: var(--el-surface);
   color: var(--color-text-2);

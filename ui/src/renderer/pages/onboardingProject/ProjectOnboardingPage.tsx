@@ -50,7 +50,7 @@ const ProjectOnboardingPage: React.FC = () => {
           type='button'
           data-testid='onboarding-create-project'
           onClick={() => void mountProject()}
-          className='flex items-center gap-8px px-18px py-10px rd-[var(--radius-md)] bg-[rgb(var(--primary-6))] text-white text-14px cursor-pointer'
+          className='flex items-center gap-8px px-18px py-10px rd-[var(--radius-md)] bg-[rgb(var(--primary-6))] text-white text-14px cursor-pointer b-none'
         >
           <FolderPlus theme='outline' size='16' fill='currentColor' />
           {t('guid.onboardingProject.create')}
@@ -59,7 +59,7 @@ const ProjectOnboardingPage: React.FC = () => {
           type='button'
           data-testid='onboarding-open-project'
           onClick={() => void mountProject()}
-          className='flex items-center gap-8px px-18px py-10px rd-[var(--radius-md)] bg-[var(--el-elevated)] text-t-primary text-14px cursor-pointer'
+          className='flex items-center gap-8px px-18px py-10px rd-[var(--radius-md)] bg-[var(--el-elevated)] text-t-primary text-14px cursor-pointer b-none'
         >
           <FolderOpen theme='outline' size='16' fill='currentColor' />
           {t('guid.onboardingProject.open')}

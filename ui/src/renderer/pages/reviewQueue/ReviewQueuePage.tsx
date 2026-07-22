@@ -65,7 +65,7 @@ const ReviewQueuePage: React.FC = () => {
               data-testid='review-queue-batch-approve'
               disabled={loading}
               onClick={() => void handleApproveAll()}
-              className='flex items-center gap-6px px-14px py-8px rd-[var(--radius-md)] bg-[rgb(var(--primary-6))] text-white text-13px cursor-pointer disabled:opacity-60'
+              className='flex items-center gap-6px px-14px py-8px rd-[var(--radius-md)] bg-[rgb(var(--primary-6))] text-white text-13px cursor-pointer disabled:opacity-60 b-none'
             >
               {t('requirements.reviewQueue.batchApprove')}
               <Down theme='outline' size='14' fill='currentColor' />
@@ -81,7 +81,7 @@ const ReviewQueuePage: React.FC = () => {
             <button
               type='button'
               onClick={() => void navigate('/guid')}
-              className='px-16px py-9px rd-[var(--radius-md)] bg-[var(--el-elevated)] text-t-primary text-13px cursor-pointer'
+              className='px-16px py-9px rd-[var(--radius-md)] bg-[var(--el-elevated)] text-t-primary text-13px cursor-pointer b-none'
             >
               {t('requirements.reviewQueue.emptyAction')}
             </button>
@@ -110,7 +110,7 @@ const ReviewQueuePage: React.FC = () => {
                       type='button'
                       data-testid='review-queue-approve'
                       onClick={() => void handleApprove(item.id)}
-                      className='shrink-0 px-12px py-6px rd-[var(--radius-md)] bg-[rgb(var(--primary-6))] text-white text-12px cursor-pointer'
+                      className='shrink-0 px-12px py-6px rd-[var(--radius-md)] bg-[rgb(var(--primary-6))] text-white text-12px cursor-pointer b-none'
                     >
                       {t('requirements.reviewQueue.approve')}
                     </button>
@@ -118,7 +118,7 @@ const ReviewQueuePage: React.FC = () => {
                       type='button'
                       data-testid='review-queue-reject'
                       onClick={() => void handleReject(item.id)}
-                      className='shrink-0 px-12px py-6px rd-[var(--radius-md)] bg-[var(--el-elevated)] text-t-primary text-12px cursor-pointer'
+                      className='shrink-0 px-12px py-6px rd-[var(--radius-md)] bg-[var(--el-elevated)] text-t-primary text-12px cursor-pointer b-none'
                     >
                       {t('requirements.reviewQueue.reject')}
                     </button>

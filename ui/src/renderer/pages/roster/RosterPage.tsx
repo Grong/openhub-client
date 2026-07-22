@@ -84,7 +84,7 @@ const RosterPage: React.FC = () => {
             <button
               type='button'
               onClick={() => void navigate('/models')}
-              className='px-16px py-9px rd-[var(--radius-md)] bg-[rgb(var(--primary-6))] text-white text-13px cursor-pointer'
+              className='px-16px py-9px rd-[var(--radius-md)] bg-[rgb(var(--primary-6))] text-white text-13px cursor-pointer b-none'
             >
               {t('common.roster.emptyAction')}
             </button>
