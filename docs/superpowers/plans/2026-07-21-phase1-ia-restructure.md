@@ -1270,3 +1270,9 @@ git commit -m "docs: create DESIGN.md from spec section 4 and 11"
 - Spec 覆盖：§3 IA（T4/T5/T6/T7/T8）、§4 风格（T1）、§11.1-11.5（T1/T7/落点 T2/引导 T3）、默认落点（T2/T6）、移动端冻结（Global Constraints 注明一期不做）、一次性 redirect 例外（T4）。一期 NOT in scope（项目四块/状态机/迁移/认证）明确排除。
 - 占位扫描：无 TBD/TODO；每步含实际代码或精确改动点。
 - 类型一致性：`resolveLandingTarget`/`writeLastProjectId`（T2 定义，T3/T6 消费）✓；`getSuggestionCards`/`detectGitRepo`（T6）✓；`useReviewQueue` 返回 `{ groups, total, loading, error, approve, reject, approveAll }`（T7）✓；`useNeedsReviewCount`（T5）✓。
+
+## 终审修订（2026-07-21，whole-branch review）
+
+终审（Ready to merge: With fixes）后修复：badge 补 `onUpdated` 订阅；落点规则接入 GuidPage 挂载；新页面按钮补 `border: none`。
+
+**产品决策（用户拍板）**：一期**不带会话浏览**——侧边栏会话列表移除后，历史会话一期只能通过深链或项目进入，UI 不提供浏览/搜索。二期做任务模型时，会话作为任务执行现场重新挂回（含浏览与搜索）。此为有意的计划缺口，非缺陷。
